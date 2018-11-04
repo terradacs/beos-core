@@ -45,6 +45,10 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/consensus-validation-malicious-produc
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/validate-dirty-db.py ${CMAKE_CURRENT_BINARY_DIR}/validate-dirty-db.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/launcher_test.py ${CMAKE_CURRENT_BINARY_DIR}/launcher_test.py COPYONLY)
 
+# copy beos test dirs to binary dir
+execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/beos_plugin_tests ${CMAKE_CURRENT_BINARY_DIR}/beos_plugin_tests)
+execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/beos_transfer_tests ${CMAKE_CURRENT_BINARY_DIR}/beos_transfer_tests)
+
 #To run plugin_test with all log from blockchain displayed, put --verbose after --, i.e. plugin_test -- --verbose
 add_test(NAME plugin_test COMMAND plugin_test --report_level=detailed --color_output)
 

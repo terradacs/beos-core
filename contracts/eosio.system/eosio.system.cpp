@@ -134,6 +134,28 @@ namespace eosiosystem {
       }
    }
 
+  void system_contract::reward( account_name receiver, int64_t ram_bytes, asset net_weight, asset cpu_weight )
+  {
+    user_resources_table  userres( _self, receiver );
+
+    auto res_itr = userres.find( receiver );
+
+    if( res_itr ==  userres.end() ) {
+        res_itr = userres.emplace( receiver, [&]( auto& res ) {
+              res.owner = receiver;
+              res.ram_bytes = ram_bytes;
+              res.net_weight = net_weight;
+              res.cpu_weight = cpu_weight;
+          });
+    } else {
+        userres.modify( res_itr, receiver, [&]( auto& res ) {
+              res.ram_bytes += ram_bytes;
+              res.net_weight += net_weight;
+              res.cpu_weight += cpu_weight;
+          });
+    }
+  }
+
    /**
     *  Called after a new account is created. This code enforces resource-limits rules
     *  for new accounts as well as new account naming conventions.
@@ -186,7 +208,7 @@ namespace eosiosystem {
 
 EOSIO_ABI( eosiosystem::system_contract,
      // native.hpp (newaccount definition is actually in eosio.system.cpp)
-     (newaccount)(updateauth)(deleteauth)(linkauth)(unlinkauth)(canceldelay)(onerror)
+     (initram)(delegateram)(reward)(newaccount)(updateauth)(deleteauth)(linkauth)(unlinkauth)(canceldelay)(onerror)
      // eosio.system.cpp
      (setram)(setparams)(setpriv)(rmvproducer)(bidname)
      // delegate_bandwidth.cpp

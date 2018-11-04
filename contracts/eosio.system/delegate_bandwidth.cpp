@@ -152,6 +152,63 @@ namespace eosiosystem {
       set_resource_limits( res_itr->owner, res_itr->ram_bytes, res_itr->net_weight.amount, res_itr->cpu_weight.amount );
    }
 
+  void system_contract::initram( account_name receiver, int64_t bytes )
+  {
+    require_auth( _self );
+
+    //Delegate RAM from payer to receiver
+    user_resources_table userres( _self, receiver );
+
+    auto res_itr = userres.find( receiver );
+
+    if( res_itr ==  userres.end() ) {
+        res_itr = userres.emplace( receiver, [&]( auto& res ) {
+              res.owner = receiver;
+              res.ram_bytes = bytes;
+          });
+    } else {
+        userres.modify( res_itr, receiver, [&]( auto& res ) {
+              res.ram_bytes += bytes;
+          });
+    }
+
+    set_resource_limits( res_itr->owner, res_itr->ram_bytes, res_itr->net_weight.amount, res_itr->cpu_weight.amount );
+  }
+
+  void system_contract::delegateram( account_name payer, account_name receiver, int64_t bytes )
+  {
+    require_auth( payer );
+
+    //Check amount of RAM for payer
+    user_resources_table userres_payer( _self, payer );
+    auto res_itr = userres_payer.find( payer );
+    eosio_assert( res_itr != userres_payer.end(), "payer must exist" );
+
+    eosio_assert( res_itr->ram_bytes >= bytes, "not enough RAM" );
+
+    //Decrease amount of RAM for payer
+    userres_payer.modify( res_itr, payer, [&]( auto& res ) {
+          res.ram_bytes -= bytes;
+      });
+
+    //Delegate RAM from payer to receiver
+    user_resources_table  userres( _self, receiver );
+
+    res_itr = userres.find( receiver );
+
+    if( res_itr ==  userres.end() ) {
+        res_itr = userres.emplace( receiver, [&]( auto& res ) {
+              res.owner = receiver;
+              res.ram_bytes = bytes;
+          });
+    } else {
+        userres.modify( res_itr, receiver, [&]( auto& res ) {
+              res.ram_bytes += bytes;
+          });
+    }
+
+    set_resource_limits( res_itr->owner, res_itr->ram_bytes, res_itr->net_weight.amount, res_itr->cpu_weight.amount );
+  }
 
    /**
     *  The system contract now buys and sells RAM allocations at prevailing market prices.

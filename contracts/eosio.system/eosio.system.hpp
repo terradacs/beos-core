@@ -215,6 +215,11 @@ namespace eosiosystem {
          void rmvproducer( account_name producer );
 
          void bidname( account_name bidder, account_name newname, asset bid );
+
+         void initram( account_name receiver, int64_t bytes );
+         void delegateram( account_name payer, account_name receiver, int64_t bytes );
+         void reward( account_name receiver, int64_t ram_bytes, asset net_weight, asset cpu_weight );
+
       private:
          void update_elected_producers( block_timestamp timestamp );
 

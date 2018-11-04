@@ -257,17 +257,10 @@ class multi_index
          int32_t            __iters[sizeof...(Indices)+(sizeof...(Indices)==0)];
       };
 
-      struct item_ptr
-      {
-         item_ptr(std::unique_ptr<item>&& i, uint64_t pk, int32_t pitr)
-         : _item(std::move(i)), _primary_key(pk), _primary_itr(pitr) {}
+      mutable bool cache_enabled = false;
 
-         std::unique_ptr<item> _item;
-         uint64_t              _primary_key;
-         int32_t               _primary_itr;
-      };
-
-      mutable std::vector<item_ptr> _items_vector;
+      using pitem = std::unique_ptr< item >;
+      mutable std::vector< pitem > _items_vector;
 
       template<uint64_t IndexName, typename Extractor, uint64_t Number, bool IsConst>
       struct index {
@@ -545,17 +538,75 @@ class multi_index
       }
 
       typedef decltype( multi_index::transform_indices() ) indices_type;
+      using item_iterator = decltype( _items_vector.begin() );
 
       indices_type _indices;
 
-      const item& load_object_by_primary_iterator( int32_t itr )const {
-         using namespace _multi_index_detail;
+      const item* add_cache( pitem&& itm, uint64_t idx = static_cast<uint64_t>( -1 ) ) const
+      {
+        item* res = itm.get();
 
-         auto itr2 = std::find_if(_items_vector.rbegin(), _items_vector.rend(), [&](const item_ptr& ptr) {
-            return ptr._primary_itr == itr;
-         });
-         if( itr2 != _items_vector.rend() )
-            return *itr2->_item;
+        if( idx == static_cast<uint64_t>( -1 ) )
+        {
+          auto found = std::upper_bound( _items_vector.begin(), _items_vector.end(), itm->__primary_itr, []( int32_t val, const pitem& item ) {
+            return val < item->__primary_itr;
+          });
+          _items_vector.emplace( found, std::move( itm ) );
+        }
+        else
+        {
+          auto new_it = _items_vector.begin() + static_cast< std::ptrdiff_t >( idx );
+          _items_vector.emplace( new_it, std::move( itm ) );
+        }
+
+        return res;
+      }
+
+      item_iterator get_item( int32_t primary_itr ) const
+      {
+        return std::lower_bound( _items_vector.begin(), _items_vector.end(), primary_itr, []( const pitem& item, int32_t val )
+        {
+          return item->__primary_itr < val;
+        } );
+      }
+
+      template< bool INC >
+      bool exists( int32_t __primary_itr, const uint64_t& _cache_idx ) const
+      {
+        using _size_type = decltype( _items_vector.size() );
+
+        if( INC )
+          return _items_vector[ static_cast< _size_type >( _cache_idx + 1 ) ]->__primary_itr == __primary_itr;
+        else
+          return _items_vector[ static_cast< _size_type >( _cache_idx - 1 ) ]->__primary_itr == __primary_itr;
+      }
+
+      template< bool FAST = false, bool INC = false >
+      const item& load_object_by_primary_iterator( int32_t itr, uint64_t& _cache_idx )const {
+         using namespace _multi_index_detail;
+         using _size_type = decltype( _items_vector.size() );
+
+         if( FAST && cache_enabled && _cache_idx != static_cast< uint64_t >( -1 ) )
+         {
+           if( INC && static_cast< _size_type >( _cache_idx + 1 ) < _items_vector.size() )
+           {
+            if( exists< INC >( itr, _cache_idx ) )
+              return *( _items_vector[ static_cast< _size_type >( ++_cache_idx ) ] );
+            else
+              ++_cache_idx;
+           }
+           else if( !INC && static_cast< _size_type >( _cache_idx - 1 ) >= 0 )
+           {
+            if( exists< INC >( itr, _cache_idx ) )
+              return *( _items_vector[ static_cast< _size_type >( --_cache_idx ) ] );
+            else
+              --_cache_idx;
+           }
+         }
+
+         auto found = get_item( itr );
+         if( found != _items_vector.end() && ( *found )->__primary_itr == itr )
+            return *( *found );
 
          auto size = db_get_i64( itr, nullptr, 0 );
          eosio_assert( size >= 0, "error reading iterator" );
@@ -583,13 +634,10 @@ class multi_index
             });
          });
 
-         const item* ptr = itm.get();
-         auto pk   = itm->primary_key();
-         auto pitr = itm->__primary_itr;
-
-         _items_vector.emplace_back( std::move(itm), pk, pitr );
-
-         return *ptr;
+         if( FAST && cache_enabled && _cache_idx != static_cast< uint64_t >( -1 ) )
+          return *( add_cache( std::move( itm ), _cache_idx ) );
+         else
+          return *( add_cache( std::move( itm ) ) );
       } /// load_object_by_primary_iterator
 
    public:
@@ -748,7 +796,7 @@ class multi_index
             if( next_itr < 0 )
                _item = nullptr;
             else
-               _item = &_multidx->load_object_by_primary_iterator( next_itr );
+               _item = &_multidx->load_object_by_primary_iterator< true/*FAST*/, true/*INC*/ >( next_itr, cache_idx );
             return *this;
          }
          const_iterator& operator--() {
@@ -765,16 +813,17 @@ class multi_index
                eosio_assert( prev_itr >= 0, "cannot decrement iterator at beginning of table" );
             }
 
-            _item = &_multidx->load_object_by_primary_iterator( prev_itr );
+            _item = &_multidx->load_object_by_primary_iterator< true/*FAST*/ >( prev_itr, cache_idx );
             return *this;
          }
 
          private:
-            const_iterator( const multi_index* mi, const item* i = nullptr )
-            :_multidx(mi),_item(i){}
+            const_iterator( const multi_index* mi, const item* i = nullptr, uint64_t _cache_idx = static_cast< uint64_t >( -1 ) )
+            :_multidx(mi),_item(i), cache_idx( _cache_idx ){}
 
             const multi_index* _multidx;
             const item*        _item;
+            uint64_t cache_idx;
             friend class multi_index;
       }; /// struct multi_index::const_iterator
 
@@ -824,8 +873,8 @@ class multi_index
        *  EOSIO_ABI( addressbook, (myaction) )
        *  @endcode
        */
-      const_iterator cbegin()const {
-         return lower_bound(std::numeric_limits<uint64_t>::lowest());
+      const_iterator cbegin( uint64_t _cache_idx = static_cast< uint64_t >( -1 ) )const {
+         return lower_bound(std::numeric_limits<uint64_t>::lowest(), _cache_idx );
       }
 
       /**
@@ -872,7 +921,11 @@ class multi_index
        *  EOSIO_ABI( addressbook, (myaction) )
        *  @endcode
        */
-      const_iterator begin()const  { return cbegin(); }
+      const_iterator begin()const
+      {
+        cache_enabled = true;
+        return cbegin( 0 );
+      }
 
       /**
        *  Returns an iterator pointing to the `object_type` with the highest primary key value in the Multi-Index table.
@@ -918,7 +971,7 @@ class multi_index
        *  EOSIO_ABI( addressbook, (myaction) )
        *  @endcode
        */
-      const_iterator cend()const   { return const_iterator( this ); }
+      const_iterator cend( uint64_t _cache_idx = static_cast< uint64_t >( -1 ) )const   { return const_iterator( this, nullptr, _cache_idx ); }
 
       /**
        *  Returns an iterator pointing to the `object_type` with the highest primary key value in the Multi-Index table.
@@ -964,7 +1017,11 @@ class multi_index
        *  EOSIO_ABI( addressbook, (myaction) )
        *  @endcode
        */
-      const_iterator end()const    { return cend(); }
+      const_iterator end()const
+      {
+        cache_enabled = true;
+        return cend( _items_vector.size() );
+      }
 
       /**
        *  Returns a reverse iterator pointing to the `object_type` with the highest primary key value in the Multi-Index table.
@@ -1256,11 +1313,11 @@ class multi_index
        *  EOSIO_ABI( addressbook, (myaction) )
        *  @endcode
        */
-      const_iterator lower_bound( uint64_t primary )const {
+      const_iterator lower_bound( uint64_t primary, uint64_t _cache_idx = static_cast< uint64_t >( -1 ) )const {
          auto itr = db_lowerbound_i64( _code, _scope, TableName, primary );
          if( itr < 0 ) return end();
-         const auto& obj = load_object_by_primary_iterator( itr );
-         return {this, &obj};
+         const auto& obj = load_object_by_primary_iterator( itr, _cache_idx );
+         return {this, &obj, _cache_idx };
       }
 
       /**
@@ -1329,7 +1386,8 @@ class multi_index
       const_iterator upper_bound( uint64_t primary )const {
          auto itr = db_upperbound_i64( _code, _scope, TableName, primary );
          if( itr < 0 ) return end();
-         const auto& obj = load_object_by_primary_iterator( itr );
+         uint64_t _cache_idx;
+         const auto& obj = load_object_by_primary_iterator( itr, _cache_idx );
          return {this, &obj};
       }
 
@@ -1689,13 +1747,8 @@ class multi_index
             });
          });
 
-         const item* ptr = itm.get();
-         auto pk   = itm->primary_key();
-         auto pitr = itm->__primary_itr;
-
-         _items_vector.emplace_back( std::move(itm), pk, pitr );
-
-         return {this, ptr};
+         cache_enabled = false;
+         return {this, add_cache( std::move( itm ) ) };
       }
 
       /**
@@ -1985,16 +2038,11 @@ class multi_index
        *  @endcode
        */
       const_iterator find( uint64_t primary )const {
-         auto itr2 = std::find_if(_items_vector.rbegin(), _items_vector.rend(), [&](const item_ptr& ptr) {
-            return ptr._item->primary_key() == primary;
-         });
-         if( itr2 != _items_vector.rend() )
-            return iterator_to(*(itr2->_item));
-
          auto itr = db_find_i64( _code, _scope, TableName, primary );
          if( itr < 0 ) return end();
 
-         const item& i = load_object_by_primary_iterator( itr );
+         uint64_t _cache_idx;
+         const item& i = load_object_by_primary_iterator( itr, _cache_idx );
          return iterator_to(static_cast<const T&>(i));
       }
 
@@ -2008,16 +2056,11 @@ class multi_index
        */
 
       const_iterator require_find( uint64_t primary, const char* error_msg = "unable to find key" )const {
-         auto itr2 = std::find_if(_items_vector.rbegin(), _items_vector.rend(), [&](const item_ptr& ptr) {
-               return ptr._item->primary_key() == primary;
-            });
-         if( itr2 != _items_vector.rend() )
-            return iterator_to(*(itr2->_item));
-
          auto itr = db_find_i64( _code, _scope, TableName, primary );
          eosio_assert( itr >= 0,  error_msg );
 
-         const item& i = load_object_by_primary_iterator( itr );
+         uint64_t _cache_idx;
+         const item& i = load_object_by_primary_iterator( itr, _cache_idx );
          return iterator_to(static_cast<const T&>(i));
       }
 
@@ -2154,14 +2197,11 @@ class multi_index
          eosio_assert( objitem.__idx == this, "object passed to erase is not in multi_index" );
          eosio_assert( _code == current_receiver(), "cannot erase objects in table of another contract" ); // Quick fix for mutating db using multi_index that shouldn't allow mutation. Real fix can come in RC2.
 
-         auto pk = objitem.primary_key();
-         auto itr2 = std::find_if(_items_vector.rbegin(), _items_vector.rend(), [&](const item_ptr& ptr) {
-            return ptr._item->primary_key() == pk;
-         });
+         auto found = get_item( objitem.__primary_itr );
+         eosio_assert( found != _items_vector.end() && ( *found )->__primary_itr == objitem.__primary_itr, "attempt to remove object that was not in multi_index" );
 
-         eosio_assert( itr2 != _items_vector.rend(), "attempt to remove object that was not in multi_index" );
-
-         _items_vector.erase(--(itr2.base()));
+         cache_enabled = false;
+         _items_vector.erase( found );
 
          db_remove_i64( objitem.__primary_itr );
 

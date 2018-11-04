@@ -12,6 +12,13 @@
 #include <eosio.msig/eosio.msig.wast.hpp>
 #include <eosio.msig/eosio.msig.abi.hpp>
 
+#include <eosio.init/eosio.init.wast.hpp>
+#include <eosio.init/eosio.init.abi.hpp>
+#include <eosio.gateway/eosio.gateway.wast.hpp>
+#include <eosio.gateway/eosio.gateway.abi.hpp>
+#include <eosio.distribution/eosio.distribution.wast.hpp>
+#include <eosio.distribution/eosio.distribution.abi.hpp>
+
 #include <Runtime/Runtime.h>
 
 #include <fc/variant_object.hpp>
@@ -182,7 +189,7 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
     try {
 
         // Create eosio.msig and eosio.token
-        create_accounts({N(eosio.msig), N(eosio.token), N(eosio.ram), N(eosio.ramfee), N(eosio.stake), N(eosio.vpay), N(eosio.bpay), N(eosio.saving) });
+        create_accounts({N(eosio.msig), N(eosio.token), N(eosio.ram), N(eosio.ramfee), N(eosio.stake), N(eosio.vpay), N(eosio.bpay), N(eosio.saving), N(beos.init) });
 
         // Set code for the following accounts:
         //  - eosio (code: eosio.bios) (already set by tester constructor)
@@ -219,6 +226,8 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
 
         // Set eosio.system to eosio
         set_code_abi(config::system_account_name, eosio_system_wast, eosio_system_abi);
+
+        initial_settings(eosio_init_wast, eosio_init_abi, eosio_gateway_wast, eosio_gateway_abi, eosio_distribution_wast, eosio_distribution_abi);
 
         // Buy ram and stake cpu and net for each genesis accounts
         for( const auto& a : test_genesis ) {

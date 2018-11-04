@@ -19,6 +19,8 @@ struct genesis_state {
    genesis_state();
 
    static const string eosio_root_key;
+   static const string gateway_root_key;
+   static const string distribution_root_key;
 
    chain_config   initial_configuration = {
       .max_block_net_usage                  = config::default_max_block_net_usage,
@@ -44,6 +46,8 @@ struct genesis_state {
 
    time_point                               initial_timestamp;
    public_key_type                          initial_key;
+   public_key_type                          initial_key_gateway;
+   public_key_type                          initial_key_distribution;
 
    /**
     * Get the chain_id corresponding to this genesis state.
@@ -57,4 +61,4 @@ struct genesis_state {
 
 
 FC_REFLECT(eosio::chain::genesis_state,
-           (initial_timestamp)(initial_key)(initial_configuration))
+           (initial_timestamp)(initial_key)(initial_key_gateway)(initial_key_distribution)(initial_configuration))

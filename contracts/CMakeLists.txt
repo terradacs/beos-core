@@ -34,6 +34,10 @@ add_subdirectory(noop)
 add_subdirectory(tic_tac_toe)
 add_subdirectory(payloadless)
 add_subdirectory(integration_test)
+add_subdirectory(beoslib)
+add_subdirectory(eosio.init)
+add_subdirectory(eosio.gateway)
+add_subdirectory(eosio.distribution)
 
 
 file(GLOB SKELETONS RELATIVE ${CMAKE_SOURCE_DIR}/contracts "skeleton/*")

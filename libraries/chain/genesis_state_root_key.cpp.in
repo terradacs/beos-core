@@ -8,5 +8,7 @@
 namespace eosio { namespace chain {
 
 const string genesis_state::eosio_root_key = "${EOSIO_ROOT_KEY}";
+const string genesis_state::gateway_root_key = "${GATEWAY_ROOT_KEY}";
+const string genesis_state::distribution_root_key = "${DISTRIBUTION_ROOT_KEY}";
 
 } } // namespace eosio::chain

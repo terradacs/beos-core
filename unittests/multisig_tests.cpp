@@ -14,6 +14,15 @@
 #include <eosio.token/eosio.token.wast.hpp>
 #include <eosio.token/eosio.token.abi.hpp>
 
+#include <eosio.init/eosio.init.wast.hpp>
+#include <eosio.init/eosio.init.abi.hpp>
+
+#include <eosio.gateway/eosio.gateway.wast.hpp>
+#include <eosio.gateway/eosio.gateway.abi.hpp>
+
+#include <eosio.distribution/eosio.distribution.wast.hpp>
+#include <eosio.distribution/eosio.distribution.abi.hpp>
+
 #include <Runtime/Runtime.h>
 
 #include <fc/variant_object.hpp>
@@ -30,7 +39,7 @@ class eosio_msig_tester : public tester {
 public:
 
    eosio_msig_tester() {
-      create_accounts( { N(eosio.msig), N(eosio.stake), N(eosio.ram), N(eosio.ramfee), N(alice), N(bob), N(carol) } );
+      create_accounts( { N(eosio.msig), N(eosio.stake), N(eosio.ram), N(eosio.ramfee), N(beos.init), N(alice), N(bob), N(carol) } );
       produce_block();
 
       auto trace = base_tester::push_action(config::system_account_name, N(setpriv),
@@ -411,6 +420,8 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_all_approve, eosio_msig_tester )
    set_code( config::system_account_name, eosio_system_wast );
    set_abi( config::system_account_name, eosio_system_abi );
 
+   initial_settings(eosio_init_wast, eosio_init_abi, eosio_gateway_wast, eosio_gateway_abi, eosio_distribution_wast, eosio_distribution_abi);
+
    produce_blocks();
 
    create_account_with_resources( N(alice1111111), config::system_account_name, core_from_string("1.0000"), false );
@@ -521,6 +532,8 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_major_approve, eosio_msig_tester
 
    set_code( config::system_account_name, eosio_system_wast );
    set_abi( config::system_account_name, eosio_system_abi );
+
+   initial_settings( eosio_init_wast, eosio_init_abi, eosio_gateway_wast, eosio_gateway_abi, eosio_distribution_wast, eosio_distribution_abi );
 
    produce_blocks();
 

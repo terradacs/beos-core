@@ -167,6 +167,10 @@ namespace eosio { namespace testing {
          transaction_trace_ptr transfer( account_name from, account_name to, string amount, string memo, account_name currency );
          transaction_trace_ptr issue( account_name to, string amount, account_name currency );
 
+         void initial_settings( const char* const init_code, const char* const init_abi,
+                                const char* const gateway_code, const char* const gateway_abi,
+                                const char* const distribution_code, const char* const distribution_abi );
+
          template<typename ObjectType>
          const auto& get(const chainbase::oid< ObjectType >& key) {
             return control->db().get<ObjectType>(key);
@@ -511,4 +515,41 @@ namespace eosio { namespace testing {
      string expected;
   };
 
+  struct test_global_state_element
+     {
+     uint64_t starting_block_for_distribution;
+     uint64_t ending_block_for_distribution;
+     uint64_t distribution_payment_block_interval_for_distribution;
+     uint64_t amount_of_reward;
+
+     test_global_state_element(uint64_t s, uint64_t e, uint64_t d, uint64_t a)
+        : starting_block_for_distribution(s),
+        ending_block_for_distribution(e),
+        distribution_payment_block_interval_for_distribution(d),
+        amount_of_reward(a)
+        {}
+
+     };
+
+  struct test_global_state
+     {
+     asset proxy_asset;
+     uint64_t starting_block_for_initial_witness_election;
+     test_global_state_element beos;
+     test_global_state_element ram;
+     test_global_state_element trustee;
+
+     test_global_state()
+        : proxy_asset(0, symbol(SY(4, PROXY))),
+        starting_block_for_initial_witness_election(100),
+        beos(240, 270, 10, 8000000),
+        ram(240, 248, 4, 5000000),
+        trustee(240, 300, 15, 200000)
+        {}
+     };
+
 } } /// eosio::testing
+
+FC_REFLECT(eosio::testing::test_global_state_element, (starting_block_for_distribution)(ending_block_for_distribution)(distribution_payment_block_interval_for_distribution)(amount_of_reward))
+FC_REFLECT(eosio::testing::test_global_state, (proxy_asset)(starting_block_for_initial_witness_election)(beos)(ram)(trustee))
+

@@ -16,6 +16,15 @@
 #include <eosio.msig/eosio.msig.wast.hpp>
 #include <eosio.msig/eosio.msig.abi.hpp>
 
+#include <eosio.init/eosio.init.wast.hpp>
+#include <eosio.init/eosio.init.abi.hpp>
+
+#include <eosio.gateway/eosio.gateway.wast.hpp>
+#include <eosio.gateway/eosio.gateway.abi.hpp>
+
+#include <eosio.distribution/eosio.distribution.wast.hpp>
+#include <eosio.distribution/eosio.distribution.abi.hpp>
+
 #include <fc/variant_object.hpp>
 
 using namespace eosio::chain;
@@ -47,7 +56,7 @@ public:
       produce_blocks( 2 );
 
       create_accounts({ N(eosio.token), N(eosio.ram), N(eosio.ramfee), N(eosio.stake),
-               N(eosio.bpay), N(eosio.vpay), N(eosio.saving), N(eosio.names) });
+               N(eosio.bpay), N(eosio.vpay), N(eosio.saving), N(eosio.names), N(beos.init) });
 
 
       produce_blocks( 100 );
@@ -68,6 +77,8 @@ public:
 
       set_code( config::system_account_name, eosio_system_wast );
       set_abi( config::system_account_name, eosio_system_abi );
+
+      initial_settings(eosio_init_wast, eosio_init_abi, eosio_gateway_wast, eosio_gateway_abi, eosio_distribution_wast, eosio_distribution_abi);
 
       {
          const auto& accnt = control->db().get<account_object,by_name>( config::system_account_name );

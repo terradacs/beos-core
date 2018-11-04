@@ -215,7 +215,20 @@ endif()
 
 message( STATUS "Using '${EOSIO_ROOT_KEY}' as public key for 'eosio' account" )
 
+if ("${GATEWAY_ROOT_KEY}" STREQUAL "")
+   message(FATAL_ERROR "GATEWAY_ROOT_KEY must be specified")
+endif()
+
+message( STATUS "Using '${GATEWAY_ROOT_KEY}' as public key for 'beos.gateway' account" )
+
+if ("${DISTRIBUTION_ROOT_KEY}" STREQUAL "")
+   message(FATAL_ERROR "DISTRIBUTION_ROOT_KEY must be specified")
+endif()
+
+message( STATUS "Using '${DISTRIBUTION_ROOT_KEY}' as public key for 'beos.distrib' account" )
+
 include(wasm)
+
 add_subdirectory( libraries )
 add_subdirectory( contracts )
 add_subdirectory( plugins )

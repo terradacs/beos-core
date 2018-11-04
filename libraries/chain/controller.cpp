@@ -641,7 +641,13 @@ struct controller_impl {
       resource_limits.initialize_database();
 
       authority system_auth(conf.genesis.initial_key);
+      authority system_auth_gateway(conf.genesis.initial_key_gateway);
+      authority system_auth_distribution(conf.genesis.initial_key_distribution);
+      //Is necessary to add additional keys?
+
       create_native_account( config::system_account_name, system_auth, system_auth, true );
+      create_native_account(config::gateway_account_name, system_auth_gateway, system_auth_gateway, true);
+      create_native_account(config::distribution_account_name, system_auth_distribution, system_auth_distribution, true);
 
       auto empty_authority = authority(1, {}, {});
       auto active_producers_authority = authority(1, {}, {});
@@ -1546,8 +1552,17 @@ struct controller_impl {
       on_block_act.authorization = vector<permission_level>{{config::system_account_name, config::active_name}};
       on_block_act.data = fc::raw::pack(self.head_block_header());
 
+      action on_block_distribution_act;
+      on_block_distribution_act.account = config::distribution_account_name;
+      on_block_distribution_act.name = N(onblock);
+      on_block_distribution_act.authorization = vector<permission_level>{ { config::distribution_account_name, config::active_name } };
+      on_block_distribution_act.data = fc::raw::pack(self.head_block_header());
+
+
       signed_transaction trx;
       trx.actions.emplace_back(std::move(on_block_act));
+      trx.actions.emplace_back(std::move(on_block_distribution_act));
+
       trx.set_reference_block(self.head_block_id());
       trx.expiration = self.pending_block_time() + fc::microseconds(999'999); // Round up to nearest second to avoid appearing expired
       return trx;

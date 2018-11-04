@@ -571,6 +571,52 @@ namespace eosio { namespace testing {
       return push_transaction( trx );
    }
 
+   void base_tester::initial_settings(const char* const init_code, const char* const init_abi,
+      const char* const gateway_code, const char* const gateway_abi,
+      const char* const distribution_code, const char* const distribution_abi)
+      {
+      produce_block();
+      set_code(N(beos.init), init_code);
+
+      produce_block();
+      set_abi(N(beos.init), init_abi);
+
+      produce_block();
+      set_code(config::gateway_account_name, gateway_code);
+
+      produce_block();
+      set_abi(config::gateway_account_name, gateway_abi);
+
+      produce_block();
+      set_code(config::distribution_account_name, distribution_code);
+
+      produce_block();
+      set_abi(config::distribution_account_name, distribution_abi);
+
+      produce_block();
+
+      test_global_state tgs;
+
+      tgs.ram.starting_block_for_distribution = 1;
+      tgs.ram.ending_block_for_distribution = 2;
+      tgs.starting_block_for_initial_witness_election = 1;
+
+      produce_block();
+
+      variants v;
+      v.emplace_back(tgs.proxy_asset);
+      v.emplace_back(tgs.starting_block_for_initial_witness_election);
+      v.emplace_back(std::move(tgs.beos));
+      v.emplace_back(std::move(tgs.ram));
+      v.emplace_back(std::move(tgs.trustee));
+
+      push_action(config::distribution_account_name, N(changeparams),
+         config::distribution_account_name, mutable_variant_object()
+         ("new_params", v)
+      );
+
+      produce_block();
+      }
 
    void base_tester::link_authority( account_name account, account_name code, permission_name req, action_name type ) {
       signed_transaction trx;

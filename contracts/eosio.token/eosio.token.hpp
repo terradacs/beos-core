@@ -36,6 +36,8 @@ namespace eosio {
          
          inline asset get_balance( account_name owner, symbol_name sym )const;
 
+         inline asset check_balance( account_name owner, symbol_name sym )const;
+
       private:
          struct account {
             asset    balance;
@@ -79,5 +81,16 @@ namespace eosio {
       const auto& ac = accountstable.get( sym );
       return ac.balance;
    }
+
+  asset token::check_balance( account_name owner, symbol_name sym )const
+  {
+    accounts accountstable( _self, owner );
+    auto found = accountstable.find( sym );
+
+    if( found == accountstable.end() )
+      return asset( 0, sym );
+    else
+      return found->balance;
+  }
 
 } /// namespace eosio
