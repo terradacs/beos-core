@@ -105,16 +105,23 @@ def show_nodeos_postconf(node_index, name, public_key, use_https = False):
     parameters = parameters + https_opts + plugins
     logger.info("Configuration complete, you can now run nodeos with command (consider running in screen): {0}".format(" ".join(parameters)))
 
-def run_keosd(ip_address, port, wallet_dir, use_https = False):
+def run_keosd(ip_address, port, wallet_dir, use_https = False, forceWalletCleanup = False):
     logger.info("*** Running KLEOSD at {0}:{1} in {2}".format(ip_address, port, wallet_dir))
     from sys import exit
+    from shutil import rmtree
     if os.path.exists(config.DEFAULT_WALLET_DIR):
-        logger.error("{0} exists. Please delete it manually and try again.".format(config.DEFAULT_WALLET_DIR))
-        exit(1)
+        if forceWalletCleanup:
+            rmtree(config.DEFAULT_WALLET_DIR)
+        else:
+            logger.error("{0} exists. Please delete it manually and try again.".format(config.DEFAULT_WALLET_DIR))
+            exit(1)
     
     if os.path.exists(config.WALLET_PASSWORD_DIR):
-        logger.error("{0} exists. Please delete it manually and try again.".format(config.WALLET_PASSWORD_DIR))
-        exit(1)
+        if forceWalletCleanup:
+            rmtree(config.WALLET_PASSWORD_DIR)
+        else:
+            logger.error("{0} exists. Please delete it manually and try again.".format(config.WALLET_PASSWORD_DIR))
+            exit(1)
     
     os.makedirs(config.DEFAULT_WALLET_DIR)
     os.makedirs(config.WALLET_PASSWORD_DIR)
