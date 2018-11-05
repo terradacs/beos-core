@@ -216,7 +216,7 @@ namespace eosiosystem {
 
          void bidname( account_name bidder, account_name newname, asset bid );
 
-         void initram( account_name receiver, int64_t bytes );
+         void initresource( account_name receiver, int64_t bytes, asset stake_net_quantity, asset stake_cpu_quantity );
          void delegateram( account_name payer, account_name receiver, int64_t bytes );
          void reward( account_name receiver, int64_t ram_bytes, asset net_weight, asset cpu_weight );
 

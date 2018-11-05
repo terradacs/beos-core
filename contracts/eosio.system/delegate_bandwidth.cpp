@@ -152,7 +152,7 @@ namespace eosiosystem {
       set_resource_limits( res_itr->owner, res_itr->ram_bytes, res_itr->net_weight.amount, res_itr->cpu_weight.amount );
    }
 
-  void system_contract::initram( account_name receiver, int64_t bytes )
+  void system_contract::initresource( account_name receiver, int64_t bytes, asset stake_net_quantity, asset stake_cpu_quantity )
   {
     require_auth( _self );
 
@@ -165,10 +165,14 @@ namespace eosiosystem {
         res_itr = userres.emplace( receiver, [&]( auto& res ) {
               res.owner = receiver;
               res.ram_bytes = bytes;
+              res.net_weight = stake_net_quantity;
+              res.cpu_weight = stake_cpu_quantity;
           });
     } else {
         userres.modify( res_itr, receiver, [&]( auto& res ) {
               res.ram_bytes += bytes;
+              res.net_weight += stake_net_quantity;
+              res.cpu_weight += stake_cpu_quantity;
           });
     }
 
