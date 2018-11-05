@@ -259,9 +259,12 @@ def install_wasm():
         cmake_options["WASM_ROOT"] = config.WASM_INSTALL_DIR
         os.environ["WASM_ROOT"] = config.WASM_INSTALL_DIR
         return cmake_options
-    
-    Repo.clone_from(wasm_llvm_url, wasm_root + "/llvm",  branch = "release_40", depth = 1)
-    Repo.clone_from(wasm_clang_url, wasm_root + "/llvm/tools/clang",  branch = "release_40", depth = 1)
+    try:
+        Repo.clone_from(wasm_llvm_url, wasm_root + "/llvm",  branch = "release_40", depth = 1)
+        Repo.clone_from(wasm_clang_url, wasm_root + "/llvm/tools/clang",  branch = "release_40", depth = 1)
+    except Exception as ex:
+        logger.error(ex)
+        sys.exit(1)
     
     wasm_build_dir = wasm_root + "/llvm/build"
     if not os.path.exists(wasm_build_dir):
