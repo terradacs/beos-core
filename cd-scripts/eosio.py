@@ -6,6 +6,11 @@ import os
 import time
 import sys
 
+global KEOSD
+KEOSD = None
+global NODEOS
+NODEOS = None
+
 try:
     import config
 except Exception as ex:
@@ -126,8 +131,6 @@ def run_keosd(ip_address, port, wallet_dir, use_https = False, forceWalletCleanu
     os.makedirs(config.DEFAULT_WALLET_DIR)
     os.makedirs(config.WALLET_PASSWORD_DIR)
 
-    time.sleep(0.5)
-
     parameters = None
     if use_https:
         # run kleosd in https mode
@@ -144,7 +147,18 @@ def run_keosd(ip_address, port, wallet_dir, use_https = False, forceWalletCleanu
             "--wallet-dir", wallet_dir,
         ]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
-    subprocess.Popen(parameters, stdout=config.log_main, stderr=config.log_main)
+    global KEOSD
+    KEOSD = subprocess.Popen(parameters, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    while True:
+        line = KEOSD.stdout.readline()
+        line = line.decode('utf-8').strip()
+        if line.startswith("error"):
+            raise EOSIOException("Error during KEOSD run")
+        else:
+            logger.debug(line)
+            if line.endswith("add api url: /v1/wallet/unlock"):
+                logger.info("KEOSD is up and running")
+                break
 
 def unlock_wallet(wallet_name, wallet_password):
     parameters = [config.CLEOS_EXECUTABLE, 
@@ -155,7 +169,6 @@ def unlock_wallet(wallet_name, wallet_password):
     logger.info("Executing command: {0}".format(" ".join(parameters)))
     ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
     retcode = ret.returncode
-    time.sleep(1)
     if retcode == 0:
         logger.debug("Executed with ret: {0}".format(ret))
     else:
@@ -181,7 +194,6 @@ def import_key(wallet_name, key, wallet_url = None):
         logger.info("Executing command: {0}".format(" ".join(parameters)))
         ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
         retcode = ret.returncode
-        time.sleep(1)
         if retcode == 0:
             logger.debug("Executed with ret: {0}".format(ret))
         else:
@@ -212,7 +224,6 @@ def create_wallet(wallet_url = None, unlock = False):
     logger.info("Executing command: {0}".format(" ".join(parameters)))
     ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
     retcode = ret.returncode
-    time.sleep(1)
     if retcode == 0:
         logger.debug("Executed with ret: {0}".format(ret))
     else:
@@ -283,13 +294,18 @@ def run_nodeos(node_index, name, public_key, use_https = False):
     parameters = parameters + https_opts + plugins
 
     logger.info("Executing command: {0}".format(" ".join(parameters)))
-    try:
-        import time
-        subprocess.Popen(parameters, stdout=config.log_main, stderr=config.log_main)
-        time.sleep(2.0)
-    except Exception as ex:
-        logger.error("Exception during spawning nodeos process: {0}".format(ex))
-    return 0
+    global NODEOS
+    NODEOS = subprocess.Popen(parameters, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    while True:
+        line = NODEOS.stdout.readline()
+        line = line.decode('utf-8').strip()
+        if line.startswith("error"):
+            logger.error(line)
+        else:
+            logger.debug(line)
+            if "] Produced block" in line:
+                logger.info("NODEOS is up and running")
+                break
 
 def create_account(creator, name, owner_key, active_key, schema = "http"):
     if not owner_key and not active_key:
@@ -302,7 +318,6 @@ def create_account(creator, name, owner_key, active_key, schema = "http"):
     logger.info("Executing command: {0}".format(" ".join(parameters)))
     ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
     retcode = ret.returncode
-    time.sleep(1)
     if retcode == 0:
         logger.debug("Executed with ret: {0}".format(ret))
     else:
@@ -318,7 +333,6 @@ def set_contract(account, contract, permission, schema = "http"):
     logger.info("Executing command: {0}".format(" ".join(parameters)))
     ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
     retcode = ret.returncode
-    time.sleep(1)
     if retcode == 0:
         logger.debug("Executed with ret: {0}".format(ret))
     else:
@@ -334,7 +348,6 @@ def push_action(account, action, data, permission, schema = "http"):
     logger.info("Executing command: {0}".format(" ".join(parameters)))
     ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
     retcode = ret.returncode
-    time.sleep(1)
     if retcode == 0:
         logger.debug("Executed with ret: {0}".format(ret))
     else:
@@ -343,29 +356,16 @@ def push_action(account, action, data, permission, schema = "http"):
         raise EOSIOException("Initialization failed on last command")
 
 def terminate_running_tasks():
-    parameters = ["pkill", "nodeos"]
-    logger.info("Executing command: {0}".format(" ".join(parameters)))
-    ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
-    retcode = ret.returncode
-    time.sleep(1)
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("Initialization failed on last command")
-        raise EOSIOException("Initialization failed on last command")
+    try:
+        if NODEOS is not None:
+            logger.info("Terminating NODEOS")
+            NODEOS.terminate()
 
-    parameters = ["pkill", "keosd"]
-    logger.info("Executing command: {0}".format(" ".join(parameters)))
-    ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
-    retcode = ret.returncode
-    time.sleep(1)
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("Initialization failed on last command")
-        raise EOSIOException("Initialization failed on last command")
+        if KEOSD is not None:
+            logger.info("Terminating KEOSD")
+            KEOSD.terminate()
+    except Exception as ex:
+        logger.error("Exception occured: {0}".format(ex))
 
 if __name__ == '__main__':
     name = "eosio"
