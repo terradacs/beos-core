@@ -12,9 +12,6 @@ BEOS_DIR = SOURCES_DOWNLOAD_DIR + "/beos-core"
 BEOS_REPOSITORY_PATH = "git@gitlab.syncad.com:blocktrades/beos-core.git"
 BEOS_REPOSITORY_BRANCH = 'beos-initial-release '
 #
-EOSIO_SRC_DIR = BEOS_DIR
-# eosio build directory - here will land final build
-EOSIO_BUILD_DIR = EOSIO_SRC_DIR + "/build"
 
 MAIN_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
 ERROR_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
@@ -94,7 +91,7 @@ BEOS_DISTRIB_PUBLIC_KEY = ""
 BEOS_DISTRIB_PRIVATE_KEY = ""
 
 # path to keosd executable
-KEOSD_EXECUTABLE = EOSIO_BUILD_DIR + "/programs/keosd/keosd"
+KEOSD_EXECUTABLE = BEOS_BUILD_DIR + "/programs/keosd/keosd"
 # keosd ip address
 KEOSD_IP_ADDRESS = "127.0.0.1"
 # keosd port
@@ -105,9 +102,9 @@ KEOSD_CERTIFICATE_CHAIN_FILE = None
 KEOSD_PRIVATE_KEY_FILE = None
 
 # path to cleos executable
-CLEOS_EXECUTABLE = EOSIO_BUILD_DIR + "/programs/cleos/cleos"
+CLEOS_EXECUTABLE = BEOS_BUILD_DIR + "/programs/cleos/cleos"
 # path to nodeos executable
-NODEOS_EXECUTABLE = EOSIO_BUILD_DIR + "/programs/nodeos/nodeos"
+NODEOS_EXECUTABLE = BEOS_BUILD_DIR + "/programs/nodeos/nodeos"
 # nodeos ip address
 NODEOS_IP_ADDRESS = "127.0.0.1"
 # nodeos port
@@ -123,7 +120,7 @@ DEFAULT_WALLET_DIR = os.environ["HOME"] + "/eosio-wallet"
 # name of the master wallet
 MASTER_WALLET_NAME = "beos_master_wallet"
 # directory with password file for master wallet
-WALLET_PASSWORD_DIR = EOSIO_BUILD_DIR + "/wallet/"
+WALLET_PASSWORD_DIR = BEOS_BUILD_DIR + "/wallet/"
 # password file for master wallet KEEP SECURE
 WALLET_PASSWORD_PATH = WALLET_PASSWORD_DIR + "wallet.dat"
 # KEEPING KEYS IN PUBLIC FILE IS NOT WISE!

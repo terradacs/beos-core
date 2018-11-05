@@ -373,9 +373,9 @@ def install_libraries():
 
 def install_eosio(c_compiler, cxx_compiler):
     build_eosio(c_compiler, cxx_compiler)
-    logger.info("Running make install {0}".format(config.EOSIO_BUILD_DIR))
+    logger.info("Running make install {0}".format(config.BEOS_BUILD_DIR))
     params = ["sudo", "make", "install"]
-    ret = subprocess.run(params, cwd = config.EOSIO_BUILD_DIR, stdout=config.log_main, stderr=config.log_main)
+    ret = subprocess.run(params, cwd = config.BEOS_BUILD_DIR, stdout=config.log_main, stderr=config.log_main)
     retcode = ret.returncode
     if retcode == 0:
         logger.debug("Executed with ret: {0}".format(ret))
@@ -386,13 +386,13 @@ def install_eosio(c_compiler, cxx_compiler):
 
 def build_eosio(c_compiler, cxx_compiler):
     # check if build dir exists, if not make one
-    if not os.path.exists(config.EOSIO_BUILD_DIR):
-        os.makedirs(config.EOSIO_BUILD_DIR)
+    if not os.path.exists(config.BEOS_BUILD_DIR):
+        os.makedirs(config.BEOS_BUILD_DIR)
     # check if Makefile exists in build dir, if yes we will call make clean, cmake, and make
-    #if os.path.exists(config.EOSIO_BUILD_DIR + "/Makefile"):
-    #    logger.info("Running make clean in {0}".format(config.EOSIO_BUILD_DIR))
+    #if os.path.exists(config.BEOS_BUILD_DIR + "/Makefile"):
+    #    logger.info("Running make clean in {0}".format(config.BEOS_BUILD_DIR))
     #    params = ["make", "clean"]
-    #    subprocess.run(params, cwd = config.EOSIO_BUILD_DIR, stdout=config.log_main, stderr=config.log_main)
+    #    subprocess.run(params, cwd = config.BEOS_BUILD_DIR, stdout=config.log_main, stderr=config.log_main)
     # calling cmake
     params = [
         "cmake",
@@ -402,6 +402,7 @@ def build_eosio(c_compiler, cxx_compiler):
         "-DWASM_ROOT={0}".format(config.WASM_INSTALL_DIR),
         "-DCORE_SYMBOL_NAME={0}".format(config.CORE_SYMBOL_NAME),
         "-DOPENSSL_ROOT_DIR={0}".format(config.OPENSSL_ROOT_DIR),
+        "-DBOOST_ROOT={0}".format(config.BOOST_INSTALL_DIR),
         "-DBUILD_MONGO_DB_PLUGIN={0}".format(config.BUILD_MONGO_DB_PLUGIN),
         "-DENABLE_COVERAGE_TESTING={0}".format(config.ENABLE_COVERAGE_TESTING),
         "-DBUILD_DOXYGEN={0}".format(config.DOXYGEN),
@@ -409,10 +410,10 @@ def build_eosio(c_compiler, cxx_compiler):
         "-DEOSIO_ROOT_KEY={0}".format(config.EOSIO_PUBLIC_KEY),
         "-DGATEWAY_ROOT_KEY={0}".format(config.BEOS_GATEWAY_PUBLIC_KEY),
         "-DDISTRIBUTION_ROOT_KEY={0}".format(config.BEOS_DISTRIB_PUBLIC_KEY),
-        config.EOSIO_SRC_DIR
+        config.BEOS_DIR
     ]
     logger.info("Running cmake with params {0}".format(" ".join(params)))
-    ret = subprocess.run(params, cwd = config.EOSIO_BUILD_DIR, stdout=config.log_main, stderr=config.log_main)
+    ret = subprocess.run(params, cwd = config.BEOS_BUILD_DIR, stdout=config.log_main, stderr=config.log_main)
     retcode = ret.returncode
     if retcode == 0:
         logger.debug("Executed with ret: {0}".format(ret))
@@ -421,12 +422,12 @@ def build_eosio(c_compiler, cxx_compiler):
         logger.error("Cmake command failed. Please inspect log files for more information.")
         sys.exit(1)
     
-    logger.info("Running make in {0}".format(config.EOSIO_BUILD_DIR))
+    logger.info("Running make in {0}".format(config.BEOS_BUILD_DIR))
     params = ["make"]
     pcnt = get_processor_count()
     if pcnt > 1:
         params.append("-j{0}".format(pcnt))
-    ret = subprocess.run(params, cwd = config.EOSIO_BUILD_DIR, stdout=config.log_main, stderr=config.log_main)
+    ret = subprocess.run(params, cwd = config.BEOS_BUILD_DIR, stdout=config.log_main, stderr=config.log_main)
     retcode = ret.returncode
     if retcode == 0:
         logger.debug("Executed with ret: {0}".format(ret))
@@ -438,50 +439,6 @@ def build_eosio(c_compiler, cxx_compiler):
 def install_beos(c_compiler, cxx_compiler):
     configure_eosio_init()
     install_eosio(c_compiler, cxx_compiler)
-
-# workaround on copytree flaw
-# https://stackoverflow.com/questions/1868714/how-do-i-copy-an-entire-directory-of-files-into-an-existing-directory-using-pyth
-def copytree(src, dst, symlinks = False, ignore = None):
-    import shutil
-    import stat
-    if not os.path.exists(dst):
-        os.makedirs(dst)
-        shutil.copystat(src, dst)
-    lst = os.listdir(src)
-    if ignore:
-        excl = ignore(src, lst)
-        lst = [x for x in lst if x not in excl]
-    for item in lst:
-        s = os.path.join(src, item)
-        d = os.path.join(dst, item)
-        if symlinks and os.path.islink(s):
-            if os.path.lexists(d):
-                os.remove(d)
-            os.symlink(os.readlink(s), d)
-            try:
-                st = os.lstat(s)
-                mode = stat.S_IMODE(st.st_mode)
-                os.lchmod(d, mode)
-            except:
-                pass # lchmod not available
-        elif os.path.isdir(s):
-            copytree(s, d, symlinks, ignore)
-        else:
-            shutil.copy2(s, d)
-
-def copy_beos_directories():
-    logger.info("Copying BEOS data to EOSIO source tree")
-    from shutil import copy
-    src = "{0}/{1}".format(config.BEOS_DIR, "CMakeLists.txt")
-    dst = "{0}/{1}".format(config.EOSIO_SRC_DIR, "CMakeLists.txt")
-    logger.info("Copying from {0} to {1}".format(src, dst))
-    copy(src, dst)
-    directories = ["contracts", "libraries", "plugins", "programs", "resources", "tests", "unittests"]
-    for directory in directories:
-        src = "{0}/{1}/".format(config.BEOS_DIR, directory)
-        dst = "{0}/{1}/".format(config.EOSIO_SRC_DIR, directory)
-        logger.info("Copying from {0} to {1}".format(src, dst))
-        copytree(src, dst)
 
 def build_beos(c_compiler, cxx_compiler):
     configure_eosio_init()
@@ -512,7 +469,7 @@ def configure_eosio_init():
     }
 
     eosio_init_src = config.BEOS_DIR + "/contracts/eosio.init/eosio.init.hpp.in"
-    eosio_init_dst = config.EOSIO_SRC_DIR + "/contracts/eosio.init/eosio.init.hpp"
+    eosio_init_dst = config.BEOS_DIR + "/contracts/eosio.init/eosio.init.hpp"
     dst = None
     with open(eosio_init_src, "r") as in_f:
         from string import Template
@@ -553,7 +510,7 @@ def configure_genesis_json():
 def initialize_beos():
     import eosio
     try:
-        eosio.run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
+        eosio.run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR, False, True)
         eosio.create_wallet("http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT), False)
         eosio.run_nodeos(config.START_NODE_INDEX, "eosio", config.EOSIO_PUBLIC_KEY)
 
@@ -610,30 +567,30 @@ def clear_initialization_data(node_index, name):
 
 
 def make_integration_test():
-    if os.path.exists(config.EOSIO_BUILD_DIR + "/Makefile"):
+    if os.path.exists(config.BEOS_BUILD_DIR + "/Makefile"):
         logger.info("Running integration tests")
         params = ["make", "test"]
-        subprocess.run(params, cwd = config.EOSIO_BUILD_DIR, stdout=config.log_main, stderr=config.log_main)
+        subprocess.run(params, cwd = config.BEOS_BUILD_DIR, stdout=config.log_main, stderr=config.log_error)
     else:
-        logger.error("Makefile does not exists in {0}, calling make test will not work.".format(config.EOSIO_BUILD_DIR))
+        logger.error("Makefile does not exists in {0}, calling make test will not work.".format(config.BEOS_BUILD_DIR))
 
 def make_unit_test():
     logger.info("Running unit tests")
-    tests_working_dir = "{0}/{1}".format(config.EOSIO_BUILD_DIR, "unittests/")
+    tests_working_dir = "{0}/{1}".format(config.BEOS_BUILD_DIR, "unittests/")
     params = ["./unit_test"]
     subprocess.run(params, cwd = tests_working_dir, stdout=config.log_main, stderr=config.log_main)
 
 def make_beos_plugin_test():
     logger.info("Running BEOS plugin tests")
-    tests_working_dir = "{0}/{1}".format(config.EOSIO_BUILD_DIR, "tests/beos_plugin_tests/")
-    params = ["./test01.py", "--main-dir", config.EOSIO_BUILD_DIR]
-    subprocess.run(params, cwd = tests_working_dir, stdout=config.log_main, stderr=config.log_main)
+    tests_working_dir = "{0}/{1}".format(config.BEOS_BUILD_DIR, "tests/beos_plugin_tests/")
+    params = ["./test01.py", "--main-dir", config.BEOS_BUILD_DIR]
+    subprocess.run(params, cwd = tests_working_dir, stdout=config.log_main, stderr=config.log_error)
 
 # Disabled as requeste by mtrela
-#    params = ["./test02.py", "--main-dir", config.EOSIO_BUILD_DIR]
-#    subprocess.run(params, cwd = tests_working_dir, stdout=config.log_main, stderr=config.log_main)
+#    params = ["./test02.py", "--main-dir", config.BEOS_BUILD_DIR]
+#    subprocess.run(params, cwd = tests_working_dir, stdout=config.log_main, stderr=config.log_error)
 
-    params = ["./test03.py", "--main-dir", config.EOSIO_BUILD_DIR]
+    params = ["./test03.py", "--main-dir", config.BEOS_BUILD_DIR]
     subprocess.run(params, cwd = tests_working_dir, stdout=config.log_main, stderr=config.log_main)
 
 if __name__ == '__main__':
@@ -719,16 +676,16 @@ if __name__ == '__main__':
         install_libraries()
 
     from sys import exit
-    if os.path.exists(config.EOSIO_SRC_DIR):
-        if os.path.isdir(config.EOSIO_SRC_DIR):
-            if not os.listdir(config.EOSIO_SRC_DIR):
-                logger.error("{0} is empty. Please run: deploy.py with --download-sources option".format(config.EOSIO_SRC_DIR))
+    if os.path.exists(config.BEOS_DIR):
+        if os.path.isdir(config.BEOS_DIR):
+            if not os.listdir(config.BEOS_DIR):
+                logger.error("{0} is empty. Please run: deploy.py with --download-sources option".format(config.BEOS_DIR))
                 exit(1)
         else:
-            logger.error("{0} is not a directory.".format(config.EOSIO_SRC_DIR))
+            logger.error("{0} is not a directory.".format(config.BEOS_DIR))
             exit(1)
     else:
-        logger.error("{0} does not exists.".format(config.EOSIO_SRC_DIR))
+        logger.error("{0} does not exists.".format(config.BEOS_DIR))
         exit(1)
 
     if options.install_eosio:
