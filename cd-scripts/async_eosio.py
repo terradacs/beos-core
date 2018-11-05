@@ -5,6 +5,12 @@ import logging
 import os
 import time
 import sys
+import asyncio
+
+global KEOSD
+KEOSD = None
+global NODEOS
+NODEOS = None
 
 try:
     import config
@@ -33,7 +39,7 @@ class EOSIOException(Exception):
     def __str__(self):
         return self.message
 
-def show_wallet_unlock_postconf():
+async def show_wallet_unlock_postconf():
     wallet_password = None
     with open(config.WALLET_PASSWORD_PATH, "r") as password_file:
         wallet_password = password_file.readline()
@@ -46,7 +52,7 @@ def show_wallet_unlock_postconf():
     ]
     logger.info("Dont forget to unlock your wallet with command: {0}".format(" ".join(parameters)))
 
-def show_keosd_postconf(ip_address, port, wallet_dir, use_https = False):
+async def show_keosd_postconf(ip_address, port, wallet_dir, use_https = False):
     parameters = None
     if use_https:
         # run kleosd in https mode
@@ -64,7 +70,7 @@ def show_keosd_postconf(ip_address, port, wallet_dir, use_https = False):
         ]
     logger.info("Configuration complete, you can now run keosd with command (consider running in screen): {0}".format(" ".join(parameters)))
 
-def show_nodeos_postconf(node_index, name, public_key, use_https = False):
+async def show_nodeos_postconf(node_index, name, public_key, use_https = False):
     working_dir = "{0}{1}-{2}/".format(config.NODEOS_WORKING_DIR, node_index, name)
 
     https_opts = [
@@ -105,28 +111,19 @@ def show_nodeos_postconf(node_index, name, public_key, use_https = False):
     parameters = parameters + https_opts + plugins
     logger.info("Configuration complete, you can now run nodeos with command (consider running in screen): {0}".format(" ".join(parameters)))
 
-def run_keosd(ip_address, port, wallet_dir, use_https = False, forceWalletCleanup = False):
+async def run_keosd(ip_address, port, wallet_dir, use_https = False):
     logger.info("*** Running KLEOSD at {0}:{1} in {2}".format(ip_address, port, wallet_dir))
     from sys import exit
-    from shutil import rmtree
     if os.path.exists(config.DEFAULT_WALLET_DIR):
-        if forceWalletCleanup:
-            rmtree(config.DEFAULT_WALLET_DIR)
-        else:
-            logger.error("{0} exists. Please delete it manually and try again.".format(config.DEFAULT_WALLET_DIR))
-            exit(1)
+        logger.error("{0} exists. Please delete it manually and try again.".format(config.DEFAULT_WALLET_DIR))
+        exit(1)
     
     if os.path.exists(config.WALLET_PASSWORD_DIR):
-        if forceWalletCleanup:
-            rmtree(config.WALLET_PASSWORD_DIR)
-        else:
-            logger.error("{0} exists. Please delete it manually and try again.".format(config.WALLET_PASSWORD_DIR))
-            exit(1)
+        logger.error("{0} exists. Please delete it manually and try again.".format(config.WALLET_PASSWORD_DIR))
+        exit(1)
     
     os.makedirs(config.DEFAULT_WALLET_DIR)
     os.makedirs(config.WALLET_PASSWORD_DIR)
-
-    time.sleep(0.5)
 
     parameters = None
     if use_https:
@@ -144,26 +141,43 @@ def run_keosd(ip_address, port, wallet_dir, use_https = False, forceWalletCleanu
             "--wallet-dir", wallet_dir,
         ]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
-    subprocess.Popen(parameters, stdout=config.log_main, stderr=config.log_main)
+    global KEOSD
+    KEOSD = await asyncio.create_subprocess_exec(*parameters, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT)
+    while True:
+        line = await asyncio.wait_for(KEOSD.stdout.readline(), 5)
+        line = line.decode('utf-8').strip()
+        if not line: # EOF
+            break
+        else:
+            if line.startswith("error"):
+                logger.error(line)
+                if KEOSD is not None:
+                    KEOSD.terminate()
+                raise EOSIOException("Error during KEOSD run")
+            else:
+                logger.debug(line)
+            if line.endswith("add api url: /v1/wallet/unlock"):
+                logger.info("KEOSD is up and running")
+                break
+            continue
 
-def unlock_wallet(wallet_name, wallet_password):
+async def unlock_wallet(wallet_name, wallet_password):
     parameters = [config.CLEOS_EXECUTABLE, 
         "wallet", "unlock", 
         "-n", wallet_name, 
         "--password", wallet_password
     ]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
-    ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
-    retcode = ret.returncode
-    time.sleep(1)
+    proc = await asyncio.create_subprocess_exec(*parameters, stdout=config.log_main, stderr=config.log_main)
+    retcode = await proc.wait()
     if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
+        logger.debug("Executed with ret: {0}".format(retcode))
     else:
-        logger.error("Executed with ret: {0}".format(ret))
+        logger.error("Executed with ret: {0}".format(retcode))
         logger.error("Initialization failed on last command")
         raise EOSIOException("Initialization failed on last command")
 
-def import_key(wallet_name, key, wallet_url = None):
+async def import_key(wallet_name, key, wallet_url = None):
     if key:
         parameters = [config.CLEOS_EXECUTABLE, 
             "wallet", "import", 
@@ -179,20 +193,19 @@ def import_key(wallet_name, key, wallet_url = None):
         ]
         
         logger.info("Executing command: {0}".format(" ".join(parameters)))
-        ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
-        retcode = ret.returncode
-        time.sleep(1)
+        proc = await asyncio.create_subprocess_exec(*parameters, stdout=config.log_main, stderr=config.log_main)
+        retcode = await proc.wait()
         if retcode == 0:
-            logger.debug("Executed with ret: {0}".format(ret))
+            logger.debug("Executed with ret: {0}".format(retcode))
         else:
-            logger.error("Executed with ret: {0}".format(ret))
+            logger.error("Executed with ret: {0}".format(retcode))
             logger.error("Initialization failed on last command")
             raise EOSIOException("Initialization failed on last command")
     else:
         logger.error("Importing empty key!")
         raise EOSIOException("Importing empty key!")
 
-def create_wallet(wallet_url = None, unlock = False):
+async def create_wallet(wallet_url = None, unlock = False):
     logger.info("*** Create wallet, wallet url {0}".format(wallet_url))
 
     # if wallet_url is empty run local wallet
@@ -210,13 +223,13 @@ def create_wallet(wallet_url = None, unlock = False):
         ]
 
     logger.info("Executing command: {0}".format(" ".join(parameters)))
-    ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
-    retcode = ret.returncode
-    time.sleep(1)
+    proc = await asyncio.create_subprocess_exec(*parameters, stdout=config.log_main, stderr=config.log_main)
+    retcode = await proc.wait()
+
     if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
+        logger.debug("Executed with ret: {0}".format(retcode))
     else:
-        logger.error("Executed with ret: {0}".format(ret))
+        logger.error("Executed with ret: {0}".format(retcode))
         logger.error("Initialization failed on last command")
         raise EOSIOException("Initialization failed on last command")
 
@@ -225,12 +238,12 @@ def create_wallet(wallet_url = None, unlock = False):
         with open(config.WALLET_PASSWORD_PATH, "r") as password_file:
             wallet_password = password_file.readline()
             #wallet_password = wallet_password[1:-1] # remove " character from begin and end of string
-        unlock_wallet(config.MASTER_WALLET_NAME, wallet_password)
+        await unlock_wallet(config.MASTER_WALLET_NAME, wallet_password)
 
     for key in config.SYSTEM_ACCOUNT_KEYS:
-        import_key(config.MASTER_WALLET_NAME, key, wallet_url)
+        await import_key(config.MASTER_WALLET_NAME, key, wallet_url)
 
-def run_nodeos(node_index, name, public_key, use_https = False):
+async def run_nodeos(node_index, name, public_key, use_https = False):
     if not public_key:
         logger.error("Public key is empty, aborting")
         raise EOSIOException("Public key is empty, aborting")
@@ -283,15 +296,24 @@ def run_nodeos(node_index, name, public_key, use_https = False):
     parameters = parameters + https_opts + plugins
 
     logger.info("Executing command: {0}".format(" ".join(parameters)))
-    try:
-        import time
-        subprocess.Popen(parameters, stdout=config.log_main, stderr=config.log_main)
-        time.sleep(2.0)
-    except Exception as ex:
-        logger.error("Exception during spawning nodeos process: {0}".format(ex))
-    return 0
+    global NODEOS
+    NODEOS = await asyncio.create_subprocess_exec(*parameters, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT)
+    while True:
+        line = await asyncio.wait_for(NODEOS.stdout.readline(), 5)
+        line = line.decode('utf-8').strip()
+        if not line: # EOF
+            break
+        else:
+            if line.startswith("error"):
+                logger.error(line)
+            else:
+                logger.info(line)
+            if "] Produced block" in line:
+                logger.info("NODEOS is up and running")
+                break
+            continue
 
-def create_account(creator, name, owner_key, active_key, schema = "http"):
+async def create_account(creator, name, owner_key, active_key, schema = "http"):
     if not owner_key and not active_key:
         logger.error("Owner key or active key are empty, aborting")
         raise EOSIOException("Owner key or active key are empty, aborting")
@@ -300,72 +322,56 @@ def create_account(creator, name, owner_key, active_key, schema = "http"):
         "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
         "create", "account", creator, name, owner_key, active_key]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
-    ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
-    retcode = ret.returncode
-    time.sleep(1)
+    proc = await asyncio.create_subprocess_exec(*parameters, stdout=config.log_main, stderr=config.log_main)
+    retcode = await proc.wait()
     if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
+        logger.debug("Executed with ret: {0}".format(retcode))
     else:
-        logger.error("Executed with ret: {0}".format(ret))
+        logger.error("Executed with ret: {0}".format(retcode))
         logger.error("Initialization failed on last command")
         raise EOSIOException("Initialization failed on last command")
 
-def set_contract(account, contract, permission, schema = "http"):
+async def set_contract(account, contract, permission, schema = "http"):
     parameters = [config.CLEOS_EXECUTABLE, 
         "--url", "{0}://{1}:{2}".format(schema, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT),
         "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
         "set", "contract", account, contract, "-p", permission]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
-    ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
-    retcode = ret.returncode
-    time.sleep(1)
+    proc = await asyncio.create_subprocess_exec(*parameters, stdout=config.log_main, stderr=config.log_main)
+    retcode = await proc.wait()
     if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
+        logger.debug("Executed with ret: {0}".format(retcode))
     else:
-        logger.error("Executed with ret: {0}".format(ret))
+        logger.error("Executed with ret: {0}".format(retcode))
         logger.error("Initialization failed on last command")
         raise EOSIOException("Initialization failed on last command")
 
-def push_action(account, action, data, permission, schema = "http"):
+async def push_action(account, action, data, permission, schema = "http"):
     parameters = [config.CLEOS_EXECUTABLE, 
         "--url", "{0}://{1}:{2}".format(schema, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT),
         "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
         "push", "action", account, action, data, "-p", permission]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
-    ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
-    retcode = ret.returncode
-    time.sleep(1)
+    proc = await asyncio.create_subprocess_exec(*parameters, stdout=config.log_main, stderr=config.log_main)
+    retcode = await proc.wait()
     if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
+        logger.debug("Executed with ret: {0}".format(retcode))
     else:
-        logger.error("Executed with ret: {0}".format(ret))
+        logger.error("Executed with ret: {0}".format(retcode))
         logger.error("Initialization failed on last command")
         raise EOSIOException("Initialization failed on last command")
 
-def terminate_running_tasks():
-    parameters = ["pkill", "nodeos"]
-    logger.info("Executing command: {0}".format(" ".join(parameters)))
-    ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
-    retcode = ret.returncode
-    time.sleep(1)
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("Initialization failed on last command")
-        raise EOSIOException("Initialization failed on last command")
+async def terminate_running_tasks():
+    try:
+        if NODEOS is not None:
+            logger.info("Terminating NODEOS")
+            NODEOS.terminate()
 
-    parameters = ["pkill", "keosd"]
-    logger.info("Executing command: {0}".format(" ".join(parameters)))
-    ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
-    retcode = ret.returncode
-    time.sleep(1)
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("Initialization failed on last command")
-        raise EOSIOException("Initialization failed on last command")
+        if KEOSD is not None:
+            logger.info("Terminating KEOSD")
+            KEOSD.terminate()
+    except Exception as ex:
+        logger.error("Exception occured: {0}".format(ex))
 
 if __name__ == '__main__':
     name = "eosio"
@@ -384,38 +390,39 @@ if __name__ == '__main__':
         logger.info("{0} exists. Deleting.".format(working_dir))
         rmtree(working_dir)
 
-    run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
-    create_wallet("http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT), False)
-    run_nodeos(config.START_NODE_INDEX, "eosio", config.EOSIO_PUBLIC_KEY)
+    loop = asyncio.get_event_loop()
+    result = loop.run_until_complete(run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR))
+    result = loop.run_until_complete(create_wallet("http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)))
+    result = loop.run_until_complete(run_nodeos(config.START_NODE_INDEX, "eosio", config.EOSIO_PUBLIC_KEY))
 
-    create_account("eosio", "eosio.msig", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-    create_account("eosio", "eosio.names", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-    create_account("eosio", "eosio.saving", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-    create_account("eosio", "eosio.vpay", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-    create_account("eosio", "eosio.unregd", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-    
-    create_account("eosio", "eosio.bpay", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+    result = loop.run_until_complete(create_account("eosio", "eosio.msig", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY))
+    result = loop.run_until_complete(create_account("eosio", "eosio.names", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY))
+    result = loop.run_until_complete(create_account("eosio", "eosio.saving", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY))
+    result = loop.run_until_complete(create_account("eosio", "eosio.vpay", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY))
+    result = loop.run_until_complete(create_account("eosio", "eosio.unregd", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY))
 
-    create_account("eosio", "eosio.ram", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-    create_account("eosio", "eosio.ramfee", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-    create_account("eosio", "eosio.stake", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+    result = loop.run_until_complete(create_account("eosio", "eosio.bpay", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY))
 
-    create_account("eosio", "eosio.token", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-    create_account("eosio", "beos.init", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY)
+    result = loop.run_until_complete(create_account("eosio", "eosio.ram", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY))
+    result = loop.run_until_complete(create_account("eosio", "eosio.ramfee", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY))
+    result = loop.run_until_complete(create_account("eosio", "eosio.stake", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY))
 
-    set_contract("eosio.token", config.CONTRACTS_DIR + "/eosio.token", "eosio.token")
+    result = loop.run_until_complete(create_account("eosio", "eosio.token", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY))
+    result = loop.run_until_complete(create_account("eosio", "beos.init", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY))
 
-    push_action("eosio.token", "create", '[ "beos.distrib", "{0} {1}"]'.format(config.CORE_INITIAL_AMOUNT, config.CORE_SYMBOL_NAME), "eosio.token")
-    push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PROXY_INITIAL_AMOUNT, config.PROXY_ASSET_NAME), "eosio.token")
+    result = loop.run_until_complete(set_contract("eosio.token", config.CONTRACTS_DIR + "/eosio.token", "eosio.token"))
 
-    set_contract("eosio", config.CONTRACTS_DIR + "eosio.system", "eosio")
-    set_contract("beos.init", config.CONTRACTS_DIR + "eosio.init", "beos.init")
-    set_contract("beos.gateway", config.CONTRACTS_DIR + "eosio.gateway", "beos.gateway")
-    set_contract("beos.distrib", config.CONTRACTS_DIR + "eosio.distribution", "beos.distrib")
+    result = loop.run_until_complete(push_action("eosio.token", "create", '[ "beos.distrib", "{0} {1}"]'.format(config.CORE_INITIAL_AMOUNT, config.CORE_SYMBOL_NAME), "eosio.token"))
+    result = loop.run_until_complete(push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PROXY_INITIAL_AMOUNT, config.PROXY_ASSET_NAME), "eosio.token"))
 
-    push_action("eosio", "initram", '[ "beos.gateway", "{0}"]'.format(config.INIT_RAM), "eosio")
+    result = loop.run_until_complete(set_contract("eosio", config.CONTRACTS_DIR + "eosio.system", "eosio"))
+    result = loop.run_until_complete(set_contract("beos.init", config.CONTRACTS_DIR + "eosio.init", "beos.init"))
+    result = loop.run_until_complete(set_contract("beos.gateway", config.CONTRACTS_DIR + "eosio.gateway", "beos.gateway"))
+    result = loop.run_until_complete(set_contract("beos.distrib", config.CONTRACTS_DIR + "eosio.distribution", "beos.distrib"))
 
-    terminate_running_tasks()
-    show_keosd_postconf(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
-    show_wallet_unlock_postconf()
-    show_nodeos_postconf(0, "eosio", config.EOSIO_PUBLIC_KEY)
+    result = loop.run_until_complete(push_action("eosio", "initram", '[ "beos.gateway", "{0}"]'.format(config.INIT_RAM), "eosio"))
+
+    result = loop.run_until_complete(terminate_running_tasks())
+    result = loop.run_until_complete(show_keosd_postconf(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR))
+    result = loop.run_until_complete(show_wallet_unlock_postconf())
+    result = loop.run_until_complete(show_nodeos_postconf(0, "eosio", config.EOSIO_PUBLIC_KEY))
