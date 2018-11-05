@@ -144,6 +144,8 @@ BEOS_CONFIG_FILE = "beos.config.ini"
 GENESIS_JSON_FILE_SRC = os.path.dirname(os.path.abspath(__file__)) + "/resources/genesis.json"
 # genesis json file name
 GENESIS_JSON_FILE = "genesis.json"
+#starting node index
+START_NODE_INDEX = 0
 
 ##############      configuration data for contracts/accounts     ###############
 #################################################################################

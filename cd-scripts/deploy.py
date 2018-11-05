@@ -42,7 +42,7 @@ ch = logging.StreamHandler(sys.stdout)
 ch.setLevel(config.LOG_LEVEL)
 ch.setFormatter(logging.Formatter(config.LOG_FORMAT))
 
-fh = logging.FileHandler(os.path.dirname(os.path.abspath(__file__)) + '/beos_deploy.log')
+fh = logging.FileHandler(config.MAIN_LOG_PATH)
 fh.setLevel(config.LOG_LEVEL)
 fh.setFormatter(logging.Formatter(config.LOG_FORMAT))
 
@@ -118,14 +118,22 @@ def install_boost():
     logger.info("Bootstraping boost..")
     params = ["./bootstrap.sh", "--prefix", config.BOOST_INSTALL_PREFIX]
     ret = subprocess.run(params, cwd = boost_root)
-    if ret.returncode != 0:
+    retcode = ret.returncode
+    if retcode == 0:
+        logger.debug("Executed with ret: {0}".format(ret))
+    else:
+        logger.error("Executed with ret: {0}".format(ret))
         logger.error("bootstrap command failed. Please inspect log files for more information.")
         sys.exit(1)
     
     logger.info("Installing boost..")
     params = ["sudo", "./b2", "install"]
     ret = subprocess.run(params, cwd = boost_root)
-    if ret.returncode != 0:
+    retcode = ret.returncode
+    if retcode == 0:
+        logger.debug("Executed with ret: {0}".format(ret))
+    else:
+        logger.error("Executed with ret: {0}".format(ret))
         logger.error("sudo b2 install command failed. Please inspect log files for more information.")
         sys.exit(1)
     
@@ -159,7 +167,11 @@ def install_mongo_driver():
         logger.info("Running cmake...")
         params = ["cmake", "-DBUILD_SHARED_LIBS=OFF", "-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_INSTALL_PREFIX={0}".format(config.MONGO_C_INSTALL_PREFIX), ".."]
         ret = subprocess.run(params, cwd = "{0}/{1}".format(mongoc_root, "build"))
-        if ret.returncode != 0:
+        retcode = ret.returncode
+        if retcode == 0:
+            logger.debug("Executed with ret: {0}".format(ret))
+        else:
+            logger.error("Executed with ret: {0}".format(ret))
             logger.error("Cmake command failed. Please inspect log files for more information.")
             sys.exit(1)
 
@@ -169,14 +181,22 @@ def install_mongo_driver():
         if pcnt > 1:
             params.append("-j{0}".format(pcnt))
         ret = subprocess.run(params, cwd = "{0}/{1}".format(mongoc_root, "build"))
-        if ret.returncode != 0:
+        retcode = ret.returncode
+        if retcode == 0:
+            logger.debug("Executed with ret: {0}".format(ret))
+        else:
+            logger.error("Executed with ret: {0}".format(ret))
             logger.error("make command failed. Please inspect log files for more information.")
             sys.exit(1)
 
         logger.info("Installing Mongo C drivers")
         params = ["sudo", "make", "install"]
         ret = subprocess.run(params, cwd = "{0}/{1}".format(mongoc_root, "build"))
-        if ret.returncode != 0:
+        retcode = ret.returncode
+        if retcode == 0:
+            logger.debug("Executed with ret: {0}".format(ret))
+        else:
+            logger.error("Executed with ret: {0}".format(ret))
             logger.error("sudo make install command failed. Please inspect log files for more information.")
             sys.exit(1)
 
@@ -191,7 +211,11 @@ def install_mongo_driver():
         logger.info("Running cmake...")
         params = ["cmake", "-DBUILD_SHARED_LIBS=OFF", "-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_INSTALL_PREFIX={0}".format(config.MONGO_C_INSTALL_PREFIX), ".."]
         ret = subprocess.run(params, cwd = "{0}/{1}".format(mongocxx_root, "build"))
-        if ret.returncode != 0:
+        retcode = ret.returncode
+        if retcode == 0:
+            logger.debug("Executed with ret: {0}".format(ret))
+        else:
+            logger.error("Executed with ret: {0}".format(ret))
             logger.error("Cmake command failed. Please inspect log files for more information.")
             sys.exit(1)
 
@@ -201,14 +225,21 @@ def install_mongo_driver():
         if pcnt > 1:
             params.append("-j{0}".format(pcnt))
         ret = subprocess.run(params, cwd = "{0}/{1}".format(mongocxx_root, "build"))
-        if ret.returncode != 0:
+        retcode = ret.returncode
+        if retcode == 0:
+            logger.debug("Executed with ret: {0}".format(ret))
+        else:
+            logger.error("Executed with ret: {0}".format(ret))
             logger.error("make command failed. Please inspect log files for more information.")
             sys.exit(1)
 
         logger.info("Installing Mongo CXX drivers")
         params = ["sudo", "make", "install"]
         ret = subprocess.run(params, cwd = "{0}/{1}".format(mongocxx_root, "build"))
-        if ret.returncode != 0:
+        if retcode == 0:
+            logger.debug("Executed with ret: {0}".format(ret))
+        else:
+            logger.error("Executed with ret: {0}".format(ret))
             logger.error("sudo make install command failed. Please inspect log files for more information.")
             sys.exit(1)
 
@@ -228,14 +259,22 @@ def install_secp256k1_zkp():
     logger.info("Running autogen.sh...")
     params = ["./autogen.sh"]
     ret = subprocess.run(params, cwd = secp256k1_root)
-    if ret.returncode != 0:
+    retcode = ret.returncode
+    if retcode == 0:
+        logger.debug("Executed with ret: {0}".format(ret))
+    else:
+        logger.error("Executed with ret: {0}".format(ret))
         logger.error("Cmake command failed. Please inspect log files for more information.")
         sys.exit(1)
 
     logger.info("Running configure...")
     params = ["./configure", "--prefix", config.SECP256_INSTALL_PREFIX]
     ret = subprocess.run(params, cwd = secp256k1_root)
-    if ret.returncode != 0:
+    retcode = ret.returncode
+    if retcode == 0:
+        logger.debug("Executed with ret: {0}".format(ret))
+    else:
+        logger.error("Executed with ret: {0}".format(ret))
         logger.error("configure command failed. Please inspect log files for more information.")
         sys.exit(1)
 
@@ -245,14 +284,22 @@ def install_secp256k1_zkp():
     if pcnt > 1:
         params.append("-j{0}".format(pcnt))
     ret = subprocess.run(params, cwd = secp256k1_root)
-    if ret.returncode != 0:
+    retcode = ret.returncode
+    if retcode == 0:
+        logger.debug("Executed with ret: {0}".format(ret))
+    else:
+        logger.error("Executed with ret: {0}".format(ret))
         logger.error("make command failed. Please inspect log files for more information.")
         sys.exit(1)
 
     logger.info("Installing secp256k1-zkp")
     params = ["sudo", "make", "install"]
     ret = subprocess.run(params, cwd = secp256k1_root)
-    if ret.returncode != 0:
+    retcode = ret.returncode
+    if retcode == 0:
+        logger.debug("Executed with ret: {0}".format(ret))
+    else:
+        logger.error("Executed with ret: {0}".format(ret))
         logger.error("Sudo make install command failed. Please inspect log files for more information.")
         sys.exit(1)
 
@@ -279,7 +326,11 @@ def install_wasm():
         
     params = ["cmake", "-G", "Unix Makefiles", "-DCMAKE_INSTALL_PREFIX={0}".format(config.WASM_INSTALL_DIR), "-DLLVM_TARGETS_TO_BUILD=", "-DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=WebAssembly", "-DCMAKE_BUILD_TYPE=Release", ".."]
     ret = subprocess.run(params, cwd = wasm_build_dir)
-    if ret.returncode != 0:
+    retcode = ret.returncode
+    if retcode == 0:
+        logger.debug("Executed with ret: {0}".format(ret))
+    else:
+        logger.error("Executed with ret: {0}".format(ret))
         logger.error("Cmake command failed. Please inspect log files for more information.")
         sys.exit(1)
 
@@ -289,14 +340,22 @@ def install_wasm():
     if pcnt > 1:
         params.append("-j{0}".format(pcnt))
     ret = subprocess.run(params, cwd = wasm_build_dir)
-    if ret.returncode != 0:
+    retcode = ret.returncode
+    if retcode == 0:
+        logger.debug("Executed with ret: {0}".format(ret))
+    else:
+        logger.error("Executed with ret: {0}".format(ret))
         logger.error("make command failed. Please inspect log files for more information.")
         sys.exit(1)
 
     logger.info("Installing secp256k1-zkp")
     params = ["sudo", "make", "install"]
     ret = subprocess.run(params, cwd = wasm_build_dir)
-    if ret.returncode != 0:
+    retcode = ret.returncode
+    if retcode == 0:
+        logger.debug("Executed with ret: {0}".format(ret))
+    else:
+        logger.error("Executed with ret: {0}".format(ret))
         logger.error("sudo make install command failed. Please inspect log files for more information.")
         sys.exit(1)
 
@@ -314,17 +373,26 @@ def install_libraries():
 
 def install_eosio(c_compiler, cxx_compiler):
     build_eosio(c_compiler, cxx_compiler)
-    logger.info("Running make install {0}".format(config.BEOS_BUILD_DIR))
+    logger.info("Running make install {0}".format(config.EOSIO_BUILD_DIR))
     params = ["sudo", "make", "install"]
-    ret = subprocess.run(params, cwd = config.BEOS_BUILD_DIR, stdout=config.log_main, stderr=config.log_error)
-    if ret.returncode != 0:
+    ret = subprocess.run(params, cwd = config.EOSIO_BUILD_DIR, stdout=config.log_main, stderr=config.log_main)
+    retcode = ret.returncode
+    if retcode == 0:
+        logger.debug("Executed with ret: {0}".format(ret))
+    else:
+        logger.error("Executed with ret: {0}".format(ret))
         logger.error("Make install command failed. Please inspect log files for more information.")
         sys.exit(1)
 
 def build_eosio(c_compiler, cxx_compiler):
     # check if build dir exists, if not make one
-    if not os.path.exists(config.BEOS_BUILD_DIR):
-        os.makedirs(config.BEOS_BUILD_DIR)
+    if not os.path.exists(config.EOSIO_BUILD_DIR):
+        os.makedirs(config.EOSIO_BUILD_DIR)
+    # check if Makefile exists in build dir, if yes we will call make clean, cmake, and make
+    if os.path.exists(config.EOSIO_BUILD_DIR + "/Makefile"):
+        logger.info("Running make clean in {0}".format(config.EOSIO_BUILD_DIR))
+        params = ["make", "clean"]
+        subprocess.run(params, cwd = config.EOSIO_BUILD_DIR, stdout=config.log_main, stderr=config.log_main)
     # calling cmake
     params = [
         "cmake",
@@ -341,30 +409,86 @@ def build_eosio(c_compiler, cxx_compiler):
         "-DEOSIO_ROOT_KEY={0}".format(config.EOSIO_PUBLIC_KEY),
         "-DGATEWAY_ROOT_KEY={0}".format(config.BEOS_GATEWAY_PUBLIC_KEY),
         "-DDISTRIBUTION_ROOT_KEY={0}".format(config.BEOS_DISTRIB_PUBLIC_KEY),
-        config.BEOS_DIR
+        config.EOSIO_SRC_DIR
     ]
     logger.info("Running cmake with params {0}".format(" ".join(params)))
-    ret = subprocess.run(params, cwd = config.BEOS_BUILD_DIR, stdout=config.log_main, stderr=config.log_error)
-    if ret.returncode != 0:
+    ret = subprocess.run(params, cwd = config.EOSIO_BUILD_DIR, stdout=config.log_main, stderr=config.log_main)
+    retcode = ret.returncode
+    if retcode == 0:
+        logger.debug("Executed with ret: {0}".format(ret))
+    else:
+        logger.error("Executed with ret: {0}".format(ret))
         logger.error("Cmake command failed. Please inspect log files for more information.")
         sys.exit(1)
     
-    logger.info("Running make in {0}".format(config.BEOS_BUILD_DIR))
+    logger.info("Running make in {0}".format(config.EOSIO_BUILD_DIR))
     params = ["make"]
     pcnt = get_processor_count()
     if pcnt > 1:
         params.append("-j{0}".format(pcnt))
-    ret = subprocess.run(params, cwd = config.BEOS_BUILD_DIR, stdout=config.log_main, stderr=config.log_error)
-    if ret.returncode != 0:
+    ret = subprocess.run(params, cwd = config.EOSIO_BUILD_DIR, stdout=config.log_main, stderr=config.log_main)
+    retcode = ret.returncode
+    if retcode == 0:
+        logger.debug("Executed with ret: {0}".format(ret))
+    else:
+        logger.error("Executed with ret: {0}".format(ret))
         logger.error("make command failed. Please inspect log files for more information.")
         sys.exit(1)
 
 def install_beos(c_compiler, cxx_compiler):
+    # copying BEOS dirs to EOSIO src tree
+    copy_beos_directories()
     #
     configure_eosio_init()
     install_eosio(c_compiler, cxx_compiler)
 
+# workaround on copytree flaw
+# https://stackoverflow.com/questions/1868714/how-do-i-copy-an-entire-directory-of-files-into-an-existing-directory-using-pyth
+def copytree(src, dst, symlinks = False, ignore = None):
+    import shutil
+    import stat
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+        shutil.copystat(src, dst)
+    lst = os.listdir(src)
+    if ignore:
+        excl = ignore(src, lst)
+        lst = [x for x in lst if x not in excl]
+    for item in lst:
+        s = os.path.join(src, item)
+        d = os.path.join(dst, item)
+        if symlinks and os.path.islink(s):
+            if os.path.lexists(d):
+                os.remove(d)
+            os.symlink(os.readlink(s), d)
+            try:
+                st = os.lstat(s)
+                mode = stat.S_IMODE(st.st_mode)
+                os.lchmod(d, mode)
+            except:
+                pass # lchmod not available
+        elif os.path.isdir(s):
+            copytree(s, d, symlinks, ignore)
+        else:
+            shutil.copy2(s, d)
+
+def copy_beos_directories():
+    logger.info("Copying BEOS data to EOSIO source tree")
+    from shutil import copy
+    src = "{0}/{1}".format(config.BEOS_DIR, "CMakeLists.txt")
+    dst = "{0}/{1}".format(config.EOSIO_SRC_DIR, "CMakeLists.txt")
+    logger.info("Copying from {0} to {1}".format(src, dst))
+    copy(src, dst)
+    directories = ["contracts", "libraries", "plugins", "programs", "resources", "tests", "unittests"]
+    for directory in directories:
+        src = "{0}/{1}/".format(config.BEOS_DIR, directory)
+        dst = "{0}/{1}/".format(config.EOSIO_SRC_DIR, directory)
+        logger.info("Copying from {0} to {1}".format(src, dst))
+        copytree(src, dst)
+
 def build_beos(c_compiler, cxx_compiler):
+    # copying BEOS dirs to EOSIO src tree
+    copy_beos_directories()
     #
     configure_eosio_init()
     #
@@ -394,7 +518,7 @@ def configure_eosio_init():
     }
 
     eosio_init_src = config.BEOS_DIR + "/contracts/eosio.init/eosio.init.hpp.in"
-    eosio_init_dst = config.BEOS_DIR + "/contracts/eosio.init/eosio.init.hpp"
+    eosio_init_dst = config.EOSIO_SRC_DIR + "/contracts/eosio.init/eosio.init.hpp"
     dst = None
     with open(eosio_init_src, "r") as in_f:
         from string import Template
@@ -436,8 +560,8 @@ def initialize_beos():
     import eosio
     try:
         eosio.run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
-        eosio.create_wallet("http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT), True)
-        eosio.run_nodeos(0, "eosio", config.EOSIO_PUBLIC_KEY)
+        eosio.create_wallet("http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT), False)
+        eosio.run_nodeos(config.START_NODE_INDEX, "eosio", config.EOSIO_PUBLIC_KEY)
 
         eosio.create_account("eosio", "eosio.msig", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
         eosio.create_account("eosio", "eosio.names", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
@@ -475,32 +599,48 @@ def initialize_beos():
         logger.error("Exception during initialize: {0}".format(ex))
         sys.exit(1)
 
+def clear_initialization_data(node_index, name):
+    from shutil import rmtree
+    if os.path.exists(config.DEFAULT_WALLET_DIR):
+        logger.info("{0} exists. Deleting.".format(config.DEFAULT_WALLET_DIR))
+        rmtree(config.DEFAULT_WALLET_DIR)
+    
+    if os.path.exists(config.WALLET_PASSWORD_DIR):
+        logger.info("{0} exists. Deleting.".format(config.WALLET_PASSWORD_DIR))
+        rmtree(config.WALLET_PASSWORD_DIR)
+    
+    working_dir = "{0}{1}-{2}/".format(config.NODEOS_WORKING_DIR, node_index, name)
+    if os.path.exists(working_dir):
+        logger.info("{0} exists. Deleting.".format(working_dir))
+        rmtree(working_dir)
+
+
 def make_integration_test():
-    if os.path.exists(config.BEOS_BUILD_DIR + "/Makefile"):
+    if os.path.exists(config.EOSIO_BUILD_DIR + "/Makefile"):
         logger.info("Running integration tests")
         params = ["make", "test"]
-        subprocess.run(params, cwd = config.BEOS_BUILD_DIR, stdout=config.log_main, stderr=config.log_error)
+        subprocess.run(params, cwd = config.EOSIO_BUILD_DIR, stdout=config.log_main, stderr=config.log_main)
     else:
-        logger.error("Makefile does not exists in {0}, calling make test will not work.".format(config.BEOS_BUILD_DIR))
+        logger.error("Makefile does not exists in {0}, calling make test will not work.".format(config.EOSIO_BUILD_DIR))
 
 def make_unit_test():
     logger.info("Running unit tests")
-    tests_working_dir = "{0}/{1}".format(config.BEOS_BUILD_DIR, "unittests/")
+    tests_working_dir = "{0}/{1}".format(config.EOSIO_BUILD_DIR, "unittests/")
     params = ["./unit_test"]
-    subprocess.run(params, cwd = tests_working_dir, stdout=config.log_main, stderr=config.log_error)
+    subprocess.run(params, cwd = tests_working_dir, stdout=config.log_main, stderr=config.log_main)
 
 def make_beos_plugin_test():
     logger.info("Running BEOS plugin tests")
-    tests_working_dir = "{0}/{1}".format(config.BEOS_BUILD_DIR, "tests/beos_plugin_tests/")
-    params = ["./test01.py", "--main-dir", config.BEOS_BUILD_DIR]
-    subprocess.run(params, cwd = tests_working_dir, stdout=config.log_main, stderr=config.log_error)
+    tests_working_dir = "{0}/{1}".format(config.EOSIO_BUILD_DIR, "tests/beos_plugin_tests/")
+    params = ["./test01.py", "--main-dir", config.EOSIO_BUILD_DIR]
+    subprocess.run(params, cwd = tests_working_dir, stdout=config.log_main, stderr=config.log_main)
 
 # Disabled as requeste by mtrela
-#    params = ["./test02.py", "--main-dir", config.BEOS_BUILD_DIR]
-#    subprocess.run(params, cwd = tests_working_dir, stdout=config.log_main, stderr=config.log_error)
+#    params = ["./test02.py", "--main-dir", config.EOSIO_BUILD_DIR]
+#    subprocess.run(params, cwd = tests_working_dir, stdout=config.log_main, stderr=config.log_main)
 
-    params = ["./test03.py", "--main-dir", config.BEOS_BUILD_DIR]
-    subprocess.run(params, cwd = tests_working_dir, stdout=config.log_main, stderr=config.log_error)
+    params = ["./test03.py", "--main-dir", config.EOSIO_BUILD_DIR]
+    subprocess.run(params, cwd = tests_working_dir, stdout=config.log_main, stderr=config.log_main)
 
 if __name__ == '__main__':
     from optparse import OptionParser, OptionGroup
@@ -529,6 +669,7 @@ if __name__ == '__main__':
     buildGroup.add_option("--build-beos", action="store_true", dest="build_beos", help="Build EOSIO with BEOS without installing")
 
     postinstallGroup = OptionGroup(parser, "Postinstallation actions")
+    postinstallGroup.add_option("--clear-initialization-data", action="store_true", dest="clear_init_data", help="Removes all data set in initialization process!")
     postinstallGroup.add_option("--initialize-beos", action="store_true", dest="initialize_beos", help="Runs executable and creates system accounts.")
     postinstallGroup.add_option("--create-genesis-and-config", action="store_true", dest="create_genesis_and_config", help="Creates genesis.json and config.ini files.")
 
@@ -584,16 +725,16 @@ if __name__ == '__main__':
         install_libraries()
 
     from sys import exit
-    if os.path.exists(config.BEOS_DIR):
-        if os.path.isdir(config.BEOS_DIR):
-            if not os.listdir(config.BEOS_DIR):
-                logger.error("{0} is empty. Please run: deploy.py with --download-sources option".format(config.BEOS_DIR))
+    if os.path.exists(config.EOSIO_SRC_DIR):
+        if os.path.isdir(config.EOSIO_SRC_DIR):
+            if not os.listdir(config.EOSIO_SRC_DIR):
+                logger.error("{0} is empty. Please run: deploy.py with --download-sources option".format(config.EOSIO_SRC_DIR))
                 exit(1)
         else:
-            logger.error("{0} is not a directory.".format(config.BEOS_DIR))
+            logger.error("{0} is not a directory.".format(config.EOSIO_SRC_DIR))
             exit(1)
     else:
-        logger.error("{0} does not exists.".format(config.BEOS_DIR))
+        logger.error("{0} does not exists.".format(config.EOSIO_SRC_DIR))
         exit(1)
 
     if options.install_eosio:
@@ -625,7 +766,12 @@ if __name__ == '__main__':
         configure_config_ini()
         configure_genesis_json()
 
+    if options.clear_init_data:
+        clear_initialization_data(config.START_NODE_INDEX, "eosio")
+
     if options.initialize_beos:
+        configure_config_ini()
+        configure_genesis_json()
         initialize_beos()
 
     # close loggers
