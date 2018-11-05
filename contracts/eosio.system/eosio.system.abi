@@ -18,11 +18,13 @@
    }],
    "____comment": "eosio.bios structs: set_account_limits, setpriv, set_global_limits, producer_key, set_producers, require_auth are provided so abi available for deserialization in future.",
    "structs": [{
-      "name": "initram",
+      "name": "initresource",
       "base": "",
       "fields": [
          {"name":"receiver", "type":"account_name"},
-         {"name":"bytes", "type":"uint64"}
+         {"name":"bytes", "type":"uint64"},
+         {"name":"stake_net_quantity", "type":"asset"},
+         {"name":"stake_cpu_quantity", "type":"asset"}
       ]
     },{
       "name": "delegateram",
@@ -422,8 +424,8 @@
     }
    ],
    "actions": [{
-     "name": "initram",
-     "type": "initram",
+     "name": "initresource",
+     "type": "initresource",
      "ricardian_contract": ""
    },{
      "name": "delegateram",
