@@ -171,6 +171,6 @@ AMOUNT_OF_REWARD_TRUSTEE = 800 * BEOS_SYMBOL_PRECISION # 800 * asset().symbol.pr
 
 ### init loggers
 global log_main
-log_main =  open(MAIN_LOG_PATH, "a+")
+log_main = open(MAIN_LOG_PATH, "a+")
 global log_error
 log_error = open(ERROR_LOG_PATH, "a+")
