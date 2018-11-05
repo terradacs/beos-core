@@ -113,10 +113,10 @@ def install_boost():
     logger.info("Decompressing boost...")
     import tarfile
     boost_tar = tarfile.open(boost_archive_name, mode = 'r:bz2')
-    boost_tar.extractall(boost_source_dir)
+    boost_tar.extractall(config.SOURCES_DOWNLOAD_DIR)
     
     logger.info("Bootstraping boost..")
-    params = ["./bootstrap.sh", "--prefix", config.BOOST_INSTALL_PREFIX]
+    params = ["./bootstrap.sh", "--prefix={0}".format(config.BOOST_INSTALL_PREFIX)]
     ret = subprocess.run(params, cwd = boost_root)
     retcode = ret.returncode
     if retcode == 0:
