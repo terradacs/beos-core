@@ -112,7 +112,7 @@ async def show_nodeos_postconf(node_index, name, public_key, use_https = False):
     logger.info("Configuration complete, you can now run nodeos with command (consider running in screen): {0}".format(" ".join(parameters)))
 
 async def run_keosd(ip_address, port, wallet_dir, use_https = False):
-    logger.info("*** Running KLEOSD at {0}:{1} in {2}".format(ip_address, port, wallet_dir))
+    logger.info("*** Running KEOSD at {0}:{1} in {2}".format(ip_address, port, wallet_dir))
     from sys import exit
     if os.path.exists(config.DEFAULT_WALLET_DIR):
         logger.error("{0} exists. Please delete it manually and try again.".format(config.DEFAULT_WALLET_DIR))
@@ -307,7 +307,7 @@ async def run_nodeos(node_index, name, public_key, use_https = False):
             if line.startswith("error"):
                 logger.error(line)
             else:
-                logger.info(line)
+                logger.debug(line)
             if "] Produced block" in line:
                 logger.info("NODEOS is up and running")
                 break
