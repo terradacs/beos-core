@@ -7,12 +7,12 @@ LOG_LEVEL = INFO
 # directory where all sources will be downloaded
 SOURCES_DOWNLOAD_DIR = os.environ["HOME"] + "/sources"
 # beos main directory
-BEOS_DIR = SOURCES_DOWNLOAD_DIR + "/beos"
+BEOS_DIR = SOURCES_DOWNLOAD_DIR + "/beos-core"
 # path to beos sources repository
-BEOS_REPOSITORY_PATH = "git@gitlab.syncad.com:blocktrades/beos.git"
-BEOS_REPOSITORY_BRANCH = 'initial-setup'
+BEOS_REPOSITORY_PATH = "git@gitlab.syncad.com:blocktrades/beos-core.git"
+BEOS_REPOSITORY_BRANCH = 'beos-initial-release '
 #
-EOSIO_SRC_DIR = BEOS_DIR + "/eos"
+EOSIO_SRC_DIR = BEOS_DIR
 # eosio build directory - here will land final build
 EOSIO_BUILD_DIR = EOSIO_SRC_DIR + "/build"
 

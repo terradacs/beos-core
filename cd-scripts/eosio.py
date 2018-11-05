@@ -37,7 +37,7 @@ def show_wallet_unlock_postconf():
     wallet_password = None
     with open(config.WALLET_PASSWORD_PATH, "r") as password_file:
         wallet_password = password_file.readline()
-        wallet_password = wallet_password[1:-1] # remove " character from begin and end of string
+        #wallet_password = wallet_password[1:-1] # remove " character from begin and end of string
 
     parameters = [config.CLEOS_EXECUTABLE, 
         "wallet", "unlock", 
@@ -218,7 +218,7 @@ def create_wallet(wallet_url = None, unlock = False):
         wallet_password = None
         with open(config.WALLET_PASSWORD_PATH, "r") as password_file:
             wallet_password = password_file.readline()
-            wallet_password = wallet_password[1:-1] # remove " character from begin and end of string
+            #wallet_password = wallet_password[1:-1] # remove " character from begin and end of string
         unlock_wallet(config.MASTER_WALLET_NAME, wallet_password)
 
     for key in config.SYSTEM_ACCOUNT_KEYS:

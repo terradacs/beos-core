@@ -389,10 +389,10 @@ def build_eosio(c_compiler, cxx_compiler):
     if not os.path.exists(config.EOSIO_BUILD_DIR):
         os.makedirs(config.EOSIO_BUILD_DIR)
     # check if Makefile exists in build dir, if yes we will call make clean, cmake, and make
-    if os.path.exists(config.EOSIO_BUILD_DIR + "/Makefile"):
-        logger.info("Running make clean in {0}".format(config.EOSIO_BUILD_DIR))
-        params = ["make", "clean"]
-        subprocess.run(params, cwd = config.EOSIO_BUILD_DIR, stdout=config.log_main, stderr=config.log_main)
+    #if os.path.exists(config.EOSIO_BUILD_DIR + "/Makefile"):
+    #    logger.info("Running make clean in {0}".format(config.EOSIO_BUILD_DIR))
+    #    params = ["make", "clean"]
+    #    subprocess.run(params, cwd = config.EOSIO_BUILD_DIR, stdout=config.log_main, stderr=config.log_main)
     # calling cmake
     params = [
         "cmake",
@@ -436,9 +436,6 @@ def build_eosio(c_compiler, cxx_compiler):
         sys.exit(1)
 
 def install_beos(c_compiler, cxx_compiler):
-    # copying BEOS dirs to EOSIO src tree
-    copy_beos_directories()
-    #
     configure_eosio_init()
     install_eosio(c_compiler, cxx_compiler)
 
@@ -487,9 +484,6 @@ def copy_beos_directories():
         copytree(src, dst)
 
 def build_beos(c_compiler, cxx_compiler):
-    # copying BEOS dirs to EOSIO src tree
-    copy_beos_directories()
-    #
     configure_eosio_init()
     #
     configure_config_ini()
