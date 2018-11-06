@@ -49,6 +49,16 @@ fh.setFormatter(logging.Formatter(config.LOG_FORMAT))
 logger.addHandler(ch)
 logger.addHandler(fh)
 
+def run_command(parameters, working_dir):
+    ret = subprocess.run(parameters, cwd = working_dir, stdout=config.log_main, stderr=config.log_main)
+    retcode = ret.returncode
+    if retcode == 0:
+        logger.debug("Executed with ret: {0}".format(ret))
+    else:
+        logger.error("Executed with ret: {0}".format(ret))
+        logger.error("{0} command failed. Please inspect log files for more information.".format(" ".join(parameters)))
+        sys.exit(1)
+
 def get_processor_count():
     from multiprocessing import cpu_count
     return cpu_count()
@@ -102,7 +112,6 @@ def install_boost():
     logger.info("Boost libraries not detected attempting to install")
     boost_download_url = "https://sourceforge.net/projects/boost/files/boost/1.67.0/boost_1_67_0.tar.bz2/download"
     boost_archive_name = "{0}/{1}".format(config.SOURCES_DOWNLOAD_DIR, "boost_1.67.0.tar.bz2")
-    boost_source_dir = "{0}/{1}".format(config.SOURCES_DOWNLOAD_DIR, "boost_1_67_0")
     boost_root = "{0}/{1}".format(config.SOURCES_DOWNLOAD_DIR, "boost_1_67_0")
     
     logger.info("Downloading boost...")
@@ -113,29 +122,15 @@ def install_boost():
     logger.info("Decompressing boost...")
     import tarfile
     boost_tar = tarfile.open(boost_archive_name, mode = 'r:bz2')
-    boost_tar.extractall(boost_source_dir)
+    boost_tar.extractall(config.SOURCES_DOWNLOAD_DIR)
     
     logger.info("Bootstraping boost..")
-    params = ["./bootstrap.sh", "--prefix", config.BOOST_INSTALL_PREFIX]
-    ret = subprocess.run(params, cwd = boost_root)
-    retcode = ret.returncode
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("bootstrap command failed. Please inspect log files for more information.")
-        sys.exit(1)
+    params = ["./bootstrap.sh", "--prefix={0}".format(config.BOOST_INSTALL_PREFIX)]
+    run_command(params, boost_root)
     
     logger.info("Installing boost..")
     params = ["sudo", "./b2", "install"]
-    ret = subprocess.run(params, cwd = boost_root)
-    retcode = ret.returncode
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("sudo b2 install command failed. Please inspect log files for more information.")
-        sys.exit(1)
+    run_command(params, boost_root)
     
     cmake_options["BOOST_ROOT"] = config.BOOST_INSTALL_PREFIX
     os.environ["BOOST_ROOT"] = config.BOOST_INSTALL_PREFIX
@@ -166,39 +161,18 @@ def install_mongo_driver():
 
         logger.info("Running cmake...")
         params = ["cmake", "-DBUILD_SHARED_LIBS=OFF", "-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_INSTALL_PREFIX={0}".format(config.MONGO_C_INSTALL_PREFIX), ".."]
-        ret = subprocess.run(params, cwd = "{0}/{1}".format(mongoc_root, "build"))
-        retcode = ret.returncode
-        if retcode == 0:
-            logger.debug("Executed with ret: {0}".format(ret))
-        else:
-            logger.error("Executed with ret: {0}".format(ret))
-            logger.error("Cmake command failed. Please inspect log files for more information.")
-            sys.exit(1)
+        run_command(params, "{0}/{1}".format(mongoc_root, "build"))
 
         logger.info("Running make...")
-        params = ["make"]
+        params = ["sudo", "make"]
         pcnt = get_processor_count()
         if pcnt > 1:
             params.append("-j{0}".format(pcnt))
-        ret = subprocess.run(params, cwd = "{0}/{1}".format(mongoc_root, "build"))
-        retcode = ret.returncode
-        if retcode == 0:
-            logger.debug("Executed with ret: {0}".format(ret))
-        else:
-            logger.error("Executed with ret: {0}".format(ret))
-            logger.error("make command failed. Please inspect log files for more information.")
-            sys.exit(1)
+        run_command(params, "{0}/{1}".format(mongoc_root, "build"))
 
         logger.info("Installing Mongo C drivers")
         params = ["sudo", "make", "install"]
-        ret = subprocess.run(params, cwd = "{0}/{1}".format(mongoc_root, "build"))
-        retcode = ret.returncode
-        if retcode == 0:
-            logger.debug("Executed with ret: {0}".format(ret))
-        else:
-            logger.error("Executed with ret: {0}".format(ret))
-            logger.error("sudo make install command failed. Please inspect log files for more information.")
-            sys.exit(1)
+        run_command(params, "{0}/{1}".format(mongoc_root, "build"))
 
     if os.path.exists(config.MONGO_CXX_INSTALL_DIR):
         logger.info("Mongo CXX driver is already installed")
@@ -206,102 +180,27 @@ def install_mongo_driver():
         mongocxx_git_url = "https://github.com/mongodb/mongo-cxx-driver.git"
         mongocxx_root = "{0}/{1}".format(config.SOURCES_DOWNLOAD_DIR, "mongo-cxx-driver")
         logger.info("Cloning Mongo CXX sources")
-        Repo.clone_from(mongocxx_git_url, mongocxx_root,  branch = "releases/stable", depth = 1)
+        try:
+            Repo.clone_from(mongocxx_git_url, mongocxx_root,  branch = "releases/stable", depth = 1)
+        except Exception as ex:
+            logger.error(ex)
+            sys.exit(1)
 
         logger.info("Running cmake...")
         params = ["cmake", "-DBUILD_SHARED_LIBS=OFF", "-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_INSTALL_PREFIX={0}".format(config.MONGO_C_INSTALL_PREFIX), ".."]
-        ret = subprocess.run(params, cwd = "{0}/{1}".format(mongocxx_root, "build"))
-        retcode = ret.returncode
-        if retcode == 0:
-            logger.debug("Executed with ret: {0}".format(ret))
-        else:
-            logger.error("Executed with ret: {0}".format(ret))
-            logger.error("Cmake command failed. Please inspect log files for more information.")
-            sys.exit(1)
+        run_command(params, "{0}/{1}".format(mongocxx_root, "build"))
 
         logger.info("Running make...")
-        params = ["make"]
+        # for some weird reason it need sudo!
+        params = ["sudo", "make"]
         pcnt = get_processor_count()
         if pcnt > 1:
             params.append("-j{0}".format(pcnt))
-        ret = subprocess.run(params, cwd = "{0}/{1}".format(mongocxx_root, "build"))
-        retcode = ret.returncode
-        if retcode == 0:
-            logger.debug("Executed with ret: {0}".format(ret))
-        else:
-            logger.error("Executed with ret: {0}".format(ret))
-            logger.error("make command failed. Please inspect log files for more information.")
-            sys.exit(1)
+        run_command(params, "{0}/{1}".format(mongocxx_root, "build"))
 
         logger.info("Installing Mongo CXX drivers")
         params = ["sudo", "make", "install"]
-        ret = subprocess.run(params, cwd = "{0}/{1}".format(mongocxx_root, "build"))
-        if retcode == 0:
-            logger.debug("Executed with ret: {0}".format(ret))
-        else:
-            logger.error("Executed with ret: {0}".format(ret))
-            logger.error("sudo make install command failed. Please inspect log files for more information.")
-            sys.exit(1)
-
-def install_secp256k1_zkp():
-    logger.info("=== Checking for secp256k1")
-    if os.path.exists("{0}/{1}".format(config.SECP256_INSTALL_PREFIX, "include/secp256k1.h")):
-        logger.info("secp256k1 is already installed")
-        return
-
-    logger.info("secp256k1 is not installed. Performing installation...")
-    secp256k1_url = "https://github.com/cryptonomex/secp256k1-zkp.git"
-    secp256k1_root = "{0}/{1}".format(config.SOURCES_DOWNLOAD_DIR, "secp256k1-zkp")
-    
-    from git import Repo
-    Repo.clone_from(secp256k1_url, secp256k1_root,  branch = "releases/stable", depth = 1)
-
-    logger.info("Running autogen.sh...")
-    params = ["./autogen.sh"]
-    ret = subprocess.run(params, cwd = secp256k1_root)
-    retcode = ret.returncode
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("Cmake command failed. Please inspect log files for more information.")
-        sys.exit(1)
-
-    logger.info("Running configure...")
-    params = ["./configure", "--prefix", config.SECP256_INSTALL_PREFIX]
-    ret = subprocess.run(params, cwd = secp256k1_root)
-    retcode = ret.returncode
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("configure command failed. Please inspect log files for more information.")
-        sys.exit(1)
-
-    logger.info("Running make...")
-    params = ["make"]
-    pcnt = get_processor_count()
-    if pcnt > 1:
-        params.append("-j{0}".format(pcnt))
-    ret = subprocess.run(params, cwd = secp256k1_root)
-    retcode = ret.returncode
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("make command failed. Please inspect log files for more information.")
-        sys.exit(1)
-
-    logger.info("Installing secp256k1-zkp")
-    params = ["sudo", "make", "install"]
-    ret = subprocess.run(params, cwd = secp256k1_root)
-    retcode = ret.returncode
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("Sudo make install command failed. Please inspect log files for more information.")
-        sys.exit(1)
+        run_command(params, "{0}/{1}".format(mongocxx_root, "build"))
 
 def install_wasm():
     logger.info("=== Checking for WASM")
@@ -315,9 +214,12 @@ def install_wasm():
         cmake_options["WASM_ROOT"] = config.WASM_INSTALL_DIR
         os.environ["WASM_ROOT"] = config.WASM_INSTALL_DIR
         return cmake_options
-    
-    Repo.clone_from(wasm_llvm_url, wasm_root + "/llvm",  branch = "release_40", depth = 1)
-    Repo.clone_from(wasm_clang_url, wasm_root + "/llvm/tools/clang",  branch = "release_40", depth = 1)
+    try:
+        Repo.clone_from(wasm_llvm_url, wasm_root + "/llvm",  branch = "release_40", depth = 1)
+        Repo.clone_from(wasm_clang_url, wasm_root + "/llvm/tools/clang",  branch = "release_40", depth = 1)
+    except Exception as ex:
+        logger.error(ex)
+        sys.exit(1)
     
     wasm_build_dir = wasm_root + "/llvm/build"
     if not os.path.exists(wasm_build_dir):
@@ -325,39 +227,18 @@ def install_wasm():
         makedirs(wasm_build_dir)
         
     params = ["cmake", "-G", "Unix Makefiles", "-DCMAKE_INSTALL_PREFIX={0}".format(config.WASM_INSTALL_DIR), "-DLLVM_TARGETS_TO_BUILD=", "-DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=WebAssembly", "-DCMAKE_BUILD_TYPE=Release", ".."]
-    ret = subprocess.run(params, cwd = wasm_build_dir)
-    retcode = ret.returncode
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("Cmake command failed. Please inspect log files for more information.")
-        sys.exit(1)
+    run_command(params, wasm_build_dir)
 
     logger.info("Running make...")
     params = ["make"]
     pcnt = get_processor_count()
     if pcnt > 1:
         params.append("-j{0}".format(pcnt))
-    ret = subprocess.run(params, cwd = wasm_build_dir)
-    retcode = ret.returncode
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("make command failed. Please inspect log files for more information.")
-        sys.exit(1)
+    run_command(params, wasm_build_dir)
 
-    logger.info("Installing secp256k1-zkp")
+    logger.info("Installing WASM")
     params = ["sudo", "make", "install"]
-    ret = subprocess.run(params, cwd = wasm_build_dir)
-    retcode = ret.returncode
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("sudo make install command failed. Please inspect log files for more information.")
-        sys.exit(1)
+    run_command(params, wasm_build_dir)
 
     cmake_options["WASM_ROOT"] = config.WASM_INSTALL_DIR
     os.environ["WASM_ROOT"] = config.WASM_INSTALL_DIR
@@ -367,22 +248,13 @@ def install_libraries():
     install_system_packages()
     install_boost()
     install_mongo_driver()
-# Not needed - proper version of this library is a part of eos now.
-#    install_secp256k1_zkp()
     install_wasm()
 
 def install_eosio(c_compiler, cxx_compiler):
     build_eosio(c_compiler, cxx_compiler)
     logger.info("Running make install {0}".format(config.BEOS_BUILD_DIR))
     params = ["sudo", "make", "install"]
-    ret = subprocess.run(params, cwd = config.BEOS_BUILD_DIR, stdout=config.log_main, stderr=config.log_main)
-    retcode = ret.returncode
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("Make install command failed. Please inspect log files for more information.")
-        sys.exit(1)
+    run_command(params, config.BEOS_BUILD_DIR)
 
 def build_eosio(c_compiler, cxx_compiler):
     # check if build dir exists, if not make one
@@ -413,28 +285,14 @@ def build_eosio(c_compiler, cxx_compiler):
         config.BEOS_DIR
     ]
     logger.info("Running cmake with params {0}".format(" ".join(params)))
-    ret = subprocess.run(params, cwd = config.BEOS_BUILD_DIR, stdout=config.log_main, stderr=config.log_main)
-    retcode = ret.returncode
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("Cmake command failed. Please inspect log files for more information.")
-        sys.exit(1)
+    run_command(params, config.BEOS_BUILD_DIR)
     
     logger.info("Running make in {0}".format(config.BEOS_BUILD_DIR))
     params = ["make"]
     pcnt = get_processor_count()
     if pcnt > 1:
         params.append("-j{0}".format(pcnt))
-    ret = subprocess.run(params, cwd = config.BEOS_BUILD_DIR, stdout=config.log_main, stderr=config.log_main)
-    retcode = ret.returncode
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("make command failed. Please inspect log files for more information.")
-        sys.exit(1)
+    run_command(params, config.BEOS_BUILD_DIR)
 
 def install_beos(c_compiler, cxx_compiler):
     configure_eosio_init()
@@ -448,6 +306,15 @@ def build_beos(c_compiler, cxx_compiler):
     configure_genesis_json()
     #
     build_eosio(c_compiler, cxx_compiler)
+
+def create_file_from_template(template_src, file_dst, template_dict):
+    dst = None
+    with open(template_src, "r") as in_f:
+        from string import Template
+        src = Template(in_f.read())
+        dst = src.substitute(template_dict)
+    with open(file_dst, "w") as out_f:
+        out_f.write(dst)
 
 def configure_eosio_init():
     eosio_init_opt = {
@@ -470,13 +337,7 @@ def configure_eosio_init():
 
     eosio_init_src = config.BEOS_DIR + "/contracts/eosio.init/eosio.init.hpp.in"
     eosio_init_dst = config.BEOS_DIR + "/contracts/eosio.init/eosio.init.hpp"
-    dst = None
-    with open(eosio_init_src, "r") as in_f:
-        from string import Template
-        src = Template(in_f.read())
-        dst = src.substitute(eosio_init_opt)
-    with open(eosio_init_dst, "w") as out_f:
-        out_f.write(dst)
+    create_file_from_template(eosio_init_src, eosio_init_dst, eosio_init_opt)
 
 def configure_config_ini():
     ini_opt = {
@@ -487,12 +348,7 @@ def configure_config_ini():
     }
     ini_src = os.path.dirname(os.path.abspath(__file__)) + "/resources/config.ini.in"
     ini_dst = os.path.dirname(os.path.abspath(__file__)) + "/resources/config.ini"
-    with open(ini_src, "r") as in_f:
-        from string import Template
-        src = Template(in_f.read())
-        dst = src.substitute(ini_opt)
-    with open(ini_dst, "w") as out_f:
-        out_f.write(dst)
+    create_file_from_template(ini_src, ini_dst, ini_opt)
 
 def configure_genesis_json():
     json_opt = {
@@ -500,19 +356,14 @@ def configure_genesis_json():
     }
     json_src = os.path.dirname(os.path.abspath(__file__)) + "/resources/genesis.json.in"
     json_dst = os.path.dirname(os.path.abspath(__file__)) + "/resources/genesis.json"
-    with open(json_src, "r") as in_f:
-        from string import Template
-        src = Template(in_f.read())
-        dst = src.substitute(json_opt)
-    with open(json_dst, "w") as out_f:
-        out_f.write(dst)
+    create_file_from_template(json_src, json_dst, json_opt)
 
 def initialize_beos():
     import eosio
     try:
-        eosio.run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR, False, True)
+        keosd = eosio.run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR, False, True)
         eosio.create_wallet("http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT), False)
-        eosio.run_nodeos(config.START_NODE_INDEX, "eosio", config.EOSIO_PUBLIC_KEY)
+        nodeos = eosio.run_nodeos(config.START_NODE_INDEX, "eosio", config.EOSIO_PUBLIC_KEY)
 
         eosio.create_account("eosio", "eosio.msig", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
         eosio.create_account("eosio", "eosio.names", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
@@ -539,14 +390,15 @@ def initialize_beos():
         eosio.set_contract("beos.gateway", config.CONTRACTS_DIR + "eosio.gateway", "beos.gateway")
         eosio.set_contract("beos.distrib", config.CONTRACTS_DIR + "eosio.distribution", "beos.distrib")
 
-        eosio.push_action("eosio", "initram", '[ "beos.gateway", "{0}"]'.format(config.INIT_RAM), "eosio")
+        #eosio.push_action("eosio", "initram", '[ "beos.gateway", "{0}"]'.format(config.INIT_RAM), "eosio")
+        eosio.push_action("eosio", "initresource", '[ "beos.gateway", "{0}", "{1} {2}", "{3} {4}"]'.format(config.INIT_RAM, config.STAKE_NET_QUANTITY, config.CORE_SYMBOL_NAME, config.STAKE_CPU_QUANTITY, config.CORE_SYMBOL_NAME), "eosio")
 
-        eosio.terminate_running_tasks()
+        eosio.terminate_running_tasks(nodeos, keosd)
         eosio.show_keosd_postconf(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
         eosio.show_wallet_unlock_postconf()
         eosio.show_nodeos_postconf(0, "eosio", config.EOSIO_PUBLIC_KEY)
-    except eosio.EOSIOException as ex:
-        eosio.terminate_running_tasks()
+    except Exception as ex:
+        eosio.terminate_running_tasks(nodeos, keosd)
         logger.error("Exception during initialize: {0}".format(ex))
         sys.exit(1)
 
@@ -565,7 +417,6 @@ def clear_initialization_data(node_index, name):
         logger.info("{0} exists. Deleting.".format(working_dir))
         rmtree(working_dir)
 
-
 def make_integration_test():
     if os.path.exists(config.BEOS_BUILD_DIR + "/Makefile"):
         logger.info("Running integration tests")
@@ -578,20 +429,16 @@ def make_unit_test():
     logger.info("Running unit tests")
     tests_working_dir = "{0}/{1}".format(config.BEOS_BUILD_DIR, "unittests/")
     params = ["./unit_test"]
-    subprocess.run(params, cwd = tests_working_dir, stdout=config.log_main, stderr=config.log_main)
+    run_command(params, tests_working_dir)
 
 def make_beos_plugin_test():
     logger.info("Running BEOS plugin tests")
     tests_working_dir = "{0}/{1}".format(config.BEOS_BUILD_DIR, "tests/beos_plugin_tests/")
     params = ["./test01.py", "--main-dir", config.BEOS_BUILD_DIR]
-    subprocess.run(params, cwd = tests_working_dir, stdout=config.log_main, stderr=config.log_error)
-
-# Disabled as requeste by mtrela
-#    params = ["./test02.py", "--main-dir", config.BEOS_BUILD_DIR]
-#    subprocess.run(params, cwd = tests_working_dir, stdout=config.log_main, stderr=config.log_error)
+    run_command(params, tests_working_dir)
 
     params = ["./test03.py", "--main-dir", config.BEOS_BUILD_DIR]
-    subprocess.run(params, cwd = tests_working_dir, stdout=config.log_main, stderr=config.log_main)
+    run_command(params, tests_working_dir)
 
 if __name__ == '__main__':
     from optparse import OptionParser, OptionGroup
@@ -606,10 +453,8 @@ if __name__ == '__main__':
     librariesGroup.add_option("--install-system-packages", action="store_true", dest="install_system_packages", help="Install system packages available in system repositories.")
     librariesGroup.add_option("--install-boost", action="store_true", dest="install_boost", help="Install newest version of the boost library.")
     librariesGroup.add_option("--install-mongo-driver", action="store_true", dest="install_mongo_driver", help="Install C and C++ drivers for MongoDB.")
-# Not needed - proper version of this library is a part of eos now.
-#    librariesGroup.add_option("--install-secp256k1-zkp", action="store_true", dest="install_secp256k1_zkp", help="Install SCEP256K1 library.")
     librariesGroup.add_option("--install-wasm", action="store_true", dest="install_wasm", help="Install WASM compiler.")
-    librariesGroup.add_option("--install-libraries", action="store_true", dest="install_libraries", help="Install boost, mongo plugin, secp256k1 library and WASM compiler in one step.")
+    librariesGroup.add_option("--install-libraries", action="store_true", dest="install_libraries", help="Install boost, mongo plugin and WASM compiler in one step.")
 
     buildGroup = OptionGroup(parser, "BEOS/EOSIO building and installing actions")
     buildGroup.add_option("--install-eosio", action="store_true", dest="install_eosio", help="Build EOSIO and install it to the specified directory.")
@@ -664,10 +509,6 @@ if __name__ == '__main__':
 
     if options.install_mongo_driver:
         install_mongo_driver()
-
-# Not needed - proper version of this library is a part of eos now.
-#    if options.install_secp256k1_zkp:
-#        install_secp256k1_zkp()
 
     if options.install_wasm:
         install_wasm()

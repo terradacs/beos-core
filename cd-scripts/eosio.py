@@ -33,6 +33,32 @@ class EOSIOException(Exception):
     def __str__(self):
         return self.message
 
+def run_command(parameters):
+    ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
+    retcode = ret.returncode
+    if retcode == 0:
+        logger.debug("Executed with ret: {0}".format(ret))
+    else:
+        logger.error("Executed with ret: {0}".format(ret))
+        logger.error("Initialization failed on last command")
+        raise EOSIOException("Initialization failed on last command")
+
+def run_service(service_name, parameters, unblock_trigger, raise_on_error = False):
+    proc = subprocess.Popen(parameters, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    while True:
+        line = proc.stdout.readline()
+        line = line.decode('utf-8').strip()
+        if line.startswith("error"):
+            logger.error(line)
+            if raise_on_error:
+                raise EOSIOException("Error during {0} run".format(service_name))
+        else:
+            logger.debug(line)
+            if unblock_trigger in line:
+                logger.info("{0} is up and running".format(service_name))
+                break
+    return proc
+
 def show_wallet_unlock_postconf():
     wallet_password = None
     with open(config.WALLET_PASSWORD_PATH, "r") as password_file:
@@ -126,8 +152,6 @@ def run_keosd(ip_address, port, wallet_dir, use_https = False, forceWalletCleanu
     os.makedirs(config.DEFAULT_WALLET_DIR)
     os.makedirs(config.WALLET_PASSWORD_DIR)
 
-    time.sleep(0.5)
-
     parameters = None
     if use_https:
         # run kleosd in https mode
@@ -144,8 +168,7 @@ def run_keosd(ip_address, port, wallet_dir, use_https = False, forceWalletCleanu
             "--wallet-dir", wallet_dir,
         ]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
-    subprocess.Popen(parameters, stdout=config.log_main, stderr=config.log_main)    
-    time.sleep(2)
+    return run_service("KEOSD", parameters, "add api url: /v1/wallet/unlock", True)
 
 def unlock_wallet(wallet_name, wallet_password):
     parameters = [config.CLEOS_EXECUTABLE, 
@@ -154,15 +177,7 @@ def unlock_wallet(wallet_name, wallet_password):
         "--password", wallet_password
     ]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
-    ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
-    retcode = ret.returncode
-    time.sleep(1)
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("Initialization failed on last command")
-        raise EOSIOException("Initialization failed on last command")
+    run_command(parameters)
 
 def import_key(wallet_name, key, wallet_url = None):
     if key:
@@ -180,15 +195,7 @@ def import_key(wallet_name, key, wallet_url = None):
         ]
         
         logger.info("Executing command: {0}".format(" ".join(parameters)))
-        ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
-        retcode = ret.returncode
-        time.sleep(1)
-        if retcode == 0:
-            logger.debug("Executed with ret: {0}".format(ret))
-        else:
-            logger.error("Executed with ret: {0}".format(ret))
-            logger.error("Initialization failed on last command")
-            raise EOSIOException("Initialization failed on last command")
+        run_command(parameters)
     else:
         logger.error("Importing empty key!")
         raise EOSIOException("Importing empty key!")
@@ -211,15 +218,7 @@ def create_wallet(wallet_url = None, unlock = False):
         ]
 
     logger.info("Executing command: {0}".format(" ".join(parameters)))
-    ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
-    retcode = ret.returncode
-    time.sleep(1)
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("Initialization failed on last command")
-        raise EOSIOException("Initialization failed on last command")
+    run_command(parameters)
 
     if unlock:
         wallet_password = None
@@ -284,13 +283,7 @@ def run_nodeos(node_index, name, public_key, use_https = False):
     parameters = parameters + https_opts + plugins
 
     logger.info("Executing command: {0}".format(" ".join(parameters)))
-    try:
-        import time
-        subprocess.Popen(parameters, stdout=config.log_main, stderr=config.log_main)
-        time.sleep(2.0)
-    except Exception as ex:
-        logger.error("Exception during spawning nodeos process: {0}".format(ex))
-    return 0
+    return run_service("NODEOS", parameters, "] Produced block", False)
 
 def create_account(creator, name, owner_key, active_key, schema = "http"):
     if not owner_key and not active_key:
@@ -301,15 +294,7 @@ def create_account(creator, name, owner_key, active_key, schema = "http"):
         "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
         "create", "account", creator, name, owner_key, active_key]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
-    ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
-    retcode = ret.returncode
-    time.sleep(1)
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("Initialization failed on last command")
-        raise EOSIOException("Initialization failed on last command")
+    run_command(parameters)
 
 def set_contract(account, contract, permission, schema = "http"):
     parameters = [config.CLEOS_EXECUTABLE, 
@@ -317,15 +302,7 @@ def set_contract(account, contract, permission, schema = "http"):
         "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
         "set", "contract", account, contract, "-p", permission]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
-    ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
-    retcode = ret.returncode
-    time.sleep(1)
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("Initialization failed on last command")
-        raise EOSIOException("Initialization failed on last command")
+    run_command(parameters)
 
 def push_action(account, action, data, permission, schema = "http"):
     parameters = [config.CLEOS_EXECUTABLE, 
@@ -333,42 +310,69 @@ def push_action(account, action, data, permission, schema = "http"):
         "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
         "push", "action", account, action, data, "-p", permission]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
-    ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
-    retcode = ret.returncode
-    time.sleep(1)
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("Initialization failed on last command")
-        raise EOSIOException("Initialization failed on last command")
+    run_command(parameters)
 
-def terminate_running_tasks():
-    parameters = ["pkill", "nodeos"]
-    logger.info("Executing command: {0}".format(" ".join(parameters)))
-    ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
-    retcode = ret.returncode
-    time.sleep(1)
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("Initialization failed on last command")
-        raise EOSIOException("Initialization failed on last command")
+def terminate_running_tasks(nodeos, keosd):
+    from signal import SIGINT
+    if nodeos is not None:
+        logger.info("Terminating NODEOS")
+        nodeos.send_signal(SIGINT)
+        nodeos.wait()
 
-    parameters = ["pkill", "keosd"]
-    logger.info("Executing command: {0}".format(" ".join(parameters)))
-    ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
-    retcode = ret.returncode
-    time.sleep(1)
-    if retcode == 0:
-        logger.debug("Executed with ret: {0}".format(ret))
-    else:
-        logger.error("Executed with ret: {0}".format(ret))
-        logger.error("Initialization failed on last command")
-        raise EOSIOException("Initialization failed on last command")
+    if keosd is not None:
+        logger.info("Terminating KEOSD")
+        keosd.send_signal(SIGINT)
+        keosd.wait()
 
 if __name__ == '__main__':
-    run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
-    create_wallet("http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT))
-    run_nodeos(0, "eosio", config.EOSIO_PUBLIC_KEY)
+    name = "eosio"
+
+    from shutil import rmtree
+    if os.path.exists(config.DEFAULT_WALLET_DIR):
+        logger.info("{0} exists. Deleting.".format(config.DEFAULT_WALLET_DIR))
+        rmtree(config.DEFAULT_WALLET_DIR)
+    
+    if os.path.exists(config.WALLET_PASSWORD_DIR):
+        logger.info("{0} exists. Deleting.".format(config.WALLET_PASSWORD_DIR))
+        rmtree(config.WALLET_PASSWORD_DIR)
+    
+    working_dir = "{0}{1}-{2}/".format(config.NODEOS_WORKING_DIR, config.START_NODE_INDEX, name)
+    if os.path.exists(working_dir):
+        logger.info("{0} exists. Deleting.".format(working_dir))
+        rmtree(working_dir)
+
+    keosd = run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
+    create_wallet("http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT), False)
+    nodeos = run_nodeos(config.START_NODE_INDEX, "eosio", config.EOSIO_PUBLIC_KEY)
+
+    create_account("eosio", "eosio.msig", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+    create_account("eosio", "eosio.names", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+    create_account("eosio", "eosio.saving", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+    create_account("eosio", "eosio.vpay", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+    create_account("eosio", "eosio.unregd", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+    
+    create_account("eosio", "eosio.bpay", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+
+    create_account("eosio", "eosio.ram", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+    create_account("eosio", "eosio.ramfee", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+    create_account("eosio", "eosio.stake", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+
+    create_account("eosio", "eosio.token", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+    create_account("eosio", "beos.init", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY)
+
+    set_contract("eosio.token", config.CONTRACTS_DIR + "/eosio.token", "eosio.token")
+
+    push_action("eosio.token", "create", '[ "beos.distrib", "{0} {1}"]'.format(config.CORE_INITIAL_AMOUNT, config.CORE_SYMBOL_NAME), "eosio.token")
+    push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PROXY_INITIAL_AMOUNT, config.PROXY_ASSET_NAME), "eosio.token")
+
+    set_contract("eosio", config.CONTRACTS_DIR + "eosio.system", "eosio")
+    set_contract("beos.init", config.CONTRACTS_DIR + "eosio.init", "beos.init")
+    set_contract("beos.gateway", config.CONTRACTS_DIR + "eosio.gateway", "beos.gateway")
+    set_contract("beos.distrib", config.CONTRACTS_DIR + "eosio.distribution", "beos.distrib")
+
+    push_action("eosio", "initram", '[ "beos.gateway", "{0}"]'.format(config.INIT_RAM), "eosio")
+
+    terminate_running_tasks(nodeos, keosd)
+    show_keosd_postconf(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
+    show_wallet_unlock_postconf()
+    show_nodeos_postconf(0, "eosio", config.EOSIO_PUBLIC_KEY)
