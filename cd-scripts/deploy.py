@@ -254,7 +254,7 @@ def install_eosio(c_compiler, cxx_compiler):
     build_eosio(c_compiler, cxx_compiler)
     logger.info("Running make install {0}".format(config.BEOS_BUILD_DIR))
     params = ["sudo", "make", "install"]
-    run_command(params, config.EOSIO_BUILD_DIR)
+    run_command(params, config.BEOS_BUILD_DIR)
 
 def build_eosio(c_compiler, cxx_compiler):
     # check if build dir exists, if not make one
@@ -285,14 +285,14 @@ def build_eosio(c_compiler, cxx_compiler):
         config.BEOS_DIR
     ]
     logger.info("Running cmake with params {0}".format(" ".join(params)))
-    run_command(params, config.EOSIO_BUILD_DIR)
+    run_command(params, config.BEOS_BUILD_DIR)
     
     logger.info("Running make in {0}".format(config.BEOS_BUILD_DIR))
     params = ["make"]
     pcnt = get_processor_count()
     if pcnt > 1:
         params.append("-j{0}".format(pcnt))
-    run_command(params, config.EOSIO_BUILD_DIR)
+    run_command(params, config.BEOS_BUILD_DIR)
 
 def install_beos(c_compiler, cxx_compiler):
     configure_eosio_init()
@@ -336,7 +336,7 @@ def configure_eosio_init():
     }
 
     eosio_init_src = config.BEOS_DIR + "/contracts/eosio.init/eosio.init.hpp.in"
-    eosio_init_dst = config.EOSIO_SRC_DIR + "/contracts/eosio.init/eosio.init.hpp"
+    eosio_init_dst = config.BEOS_DIR + "/contracts/eosio.init/eosio.init.hpp"
     create_file_from_template(eosio_init_src, eosio_init_dst, eosio_init_opt)
 
 def configure_config_ini():
@@ -432,11 +432,11 @@ def make_unit_test():
 
 def make_beos_plugin_test():
     logger.info("Running BEOS plugin tests")
-    tests_working_dir = "{0}/{1}".format(config.EOSIO_BUILD_DIR, "tests/beos_plugin_tests/")
-    params = ["./test01.py", "--main-dir", config.EOSIO_BUILD_DIR]
+    tests_working_dir = "{0}/{1}".format(config.BEOS_BUILD_DIR, "tests/beos_plugin_tests/")
+    params = ["./test01.py", "--main-dir", config.BEOS_BUILD_DIR]
     run_command(params, tests_working_dir)
 
-    params = ["./test03.py", "--main-dir", config.EOSIO_BUILD_DIR]
+    params = ["./test03.py", "--main-dir", config.BEOS_BUILD_DIR]
     run_command(params, tests_working_dir)
 
 if __name__ == '__main__':
