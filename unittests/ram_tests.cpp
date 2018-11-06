@@ -91,7 +91,7 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                         ("payer", "testram11111")
                         ("from", 1)
                         ("to", 10)
-                        ("size", 1780 /*1910*/));
+                        ("size", 1155 /*1780*/ /*1910*/));//1780 -> 1155 because of changes in multi_index
    produce_blocks(1);
    auto ram_usage = rlm.get_account_ram_usage(N(testram11111));
 
@@ -118,9 +118,9 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                         ("payer", "testram11111")
                         ("from", 1)
                         ("to", 10)
-                        ("size", 1680/*1810*/));
+                        ("size", 1155 /*1680*/ /*1810*/));//1680 -> 1155 because of changes in multi_index
    produce_blocks(1);
-   BOOST_REQUIRE_EQUAL(ram_usage - 1000, rlm.get_account_ram_usage(N(testram11111)));
+   BOOST_REQUIRE_EQUAL(ram_usage, rlm.get_account_ram_usage(N(testram11111)));
 
    // verify the added entry is beyond the allocation bytes limit
    BOOST_REQUIRE_EXCEPTION(
@@ -132,7 +132,7 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                            ram_usage_exceeded,
                            fc_exception_message_starts_with("account testram11111 has insufficient ram"));
    produce_blocks(1);
-   BOOST_REQUIRE_EQUAL(ram_usage - 1000, rlm.get_account_ram_usage(N(testram11111)));
+   BOOST_REQUIRE_EQUAL(ram_usage, rlm.get_account_ram_usage(N(testram11111)));
 
    // verify the new entry's bytes minus the freed up bytes for existing entries still exceeds the allocation bytes limit
    BOOST_REQUIRE_EXCEPTION(
@@ -144,14 +144,14 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                            ram_usage_exceeded,
                            fc_exception_message_starts_with("account testram11111 has insufficient ram"));
    produce_blocks(1);
-   BOOST_REQUIRE_EQUAL(ram_usage - 1000, rlm.get_account_ram_usage(N(testram11111)));
+   BOOST_REQUIRE_EQUAL(ram_usage, rlm.get_account_ram_usage(N(testram11111)));
 
    // verify the new entry's bytes minus the freed up bytes for existing entries are under the allocation bytes limit
    tester->push_action( N(testram11111), N(setentry), N(testram11111), mvo()
                         ("payer", "testram11111")
                         ("from", 1)
                         ("to", 11)
-                        ("size", 1600/*1720*/));
+                        ("size", 1039/*1600*/ /*1720*/));//1600 -> 1039 because of changes in multi_index
    produce_blocks(1);
 
    tester->push_action( N(testram11111), N(rmentry), N(testram11111), mvo()
@@ -175,7 +175,7 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                         ("payer", "testram11111")
                         ("from", 12)
                         ("to", 12)
-                        ("size", 1620/*1720*/));
+                        ("size", 1040/*1620*/ /*1720*/));//1620 -> 1040 because of changes in multi_index
    produce_blocks(1);
 
    // verify that anoth new entry will exceed the allocation bytes limit, to setup testing of new payer
@@ -214,7 +214,7 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                         ("payer", "testram11111")
                         ("from", 13)
                         ("to", 13)
-                        ("size", 1720));
+                        ("size", 1040 /*1720*/));//1720 -> 1040 because of changes in multi_index
    produce_blocks(1);
 
    // verify that new entries for testram22222 exceed the allocation bytes limit
@@ -233,7 +233,7 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                         ("payer", "testram22222")
                         ("from", 12)
                         ("to", 21)
-                        ("size", 1910));
+                        ("size", 1210 /*1910*/ ));//1910 -> 1210 because of changes in multi_index
    produce_blocks(1);
 
    // verify that new entry for testram22222 exceed the allocation bytes limit
