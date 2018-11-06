@@ -314,6 +314,9 @@ def push_action(account, action, data, permission, schema = "http"):
 
 def terminate_running_tasks(nodeos, keosd):
     from signal import SIGINT
+    #Just to produce few blocks and accept lately scheduled transaction(s)
+    time.sleep(2)
+
     if nodeos is not None:
         logger.info("Terminating NODEOS")
         nodeos.send_signal(SIGINT)
