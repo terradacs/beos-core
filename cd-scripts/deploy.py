@@ -390,7 +390,8 @@ def initialize_beos():
         eosio.set_contract("beos.gateway", config.CONTRACTS_DIR + "eosio.gateway", "beos.gateway")
         eosio.set_contract("beos.distrib", config.CONTRACTS_DIR + "eosio.distribution", "beos.distrib")
 
-        eosio.push_action("eosio", "initram", '[ "beos.gateway", "{0}"]'.format(config.INIT_RAM), "eosio")
+        #eosio.push_action("eosio", "initram", '[ "beos.gateway", "{0}"]'.format(config.INIT_RAM), "eosio")
+        eosio.push_action("eosio", "initresource", '[ "beos.gateway", "{0}", "{1} {2}", "{3} {4}"]'.format(config.INIT_RAM, config.STAKE_NET_QUANTITY, config.CORE_SYMBOL_NAME, config.STAKE_CPU_QUANTITY, config.CORE_SYMBOL_NAME), "eosio")
 
         eosio.terminate_running_tasks(nodeos, keosd)
         eosio.show_keosd_postconf(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
