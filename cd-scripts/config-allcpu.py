@@ -12,9 +12,7 @@ BEOS_DIR = SOURCES_DOWNLOAD_DIR + "/beos-core"
 BEOS_REPOSITORY_PATH = "git@gitlab.syncad.com:blocktrades/beos-core.git"
 BEOS_REPOSITORY_BRANCH = 'beos-initial-release '
 #
-EOSIO_SRC_DIR = BEOS_DIR
-# eosio build directory - here will land final build
-EOSIO_BUILD_DIR = EOSIO_SRC_DIR + "/build"
+BEOS_BUILD_DIR = BEOS_DIR + "/build/"
 
 MAIN_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
 ERROR_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
@@ -76,7 +74,7 @@ COMMON_SYSTEM_ACCOUNT_OWNER_PRIVATE_KEY = "5JpSDcXq6TfzQxkFmYFXQygHR6jG3pWjtGnRm
 COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY = "EOS53QRGWCMxxHtKqFjiMQo8isf3so1dUSMhPezceFBknF8T5ht9b"
 COMMON_SYSTEM_ACCOUNT_ACTIVE_PRIVATE_KEY = "5Hw8qBPp4Hpbf2wja6bA34t3x58cp4XBmDxkz7HKQGsFZ4vJ2HT"
 # path to contracts directory
-CONTRACTS_DIR = EOSIO_BUILD_DIR + "/contracts/"
+CONTRACTS_DIR = BEOS_BUILD_DIR + "/contracts/"
 
 # The main keys to the blockchain net, that allow creation of system accounts
 # EOSIO public key
@@ -94,11 +92,9 @@ BEOS_DISTRIB_PUBLIC_KEY = "EOS5FUjQDE6QLiGZKt7hGwBypCAJPL53X3SYf6Gf4JxMkdyH1wMrF
 BEOS_DISTRIB_PRIVATE_KEY = "5HvT4NQKyLMojJpa2qPCquwkGmppC6dqCJQK7cBcMFPR2i3Ei4p"
 
 # path to keosd executable
-KEOSD_EXECUTABLE = EOSIO_BUILD_DIR + "/programs/keosd/keosd"
+KEOSD_EXECUTABLE = BEOS_BUILD_DIR + "/programs/keosd/keosd"
 # keosd ip address
-#KEOSD_IP_ADDRESS = "127.0.0.1"
 KEOSD_IP_ADDRESS = "192.168.6.242"
-
 # keosd port
 KEOSD_PORT = 8900
 # keosd certificate chain file - mandatory for https
@@ -107,27 +103,11 @@ KEOSD_CERTIFICATE_CHAIN_FILE = None
 KEOSD_PRIVATE_KEY_FILE = None
 
 # path to cleos executable
-CLEOS_EXECUTABLE = EOSIO_BUILD_DIR + "/programs/cleos/cleos"
+CLEOS_EXECUTABLE = BEOS_BUILD_DIR + "/programs/cleos/cleos"
 # path to nodeos executable
-NODEOS_EXECUTABLE = EOSIO_BUILD_DIR + "/programs/nodeos/nodeos"
+NODEOS_EXECUTABLE = BEOS_BUILD_DIR + "/programs/nodeos/nodeos"
 # nodeos ip address
-#NODEOS_IP_ADDRESS = "127.0.0.1"
 NODEOS_IP_ADDRESS = "192.168.6.242"
-# keosd port
-KEOSD_PORT = 8900
-# keosd certificate chain file - mandatory for https
-KEOSD_CERTIFICATE_CHAIN_FILE = None
-# keosd private key file path - mandatory for https
-KEOSD_PRIVATE_KEY_FILE = None
-
-# path to cleos executable
-CLEOS_EXECUTABLE = EOSIO_BUILD_DIR + "/programs/cleos/cleos"
-# path to nodeos executable
-NODEOS_EXECUTABLE = EOSIO_BUILD_DIR + "/programs/nodeos/nodeos"
-# nodeos ip address
-#NODEOS_IP_ADDRESS = "127.0.0.1"
-NODEOS_IP_ADDRESS = "192.168.6.242"
-
 # nodeos port
 NODEOS_PORT = 8888
 # nodeos certificate chain file - mandatory for https
@@ -141,7 +121,7 @@ DEFAULT_WALLET_DIR = os.environ["HOME"] + "/eosio-wallet"
 # name of the master wallet
 MASTER_WALLET_NAME = "beos_master_wallet"
 # directory with password file for master wallet
-WALLET_PASSWORD_DIR = EOSIO_BUILD_DIR + "/wallet/"
+WALLET_PASSWORD_DIR = BEOS_BUILD_DIR + "/wallet/"
 # password file for master wallet KEEP SECURE
 WALLET_PASSWORD_PATH = WALLET_PASSWORD_DIR + "wallet.dat"
 # KEEPING KEYS IN PUBLIC FILE IS NOT WISE!
