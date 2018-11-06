@@ -7,15 +7,109 @@
 #include <eosiolib/time.hpp>
 #include <eosiolib/asset.hpp>
 #include <eosiolib/eosio.hpp>
+#include <eosiolib/singleton.hpp>
 
 namespace eosio {
+
+    struct beos_global_state_element
+    {
+      uint64_t starting_block_for_distribution;
+      uint64_t ending_block_for_distribution;
+      uint64_t distribution_payment_block_interval_for_distribution;
+      uint64_t amount_of_reward;
+
+      EOSLIB_SERIALIZE( beos_global_state_element,
+
+      (starting_block_for_distribution)
+      (ending_block_for_distribution)
+      (distribution_payment_block_interval_for_distribution)
+      (amount_of_reward) )
+    };
+
+    struct beos_global_state
+    {
+      asset proxy_asset;
+      uint64_t starting_block_for_initial_witness_election;
+
+      beos_global_state_element beos;
+      beos_global_state_element ram;
+      beos_global_state_element trustee;
+
+      EOSLIB_SERIALIZE( beos_global_state,
+
+      (proxy_asset)
+      (starting_block_for_initial_witness_election)
+      (beos)
+      (ram)
+      (trustee) )
+    };
+
+    typedef eosio::singleton<N(beosglobal), beos_global_state> beos_global_state_singleton;
 
   //This contract gives values of most basic parameters in BEOS.
   class init : public contract
   {
+    private:
+
+      beos_global_state            _beos_gstate;
+      beos_global_state_singleton  _beos_global;
+
+      void checker( const beos_global_state_element& state )
+      {
+        eosio_assert( state.starting_block_for_distribution > 0, "STARTING_BLOCK_FOR_DISTRIBUTION > 0" );
+        eosio_assert( state.ending_block_for_distribution > state.starting_block_for_distribution, "ENDING_BLOCK_FOR_DISTRIBUTION > STARTING_BLOCK_FOR_DISTRIBUTION" );
+        eosio_assert( state.distribution_payment_block_interval_for_distribution > 0, "DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_DISTRIBUTION > 0" );
+        eosio_assert( state.amount_of_reward > 0, "AMOUNT_OF_REWARD > 0" );
+      }
+
+      //Checking basic dependencies between BEOS parameters.
+      void checker( const beos_global_state& state )
+      {
+        eosio_assert( state.starting_block_for_initial_witness_election > 0, "STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION > 0" );
+
+        checker( state.beos );
+        checker( state.ram );
+        checker( state.trustee );
+      }
+
+      beos_global_state get_beos_default_parameters()
+      {
+        beos_global_state dp;
+
+        dp.proxy_asset = get_proxy_asset();
+
+        dp.starting_block_for_initial_witness_election = get_starting_block_for_initial_witness_election();
+
+        dp.beos.starting_block_for_distribution = get_starting_block_for_beos_distribution();
+        dp.beos.ending_block_for_distribution = get_ending_block_for_beos_distribution();
+        dp.beos.distribution_payment_block_interval_for_distribution = get_distribution_payment_block_interval_for_beos_distribution();
+        dp.beos.amount_of_reward = get_amount_of_reward_beos();
+
+        dp.ram.starting_block_for_distribution = get_starting_block_for_ram_distribution();
+        dp.ram.ending_block_for_distribution = get_ending_block_for_ram_distribution();
+        dp.ram.distribution_payment_block_interval_for_distribution = get_distribution_payment_block_interval_for_ram_distribution();
+        dp.ram.amount_of_reward = get_amount_of_reward_ram();
+
+        dp.trustee.starting_block_for_distribution = get_starting_block_for_trustee_distribution();
+        dp.trustee.ending_block_for_distribution = get_ending_block_for_trustee_distribution();
+        dp.trustee.distribution_payment_block_interval_for_distribution = get_distribution_payment_block_interval_for_trustee_distribution();
+        dp.trustee.amount_of_reward = get_amount_of_reward_trustee();
+
+        checker( dp );
+
+        return dp;
+      }
+
     public:
 
-      init( account_name self ):contract(self){}
+      init( account_name self, bool read_only = false )
+      : contract(self),
+       _beos_global( _self, _self )
+      {
+        _beos_gstate = _beos_global.exists() ? _beos_global.get() : get_beos_default_parameters();
+        if( !read_only )
+          _beos_global.set( _beos_gstate, _self );
+      }
 
       asset get_proxy_asset() const;
 
@@ -35,6 +129,12 @@ namespace eosio {
       inline uint64_t get_ending_block_for_trustee_distribution() const;
       inline uint64_t get_distribution_payment_block_interval_for_trustee_distribution() const;
       inline uint64_t get_amount_of_reward_trustee() const;
+
+      void changeparams( beos_global_state new_params );
+
+      inline beos_global_state get_beos_global_state() const;
+
+      
   };
 
   asset init::get_proxy_asset() const
@@ -161,6 +261,11 @@ namespace eosio {
   inline uint64_t init::get_amount_of_reward_trustee() const
   {
     return $AMOUNT_OF_REWARD_TRUSTEE;
+  }
+
+  inline beos_global_state init::get_beos_global_state() const
+  {
+    return _beos_gstate;
   }
 
 } /// namespace eosio
