@@ -12,6 +12,8 @@ BEOS_DIR = SOURCES_DOWNLOAD_DIR + "/beos-core"
 BEOS_REPOSITORY_PATH = "git@gitlab.syncad.com:blocktrades/beos-core.git"
 BEOS_REPOSITORY_BRANCH = 'beos-initial-release '
 #
+# eosio build directory - here will land final build
+BEOS_BUILD_DIR = os.environ["HOME"] + "/Build/beos-autobuild2"
 
 MAIN_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
 ERROR_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
@@ -73,7 +75,7 @@ COMMON_SYSTEM_ACCOUNT_OWNER_PRIVATE_KEY = ""
 COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY = ""
 COMMON_SYSTEM_ACCOUNT_ACTIVE_PRIVATE_KEY = ""
 # path to contracts directory
-CONTRACTS_DIR = EOSIO_BUILD_DIR + "/contracts/"
+CONTRACTS_DIR = BEOS_BUILD_DIR + "/contracts/"
 
 # The main keys to the blockchain net, that allow creation of system accounts
 # EOSIO public key
