@@ -44,7 +44,7 @@ void distribution::execute( uint64_t block_nr, asset proxy_asset, uint64_t start
 void distribution::onblock( block_timestamp timestamp, account_name producer )
 {
   uint64_t block_nr = static_cast< uint64_t >( get_blockchain_block_number() );
-  eosio::beos_global_state b_state = eosio::init( N(beos.init), true/*read_only*/ ).get_beos_global_state();
+  eosio::beos_global_state b_state = eosio::init( N(beos.init) ).get_beos_global_state();
 
   //Rewarding staked BEOSes, issuing BEOSes.
   execute( block_nr, b_state.proxy_asset, b_state.beos.starting_block_for_distribution, b_state.beos.ending_block_for_distribution,
@@ -58,7 +58,7 @@ void distribution::onblock( block_timestamp timestamp, account_name producer )
 
 uint64_t distribution::get_sum()
 {
-  eosio::beos_global_state b_state = eosio::init( N(beos.init), true/*read_only*/ ).get_beos_global_state();
+  eosio::beos_global_state b_state = eosio::init( N(beos.init) ).get_beos_global_state();
   auto issued = eosio::token( N(eosio.token) ).get_supply( b_state.proxy_asset.symbol.name() ).amount;
   auto withdrawn = eosio::token( N(eosio.token) ).check_balance( N(beos.gateway), b_state.proxy_asset.symbol.name() ).amount;
   

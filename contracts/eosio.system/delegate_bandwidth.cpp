@@ -85,7 +85,7 @@ namespace eosiosystem {
    bool system_contract::is_allowed_ram_operation() const {
       //RAM shouldn't be liquid during distribution period.
       uint64_t block_nr = static_cast< uint64_t >( get_blockchain_block_number() );
-      eosio::beos_global_state b_state = eosio::init( N(beos.init), true/*read_only*/ ).get_beos_global_state();
+      eosio::beos_global_state b_state = eosio::init( N(beos.init) ).get_beos_global_state();
       return block_nr > b_state.ram.ending_block_for_distribution;
    }
 
