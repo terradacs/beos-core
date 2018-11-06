@@ -14,6 +14,8 @@
 
 #include <eosio.token/eosio.token.hpp>
 
+#include <eosio.init/eosio.init.hpp>
+#include <beoslib/beos_privileged.hpp>
 
 #include <cmath>
 #include <map>
@@ -80,12 +82,20 @@ namespace eosiosystem {
    typedef eosio::multi_index< N(delband), delegated_bandwidth> del_bandwidth_table;
    typedef eosio::multi_index< N(refunds), refund_request>      refunds_table;
 
-
+   bool system_contract::is_allowed_ram_operation() const {
+      //RAM shouldn't be liquid during distribution period.
+      uint64_t block_nr = static_cast< uint64_t >( get_blockchain_block_number() );
+      eosio::beos_global_state b_state = eosio::init( N(beos.init) ).get_beos_global_state();
+      return block_nr > b_state.ram.ending_block_for_distribution;
+   }
 
    /**
     *  This action will buy an exact amount of ram and bill the payer the current market price.
     */
    void system_contract::buyrambytes( account_name payer, account_name receiver, uint32_t bytes ) {
+
+      eosio_assert( is_allowed_ram_operation(), "RAM shouldn't be liquid during distribution period" );
+
       auto itr = _rammarket.find(S(4,RAMCORE));
       auto tmp = *itr;
       auto eosout = tmp.convert( asset(bytes,S(0,RAM)), CORE_SYMBOL );
@@ -104,6 +114,8 @@ namespace eosiosystem {
     */
    void system_contract::buyram( account_name payer, account_name receiver, asset quant )
    {
+      eosio_assert( is_allowed_ram_operation(), "RAM shouldn't be liquid during distribution period" );
+
       require_auth( payer );
       eosio_assert( quant.amount > 0, "must purchase a positive amount" );
 
@@ -221,6 +233,9 @@ namespace eosiosystem {
     *  for RAM over time.
     */
    void system_contract::sellram( account_name account, int64_t bytes ) {
+
+      eosio_assert( is_allowed_ram_operation(), "RAM shouldn't be liquid during distribution period" );
+
       require_auth( account );
       eosio_assert( bytes > 0, "cannot sell negative byte" );
 
@@ -417,6 +432,7 @@ namespace eosiosystem {
       }
 
       // update voting power
+      if( is_allowed_vote_operation() )
       {
          asset total_update = stake_net_delta + stake_cpu_delta;
          auto from_voter = _voters.find(from);

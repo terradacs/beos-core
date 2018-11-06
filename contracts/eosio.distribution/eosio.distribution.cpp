@@ -7,61 +7,12 @@
 namespace eosio {
 
 distribution::distribution( account_name self )
-          : contract( self ),
-            _beos_global( _self, _self )
+          : contract( self )
 {
-  _beos_gstate = _beos_global.exists() ? _beos_global.get() : get_beos_default_parameters();
 }
 
 distribution::~distribution()
 {
-  _beos_global.set( _beos_gstate, _self );
-}
-
-beos_global_state distribution::get_beos_default_parameters()
-{
-  beos_global_state dp;
-
-  dp.proxy_asset = eosio::init(N(beos.init)).get_proxy_asset();
-
-  dp.starting_block_for_initial_witness_election = eosio::init(N(beos.init)).get_starting_block_for_initial_witness_election();
-
-  dp.beos.starting_block_for_distribution = eosio::init(N(beos.init)).get_starting_block_for_beos_distribution();
-  dp.beos.ending_block_for_distribution = eosio::init(N(beos.init)).get_ending_block_for_beos_distribution();
-  dp.beos.distribution_payment_block_interval_for_distribution = eosio::init(N(beos.init)).get_distribution_payment_block_interval_for_beos_distribution();
-  dp.beos.amount_of_reward = eosio::init(N(beos.init)).get_amount_of_reward_beos();
-
-  dp.ram.starting_block_for_distribution = eosio::init(N(beos.init)).get_starting_block_for_ram_distribution();
-  dp.ram.ending_block_for_distribution = eosio::init(N(beos.init)).get_ending_block_for_ram_distribution();
-  dp.ram.distribution_payment_block_interval_for_distribution = eosio::init(N(beos.init)).get_distribution_payment_block_interval_for_ram_distribution();
-  dp.ram.amount_of_reward = eosio::init(N(beos.init)).get_amount_of_reward_ram();
-
-  dp.trustee.starting_block_for_distribution = eosio::init(N(beos.init)).get_starting_block_for_trustee_distribution();
-  dp.trustee.ending_block_for_distribution = eosio::init(N(beos.init)).get_ending_block_for_trustee_distribution();
-  dp.trustee.distribution_payment_block_interval_for_distribution = eosio::init(N(beos.init)).get_distribution_payment_block_interval_for_trustee_distribution();
-  dp.trustee.amount_of_reward = eosio::init(N(beos.init)).get_amount_of_reward_trustee();
-
-  checker( dp );
-
-  return dp;
-}
-
-void distribution::checker( const beos_global_state_element& state )
-{
-  eosio_assert( state.starting_block_for_distribution > 0, "STARTING_BLOCK_FOR_DISTRIBUTION > 0" );
-  eosio_assert( state.ending_block_for_distribution > state.starting_block_for_distribution, "ENDING_BLOCK_FOR_DISTRIBUTION > STARTING_BLOCK_FOR_DISTRIBUTION" );
-  eosio_assert( state.distribution_payment_block_interval_for_distribution > 0, "DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_DISTRIBUTION > 0" );
-  eosio_assert( state.amount_of_reward > 0, "AMOUNT_OF_REWARD > 0" );
-}
-
-//Checking basic dependencies between BEOS parameters.
-void distribution::checker( const beos_global_state& state )
-{
-  eosio_assert( state.starting_block_for_initial_witness_election > 0, "STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION > 0" );
-
-  checker( state.beos );
-  checker( state.ram );
-  checker( state.trustee );
 }
 
 void distribution::execute( uint64_t block_nr, asset proxy_asset, uint64_t starting_block_for_any_distribution, uint64_t ending_block_for_any_distribution,
@@ -93,21 +44,23 @@ void distribution::execute( uint64_t block_nr, asset proxy_asset, uint64_t start
 void distribution::onblock( block_timestamp timestamp, account_name producer )
 {
   uint64_t block_nr = static_cast< uint64_t >( get_blockchain_block_number() );
+  eosio::beos_global_state b_state = eosio::init( N(beos.init) ).get_beos_global_state();
 
   //Rewarding staked BEOSes, issuing BEOSes.
-  execute( block_nr, _beos_gstate.proxy_asset, _beos_gstate.beos.starting_block_for_distribution, _beos_gstate.beos.ending_block_for_distribution,
-    _beos_gstate.beos.distribution_payment_block_interval_for_distribution, _beos_gstate.beos.amount_of_reward, true/*is_beos_mode*/ );
+  execute( block_nr, b_state.proxy_asset, b_state.beos.starting_block_for_distribution, b_state.beos.ending_block_for_distribution,
+    b_state.beos.distribution_payment_block_interval_for_distribution, b_state.beos.amount_of_reward, true/*is_beos_mode*/ );
 
   //Rewarding staked RAM, buying RAM.
-  execute( block_nr, _beos_gstate.proxy_asset, _beos_gstate.ram.starting_block_for_distribution, _beos_gstate.ram.ending_block_for_distribution,
-    _beos_gstate.ram.distribution_payment_block_interval_for_distribution, _beos_gstate.ram.amount_of_reward, false/*is_beos_mode*/ );
+  execute( block_nr, b_state.proxy_asset, b_state.ram.starting_block_for_distribution, b_state.ram.ending_block_for_distribution,
+    b_state.ram.distribution_payment_block_interval_for_distribution, b_state.ram.amount_of_reward, false/*is_beos_mode*/ );
 
 }
 
 uint64_t distribution::get_sum()
 {
-  auto issued = eosio::token( N(eosio.token) ).get_supply( _beos_gstate.proxy_asset.symbol.name() ).amount;
-  auto withdrawn = eosio::token( N(eosio.token) ).check_balance( N(beos.gateway), _beos_gstate.proxy_asset.symbol.name() ).amount;
+  eosio::beos_global_state b_state = eosio::init( N(beos.init) ).get_beos_global_state();
+  auto issued = eosio::token( N(eosio.token) ).get_supply( b_state.proxy_asset.symbol.name() ).amount;
+  auto withdrawn = eosio::token( N(eosio.token) ).check_balance( N(beos.gateway), b_state.proxy_asset.symbol.name() ).amount;
   
   eosio_assert( issued >= withdrawn, "issued PXBTS >= withdrawn PXBTS" );
 
@@ -173,17 +126,6 @@ void distribution::review( ConstModifier&& mod )
   }
 }
 
-//It is possible to change any parameter at runtime.
-void distribution::changeparams( beos_global_state new_params )
-{
-  require_auth( _self );
-
-  checker( new_params );
-
-  _beos_gstate = new_params;
-  _beos_global.set( _beos_gstate, _self );
-}
-
 } /// namespace eosio
 
-EOSIO_ABI( eosio::distribution, (onblock)(changeparams) )
+EOSIO_ABI( eosio::distribution, (onblock) )

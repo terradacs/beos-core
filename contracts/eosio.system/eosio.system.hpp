@@ -220,6 +220,9 @@ namespace eosiosystem {
          void delegateram( account_name payer, account_name receiver, int64_t bytes );
          void reward( account_name receiver, int64_t ram_bytes, asset net_weight, asset cpu_weight );
 
+         bool is_allowed_vote_operation() const;
+         bool is_allowed_ram_operation() const;
+
       private:
          void update_elected_producers( block_timestamp timestamp );
 

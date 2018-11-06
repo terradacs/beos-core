@@ -15,6 +15,9 @@
 #include <eosiolib/transaction.hpp>
 #include <eosio.token/eosio.token.hpp>
 
+#include <eosio.init/eosio.init.hpp>
+#include <beoslib/beos_privileged.hpp>
+
 #include <algorithm>
 #include <cmath>
 
@@ -25,6 +28,14 @@ namespace eosiosystem {
    using eosio::print;
    using eosio::singleton;
    using eosio::transaction;
+
+   bool system_contract::is_allowed_vote_operation() const
+   {
+      //Creating votes for producers has delay.
+      uint64_t block_nr = static_cast< uint64_t >( get_blockchain_block_number() );
+      eosio::beos_global_state b_state = eosio::init( N(beos.init) ).get_beos_global_state();
+      return block_nr > b_state.starting_block_for_initial_witness_election;
+   }
 
    /**
     *  This method will create a producer_config and producer_info object for 'producer'
@@ -129,6 +140,10 @@ namespace eosiosystem {
    }
 
    void system_contract::update_votes( const account_name voter_name, const account_name proxy, const std::vector<account_name>& producers, bool voting ) {
+
+     if( !is_allowed_vote_operation() )
+      return;
+
       //validate input
       if ( proxy ) {
          eosio_assert( producers.size() == 0, "cannot vote for producers and proxy at same time" );
@@ -235,6 +250,9 @@ namespace eosiosystem {
     */
    void system_contract::regproxy( const account_name proxy, bool isproxy ) {
       require_auth( proxy );
+
+      if( !is_allowed_vote_operation() )
+        return;
 
       auto pitr = _voters.find(proxy);
       if ( pitr != _voters.end() ) {

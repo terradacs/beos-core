@@ -30,6 +30,7 @@ static const uint64_t DEFAULT_RAM = 10000;
 
 struct actions: public tester
 {
+  abi_serializer beos_init_abi_ser;
   abi_serializer beos_gateway_abi_ser;
   abi_serializer token_abi_ser;
   abi_serializer beos_distrib_abi_ser;
@@ -202,7 +203,7 @@ class eosio_interchain_tester : public actions
     produce_blocks( 1 );
 
     prepare_account( config::system_account_name, eosio_system_wast, eosio_system_abi, &system_abi_ser );
-    prepare_account( N(beos.init), eosio_init_wast, eosio_init_abi );
+    prepare_account( N(beos.init), eosio_init_wast, eosio_init_abi, &beos_init_abi_ser );
     prepare_account( config::gateway_account_name, eosio_gateway_wast, eosio_gateway_abi, &beos_gateway_abi_ser );
     prepare_account( config::distribution_account_name, eosio_distribution_wast, eosio_distribution_abi, &beos_distrib_abi_ser );
 
@@ -291,10 +292,10 @@ class eosio_interchain_tester : public actions
     v.emplace_back( std::move( tgs.ram ) );
     v.emplace_back( std::move( tgs.trustee ) );
 
-    return push_action( config::distribution_account_name, N(changeparams), mvo()
+    return push_action( N(beos.init), N(changeparams), mvo()
         ("new_params",     v),
-        beos_distrib_abi_ser,
-        config::distribution_account_name
+        beos_init_abi_ser,
+        N(beos.init)
       );
   }
 
@@ -356,7 +357,7 @@ class eosio_init_tester: public eosio_interchain_tester
 
   action_result sellram( const account_name& account, uint64_t numbytes )
   {
-    return push_action( config::system_account_name, N(sellram), mvo()
+    return push_action( account, N(sellram), mvo()
         ("account", account)
         ("bytes",numbytes),
         system_abi_ser,
@@ -445,9 +446,6 @@ BOOST_AUTO_TEST_SUITE(eosio_init_tests)
 
 BOOST_FIXTURE_TEST_CASE( basic_param_test, eosio_init_tester ) try {
 
-  //!!!!!! NSY
-  return;
-
   test_global_state tgs;
 
   tgs.beos.starting_block_for_distribution = 100;
@@ -469,8 +467,6 @@ BOOST_FIXTURE_TEST_CASE( basic_param_test, eosio_init_tester ) try {
 
 BOOST_FIXTURE_TEST_CASE( basic_param_test2, eosio_init_tester ) try {
 
-  //!!!!!! NSY
-  return;
   test_global_state tgs;
 
   tgs.ram.starting_block_for_distribution = 80;
@@ -501,10 +497,15 @@ BOOST_FIXTURE_TEST_CASE( basic_param_test2, eosio_init_tester ) try {
 
 BOOST_FIXTURE_TEST_CASE( liquid_ram_test, eosio_init_tester ) try {
 
-  //!!!!!! NSY
-  return;
   test_global_state tgs;
   BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
+
+  BOOST_REQUIRE_EQUAL( success(), initresource( config::distribution_account_name,
+                                                  100'000'000,
+                                                  asset::from_string("1000.0000 BEOS"),
+                                                  asset::from_string("1000.0000 BEOS")
+                                                )
+                      );
 
   create_account_with_resources( config::distribution_account_name, N(xxxxxxxmario) );
   create_account_with_resources( config::distribution_account_name, N(xxxxxxmario2) );
@@ -513,9 +514,10 @@ BOOST_FIXTURE_TEST_CASE( liquid_ram_test, eosio_init_tester ) try {
   BOOST_REQUIRE_EQUAL( wasm_assert_msg("RAM shouldn't be liquid during distribution period"), sellram( "xxxxxxmario2", 15600 ) );
 
   produce_blocks( 248 - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 248u );
 
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg("RAM shouldn't be liquid during distribution period"), sellram( "xxxxxxxmario", 5600 ) );
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg("RAM shouldn't be liquid during distribution period"), sellram( "xxxxxxmario2", 15600 ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("RAM shouldn't be liquid during distribution period"), sellram( "xxxxxxxmario", 5601 ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("RAM shouldn't be liquid during distribution period"), sellram( "xxxxxxmario2", 15601 ) );
 
   produce_blocks( 1 );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 249u );
@@ -528,13 +530,18 @@ BOOST_FIXTURE_TEST_CASE( liquid_ram_test, eosio_init_tester ) try {
 
 BOOST_FIXTURE_TEST_CASE( liquid_ram_test2, eosio_init_tester ) try {
 
-  //!!!!!! NSY
-  return;
   test_global_state tgs;
 
   tgs.ram.starting_block_for_distribution = 80;
   tgs.ram.ending_block_for_distribution = 81;
   BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
+
+  BOOST_REQUIRE_EQUAL( success(), initresource( config::distribution_account_name,
+                                                  100'000'000,
+                                                  asset::from_string("1000.0000 BEOS"),
+                                                  asset::from_string("1000.0000 BEOS")
+                                                )
+                      );
 
   create_account_with_resources( config::distribution_account_name, N(xxxxxxxmario) );
   BOOST_REQUIRE_EQUAL( wasm_assert_msg("RAM shouldn't be liquid during distribution period"), sellram( "xxxxxxxmario", 5600 ) );
@@ -553,8 +560,6 @@ BOOST_FIXTURE_TEST_CASE( liquid_ram_test2, eosio_init_tester ) try {
 
 BOOST_FIXTURE_TEST_CASE( false_tests, eosio_init_tester ) try {
 
-  //!!!!!! NSY
-  return;
   test_global_state tgs;
 
   produce_blocks( 30 - control->head_block_num() );
@@ -572,9 +577,7 @@ BOOST_FIXTURE_TEST_CASE( false_tests, eosio_init_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( basic_vote_test, eosio_init_tester ) try {
-  
-  //!!!!!! NSY
-  return;
+
   test_global_state tgs;
 
   tgs.beos.starting_block_for_distribution = 50;
@@ -582,17 +585,25 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test, eosio_init_tester ) try {
   tgs.beos.starting_block_for_distribution = 55;
   BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
 
+  BOOST_REQUIRE_EQUAL( success(), initresource( config::distribution_account_name,
+                                                  100'000'000,
+                                                  asset::from_string("1000.0000 BEOS"),
+                                                  asset::from_string("1000.0000 BEOS")
+                                                )
+                      );
+
   create_account_with_resources( config::distribution_account_name, N(xxxxxxxmario) );
 
-  BOOST_REQUIRE_EQUAL( success(), create_producer( N(bob) ) );
-  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
-
+  BOOST_REQUIRE_EQUAL( success(), issue( N(bob), asset::from_string("5.0000 PROXY") ) );
   BOOST_REQUIRE_EQUAL( success(), issue( N(xxxxxxxmario), asset::from_string("5.0000 PROXY") ) );
 
   produce_blocks( 60 - control->head_block_num() );
 
-  CHECK_STATS(xxxxxxxmario, "5.0000 PROXY", "1600.0000 BEOS", "0");
-  //BOOST_REQUIRE_EQUAL( success(), stake( N(xxxxxxxmario), asset::from_string("5.0000 BEOS"), asset::from_string("6.0000 BEOS") ) );
+  BOOST_REQUIRE_EQUAL( success(), create_producer( N(bob) ) );
+  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
+
+  CHECK_STATS(xxxxxxxmario, "5.0000 PROXY", "800.0000 BEOS", "0");
+  CHECK_STATS(bob, "5.0000 PROXY", "800.0000 BEOS", "0");
 
   auto prod = get_producer_info( N(bob) );
   BOOST_REQUIRE_EQUAL( 0, prod["total_votes"].as_double() );
@@ -605,7 +616,7 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test, eosio_init_tester ) try {
 
   produce_blocks( 1 );
 
-  //Important!!! Problem with stake function.
+  //Important!!! Voting( 'delegatebw' action ) must work.
   // BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
   // prod = get_producer_info( N(bob) );
   // BOOST_REQUIRE_EQUAL( 120049322532.95502, prod["total_votes"].as_double() );
@@ -614,8 +625,6 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test, eosio_init_tester ) try {
 
 BOOST_FIXTURE_TEST_CASE( basic_vote_test2, eosio_init_tester ) try {
 
-  //!!!!!! NSY
-  return;
   test_global_state tgs;
 
   tgs.beos.starting_block_for_distribution = 50;
@@ -623,8 +632,27 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test2, eosio_init_tester ) try {
   tgs.beos.starting_block_for_distribution = 55;
   BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
 
+  BOOST_REQUIRE_EQUAL( success(), initresource( config::distribution_account_name,
+                                                  100'000'000,
+                                                  asset::from_string("1000.0000 BEOS"),
+                                                  asset::from_string("1000.0000 BEOS")
+                                                )
+                      );
+
   create_account_with_resources( config::distribution_account_name, N(xxxxxxxmario) );
   create_account_with_resources( config::distribution_account_name, N(xxxxxxmario2) );
+
+  BOOST_REQUIRE_EQUAL( success(), issue( N(xxxxxxxmario), asset::from_string("5.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( success(), issue( N(xxxxxxmario2), asset::from_string("5.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( success(), issue( N(bob), asset::from_string("5.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( success(), issue( N(carol), asset::from_string("5.0000 PROXY") ) );
+
+  produce_blocks( 60 - control->head_block_num() );
+
+  CHECK_STATS(xxxxxxxmario, "5.0000 PROXY", "400.0000 BEOS", "0");
+  CHECK_STATS(xxxxxxxmario, "5.0000 PROXY", "400.0000 BEOS", "0");
+  CHECK_STATS(bob, "5.0000 PROXY", "400.0000 BEOS", "0");
+  CHECK_STATS(carol, "5.0000 PROXY", "400.0000 BEOS", "0");
 
   BOOST_REQUIRE_EQUAL( success(), create_producer( N(bob) ) );
   BOOST_REQUIRE_EQUAL( success(), create_producer( N(carol) ) );
@@ -634,14 +662,6 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test2, eosio_init_tester ) try {
 
   BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxmario2), { N(bob) } ) );
   BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxmario2), { N(carol) } ) );
-
-  BOOST_REQUIRE_EQUAL( success(), issue( N(xxxxxxxmario), asset::from_string("5.0000 PROXY") ) );
-  BOOST_REQUIRE_EQUAL( success(), issue( N(xxxxxxmario2), asset::from_string("5.0000 PROXY") ) );
-
-  produce_blocks( 60 - control->head_block_num() );
-
-  CHECK_STATS(xxxxxxxmario, "5.0000 PROXY", "800.0000 BEOS", "0");
-  CHECK_STATS(xxxxxxxmario, "5.0000 PROXY", "800.0000 BEOS", "0");
 
   auto prod = get_producer_info( N(bob) );
   BOOST_REQUIRE_EQUAL( 0, prod["total_votes"].as_double() );
@@ -665,7 +685,7 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test2, eosio_init_tester ) try {
 
   produce_blocks( 1 );
 
-  //Important!!! Problem with stake function.
+  //Important!!! Voting( 'delegatebw' action ) must work.
   //BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
 
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 101u );

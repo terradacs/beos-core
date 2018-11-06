@@ -610,8 +610,8 @@ namespace eosio { namespace testing {
       v.emplace_back(std::move(tgs.ram));
       v.emplace_back(std::move(tgs.trustee));
 
-      push_action(config::distribution_account_name, N(changeparams),
-         config::distribution_account_name, mutable_variant_object()
+      push_action(N(beos.init), N(changeparams),
+         N(beos.init), mutable_variant_object()
          ("new_params", v)
       );
 
