@@ -310,6 +310,10 @@ configure_file(${CMAKE_SOURCE_DIR}/contracts/eosio.init/eosio.init.hpp.in ${CMAK
 
 set(NODEOS_HTTP_SERVER_PORT "http://127.0.0.1:8888")
 set(SIGNATURE_PROVIDER "${EOSIO_ROOT_KEY}=KEOSD:http://127.0.0.1:8900/v1/wallet/sign_digest")
+<<<<<<< HEAD
+=======
+set(WALLET_DIR "$ENV{HOME}/eosio-wallet")
+>>>>>>> Fix for issue #2 and #3. Fix for cmake issues with targets
 configure_file(${CMAKE_SOURCE_DIR}/cd-scripts/resources/config.ini.in ${CMAKE_SOURCE_DIR}/cd-scripts/resources/config.ini @ONLY)
 
 configure_file(${CMAKE_SOURCE_DIR}/cd-scripts/resources/genesis.json.in ${CMAKE_SOURCE_DIR}/cd-scripts/resources/genesis.json)

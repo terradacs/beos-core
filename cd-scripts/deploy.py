@@ -513,10 +513,6 @@ if __name__ == '__main__':
     if options.make_beos_plugin_test:
         make_beos_plugin_test()
 
-    if options.create_genesis_and_config:
-        configure_config_ini()
-        configure_genesis_json()
-
     if options.clear_init_data:
         clear_initialization_data(config.START_NODE_INDEX, "eosio")
 
