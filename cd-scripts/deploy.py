@@ -274,7 +274,7 @@ def build_eosio(c_compiler, cxx_compiler):
         "-DWASM_ROOT={0}".format(config.WASM_INSTALL_DIR),
         "-DCORE_SYMBOL_NAME={0}".format(config.CORE_SYMBOL_NAME),
         "-DOPENSSL_ROOT_DIR={0}".format(config.OPENSSL_ROOT_DIR),
-        "-DBOOST_ROOT={0}".format(config.BOOST_INSTALL_DIR),
+        "-DBOOST_ROOT={0}".format(config.BOOST_INSTALL_PREFIX),
         "-DBUILD_MONGO_DB_PLUGIN={0}".format(config.BUILD_MONGO_DB_PLUGIN),
         "-DENABLE_COVERAGE_TESTING={0}".format(config.ENABLE_COVERAGE_TESTING),
         "-DBUILD_DOXYGEN={0}".format(config.DOXYGEN),
