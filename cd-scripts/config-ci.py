@@ -97,8 +97,7 @@ KEOSD_EXECUTABLE = BEOS_BUILD_DIR + "/programs/keosd/keosd"
 # keosd ip address
 KEOSD_IP_ADDRESS = "127.0.0.1"
 # keosd port
-# KEOSD_PORT = 8900
-KEOSD_PORT = 8910
+KEOSD_PORT = 8900
 # keosd certificate chain file - mandatory for https
 KEOSD_CERTIFICATE_CHAIN_FILE = None
 # keosd private key file path - mandatory for https
@@ -111,8 +110,7 @@ NODEOS_EXECUTABLE = BEOS_BUILD_DIR + "/programs/nodeos/nodeos"
 # nodeos ip address
 NODEOS_IP_ADDRESS = "127.0.0.1"
 # nodeos port
-# NODEOS_PORT = 8888
-NODEOS_PORT = 8911
+NODEOS_PORT = 8888
 # nodeos certificate chain file - mandatory for https
 NODEOS_CERTIFICATE_CHAIN_FILE = None
 # nodeos private key file path - mandatory for https
