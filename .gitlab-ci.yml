@@ -1,7 +1,26 @@
-image: docker:latest
+before_script:
+ - pwd
+
+stages:
+ - build
+ - run
 
 build:
+ stage: build
+ script:
+  - cd cd-scripts
+  - cp config-ci.py config.py
+  - ./deploy.py --download-source
+  - ./deploy.py --build-beos
+  only:
+  - configure-ci
+  
+ 
+run:
+  stage: run
   script:
-      - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-      - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA -f Docker/Dockerfile .
-      - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  - cd cd-scripts
+  - ./deploy.py --initialize-beos
+  only:
+  - configure-ci
+  when: manual
