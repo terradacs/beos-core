@@ -247,12 +247,14 @@ def run_nodeos(node_index, name, public_key, use_https = False):
         copy(config.GENESIS_JSON_FILE_SRC, working_dir + config.GENESIS_JSON_FILE)
     else:
         logger.error("File {0} does not exists.".format(config.GENESIS_JSON_FILE_SRC))
+        terminate_running_tasks(None, keosd):
         sys.exit(1)
     logger.info("Copying config file from {0} to {1}".format(config.BEOS_CONFIG_FILE_SRC, working_dir + config.BEOS_CONFIG_FILE))
     if os.path.exists(config.BEOS_CONFIG_FILE_SRC):
         copy(config.BEOS_CONFIG_FILE_SRC, working_dir + config.BEOS_CONFIG_FILE)
     else:
         logger.error("File {0} does not exists.".format(config.BEOS_CONFIG_FILE_SRC))
+        terminate_running_tasks(None, keosd):
         sys.exit(1)
 
     https_opts = [
