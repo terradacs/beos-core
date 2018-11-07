@@ -13,7 +13,7 @@ BEOS_REPOSITORY_PATH = "git@gitlab.syncad.com:blocktrades/beos-core.git"
 BEOS_REPOSITORY_BRANCH = 'beos-initial-release'
 #
 # eosio build directory - here will land final build
-BEOS_BUILD_DIR = os.environ["HOME"] + "/Build/beos-autobuild2"
+BEOS_BUILD_DIR = os.environ["HOME"] + "/ci/build/beos-autobuild2"
 
 MAIN_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
 ERROR_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
