@@ -243,6 +243,7 @@ def run_nodeos(node_index, name, public_key, use_https = False):
         rmtree(working_dir)
     os.makedirs(working_dir)
     copy(config.GENESIS_JSON_FILE_SRC, working_dir + config.GENESIS_JSON_FILE)
+    copy(config.BEOS_CONFIG_FILE_SRC, working_dir + config.BEOS_CONFIG_FILE)
 
     https_opts = [
         "--signature-provider", "{0}=KEOSD:http://{1}:{2}/v1/wallet/sign_digest".format(public_key, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
