@@ -15,9 +15,10 @@ build:
    - ./deploy.py --download-source
    - ./deploy.py --build-beos
   only:
-   - configure-ci
+   - beos-initial-release
   tags:
    - ryzen
+  allow_failure: false
   
  
 run:
@@ -27,7 +28,8 @@ run:
   - cp config-ci.py config.py
   - ./deploy.py --initialize-beos
   only:
-  - configure-ci
+  - beos-initial-release
   when: manual
   tags:
   - ryzen
+  allow_failure: false
