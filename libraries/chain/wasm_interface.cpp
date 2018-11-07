@@ -1646,6 +1646,33 @@ class call_depth_api : public context_aware_api {
       }
 };
 
+/*
+ * This api is dedicated for using from eosio::distribution.
+ */
+class distribution_api : public context_aware_api {
+   public:
+      distribution_api( apply_context& ctx )
+      : context_aware_api( ctx, true ) {}
+
+      void reward_all( uint32_t total_amount,
+                       array_ptr<char> symbol, size_t symbol_len, //asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/,
+                       bool is_beos_mode )
+      {
+         ilog( "From inside reward_all! total_amount == ${n}", ("n", total_amount) );
+      }
+
+      void reward_done( array_ptr<char> symbol, size_t symbol_len, //asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/,
+                        bool is_beos_mode )
+      {
+         idump(("from inside reward_done!"));
+      }
+};
+
+REGISTER_INTRINSICS( distribution_api,
+   (reward_all,  void(int,int,int,int))
+   (reward_done, void(int,int,int))
+);
+
 REGISTER_INJECTED_INTRINSICS(call_depth_api,
    (call_depth_assert,  void()               )
 );

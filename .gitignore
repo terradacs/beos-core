@@ -82,3 +82,10 @@ var/lib/node_*
 .idea/
 *.iws
 .DS_Store
+
+.vs
+cd-scripts/beos_deploy_main.log
+cd-scripts/config.py
+cd-scripts/resources/config.ini
+contracts/eosio.init/eosio.init.hpp
+CMakeSettings.json

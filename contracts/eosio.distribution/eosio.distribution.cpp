@@ -15,8 +15,8 @@ distribution::~distribution()
 {
 }
 
-void distribution::execute( uint64_t block_nr, asset proxy_asset, uint64_t starting_block_for_any_distribution, uint64_t ending_block_for_any_distribution,
-              uint64_t distribution_payment_block_interval_for_any_distribution, uint64_t nr_items, bool is_beos_mode )
+void distribution::execute( uint32_t block_nr, asset proxy_asset, uint32_t starting_block_for_any_distribution, uint32_t ending_block_for_any_distribution,
+              uint32_t distribution_payment_block_interval_for_any_distribution, uint32_t nr_items, bool is_beos_mode )
 {
   //Only during a distribution period, an action can be called.
   if( block_nr >= starting_block_for_any_distribution && block_nr <= ending_block_for_any_distribution )
@@ -26,6 +26,7 @@ void distribution::execute( uint64_t block_nr, asset proxy_asset, uint64_t start
       {
         //Rewarding all accounts.
         rewardall( nr_items, proxy_asset, is_beos_mode );
+        //reward_all( nr_items, &proxy_asset, sizeof(asset), is_beos_mode );
 
         //Total end of distribution period. Transferring from staked BEOS/RAM to liquid BEOS/RAM.
         //It depends on `is_beos_mode` variable.
@@ -35,15 +36,15 @@ void distribution::execute( uint64_t block_nr, asset proxy_asset, uint64_t start
           )
         {
           rewarddone( proxy_asset, is_beos_mode );
+          //reward_done( &proxy_asset, sizeof(asset), is_beos_mode );
         }
       }
     }
 }
 
 //This method is triggered every block.
-void distribution::onblock( block_timestamp timestamp, account_name producer )
+void distribution::onblock( uint32_t block_nr )
 {
-  uint64_t block_nr = static_cast< uint64_t >( get_blockchain_block_number() );
   eosio::beos_global_state b_state = eosio::init( N(beos.init) ).get_beos_global_state();
 
   //Rewarding staked BEOSes, issuing BEOSes.
@@ -67,7 +68,7 @@ uint64_t distribution::get_sum()
   return issued - withdrawn;
 }
 
-void distribution::rewardall( uint64_t total_amount, asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/, bool is_beos_mode )
+void distribution::rewardall( uint32_t total_amount, asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/, bool is_beos_mode )
 {
   //Retrieve total sum of balances for every account.
   uint64_t gathered_amount = get_sum();

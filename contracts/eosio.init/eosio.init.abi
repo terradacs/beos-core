@@ -6,17 +6,17 @@
       "name": "beos_global_state_element",
       "base": "",
       "fields": [
-        {"name":"starting_block_for_distribution",                      "type":"uint64"},
-        {"name":"ending_block_for_distribution",                        "type":"uint64"},
-        {"name":"distribution_payment_block_interval_for_distribution", "type":"uint64"},
-        {"name":"amount_of_reward",            	                        "type":"uint64"}
+        {"name":"starting_block_for_distribution",                      "type":"uint32"},
+        {"name":"ending_block_for_distribution",                        "type":"uint32"},
+        {"name":"distribution_payment_block_interval_for_distribution", "type":"uint32"},
+        {"name":"amount_of_reward",            	                        "type":"uint32"}
       ]
     },{
       "name": "beos_global_state",
       "base": "",
       "fields": [
         {"name":"proxy_asset",                                  "type":"asset"},
-        {"name":"starting_block_for_initial_witness_election",  "type":"uint64"},
+        {"name":"starting_block_for_initial_witness_election",  "type":"uint32"},
         {"name":"beos",                                         "type":"beos_global_state_element"},
         {"name":"ram",                                          "type":"beos_global_state_element"},
         {"name":"trustee",            	                        "type":"beos_global_state_element"}

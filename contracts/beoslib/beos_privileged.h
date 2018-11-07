@@ -1,4 +1,6 @@
 #pragma once
+#include <eosiolib/types.h>
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -11,6 +13,13 @@ extern "C" {
    void newaccount();
 
    ///@ } privilegedcapi
+
+   /**
+    *  Defined in distribution_api
+    */
+   void reward_all(uint32_t, const void*, int, bool);
+   void reward_done(const void*, int, bool);
+
 #ifdef __cplusplus
 }
 #endif
