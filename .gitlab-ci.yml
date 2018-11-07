@@ -1,10 +1,3 @@
-before_script:
- - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
- - eval $(ssh-agent -s)
- - ssh-add <(echo "$SSH_PRIVATE_KEY")
- - pwd
- - pip3 install distro
-
 stages:
  - build
  - run
@@ -12,6 +5,11 @@ stages:
 build:
   stage: build
   script:
+   - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
+   - eval $(ssh-agent -s)
+   - ssh-add <(echo "$SSH_PRIVATE_KEY")
+   - pwd
+   - pip3 install distro
    - cd cd-scripts
    - cp config-ci.py config.py
    - ./deploy.py --download-source
@@ -26,6 +24,7 @@ run:
   stage: run
   script:
   - cd cd-scripts
+  - cp config-ci.py config.py
   - ./deploy.py --initialize-beos
   only:
   - configure-ci
