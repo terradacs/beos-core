@@ -16,7 +16,7 @@ bnet-follow-irreversible = 0
 # this peer will request no pending transactions from other nodes (eosio::bnet_plugin)
 bnet-no-trx = false
 
-
+# The string used to format peers when logging messages about them.  Variables are escaped with ${<variable name>}.
 # Available Variables:
 #    _name  	self-reported name
 # 
@@ -149,42 +149,6 @@ max-login-requests = 1000000
 # The maximum timeout for pending login requests (in seconds) (eosio::login_plugin)
 max-login-timeout = 60
 
-# The target queue size between nodeos and MongoDB plugin thread. (eosio::mongo_db_plugin)
-mongodb-queue-size = 1024
-
-# The maximum size of the abi cache for serializing data. (eosio::mongo_db_plugin)
-mongodb-abi-cache-size = 2048
-
-# Required with --replay-blockchain, --hard-replay-blockchain, or --delete-all-blocks to wipe mongo db.This option required to prevent accidental wipe of mongo db. (eosio::mongo_db_plugin)
-mongodb-wipe = false
-
-# If specified then only abi data pushed to mongodb until specified block is reached. (eosio::mongo_db_plugin)
-mongodb-block-start = 0
-
-# MongoDB URI connection string, see: https://docs.mongodb.com/master/reference/connection-string/. If not specified then plugin is disabled. Default database 'EOS' is used if not specified in URI. Example: mongodb://127.0.0.1:27017/EOS (eosio::mongo_db_plugin)
-# mongodb-uri = 
-
-# Enables storing blocks in mongodb. (eosio::mongo_db_plugin)
-mongodb-store-blocks = 1
-
-# Enables storing block state in mongodb. (eosio::mongo_db_plugin)
-mongodb-store-block-states = 1
-
-# Enables storing transactions in mongodb. (eosio::mongo_db_plugin)
-mongodb-store-transactions = 1
-
-# Enables storing transaction traces in mongodb. (eosio::mongo_db_plugin)
-mongodb-store-transaction-traces = 1
-
-# Enables storing action traces in mongodb. (eosio::mongo_db_plugin)
-mongodb-store-action-traces = 1
-
-# Track actions which match receiver:action:actor. Receiver, Action, & Actor may be blank to include all. i.e. eosio:: or :transfer:  Use * or leave unspecified to include all. (eosio::mongo_db_plugin)
-# mongodb-filter-on = 
-
-# Do not track actions which match receiver:action:actor. Receiver, Action, & Actor may be blank to exclude all. (eosio::mongo_db_plugin)
-# mongodb-filter-out = 
-
 # The actual host:port used to listen for incoming p2p connections. (eosio::net_plugin)
 p2p-listen-endpoint = 0.0.0.0:9876
 
@@ -230,6 +194,7 @@ max-implicit-request = 1500
 # Enable expirimental socket read watermark optimization (eosio::net_plugin)
 use-socket-read-watermark = 0
 
+# The string used to format peers when logging messages about them.  Variables are escaped with ${<variable name>}.
 # Available Variables:
 #    _name  	self-reported name
 # 
@@ -285,32 +250,24 @@ keosd-provider-timeout = 5
 # account that can not access to extended CPU/NET virtual resources (eosio::producer_plugin)
 # greylist-account = 
 
-# offset of non last block producing time in micro second. Negative number results in blocks to go out sooner, and positive number results in blocks to go out later (eosio::producer_plugin)
+# offset of non last block producing time in microseconds. Negative number results in blocks to go out sooner, and positive number results in blocks to go out later (eosio::producer_plugin)
 produce-time-offset-us = 0
 
-# offset of last block producing time in micro second. Negative number results in blocks to go out sooner, and positive number results in blocks to go out later (eosio::producer_plugin)
+# offset of last block producing time in microseconds. Negative number results in blocks to go out sooner, and positive number results in blocks to go out later (eosio::producer_plugin)
 last-block-time-offset-us = 0
 
 # ratio between incoming transations and deferred transactions when both are exhausted (eosio::producer_plugin)
 incoming-defer-ratio = 1
 
+# the location of the snapshots directory (absolute path or relative to application data dir) (eosio::producer_plugin)
+snapshots-dir = "snapshots"
+
 # Lag in number of blocks from the head block when selecting the reference block for transactions (-1 means Last Irreversible Block) (eosio::txn_test_gen_plugin)
 txn-reference-block-lag = 0
 
-# The path of the wallet files (absolute path or relative to application data dir) (eosio::wallet_plugin)
-wallet-dir = @WALLET_DIR@
-
-# Timeout for unlocked wallet in seconds (default 900 (15 minutes)). Wallets will automatically lock after specified number of seconds of inactivity. Activity is defined as any wallet command e.g. list-wallets. (eosio::wallet_plugin)
-unlock-timeout = 900
-
-# Override default URL of http://localhost:12345 for connecting to yubihsm-connector (eosio::wallet_plugin)
-# yubihsm-url = 
-
-# Enables YubiHSM support using given Authkey (eosio::wallet_plugin)
-# yubihsm-authkey = 
-
 # Plugin(s) to enable, may be specified multiple times
 # plugin = 
+
 plugin = eosio::http_plugin
 plugin = eosio::chain_api_plugin
 plugin = eosio::producer_plugin
