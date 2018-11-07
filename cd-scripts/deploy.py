@@ -299,7 +299,6 @@ def build_eosio(c_compiler, cxx_compiler):
         "-DAMOUNT_OF_REWARD_TRUSTEE={0}".format(config.AMOUNT_OF_REWARD_TRUSTEE),
         "-DNODEOS_HTTP_SERVER_PORT={0}".format("http://{0}:{1}".format(config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)),
         "-DSIGNATURE_PROVIDER={0}".format("{0}=KEOSD:http://{1}:{2}/v1/wallet/sign_digest".format(config.EOSIO_PUBLIC_KEY, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)),
-        "-DWALLET_DIR={0}".format(config.DEFAULT_WALLET_DIR),
         config.BEOS_DIR
     ]
     logger.info("Running cmake with params {0}".format(" ".join(params)))
