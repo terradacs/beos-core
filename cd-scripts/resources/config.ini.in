@@ -193,6 +193,7 @@ max-implicit-request = 1500
 # Enable expirimental socket read watermark optimization (eosio::net_plugin)
 use-socket-read-watermark = 0
 
+# The string used to format peers when logging messages about them.  Variables are escaped with ${<variable name>}.
 # Available Variables:
 #    _name  	self-reported name
 # 
