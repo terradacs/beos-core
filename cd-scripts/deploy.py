@@ -309,11 +309,11 @@ def build_beos(c_compiler, cxx_compiler):
 
 def create_file_from_template(template_src, file_dst, template_dict):
     dst = None
-    with open(template_src, "r") as in_f:
+    with open(template_src, "r", encoding = "utf-8") as in_f:
         from string import Template
         src = Template(in_f.read())
         dst = src.substitute(template_dict)
-    with open(file_dst, "w") as out_f:
+    with open(file_dst, "w", encoding = "utf-8") as out_f:
         out_f.write(dst)
 
 def configure_eosio_init():

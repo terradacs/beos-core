@@ -1,7 +1,35 @@
-image: docker:latest
+stages:
+ - build
+ - run
 
 build:
+  stage: build
   script:
-      - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-      - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA -f Docker/Dockerfile .
-      - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+   - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
+   - eval $(ssh-agent -s)
+   - ssh-add <(echo "$SSH_PRIVATE_KEY")
+   - pwd
+   - pip3 install distro
+   - cd cd-scripts
+   - cp config-ci.py config.py
+   - ./deploy.py --download-source
+   - ./deploy.py --build-beos
+  #only:
+  # - beos-initial-release
+  tags:
+   - ryzen
+  allow_failure: false
+  
+ 
+run:
+  stage: run
+  script:
+  - cd cd-scripts
+  - cp config-ci.py config.py
+  - ./deploy.py --initialize-beos
+  #only:
+  #- beos-initial-release
+  when: manual
+  tags:
+  - ryzen
+  allow_failure: false
