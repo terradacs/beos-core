@@ -116,7 +116,7 @@ NODEOS_CERTIFICATE_CHAIN_FILE = None
 # nodeos private key file path - mandatory for https
 NODEOS_PRIVATE_KEY_FILE = None
 # direcotry with nodes data
-NODEOS_WORKING_DIR = "/tmp/"
+NODEOS_WORKING_DIR = os.environ["HOME"] + "/tmp/"
 # directory in which wallet files are held
 DEFAULT_WALLET_DIR = os.environ["HOME"] + "/eosio-wallet"
 # name of the master wallet
