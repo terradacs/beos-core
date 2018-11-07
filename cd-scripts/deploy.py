@@ -49,8 +49,8 @@ fh.setFormatter(logging.Formatter(config.LOG_FORMAT))
 logger.addHandler(ch)
 logger.addHandler(fh)
 
-def run_command(parameters, working_dir):
-    ret = subprocess.run(parameters, cwd = working_dir, stdout=config.log_main, stderr=config.log_main)
+def run_command(parameters, working_dir, run_shell = False):
+    ret = subprocess.run(parameters, cwd = working_dir, shell = run_shell, stdout=config.log_main, stderr=config.log_main)
     retcode = ret.returncode
     if retcode == 0:
         logger.debug("Executed with ret: {0}".format(ret))
@@ -274,7 +274,7 @@ def build_eosio(c_compiler, cxx_compiler):
         "-DWASM_ROOT={0}".format(config.WASM_INSTALL_DIR),
         "-DCORE_SYMBOL_NAME={0}".format(config.CORE_SYMBOL_NAME),
         "-DOPENSSL_ROOT_DIR={0}".format(config.OPENSSL_ROOT_DIR),
-        "-DBOOST_ROOT={0}".format(config.BOOST_INSTALL_DIR),
+        "-DBOOST_ROOT={0}".format(config.BOOST_INSTALL_PREFIX),
         "-DBUILD_MONGO_DB_PLUGIN={0}".format(config.BUILD_MONGO_DB_PLUGIN),
         "-DENABLE_COVERAGE_TESTING={0}".format(config.ENABLE_COVERAGE_TESTING),
         "-DBUILD_DOXYGEN={0}".format(config.DOXYGEN),
@@ -282,6 +282,24 @@ def build_eosio(c_compiler, cxx_compiler):
         "-DEOSIO_ROOT_KEY={0}".format(config.EOSIO_PUBLIC_KEY),
         "-DGATEWAY_ROOT_KEY={0}".format(config.BEOS_GATEWAY_PUBLIC_KEY),
         "-DDISTRIBUTION_ROOT_KEY={0}".format(config.BEOS_DISTRIB_PUBLIC_KEY),
+        "-DPROXY_ASSET_PRECISION={0}".format(config.PROXY_ASSET_PRECISION),
+        "-DPROXY_ASSET_NAME={0}".format(config.PROXY_ASSET_NAME),
+        "-DSTARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION={0}".format(config.STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION),
+        "-DSTARTING_BLOCK_FOR_BEOS_DISTRIBUTION={0}".format(config.STARTING_BLOCK_FOR_BEOS_DISTRIBUTION),
+        "-DENDING_BLOCK_FOR_BEOS_DISTRIBUTION={0}".format(config.ENDING_BLOCK_FOR_BEOS_DISTRIBUTION),
+        "-DDISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION={0}".format(config.DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION),
+        "-DAMOUNT_OF_REWARD_BEOS={0}".format(config.AMOUNT_OF_REWARD_BEOS),
+        "-DSTARTING_BLOCK_FOR_RAM_DISTRIBUTION={0}".format(config.STARTING_BLOCK_FOR_RAM_DISTRIBUTION),
+        "-DENDING_BLOCK_FOR_RAM_DISTRIBUTION={0}".format(config.ENDING_BLOCK_FOR_RAM_DISTRIBUTION),
+        "-DDISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION={0}".format(config.DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION),
+        "-DAMOUNT_OF_REWARD_RAM={0}".format(config.AMOUNT_OF_REWARD_RAM),
+        "-DSTARTING_BLOCK_FOR_TRUSTEE_DISTRIBUTION={0}".format(config.STARTING_BLOCK_FOR_TRUSTEE_DISTRIBUTION),
+        "-DENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION={0}".format(config.ENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION),
+        "-DDISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_TRUSTEE_DISTRIBUTION={0}".format(config.DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_TRUSTEE_DISTRIBUTION),
+        "-DAMOUNT_OF_REWARD_TRUSTEE={0}".format(config.AMOUNT_OF_REWARD_TRUSTEE),
+        "-DNODEOS_HTTP_SERVER_PORT={0}".format("http://{0}:{1}".format(config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)),
+        "-DSIGNATURE_PROVIDER={0}".format("{0}=KEOSD:http://{1}:{2}/v1/wallet/sign_digest".format(config.EOSIO_PUBLIC_KEY, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)),
+        "-DWALLET_DIR={0}".format(config.DEFAULT_WALLET_DIR),
         config.BEOS_DIR
     ]
     logger.info("Running cmake with params {0}".format(" ".join(params)))
@@ -295,68 +313,10 @@ def build_eosio(c_compiler, cxx_compiler):
     run_command(params, config.BEOS_BUILD_DIR)
 
 def install_beos(c_compiler, cxx_compiler):
-    configure_eosio_init()
     install_eosio(c_compiler, cxx_compiler)
 
 def build_beos(c_compiler, cxx_compiler):
-    configure_eosio_init()
-    #
-    configure_config_ini()
-    #
-    configure_genesis_json()
-    #
     build_eosio(c_compiler, cxx_compiler)
-
-def create_file_from_template(template_src, file_dst, template_dict):
-    dst = None
-    with open(template_src, "r") as in_f:
-        from string import Template
-        src = Template(in_f.read())
-        dst = src.substitute(template_dict)
-    with open(file_dst, "w") as out_f:
-        out_f.write(dst)
-
-def configure_eosio_init():
-    eosio_init_opt = {
-        "PROXY_ASSET_PRECISION" : config.PROXY_ASSET_PRECISION,
-        "PROXY_ASSET_NAME" : config.PROXY_ASSET_NAME,
-        "STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION" : config.STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION,
-        "STARTING_BLOCK_FOR_BEOS_DISTRIBUTION" : config.STARTING_BLOCK_FOR_BEOS_DISTRIBUTION,
-        "ENDING_BLOCK_FOR_BEOS_DISTRIBUTION" : config.ENDING_BLOCK_FOR_BEOS_DISTRIBUTION,
-        "DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION" : config.DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION,
-        "AMOUNT_OF_REWARD_BEOS" : config.AMOUNT_OF_REWARD_BEOS,
-        "STARTING_BLOCK_FOR_RAM_DISTRIBUTION" : config.STARTING_BLOCK_FOR_RAM_DISTRIBUTION,
-        "ENDING_BLOCK_FOR_RAM_DISTRIBUTION" : config.ENDING_BLOCK_FOR_RAM_DISTRIBUTION,
-        "DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION" : config.DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION,
-        "AMOUNT_OF_REWARD_RAM" : config.AMOUNT_OF_REWARD_RAM,
-        "STARTING_BLOCK_FOR_TRUSTEE_DISTRIBUTION" : config.STARTING_BLOCK_FOR_TRUSTEE_DISTRIBUTION,
-        "ENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION" : config.ENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION,
-        "DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_TRUSTEE_DISTRIBUTION" : config.DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_TRUSTEE_DISTRIBUTION,
-        "AMOUNT_OF_REWARD_TRUSTEE" : config.AMOUNT_OF_REWARD_TRUSTEE
-    }
-
-    eosio_init_src = config.BEOS_DIR + "/contracts/eosio.init/eosio.init.hpp.in"
-    eosio_init_dst = config.BEOS_DIR + "/contracts/eosio.init/eosio.init.hpp"
-    create_file_from_template(eosio_init_src, eosio_init_dst, eosio_init_opt)
-
-def configure_config_ini():
-    ini_opt = {
-        "HTTP_SERVER_PORT" : "http://{0}:{1}".format(config.NODEOS_IP_ADDRESS, config.NODEOS_PORT),
-        "EOSIO_PUBLIC_KEY" : config.EOSIO_PUBLIC_KEY,
-        "SIGNATURE_PROVIDER" : "{0}=KEOSD:https://{1}:{2}/v1/wallet/sign_digest".format(config.EOSIO_PUBLIC_KEY, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
-        "WALLET_DIR" : config.DEFAULT_WALLET_DIR
-    }
-    ini_src = os.path.dirname(os.path.abspath(__file__)) + "/resources/config.ini.in"
-    ini_dst = os.path.dirname(os.path.abspath(__file__)) + "/resources/config.ini"
-    create_file_from_template(ini_src, ini_dst, ini_opt)
-
-def configure_genesis_json():
-    json_opt = {
-        "INITIAL_KEY" : "{0}".format(config.EOSIO_PUBLIC_KEY)
-    }
-    json_src = os.path.dirname(os.path.abspath(__file__)) + "/resources/genesis.json.in"
-    json_dst = os.path.dirname(os.path.abspath(__file__)) + "/resources/genesis.json"
-    create_file_from_template(json_src, json_dst, json_opt)
 
 def initialize_beos():
     import eosio
@@ -562,8 +522,6 @@ if __name__ == '__main__':
         clear_initialization_data(config.START_NODE_INDEX, "eosio")
 
     if options.initialize_beos:
-        configure_config_ini()
-        configure_genesis_json()
         initialize_beos()
 
     # close loggers
