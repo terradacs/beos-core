@@ -1,4 +1,7 @@
 before_script:
+ - apt-get install  openssh-client 
+ - eval $(ssh-agent -s)
+ - ssh-add <(echo "$SSH_PRIVATE_KEY")
  - pwd
  - pip3 install distro
 
