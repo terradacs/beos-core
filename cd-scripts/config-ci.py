@@ -69,28 +69,28 @@ OPENSSL_ROOT_DIR = "/usr/include/openssl"
 # When account is created, its public keys (owner & active) are set. The keys below are given to all system accounts, i.e.
 # eosio.msig, eosio.names, eosio.saving, eosio.bpay, eosio.vpay, eosio.unregd, eosio.ram, eosio.ramfee,
 # eosio.token, eosio.stake, beos.token, beos.init, beos.market
-COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY = ""
-COMMON_SYSTEM_ACCOUNT_OWNER_PRIVATE_KEY = ""
+COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY = "EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3"
+COMMON_SYSTEM_ACCOUNT_OWNER_PRIVATE_KEY = "5JpSDcXq6TfzQxkFmYFXQygHR6jG3pWjtGnRmtHQd7YmCxoqLtU"
 
-COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY = ""
-COMMON_SYSTEM_ACCOUNT_ACTIVE_PRIVATE_KEY = ""
+COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY = "EOS53QRGWCMxxHtKqFjiMQo8isf3so1dUSMhPezceFBknF8T5ht9b"
+COMMON_SYSTEM_ACCOUNT_ACTIVE_PRIVATE_KEY = "5Hw8qBPp4Hpbf2wja6bA34t3x58cp4XBmDxkz7HKQGsFZ4vJ2HT"
 # path to contracts directory
 CONTRACTS_DIR = BEOS_BUILD_DIR + "/contracts/"
 
 # The main keys to the blockchain net, that allow creation of system accounts
 # EOSIO public key
-EOSIO_PUBLIC_KEY = ""
+EOSIO_PUBLIC_KEY = "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
 # KEEPING KEYS IN PUBLIC FILE IS NOT WISE!
 # EOSIO private key
-EOSIO_PRIVATE_KEY = ""
+EOSIO_PRIVATE_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
 
 # Keys for `beos.gateway`
-BEOS_GATEWAY_PUBLIC_KEY = ""
-BEOS_GATEWAY_PRIVATE_KEY = ""
+BEOS_GATEWAY_PUBLIC_KEY = "EOS6Y1LJCZC1Mrp9EoLcmkobJHoNnVQMqLcNAxU5xL5iXwqzctjmd"
+BEOS_GATEWAY_PRIVATE_KEY = "5Ka14byMGwBqE4Q149pffSjXf547otfZ1NKdTEq1ivwg9DjMoi6"
 
 # Keys for `beos.distrib`
-BEOS_DISTRIB_PUBLIC_KEY = ""
-BEOS_DISTRIB_PRIVATE_KEY = ""
+BEOS_DISTRIB_PUBLIC_KEY = "EOS5FUjQDE6QLiGZKt7hGwBypCAJPL53X3SYf6Gf4JxMkdyH1wMrF"
+BEOS_DISTRIB_PRIVATE_KEY = "5HvT4NQKyLMojJpa2qPCquwkGmppC6dqCJQK7cBcMFPR2i3Ei4p"
 
 # path to keosd executable
 KEOSD_EXECUTABLE = BEOS_BUILD_DIR + "/programs/keosd/keosd"
