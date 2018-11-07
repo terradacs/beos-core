@@ -242,8 +242,18 @@ def run_nodeos(node_index, name, public_key, use_https = False):
     if os.path.exists(working_dir):
         rmtree(working_dir)
     os.makedirs(working_dir)
-    copy(config.GENESIS_JSON_FILE_SRC, working_dir + config.GENESIS_JSON_FILE)
-    copy(config.BEOS_CONFIG_FILE_SRC, working_dir + config.BEOS_CONFIG_FILE)
+    logger.info("Copying genesis file from {0} to {1}".format(config.GENESIS_JSON_FILE_SRC, working_dir + config.GENESIS_JSON_FILE))
+    if os.path.exists(config.GENESIS_JSON_FILE_SRC):
+        copy(config.GENESIS_JSON_FILE_SRC, working_dir + config.GENESIS_JSON_FILE)
+    else:
+        logger.error("File {0} does not exists.".format(config.GENESIS_JSON_FILE_SRC))
+        sys.exit(1)
+    logger.info("Copying config file from {0} to {1}".format(config.BEOS_CONFIG_FILE_SRC, working_dir + config.BEOS_CONFIG_FILE))
+    if os.path.exists(config.BEOS_CONFIG_FILE_SRC):
+        copy(config.BEOS_CONFIG_FILE_SRC, working_dir + config.BEOS_CONFIG_FILE)
+    else:
+        logger.error("File {0} does not exists.".format(config.BEOS_CONFIG_FILE_SRC))
+        sys.exit(1)
 
     https_opts = [
         "--signature-provider", "{0}=KEOSD:http://{1}:{2}/v1/wallet/sign_digest".format(public_key, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),

@@ -136,11 +136,11 @@ SYSTEM_ACCOUNT_KEYS = [
     COMMON_SYSTEM_ACCOUNT_ACTIVE_PRIVATE_KEY
 ]
 # source file for beos config
-BEOS_CONFIG_FILE_SRC = os.path.dirname(os.path.abspath(__file__)) + "/resources/beos.config.ini"
+BEOS_CONFIG_FILE_SRC = BEOS_DIR + "/cd-scripts/resources/config.ini"
 # beos config file name
-BEOS_CONFIG_FILE = "beos.config.ini"
+BEOS_CONFIG_FILE = "config.ini"
 # source file for genesis file
-GENESIS_JSON_FILE_SRC = os.path.dirname(os.path.abspath(__file__)) + "/resources/genesis.json"
+GENESIS_JSON_FILE_SRC = BEOS_DIR + "/cd-scripts/resources/genesis.json"
 # genesis json file name
 GENESIS_JSON_FILE = "genesis.json"
 #starting node index
