@@ -517,12 +517,12 @@ namespace eosio { namespace testing {
 
   struct test_global_state_element
      {
-     uint64_t starting_block_for_distribution;
-     uint64_t ending_block_for_distribution;
-     uint64_t distribution_payment_block_interval_for_distribution;
-     uint64_t amount_of_reward;
+     uint32_t starting_block_for_distribution;
+     uint32_t ending_block_for_distribution;
+     uint32_t distribution_payment_block_interval_for_distribution;
+     uint32_t amount_of_reward;
 
-     test_global_state_element(uint64_t s, uint64_t e, uint64_t d, uint64_t a)
+     test_global_state_element(uint32_t s, uint32_t e, uint32_t d, uint32_t a)
         : starting_block_for_distribution(s),
         ending_block_for_distribution(e),
         distribution_payment_block_interval_for_distribution(d),
@@ -534,7 +534,7 @@ namespace eosio { namespace testing {
   struct test_global_state
      {
      asset proxy_asset;
-     uint64_t starting_block_for_initial_witness_election;
+     uint32_t starting_block_for_initial_witness_election;
      test_global_state_element beos;
      test_global_state_element ram;
      test_global_state_element trustee;

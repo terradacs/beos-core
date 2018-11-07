@@ -1546,18 +1546,20 @@ struct controller_impl {
     */
    signed_transaction get_on_block_transaction()
    {
+      const block_header& bh = self.head_block_header();
+      uint32_t block_num = self.head_block_num();
+
       action on_block_act;
       on_block_act.account = config::system_account_name;
       on_block_act.name = N(onblock);
       on_block_act.authorization = vector<permission_level>{{config::system_account_name, config::active_name}};
-      on_block_act.data = fc::raw::pack(self.head_block_header());
+      on_block_act.data = fc::raw::pack(bh);
 
       action on_block_distribution_act;
       on_block_distribution_act.account = config::distribution_account_name;
       on_block_distribution_act.name = N(onblock);
       on_block_distribution_act.authorization = vector<permission_level>{ { config::distribution_account_name, config::active_name } };
-      on_block_distribution_act.data = fc::raw::pack(self.head_block_header());
-
+      on_block_distribution_act.data = fc::raw::pack(block_num);
 
       signed_transaction trx;
       trx.actions.emplace_back(std::move(on_block_act));
