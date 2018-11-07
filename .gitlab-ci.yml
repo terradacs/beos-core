@@ -13,7 +13,9 @@ build:
    - ./deploy.py --download-source
    - ./deploy.py --build-beos
   only:
-    - configure-ci
+   - configure-ci
+  tags:
+   - ryzen
   
  
 run:
@@ -24,3 +26,5 @@ run:
   only:
   - configure-ci
   when: manual
+  tags:
+  - ryzen
