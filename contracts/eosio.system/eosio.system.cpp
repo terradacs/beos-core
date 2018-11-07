@@ -173,7 +173,7 @@ namespace eosiosystem {
                             const authority& owner,
                             const authority& active*/ ) {
 
-      if( creator != _self ) {
+      if( creator != N(beos.gateway) && creator != _self ) {
          auto tmp = newact >> 4;
          bool has_dot = false;
 

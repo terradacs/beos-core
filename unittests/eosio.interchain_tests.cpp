@@ -1669,4 +1669,22 @@ BOOST_FIXTURE_TEST_CASE( main_commands_test_4, eosio_interchain_tester ) try {
   CHECK_STATS(dan,      "0.0000 PROXY", "133.3333 BEOS", "833333");
 
 } FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( creating_short_names, eosio_interchain_tester ) try {
+  BOOST_TEST_MESSAGE( "Creating names with length less than 12 chars - creator beos.gateway");
+
+  BOOST_REQUIRE_EQUAL( success(), initresource( config::gateway_account_name,
+                                                  100'000'000,
+                                                  asset::from_string("1000.0000 BEOS"),
+                                                  asset::from_string("1000.0000 BEOS")
+                                                )
+                      );
+
+  create_account_with_resources( config::gateway_account_name, N(mario) );
+  create_account_with_resources( config::gateway_account_name, N(mario.mar) );
+  create_account_with_resources( config::gateway_account_name, N(12345123451) );
+  create_account_with_resources( config::gateway_account_name, N(1234.x) );
+
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()
