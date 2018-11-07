@@ -319,6 +319,8 @@ def build_beos(c_compiler, cxx_compiler):
 
 def initialize_beos():
     import eosio
+    keosd = None
+    nodeos = None
     try:
         keosd = eosio.run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR, False, True)
         eosio.create_wallet("http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT), False)
