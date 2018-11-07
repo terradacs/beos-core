@@ -16,6 +16,7 @@ build:
    - ./deploy.py --build-beos
   only:
    - beos-initial-release
+   - merge-requests
   tags:
    - ryzen
   allow_failure: false
@@ -29,6 +30,7 @@ run:
   - ./deploy.py --initialize-beos
   only:
   - beos-initial-release
+  - merge-requests
   when: manual
   tags:
   - ryzen
