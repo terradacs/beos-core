@@ -12,7 +12,6 @@ build:
    - pip3 install distro
    - cd cd-scripts
    - cp config-ci.py config.py
-   - ./deploy.py --download-source
    - ./deploy.py --build-beos
   #only:
   # - beos-initial-release
