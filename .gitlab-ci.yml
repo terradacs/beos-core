@@ -1,5 +1,6 @@
 before_script:
  - pwd
+ - pip3 install distro
 
 stages:
  - build
