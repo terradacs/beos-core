@@ -284,3 +284,101 @@ install(FILES libraries/fc/src/network/LICENSE.go DESTINATION ${CMAKE_INSTALL_FU
 
 include(package)
 include(doxygen)
+
+if ("${PROXY_ASSET_NAME}" STREQUAL "")
+    set(PROXY_ASSET_NAME "PXBTS")
+endif()
+
+if ("${PROXY_ASSET_PRECISION}" STREQUAL "")
+    set(PROXY_ASSET_PRECISION "4")
+endif()
+
+if ("${PROXY_INITIAL_AMOUNT}" STREQUAL "")
+    set(PROXY_INITIAL_AMOUNT "100000.0000")
+endif()
+
+if ("${BEOS_SYMBOL_PRECISION}" STREQUAL "")
+    set(BEOS_SYMBOL_PRECISION "10000")
+endif()
+
+if ("${CORE_INITIAL_AMOUNT}" STREQUAL "")
+    set(CORE_INITIAL_AMOUNT "100000.0000")
+endif()
+
+if ("${INIT_RAM}" STREQUAL "")
+    set(INIT_RAM "1000000")
+endif()
+
+if ("${STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION}" STREQUAL "")
+    set(STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION "100")
+endif()
+
+if ("${STARTING_BLOCK_FOR_BEOS_DISTRIBUTION}" STREQUAL "")
+    set(STARTING_BLOCK_FOR_BEOS_DISTRIBUTION "days(7).to_seconds() * 2")
+endif()
+
+if ("${ENDING_BLOCK_FOR_BEOS_DISTRIBUTION}" STREQUAL "")
+    set(ENDING_BLOCK_FOR_BEOS_DISTRIBUTION "days(98).to_seconds() * 2")
+endif()
+
+if ("${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION}" STREQUAL "")
+    set(DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION "hours(1).to_seconds() * 2")
+endif()
+
+if ("${AMOUNT_OF_REWARD_BEOS}" STREQUAL "")
+    set(AMOUNT_OF_REWARD_BEOS "asset().symbol.precision()")
+endif()
+
+if ("${STARTING_BLOCK_FOR_RAM_DISTRIBUTION}" STREQUAL "")
+    set(STARTING_BLOCK_FOR_RAM_DISTRIBUTION "days(7).to_seconds() * 2")
+endif()
+
+if ("${ENDING_BLOCK_FOR_RAM_DISTRIBUTION}" STREQUAL "")
+    set(ENDING_BLOCK_FOR_RAM_DISTRIBUTION "days(280).to_seconds() * 2")
+endif()
+
+if ("${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION}" STREQUAL "")
+    set(DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION "hours(1).to_seconds() * 2")
+endif()
+
+if ("${AMOUNT_OF_REWARD_RAM}" STREQUAL "")
+    set(AMOUNT_OF_REWARD_RAM "5000000")
+endif()
+
+if ("${STARTING_BLOCK_FOR_TRUSTEE_DISTRIBUTION}" STREQUAL "")
+    set(STARTING_BLOCK_FOR_TRUSTEE_DISTRIBUTION "days(7).to_seconds() * 2")
+endif()
+
+if ("${ENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION}" STREQUAL "")
+    set(ENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION "days(98).to_seconds() * 2")
+endif()
+
+if ("${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_TRUSTEE_DISTRIBUTION}" STREQUAL "")
+    set(DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_TRUSTEE_DISTRIBUTION "hours(1).to_seconds() * 2")
+endif()
+
+if ("${AMOUNT_OF_REWARD_TRUSTEE}" STREQUAL "")
+    set(AMOUNT_OF_REWARD_TRUSTEE "asset().symbol.precision()")
+endif()
+
+if ("${STAKE_NET_QUANTITY}" STREQUAL "")
+    set(STAKE_NET_QUANTITY "10000.0000")
+endif()
+
+if ("${STAKE_CPU_QUANTITY}" STREQUAL "")
+    set(STAKE_CPU_QUANTITY "10000.0000")
+endif()
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/contracts/eosio.init/eosio.init.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/contracts/eosio.init/eosio.init.hpp)
+
+if ("${NODEOS_HTTP_SERVER_PORT}" STREQUAL "")
+    set(NODEOS_HTTP_SERVER_PORT "http://127.0.0.1:8888")
+endif()
+
+if ("${SIGNATURE_PROVIDER}" STREQUAL "")
+    set(SIGNATURE_PROVIDER "${EOSIO_ROOT_KEY}=KEOSD:http://127.0.0.1:8900/v1/wallet/sign_digest")
+endif()
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cd-scripts/resources/config.ini.in ${CMAKE_CURRENT_BINARY_DIR}/resources/config.ini @ONLY)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cd-scripts/resources/genesis.json.in ${CMAKE_CURRENT_BINARY_DIR}/resources/genesis.json)

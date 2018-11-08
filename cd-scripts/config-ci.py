@@ -5,15 +5,15 @@ from logging import INFO, DEBUG, ERROR, WARNING, CRITICAL
 LOG_LEVEL = INFO
 
 # directory where all sources will be downloaded
-SOURCES_DOWNLOAD_DIR = os.environ["HOME"] + "/ci"
+SOURCES_DOWNLOAD_DIR = os.environ["HOME"] + "/ci/sources"
 # beos main directory
-BEOS_DIR = SOURCES_DOWNLOAD_DIR + "/beos-core"
+BEOS_DIR = os.environ["CI_PROJECT_DIR"]
 # path to beos sources repository
 BEOS_REPOSITORY_PATH = "git@gitlab.syncad.com:blocktrades/beos-core.git"
 BEOS_REPOSITORY_BRANCH = 'beos-initial-release'
 #
 # eosio build directory - here will land final build
-BEOS_BUILD_DIR = os.environ["HOME"] + "/ci/build/beos-autobuild2"
+BEOS_BUILD_DIR = os.environ["HOME"] + "/ci/build/beos-autobuild"
 
 MAIN_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
 ERROR_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
@@ -136,11 +136,11 @@ SYSTEM_ACCOUNT_KEYS = [
     COMMON_SYSTEM_ACCOUNT_ACTIVE_PRIVATE_KEY
 ]
 # source file for beos config
-BEOS_CONFIG_FILE_SRC = os.path.dirname(os.path.abspath(__file__)) + "/resources/beos.config.ini"
+BEOS_CONFIG_FILE_SRC = BEOS_BUILD_DIR + "/resources/config.ini"
 # beos config file name
-BEOS_CONFIG_FILE = "beos.config.ini"
+BEOS_CONFIG_FILE = "config.ini"
 # source file for genesis file
-GENESIS_JSON_FILE_SRC = os.path.dirname(os.path.abspath(__file__)) + "/resources/genesis.json"
+GENESIS_JSON_FILE_SRC = BEOS_BUILD_DIR + "/resources/genesis.json"
 # genesis json file name
 GENESIS_JSON_FILE = "genesis.json"
 #starting node index
