@@ -1,6 +1,6 @@
 stages:
  - build
- - run
+ - test
 
 build:
   stage: build
@@ -15,23 +15,23 @@ build:
    - cp config-ci.py config.py
    - ./deploy.py --build-beos
    - ./deploy.py --initialize-beos
-  #only:
-  # - beos-initial-release
   cache: {}
   tags:
    - ryzen
   allow_failure: false
   
- 
-#run:
-#  stage: run
-#  script:
-#  - cd cd-scripts
-#  - cp config-ci.py config.py
-#  - ./deploy.py --initialize-beos
-#  #only:
-#  #- beos-initial-release
-#  when: manual
-#  tags:
-#  - ryzen
-#  allow_failure: false
+test:
+  stage: test
+  script: 
+  - cd cd-scripts
+  - cp config-ci.py config.py
+  - ./deploy.py --make-integration-test
+  - ./deploy.py --make-unit-test
+  - ./deploy.py --make-beos-plugin-test
+  when: manual
+  cache: {}
+  tags:
+  - ryzen
+  allow_failure: true
+  dependencies:
+  - build
