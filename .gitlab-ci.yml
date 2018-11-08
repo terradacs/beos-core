@@ -8,6 +8,7 @@ build:
    - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
    - eval $(ssh-agent -s)
    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+   - git submodule update --init --recursive
    - pwd
    - pip3 install distro
    - cd cd-scripts
