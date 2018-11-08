@@ -987,32 +987,45 @@ class console_api : public context_aware_api {
       : context_aware_api(ctx,true)
       , ignore(!ctx.control.contracts_console()) {}
 
+//ABW: uncomment the following symbol to unconditionally write eosio::print calls to file (works even during unit tests)
+//#define CAVEMEN_DEBUG
+#ifdef CAVEMEN_DEBUG
+#define DBG(format,value) { FILE *pFile = fopen("debug.log","a"); fprintf(pFile,format "\n",value); fclose(pFile); }
+#else
+#define DBG(format,value)
+#endif
+
       // Kept as intrinsic rather than implementing on WASM side (using prints_l and strlen) because strlen is faster on native side.
       void prints(null_terminated_ptr str) {
+         DBG("%s",(const char *)(str))
          if ( !ignore ) {
             context.console_append<const char*>(str);
          }
       }
 
       void prints_l(array_ptr<const char> str, size_t str_len ) {
+         DBG("%s",string(str, str_len).c_str())
          if ( !ignore ) {
             context.console_append(string(str, str_len));
          }
       }
 
       void printi(int64_t val) {
+         DBG("%lli",val)
          if ( !ignore ) {
             context.console_append(val);
          }
       }
 
       void printui(uint64_t val) {
+         DBG("%lli",val)
          if ( !ignore ) {
             context.console_append(val);
          }
       }
 
       void printi128(const __int128& val) {
+         DBG("%lli",val)
          if ( !ignore ) {
             bool is_negative = (val < 0);
             unsigned __int128 val_magnitude;
@@ -1033,6 +1046,7 @@ class console_api : public context_aware_api {
       }
 
       void printui128(const unsigned __int128& val) {
+         DBG("%lli",val)
          if ( !ignore ) {
             fc::uint128_t v(val>>64, static_cast<uint64_t>(val) );
             context.console_append(fc::variant(v).get_string());
@@ -1040,6 +1054,7 @@ class console_api : public context_aware_api {
       }
 
       void printsf( float val ) {
+         DBG("%e",val)
          if ( !ignore ) {
             // Assumes float representation on native side is the same as on the WASM side
             auto& console = context.get_console_stream();
@@ -1053,6 +1068,7 @@ class console_api : public context_aware_api {
       }
 
       void printdf( double val ) {
+         DBG("%e",val)
          if ( !ignore ) {
             // Assumes double representation on native side is the same as on the WASM side
             auto& console = context.get_console_stream();
@@ -1066,6 +1082,7 @@ class console_api : public context_aware_api {
       }
 
       void printqf( const float128_t& val ) {
+         DBG("%Le",val)
          /*
           * Native-side long double uses an 80-bit extended-precision floating-point number.
           * The easiest solution for now was to use the Berkeley softfloat library to round the 128-bit
@@ -1093,12 +1110,14 @@ class console_api : public context_aware_api {
       }
 
       void printn(const name& value) {
+         DBG("%s",value.to_string().c_str())
          if ( !ignore ) {
             context.console_append(value.to_string());
          }
       }
 
       void printhex(array_ptr<const char> data, size_t data_len ) {
+         DBG("%s",fc::to_hex(data, data_len).c_str())
          if ( !ignore ) {
             context.console_append(fc::to_hex(data, data_len));
          }

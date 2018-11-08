@@ -84,8 +84,6 @@ var/lib/node_*
 .DS_Store
 
 .vs
-cd-scripts/beos_deploy_main.log
+cd-scripts/beos_deploy_main.*
 cd-scripts/config.py
-cd-scripts/resources/config.ini
-contracts/eosio.init/eosio.init.hpp
 CMakeSettings.json
