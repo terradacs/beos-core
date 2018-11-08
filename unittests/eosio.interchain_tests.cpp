@@ -166,6 +166,18 @@ struct actions: public tester
       );
   }
 
+  action_result unstake( account_name who, asset unstake_net_quantity, asset unstake_cpu_quantity )
+  {
+    return push_action( who, N(undelegatebw), mvo()
+        ( "from", who )
+        ( "receiver", who )
+        ( "unstake_net_quantity", unstake_net_quantity )
+        ( "unstake_cpu_quantity", unstake_cpu_quantity ),
+        system_abi_ser,
+        config::system_account_name
+      );
+  }
+
 };
 
 class eosio_interchain_tester : public actions
@@ -707,6 +719,30 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test2, eosio_init_tester ) try {
   //BOOST_REQUIRE_EQUAL( 163703621635.84775, prod["total_votes"].as_double() );
 
 } FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( undelegate_block_test, eosio_init_tester ) try {
+  //see issue #15
+
+  test_global_state tgs;
+
+  tgs.beos.starting_block_for_distribution = 100;
+  tgs.beos.ending_block_for_distribution = 105;
+  tgs.beos.distribution_payment_block_interval_for_distribution = 8;
+
+  BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
+
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("cannot unstake during distribution period"), unstake( N(alice), asset::from_string("10.0000 BEOS"), asset::from_string("10.0000 BEOS") ) );
+
+  produce_blocks( 105 - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 105u );
+
+  //ABW: first we need to extend the test with voting (15% required to allow successful unstake) but to do that
+  //we need delegations working on stake (issue #13) - supplement once it is done
+  //BOOST_REQUIRE_EQUAL( success(), unstake( N(alice), asset::from_string("10.0000 BEOS"), asset::from_string("10.0000 BEOS") ) );
+  //CHECK_STATS(alice, "0.0000 PROXY", "20.0000 BEOS", "");
+
+} FC_LOG_AND_RETHROW()
+
 
 BOOST_AUTO_TEST_SUITE_END()
 

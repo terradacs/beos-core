@@ -9,6 +9,8 @@
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/singleton.hpp>
 
+#include <beoslib/beos_privileged.hpp>
+
 namespace eosio {
 
     struct beos_global_state_element
@@ -170,11 +172,32 @@ namespace eosio {
       void changeparams( beos_global_state new_params );
 
       inline beos_global_state get_beos_global_state() const;
+      /*
+        current block is inside [ starting_block_for_distribution : ending_block_for_distribution )
+      */
+      inline bool is_active_distribution_period() const;
+      /*
+        current block is at or above ending_block_for_distribution
+      */
+      inline bool is_past_distribution_period() const;
   };
 
   inline beos_global_state init::get_beos_global_state() const
   {
     return _beos_gstate;
+  }
+
+  inline bool init::is_active_distribution_period() const
+  {
+    auto block_no = get_blockchain_block_number();
+    return _beos_gstate.beos.starting_block_for_distribution <= block_no &&
+      block_no < _beos_gstate.beos.ending_block_for_distribution;
+  }
+
+  inline bool init::is_past_distribution_period() const
+  {
+    auto block_no = get_blockchain_block_number();
+    return _beos_gstate.beos.ending_block_for_distribution <= block_no;
   }
 
 } /// namespace eosio
