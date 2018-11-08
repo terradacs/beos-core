@@ -82,3 +82,7 @@ var/lib/node_*
 .idea/
 *.iws
 .DS_Store
+contracts/eosio.init/eosio.init.hpp
+cd-scripts/resources/config.ini
+cd-scripts/beos_deploy_main.*
+.vs
