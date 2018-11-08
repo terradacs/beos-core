@@ -32,6 +32,6 @@ test:
   cache: {}
   tags:
   - ryzen
-  allow_failure: false
+  allow_failure: true
   dependencies:
   - build
