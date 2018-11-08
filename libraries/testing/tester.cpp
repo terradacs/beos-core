@@ -600,6 +600,8 @@ namespace eosio { namespace testing {
       tgs.ram.starting_block_for_distribution = 1;
       tgs.ram.ending_block_for_distribution = 2;
       tgs.starting_block_for_initial_witness_election = 1;
+      tgs.beos.starting_block_for_distribution = 1;
+      tgs.beos.ending_block_for_distribution = 2;
 
       produce_block();
 

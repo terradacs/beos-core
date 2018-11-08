@@ -472,6 +472,7 @@ namespace eosiosystem {
    void system_contract::undelegatebw( account_name from, account_name receiver,
                                        asset unstake_net_quantity, asset unstake_cpu_quantity )
    {
+      eosio_assert( eosio::init( N(beos.init) ).is_past_distribution_period(), "cannot unstake during distribution period" );
       eosio_assert( asset() <= unstake_cpu_quantity, "must unstake a positive amount" );
       eosio_assert( asset() <= unstake_net_quantity, "must unstake a positive amount" );
       eosio_assert( asset() < unstake_cpu_quantity + unstake_net_quantity, "must unstake a positive amount" );
