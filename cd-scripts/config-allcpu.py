@@ -9,9 +9,12 @@ SOURCES_DOWNLOAD_DIR = os.environ["HOME"] + "/wkedzierski/beos-core"
 # beos main directory
 BEOS_DIR = SOURCES_DOWNLOAD_DIR + "/beos-core"
 # path to beos sources repository
-BEOS_REPOSITORY_PATH = "git@gitlab.syncad.com:blocktrades/beos-core.git"
-BEOS_REPOSITORY_BRANCH = 'beos-initial-release '
+#BEOS_REPOSITORY_PATH = "git@gitlab.syncad.com:blocktrades/beos-core.git"
+BEOS_REPOSITORY_PATH = "https://gitlab.syncad.com/blocktrades/beos-core.git" 
+
+BEOS_REPOSITORY_BRANCH = 'beos-initial-release'
 #
+# eosio build directory - here will land final build
 BEOS_BUILD_DIR = BEOS_DIR + "/build/"
 
 MAIN_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
@@ -135,11 +138,11 @@ SYSTEM_ACCOUNT_KEYS = [
     COMMON_SYSTEM_ACCOUNT_ACTIVE_PRIVATE_KEY
 ]
 # source file for beos config
-BEOS_CONFIG_FILE_SRC = os.path.dirname(os.path.abspath(__file__)) + "/resources/beos.config.ini"
+BEOS_CONFIG_FILE_SRC =  BEOS_BUILD_DIR + "/resources/config.ini"
 # beos config file name
-BEOS_CONFIG_FILE = "beos.config.ini"
+BEOS_CONFIG_FILE = "config.ini"
 # source file for genesis file
-GENESIS_JSON_FILE_SRC = os.path.dirname(os.path.abspath(__file__)) + "/resources/genesis.json"
+GENESIS_JSON_FILE_SRC = BEOS_BUILD_DIR + "/resources/genesis.json"
 # genesis json file name
 GENESIS_JSON_FILE = "genesis.json"
 #starting node index
@@ -166,9 +169,11 @@ STARTING_BLOCK_FOR_TRUSTEE_DISTRIBUTION = 7 * 24 * 3600 * 2 # days(7).to_seconds
 ENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION = 98 * 24 * 3600 * 2 # days(98).to_seconds() * 2
 DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_TRUSTEE_DISTRIBUTION = 1 * 3600 * 2 # hours(1).to_seconds() * 2
 AMOUNT_OF_REWARD_TRUSTEE = 800 * BEOS_SYMBOL_PRECISION # 800 * asset().symbol.precision()
+STAKE_NET_QUANTITY = "10000.0000"
+STAKE_CPU_QUANTITY = "10000.0000"
 
 ### init loggers
 global log_main
-log_main =  open(MAIN_LOG_PATH, "a+")
+log_main = open(MAIN_LOG_PATH, "a+")
 global log_error
 log_error = open(ERROR_LOG_PATH, "a+")
