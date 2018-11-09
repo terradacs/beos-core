@@ -136,26 +136,7 @@ namespace eosiosystem {
 
   void system_contract::reward( account_name receiver, int64_t ram_bytes, asset net_weight, asset cpu_weight )
   {
-    user_resources_table  userres( _self, receiver );
-
-    auto res_itr = userres.find( receiver );
-
-    if( res_itr ==  userres.end() ) {
-        res_itr = userres.emplace( receiver, [&]( auto& res ) {
-              res.owner = receiver;
-              res.ram_bytes = ram_bytes;
-              res.net_weight = net_weight;
-              res.cpu_weight = cpu_weight;
-          });
-    } else {
-        userres.modify( res_itr, receiver, [&]( auto& res ) {
-              res.ram_bytes += ram_bytes;
-              res.net_weight += net_weight;
-              res.cpu_weight += cpu_weight;
-          });
-    }
-
-    set_resource_limits( res_itr->owner, res_itr->ram_bytes, res_itr->net_weight.amount, res_itr->cpu_weight.amount );
+     change_resource_limits( receiver, ram_bytes, net_weight.amount, cpu_weight.amount );
   }
 
    /**
@@ -195,12 +176,6 @@ namespace eosiosystem {
             }
          }
       }
-
-      user_resources_table  userres( _self, newact);
-
-      userres.emplace( newact, [&]( auto& res ) {
-        res.owner = newact;
-      });
 
       set_resource_limits( newact, 0, 0, 0 );
    }

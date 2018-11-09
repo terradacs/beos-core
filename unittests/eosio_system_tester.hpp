@@ -345,8 +345,32 @@ public:
    }
 
    fc::variant get_total_stake( const account_name& act ) {
-      vector<char> data = get_row_by_account( config::system_account_name, act, N(userres), act );
-      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "user_resources", data, abi_serializer_max_time );
+      int64_t ram_bytes = 0;
+      int64_t net_weight = 0;
+      int64_t cpu_weight = 0;
+
+      control->get_resource_limits_manager().get_account_limits( act, ram_bytes, net_weight, cpu_weight );
+
+      asset a_net_weight( net_weight );
+      asset a_cpu_weight( cpu_weight );
+
+   /*struct user_resources {
+      account_name  owner;
+      asset         net_weight;
+      asset         cpu_weight;
+      int64_t       ram_bytes = 0;
+
+      uint64_t primary_key()const { return owner; }
+
+      // explicit serialization macro is not necessary, used here only to improve compilation time
+      EOSLIB_SERIALIZE( user_resources, (owner)(net_weight)(cpu_weight)(ram_bytes) )
+   };*/
+
+      return mvo()
+        ( "owner", act )
+        ( "net_weight", a_net_weight )
+        ( "cpu_weight", a_cpu_weight )
+        ( "ram_bytes", ram_bytes );
    }
 
    fc::variant get_voter_info( const account_name& act ) {

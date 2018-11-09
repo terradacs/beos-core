@@ -110,17 +110,25 @@ void apply_context::finalize_trace( action_trace& trace, const fc::time_point& s
    trace.elapsed = fc::time_point::now() - start;
 }
 
+//ABW: uncomment the following symbol to unconditionally write eosio::print calls to file (works even during unit tests)
+//#define CAVEMEN_DEBUG
+#ifdef CAVEMEN_DEBUG
+#define DBG(format, ... ) { FILE *pFile = fopen("debug.log","a"); fprintf(pFile,format "\n",__VA_ARGS__); fclose(pFile); }
+#else
+#define DBG(format, ... )
+#endif
+
 void apply_context::reward_stake( const account_name& account, int64_t val )
 {
+   int64_t stake_net = val / 2;
+   int64_t stake_cpu = val - stake_net;
+
    auto& resource_limit_mgr = control.get_mutable_resource_limits_manager();
    int64_t ram_bytes = 0;
    int64_t net_weight = 0;
    int64_t cpu_weight = 0;
 
    resource_limit_mgr.get_account_limits( account, ram_bytes, net_weight, cpu_weight );
-
-   int64_t stake_net = val / 2;
-   int64_t stake_cpu = val - stake_net;
 
    net_weight += stake_net;
    cpu_weight += stake_cpu;
@@ -175,11 +183,18 @@ void apply_context::reward_all( uint32_t block_nr, uint64_t gathered_amount, ass
       auto& name = account.name;
       asset balance( get_currency_balance(name, sym.get_symbol()) );
       //Calculation ratio for given account.
-      long double ratio = static_cast<long double>( balance.get_amount() ) / gathered_amount;
-      int64_t val = static_cast<int64_t>( block_nr * ratio );
+      int128_t block_amount = static_cast<int128_t>(balance.get_amount()) * block_nr;
+      long double dval = static_cast<long double>(block_amount) / gathered_amount;
+      //int64_t val = static_cast<int64_t>(dval);
+      int64_t val = llround(dval); // [MK]: round is for compatibility with the same code on contract side
 
       if (val <= 0)
          continue;
+
+      //fc::uint128_t v_block_amount(block_amount>>64, static_cast<uint64_t>(block_amount));
+
+      //DBG("reward_all for %s: balance = %lu, gathered_amount = %lu, block_amount = %s, block_nr = %u, dval = %.20Lg, val = %li",
+      //    name.to_string().c_str(), balance.get_amount(), gathered_amount, fc::variant(v_block_amount).get_string().c_str(), block_nr, dval, val);
 
       if (is_beos_mode)
         reward_stake( name, val );

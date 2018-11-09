@@ -139,7 +139,7 @@ class privileged_api : public context_aware_api {
        * @param net_weight - the weight for determining share of network capacity
        * @param cpu_weight - the weight for determining share of compute capacity
        */
-      void set_resource_limits( account_name account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight) {
+      void set_resource_limits( account_name account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight ) {
          EOS_ASSERT(ram_bytes >= -1, wasm_execution_error, "invalid value for ram resource limit expected [-1,INT64_MAX]");
          EOS_ASSERT(net_weight >= -1, wasm_execution_error, "invalid value for net resource weight expected [-1,INT64_MAX]");
          EOS_ASSERT(cpu_weight >= -1, wasm_execution_error, "invalid value for cpu resource weight expected [-1,INT64_MAX]");
@@ -150,6 +150,20 @@ class privileged_api : public context_aware_api {
 
       void get_resource_limits( account_name account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight ) {
          context.control.get_resource_limits_manager().get_account_limits( account, ram_bytes, net_weight, cpu_weight);
+      }
+
+      void change_resource_limits( account_name account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight ) {
+         int64_t _ram_bytes = 0;
+         int64_t _net_weight = 0;
+         int64_t _cpu_weight = 0;
+
+         get_resource_limits( account, _ram_bytes, _net_weight, _cpu_weight );
+
+         _ram_bytes += ram_bytes;
+         _net_weight += net_weight;
+         _cpu_weight += cpu_weight;
+
+         set_resource_limits( account, _ram_bytes, _net_weight, _cpu_weight );
       }
 
       int64_t set_proposed_producers( array_ptr<char> packed_producer_schedule, size_t datalen) {
@@ -1760,6 +1774,7 @@ REGISTER_INTRINSICS(privileged_api,
    (activate_feature,                 void(int64_t)                         )
    (get_resource_limits,              void(int64_t,int,int,int)             )
    (set_resource_limits,              void(int64_t,int64_t,int64_t,int64_t) )
+   (change_resource_limits,           void(int64_t,int64_t,int64_t,int64_t) )
    (set_proposed_producers,           int64_t(int,int)                      )
    (get_blockchain_parameters_packed, int(int, int)                         )
    (set_blockchain_parameters_packed, void(int,int)                         )

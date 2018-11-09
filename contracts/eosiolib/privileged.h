@@ -39,6 +39,16 @@ extern "C" {
    void set_resource_limits( account_name account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight );
 
    /**
+    * @brief Change the resource limits of an account
+    * Change the resource limits of an account
+    * @param account - name of the account whose resource limit to be change
+    * @param ram_bytes - ram delta limit in absolute bytes
+    * @param net_weight - fractionally proportionate net delta limit of available resources based on (weight / total_weight_of_all_accounts)
+    * @param cpu_weight - fractionally proportionate cpu delta limit of available resources based on (weight / total_weight_of_all_accounts)
+    */
+   void change_resource_limits( account_name account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight );
+
+   /**
     * Proposes a schedule change, once the block that contains the proposal becomes irreversible, the schedule is promoted to "pending" automatically. Once the block that promotes the schedule is irreversible, the schedule will become "active"
     * @param producer_data - packed data of produce_keys in the appropriate producer schedule order
     * @param producer_data_size - size of the data buffer

@@ -246,30 +246,6 @@ class eosio_interchain_tester : public actions
       ( "balance", balance )
       ( "staked_balance", a_total_net_cpu )
       ( "staked_ram", ram_bytes );
-
-    /*vector<char> data = get_row_by_account( config::system_account_name, acc, N(userres), acc );
-
-    if( data.empty() )
-    {
-      return mvo()
-        ( "balance", balance )
-        ( "staked_balance", "0.0000 BEOS" )
-        ( "staked_ram", "0.0000 BEOS" );
-    }
-    else
-    {
-      auto resources = system_abi_ser.binary_to_variant( "user_resources", data, abi_serializer_max_time );
-      auto net_weight = resources["net_weight"].as<asset>();
-      auto cpu_weight = resources["cpu_weight"].as<asset>();
-      auto ram_bytes = resources["ram_bytes"].as<int64_t>();
-
-      auto total_net_cpu = net_weight + cpu_weight;
-
-      return mvo()
-        ( "balance", balance )
-        ( "staked_balance", total_net_cpu )
-        ( "staked_ram", ram_bytes );
-    }*/
   }
 
   transaction_trace_ptr create_account_with_resources( account_name creator, account_name a, int64_t bytes = DEFAULT_RAM ) {
