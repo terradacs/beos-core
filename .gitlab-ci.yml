@@ -16,7 +16,9 @@ before_script:
 build:
   stage: build
   script:
-   - cd cd-scripts
+   - cd ..
+   - rm -rf ./build
+   - cd beos-core/cd-scripts
    - cp config-ci.py config.py
    - ./deploy.py --build-beos
    - ./deploy.py --initialize-beos
