@@ -110,6 +110,88 @@ void apply_context::finalize_trace( action_trace& trace, const fc::time_point& s
    trace.elapsed = fc::time_point::now() - start;
 }
 
+void apply_context::reward_stake( const account_name& account, int64_t val )
+{
+   auto& resource_limit_mgr = control.get_mutable_resource_limits_manager();
+   int64_t ram_bytes = 0;
+   int64_t net_weight = 0;
+   int64_t cpu_weight = 0;
+
+   resource_limit_mgr.get_account_limits( account, ram_bytes, net_weight, cpu_weight );
+
+   int64_t stake_net = val / 2;
+   int64_t stake_cpu = val - stake_net;
+
+   net_weight += stake_net;
+   cpu_weight += stake_cpu;
+
+   // [MK]: ram stay unchanged, so no need to check?
+   //if (resource_limit_mgr.set_account_limits( name, ram_bytes, net_weight, cpu_weight ))
+     //trx_context.validate_ram_usage.insert( name );
+   bool need_validation = resource_limit_mgr.set_account_limits( account, ram_bytes, net_weight, cpu_weight );
+   EOS_ASSERT( need_validation == false,
+               resource_limit_exception,
+               "new ram_bytes limit cannot be more restrictive than the previously set one (account '{account}')", ("account", account) );
+}
+
+void apply_context::reward_ram( const account_name& account, int64_t val )
+{
+   auto& resource_limit_mgr = control.get_mutable_resource_limits_manager();
+   int64_t ram_bytes = 0;
+   int64_t net_weight = 0;
+   int64_t cpu_weight = 0;
+
+   resource_limit_mgr.get_account_limits( account, ram_bytes, net_weight, cpu_weight );
+   ram_bytes += val;
+
+   if (resource_limit_mgr.set_account_limits( account, ram_bytes, net_weight, cpu_weight ))
+      trx_context.validate_ram_usage.insert( account );
+}
+
+void apply_context::reward_all( uint32_t block_nr, uint64_t gathered_amount, asset sym, bool is_beos_mode )
+{
+   auto& resource_limit_mgr = control.get_mutable_resource_limits_manager();
+   const auto& accounts_index = db.template get_index<account_index, by_id>();
+
+   auto get_currency_balance = [this]( const account_name& name, const symbol& asset_symbol ) -> asset
+   {
+      const auto* tbl = db.template find<table_id_object, by_code_scope_table>(std::make_tuple(N(eosio.token), name, N(accounts)));
+      share_type result = 0;
+
+      // the balance is implied to be 0 if either the table or row does not exist
+      if (tbl) {
+         const auto *obj = db.template find<key_value_object, by_scope_primary>(std::make_tuple(tbl->id, asset_symbol.to_symbol_code().value));
+         if (obj) {
+            //balance is the first field in the serialization
+            fc::datastream<const char *> ds(obj->value.data(), obj->value.size());
+            fc::raw::unpack(ds, result);
+         }
+      }
+      return asset(result, asset_symbol);
+   };
+
+   for (auto& account : accounts_index)
+   {
+      auto& name = account.name;
+      asset balance( get_currency_balance(name, sym.get_symbol()) );
+      //Calculation ratio for given account.
+      long double ratio = static_cast<long double>( balance.get_amount() ) / gathered_amount;
+      int64_t val = static_cast<int64_t>( block_nr * ratio );
+
+      if (val <= 0)
+         continue;
+
+      if (is_beos_mode)
+        reward_stake( name, val );
+      else
+        reward_ram( name, val );
+   }
+}
+
+void apply_context::reward_done( asset symbol, bool is_beos_mode )
+{
+}
+
 void apply_context::exec( action_trace& trace )
 {
    _notified.push_back(receiver);

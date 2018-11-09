@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <eosio/testing/tester.hpp>
 #include <eosio/chain/abi_serializer.hpp>
+#include <eosio/chain/resource_limits.hpp>
 
 #include <eosio.system/eosio.system.wast.hpp>
 #include <eosio.system/eosio.system.abi.hpp>
@@ -232,7 +233,21 @@ class eosio_interchain_tester : public actions
   fc::variant check_data( account_name acc )
   {
     asset balance = get_balance( acc, "PROXY" );
-    vector<char> data = get_row_by_account( config::system_account_name, acc, N(userres), acc );
+    const auto& resource_limit_mgr = control->get_resource_limits_manager();
+    int64_t ram_bytes = 0;
+    int64_t net_weight = 0;
+    int64_t cpu_weight = 0;
+
+    resource_limit_mgr.get_account_limits( acc, ram_bytes, net_weight, cpu_weight );
+
+    asset a_total_net_cpu( net_weight + cpu_weight );
+
+    return mvo()
+      ( "balance", balance )
+      ( "staked_balance", a_total_net_cpu )
+      ( "staked_ram", ram_bytes );
+
+    /*vector<char> data = get_row_by_account( config::system_account_name, acc, N(userres), acc );
 
     if( data.empty() )
     {
@@ -254,7 +269,7 @@ class eosio_interchain_tester : public actions
         ( "balance", balance )
         ( "staked_balance", total_net_cpu )
         ( "staked_ram", ram_bytes );
-    }
+    }*/
   }
 
   transaction_trace_ptr create_account_with_resources( account_name creator, account_name a, int64_t bytes = DEFAULT_RAM ) {

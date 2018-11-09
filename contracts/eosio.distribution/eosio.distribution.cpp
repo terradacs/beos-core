@@ -15,8 +15,9 @@ distribution::~distribution()
 {
 }
 
-void distribution::execute( uint32_t block_nr, asset proxy_asset, uint32_t starting_block_for_any_distribution, uint32_t ending_block_for_any_distribution,
-              uint32_t distribution_payment_block_interval_for_any_distribution, uint32_t nr_items, bool is_beos_mode )
+void distribution::execute( uint32_t block_nr, asset proxy_asset,
+  uint32_t starting_block_for_any_distribution, uint32_t ending_block_for_any_distribution,
+  uint32_t distribution_payment_block_interval_for_any_distribution, uint32_t nr_items, bool is_beos_mode )
 {
   //Only during a distribution period, an action can be called.
   if( block_nr >= starting_block_for_any_distribution && block_nr <= ending_block_for_any_distribution )
@@ -25,8 +26,12 @@ void distribution::execute( uint32_t block_nr, asset proxy_asset, uint32_t start
       if( ( ( block_nr - starting_block_for_any_distribution ) % distribution_payment_block_interval_for_any_distribution ) == 0 )
       {
         //Rewarding all accounts.
-        rewardall( nr_items, proxy_asset, is_beos_mode );
-        //reward_all( nr_items, &proxy_asset, sizeof(asset), is_beos_mode );
+        //rewardall( nr_items, proxy_asset, is_beos_mode );
+
+        uint64_t gathered_amount = get_sum();
+
+        if (gathered_amount != 0)
+          reward_all( nr_items, gathered_amount, &proxy_asset, sizeof(asset), is_beos_mode );
 
         //Total end of distribution period. Transferring from staked BEOS/RAM to liquid BEOS/RAM.
         //It depends on `is_beos_mode` variable.
@@ -35,8 +40,8 @@ void distribution::execute( uint32_t block_nr, asset proxy_asset, uint32_t start
             ( block_nr + distribution_payment_block_interval_for_any_distribution > ending_block_for_any_distribution )
           )
         {
-          rewarddone( proxy_asset, is_beos_mode );
-          //reward_done( &proxy_asset, sizeof(asset), is_beos_mode );
+          //rewarddone( proxy_asset, is_beos_mode );
+          reward_done( &proxy_asset, sizeof(asset), is_beos_mode );
         }
       }
     }
