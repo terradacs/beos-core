@@ -4,17 +4,21 @@ stages:
 
 build:
   stage: build
-  script:
+  before_script:
+   - pwd
+   - rm -rf ./build
    - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
    - eval $(ssh-agent -s)
    - ssh-add <(echo "$SSH_PRIVATE_KEY")
    - git submodule update --init --recursive
-   - pwd
    - pip3 install distro
+  script:
    - cd cd-scripts
    - cp config-ci.py config.py
    - ./deploy.py --build-beos
    - ./deploy.py --initialize-beos
+  after_script: 
+   - cat beos_deploy_main.log
   cache: {}
   tags:
    - ryzen
