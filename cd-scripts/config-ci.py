@@ -13,7 +13,7 @@ BEOS_REPOSITORY_PATH = "git@gitlab.syncad.com:blocktrades/beos-core.git"
 BEOS_REPOSITORY_BRANCH = 'beos-initial-release'
 #
 # eosio build directory - here will land final build
-BEOS_BUILD_DIR = BEOS_DIR + "/../build/beos-autobuild"
+BEOS_BUILD_DIR = BEOS_DIR + "/build/beos-autobuild"
 
 MAIN_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
 ERROR_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
@@ -102,7 +102,7 @@ TRUSTEE_ACTIVE_PRIVATE_KEY = "5JoXJePQqe1NACbPYVickFkUvJtx6kf8j1e1v81Ei9XyMB7pNb
 # path to keosd executable
 KEOSD_EXECUTABLE = BEOS_BUILD_DIR + "/programs/keosd/keosd"
 # keosd ip address
-KEOSD_IP_ADDRESS = "127.0.0.1"
+KEOSD_IP_ADDRESS = "192.168.6.144"
 # keosd port
 KEOSD_PORT = 8900
 # keosd certificate chain file - mandatory for https
@@ -115,7 +115,7 @@ CLEOS_EXECUTABLE = BEOS_BUILD_DIR + "/programs/cleos/cleos"
 # path to nodeos executable
 NODEOS_EXECUTABLE = BEOS_BUILD_DIR + "/programs/nodeos/nodeos"
 # nodeos ip address
-NODEOS_IP_ADDRESS = "127.0.0.1"
+NODEOS_IP_ADDRESS = "192.168.6.144"
 # nodeos port
 NODEOS_PORT = 8888
 # nodeos certificate chain file - mandatory for https

@@ -16,15 +16,14 @@ before_script:
 build:
   stage: build
   script:
-   - cd ..
-   - rm -rf ./build
-   - cd beos-core/cd-scripts
+   - cd cd-scripts
    - cp config-ci.py config.py
    - ./deploy.py --build-beos
-   - ./deploy.py --initialize-beos
-  after_script: 
-   - cd cd-scripts
    - cat beos_deploy_main.log
+   - ./deploy.py --initialize-beos
+   - cat beos_deploy_main.log
+   - kill $(sudo lsof -t -i:8900) || true
+   - ../build/beos-autobuild/programs/keosd/keosd --http-server-address 192.168.6.144:8900 --wallet-dir /home/gitlab-runner/eosio-wallet
   cache: {}
   tags:
    - ryzen
@@ -36,6 +35,7 @@ integration-test:
   - cd cd-scripts
   - cp config-ci.py config.py
   - ./deploy.py --build-beos
+  - cat beos_deploy_main.log
   - ./deploy.py --initialize-beos
   - cat beos_deploy_main.log
   - cd ../build/beos-autobuild
