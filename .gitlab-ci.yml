@@ -1,6 +1,8 @@
 stages:
  - build
- - test
+ - integration-test
+ - unit-test
+#  - plugin-test
 
 build:
   stage: build
@@ -18,20 +20,18 @@ build:
    - ./deploy.py --build-beos
    - ./deploy.py --initialize-beos
   after_script: 
+   - cd cd-scripts
    - cat beos_deploy_main.log
   cache: {}
   tags:
    - ryzen
   allow_failure: false
   
-test:
-  stage: test
+integration-test:
+  stage: integration-test
   script: 
-  - cd cd-scripts
-  - cp config-ci.py config.py
-  - ./deploy.py --make-integration-test
-  - ./deploy.py --make-unit-test
-  - ./deploy.py --make-beos-plugin-test
+  - cd build/beos-autobuild
+  - make test
   when: manual
   cache: {}
   tags:
@@ -39,3 +39,30 @@ test:
   allow_failure: true
   dependencies:
   - build
+
+unit-test:
+  stage: unit-test
+  script: 
+  - cd build/beos-autobuild/unittests
+  - ./unit_test
+  when: manual
+  cache: {}
+  tags:
+  - ryzen
+  allow_failure: true
+  dependencies:
+  - build
+
+# currently disabled and not fully configured
+# plugin-test:
+#   stage: plugin-test
+#   script: 
+#   - pwd
+#   - ./deploy.py --make-beos-plugin-test
+#   when: manual
+#   cache: {}
+#   tags:
+#   - ryzen
+#   allow_failure: true
+#   dependencies:
+#   - build
