@@ -61,7 +61,7 @@ uint64_t distribution::get_sum()
 {
   eosio::beos_global_state b_state = eosio::init( N(beos.init) ).get_beos_global_state();
   auto issued = eosio::token( N(eosio.token) ).get_supply( b_state.proxy_asset.symbol.name() ).amount;
-  auto withdrawn = eosio::token( N(eosio.token) ).check_balance( N(beos.gateway), b_state.proxy_asset.symbol.name() ).amount;
+  auto withdrawn = eosio::token( N(eosio.token) ).check_balance( N(beos.gateway), b_state.proxy_asset.symbol ).amount;
   
   eosio_assert( issued >= withdrawn, "issued PXBTS >= withdrawn PXBTS" );
 
@@ -78,7 +78,7 @@ void distribution::rewardall( uint32_t total_amount, asset symbol/*correct symbo
 
   auto callable = [&]( const init_data& obj )
   {
-    auto balance = eosio::token( N(eosio.token) ).check_balance( obj.owner, symbol.symbol.name() );  
+    auto balance = eosio::token( N(eosio.token) ).check_balance( obj.owner, symbol.symbol );  
     //Calculation ratio for given account.
     long double ratio = static_cast< long double >( balance.amount ) / gathered_amount;
     int64_t val = static_cast< int64_t >( total_amount * ratio );

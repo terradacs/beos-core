@@ -1028,6 +1028,7 @@ BOOST_FIXTURE_TEST_CASE( manipulation_lock_test, eosio_interchain_tester ) try {
 
   CHECK_STATS(alice, "", "800.0000 BEOS", "");
 
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("overdrawn balance during withdraw"), withdraw( N(alice), asset::from_string("1.0001 PROXY") ) );
   BOOST_REQUIRE_EQUAL( success(), withdraw( N(alice), asset::from_string("1.0000 PROXY") ) );
 
   produce_blocks( 9 );
@@ -1409,13 +1410,13 @@ BOOST_FIXTURE_TEST_CASE( performance_decrease_test, eosio_interchain_tester ) tr
   BOOST_REQUIRE_EQUAL( success(), withdraw( N(alice), asset::from_string("0.1000 PROXY") ) );
   CHECK_STATS(alice,"0.0000 PROXY", "", "");
 
-  BOOST_REQUIRE_EQUAL( success(), withdraw( N(alice), asset::from_string("0.1000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("overdrawn balance during withdraw"), withdraw( N(alice), asset::from_string("0.1000 PROXY") ) );
   CHECK_STATS(alice,"0.0000 PROXY", "", "");
 
-  BOOST_REQUIRE_EQUAL( success(), withdraw( N(alice), asset::from_string("0.1000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("overdrawn balance during withdraw"), withdraw( N(alice), asset::from_string("0.1000 PROXY") ) );
   CHECK_STATS(alice,"0.0000 PROXY", "", "");
 
-  produce_blocks( 6 );
+  produce_blocks( 8 );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 270u );
 
   CHECK_STATS(alice,"0.0000 PROXY", "2400.0000 BEOS", "10000000");
@@ -1437,7 +1438,8 @@ BOOST_FIXTURE_TEST_CASE( performance_decrease_test2, eosio_interchain_tester ) t
   CHECK_STATS(alice,"2.0000 PROXY", "400.0000 BEOS", "2500000");
   CHECK_STATS(bob,  "2.0000 PROXY", "400.0000 BEOS", "2500000");
 
-  BOOST_REQUIRE_EQUAL( success(), withdraw( N(bob), asset::from_string("6.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("overdrawn balance during withdraw"), withdraw( N(bob), asset::from_string("6.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( success(), withdraw( N(bob), asset::from_string("2.0000 PROXY") ) );
 
   produce_blocks( 3 );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 244u );
@@ -1478,8 +1480,11 @@ BOOST_FIXTURE_TEST_CASE( performance_decrease_test2, eosio_interchain_tester ) t
   BOOST_REQUIRE_EQUAL( success(), issue( N(bob), asset::from_string("41.0000 PROXY") ) );
   BOOST_REQUIRE_EQUAL( success(), withdraw( N(bob), asset::from_string("1.0000 PROXY") ) );
   BOOST_REQUIRE_EQUAL( success(), issue( N(bob), asset::from_string("8.0000 PROXY") ) );
-  BOOST_REQUIRE_EQUAL( success(), withdraw( N(dan), asset::from_string("500.0000 PROXY") ) );
-  BOOST_REQUIRE_EQUAL( success(), withdraw( N(alice), asset::from_string("500.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("overdrawn balance during withdraw"), withdraw( N(dan), asset::from_string("500.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("overdrawn balance during withdraw"), withdraw( N(alice), asset::from_string("500.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( success(), withdraw( N(dan), asset::from_string("48.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("must withdraw positive quantity"), withdraw( N(alice), asset::from_string("0.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( success(), withdraw( N(alice), asset::from_string("40.0000 PROXY") ) );
 
   produce_blocks( 4 );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 270u );

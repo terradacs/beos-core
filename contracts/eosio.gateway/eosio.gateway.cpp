@@ -34,7 +34,7 @@ void gateway::issue( account_name to, asset quantity )
     b) only transfer
     c) issue + transfer
   */
-  auto gateway_balance = eosio::token( N(eosio.token) ).check_balance( from, quantity.symbol.name() );
+  auto gateway_balance = eosio::token( N(eosio.token) ).check_balance( from, quantity.symbol );
 
   if( gateway_balance.amount == 0 )//a
   {
@@ -67,22 +67,18 @@ void gateway::withdraw( account_name owner, asset quantity )
 
   eosio_assert( quantity.amount > 0, "must withdraw positive quantity" );
 
-  auto balance = eosio::token( N(eosio.token) ).check_balance( owner, quantity.symbol.name() );
-  if( balance.amount == 0 )
-    return;
-
-  if( quantity > balance )
-    quantity = balance;
+  auto balance = eosio::token( N(eosio.token) ).check_balance( owner, quantity.symbol );
+  eosio_assert( balance >= quantity, "overdrawn balance during withdraw" );
 
   INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {owner,N(active)},
-                                               { owner, N(beos.gateway), quantity, std::string("decrease") } );
+                                               { owner, N(beos.gateway), quantity, std::string("withdraw") } );
 }
 
 void gateway::withdrawall( account_name removed, asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/ )
 {
   checker( removed, symbol );
 
-  auto balance = eosio::token( N(eosio.token) ).check_balance( removed, symbol.symbol.name() );
+  auto balance = eosio::token( N(eosio.token) ).check_balance( removed, symbol.symbol );
   if( balance.amount == 0 )
     return;
 
