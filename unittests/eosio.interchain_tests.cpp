@@ -139,16 +139,6 @@ struct actions: public tester
       );
   }
 
-  action_result withdrawall( account_name removed, asset symbol )
-  {
-    return push_action( removed, N(withdrawall), mvo()
-        ( "removed", removed )
-        ( "symbol", symbol ),
-        beos_gateway_abi_ser,
-        N(beos.gateway)
-      );
-  }
-
   action_result locks( account_name from, std::vector< action >&& acts )
   {
     return push_actions( std::move( acts ), uint64_t( from ) );
@@ -1028,6 +1018,7 @@ BOOST_FIXTURE_TEST_CASE( manipulation_lock_test, eosio_interchain_tester ) try {
 
   CHECK_STATS(alice, "", "800.0000 BEOS", "");
 
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("overdrawn balance during withdraw"), withdraw( N(alice), asset::from_string("1.0001 PROXY") ) );
   BOOST_REQUIRE_EQUAL( success(), withdraw( N(alice), asset::from_string("1.0000 PROXY") ) );
 
   produce_blocks( 9 );
@@ -1057,7 +1048,7 @@ BOOST_FIXTURE_TEST_CASE( manipulation_lock_test, eosio_interchain_tester ) try {
 
 BOOST_FIXTURE_TEST_CASE( manipulation_lock_test2, eosio_interchain_tester ) try {
 
-  BOOST_TEST_MESSAGE( "1 account - actions: issue, withdraw, withdrawall in different configurations" );
+  BOOST_TEST_MESSAGE( "1 account - actions: issue, withdraw in different configurations" );
 
   test_global_state tgs;
   BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
@@ -1083,7 +1074,7 @@ BOOST_FIXTURE_TEST_CASE( manipulation_lock_test2, eosio_interchain_tester ) try 
 
   CHECK_STATS(alice, "3.0000 PROXY", "800.0000 BEOS", "");
 
-  BOOST_REQUIRE_EQUAL( success(), withdrawall( N(alice), asset::from_string("0.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( success(), withdraw( N(alice), asset::from_string("3.0000 PROXY") ) );
 
   produce_blocks( 8 );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 260u );
@@ -1101,7 +1092,7 @@ BOOST_FIXTURE_TEST_CASE( manipulation_lock_test2, eosio_interchain_tester ) try 
 
 BOOST_FIXTURE_TEST_CASE( manipulation_lock_test3, eosio_interchain_tester ) try {
 
-  BOOST_TEST_MESSAGE( "4 accounts - actions: issue, withdraw, withdrawall in different configurations" );
+  BOOST_TEST_MESSAGE( "4 accounts - actions: issue, withdraw in different configurations" );
 
   test_global_state tgs;
   BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
@@ -1151,8 +1142,8 @@ BOOST_FIXTURE_TEST_CASE( manipulation_lock_test3, eosio_interchain_tester ) try 
   CHECK_STATS(carol, "24.0000 PROXY", "809.5238 BEOS", "");
   CHECK_STATS(dan,   "16.0000 PROXY", "428.5714 BEOS", "");
 
-  BOOST_REQUIRE_EQUAL( success(), withdrawall( N(alice), asset::from_string("0.0000 PROXY") ) );
-  BOOST_REQUIRE_EQUAL( success(), withdrawall( N(dan), asset::from_string("0.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( success(), withdraw( N(alice), asset::from_string("8.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( success(), withdraw( N(dan), asset::from_string("16.0000 PROXY") ) );
   BOOST_REQUIRE_EQUAL( success(), issue( N(bob), asset::from_string("48.0000 PROXY") ) );
 
   produce_blocks( 7 );
@@ -1347,15 +1338,15 @@ BOOST_FIXTURE_TEST_CASE( false_tests, eosio_interchain_tester ) try {
   BOOST_REQUIRE_EQUAL( wasm_assert_msg("must issue positive quantity"), issue( N(alice), asset::from_string("0.0000 PROXY") ) );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 100u );
 
-  BOOST_TEST_MESSAGE( "'withdrawall' action" );
+  BOOST_TEST_MESSAGE( "'withdraw' action" );
 
-  BOOST_REQUIRE_EQUAL( "action's authorizing actor 'fake.acc2' does not exist", withdrawall( N(fake.acc2), asset::from_string("5.5432 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( "action's authorizing actor 'fake.acc2' does not exist", withdraw( N(fake.acc2), asset::from_string("5.5432 PROXY") ) );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 100u );
 
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg("unable to find key"), withdrawall( N(beos.gateway), asset::from_string("100.0000 ABC") ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("unable to find key"), withdraw( N(beos.gateway), asset::from_string("100.0000 ABC") ) );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 100u );
 
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg("symbol precision mismatch"), withdrawall( N(beos.gateway), asset::from_string("100.00 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("symbol precision mismatch"), withdraw( N(beos.gateway), asset::from_string("100.00 PROXY") ) );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 100u );
 
 } FC_LOG_AND_RETHROW()
@@ -1409,13 +1400,13 @@ BOOST_FIXTURE_TEST_CASE( performance_decrease_test, eosio_interchain_tester ) tr
   BOOST_REQUIRE_EQUAL( success(), withdraw( N(alice), asset::from_string("0.1000 PROXY") ) );
   CHECK_STATS(alice,"0.0000 PROXY", "", "");
 
-  BOOST_REQUIRE_EQUAL( success(), withdraw( N(alice), asset::from_string("0.1000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("overdrawn balance during withdraw"), withdraw( N(alice), asset::from_string("0.1000 PROXY") ) );
   CHECK_STATS(alice,"0.0000 PROXY", "", "");
 
-  BOOST_REQUIRE_EQUAL( success(), withdraw( N(alice), asset::from_string("0.1000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("overdrawn balance during withdraw"), withdraw( N(alice), asset::from_string("0.1000 PROXY") ) );
   CHECK_STATS(alice,"0.0000 PROXY", "", "");
 
-  produce_blocks( 6 );
+  produce_blocks( 8 );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 270u );
 
   CHECK_STATS(alice,"0.0000 PROXY", "2400.0000 BEOS", "10000000");
@@ -1437,7 +1428,8 @@ BOOST_FIXTURE_TEST_CASE( performance_decrease_test2, eosio_interchain_tester ) t
   CHECK_STATS(alice,"2.0000 PROXY", "400.0000 BEOS", "2500000");
   CHECK_STATS(bob,  "2.0000 PROXY", "400.0000 BEOS", "2500000");
 
-  BOOST_REQUIRE_EQUAL( success(), withdraw( N(bob), asset::from_string("6.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("overdrawn balance during withdraw"), withdraw( N(bob), asset::from_string("6.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( success(), withdraw( N(bob), asset::from_string("2.0000 PROXY") ) );
 
   produce_blocks( 3 );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 244u );
@@ -1478,8 +1470,11 @@ BOOST_FIXTURE_TEST_CASE( performance_decrease_test2, eosio_interchain_tester ) t
   BOOST_REQUIRE_EQUAL( success(), issue( N(bob), asset::from_string("41.0000 PROXY") ) );
   BOOST_REQUIRE_EQUAL( success(), withdraw( N(bob), asset::from_string("1.0000 PROXY") ) );
   BOOST_REQUIRE_EQUAL( success(), issue( N(bob), asset::from_string("8.0000 PROXY") ) );
-  BOOST_REQUIRE_EQUAL( success(), withdraw( N(dan), asset::from_string("500.0000 PROXY") ) );
-  BOOST_REQUIRE_EQUAL( success(), withdraw( N(alice), asset::from_string("500.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("overdrawn balance during withdraw"), withdraw( N(dan), asset::from_string("500.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("overdrawn balance during withdraw"), withdraw( N(alice), asset::from_string("500.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( success(), withdraw( N(dan), asset::from_string("48.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("must withdraw positive quantity"), withdraw( N(alice), asset::from_string("0.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( success(), withdraw( N(alice), asset::from_string("40.0000 PROXY") ) );
 
   produce_blocks( 4 );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 270u );
@@ -1491,7 +1486,7 @@ BOOST_FIXTURE_TEST_CASE( performance_decrease_test2, eosio_interchain_tester ) t
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( main_commands_test_1, eosio_interchain_tester ) try {
-  BOOST_TEST_MESSAGE( " Test issue, withdraw and withdrawall for one account");
+  BOOST_TEST_MESSAGE( " Test issue, withdraw for one account");
 
   test_global_state tgs;
   BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
@@ -1517,7 +1512,7 @@ BOOST_FIXTURE_TEST_CASE( main_commands_test_1, eosio_interchain_tester ) try {
   
   CHECK_STATS(alice,  "8.0000 PROXY", "1600.0000 BEOS", "5000000");
 
-  BOOST_REQUIRE_EQUAL( success(), withdrawall( N(alice), asset::from_string("0.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( success(), withdraw( N(alice), asset::from_string("8.0000 PROXY") ) );
 
   produce_blocks( 9 );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 270u );
@@ -1527,7 +1522,7 @@ BOOST_FIXTURE_TEST_CASE( main_commands_test_1, eosio_interchain_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( main_commands_test_2, eosio_interchain_tester ) try {
-  BOOST_TEST_MESSAGE( " Test issue, withdraw and withdrawall for four accounts");
+  BOOST_TEST_MESSAGE( " Test issue, withdraw for four accounts");
 
   test_global_state tgs;
   BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
@@ -1574,7 +1569,7 @@ BOOST_FIXTURE_TEST_CASE( main_commands_test_2, eosio_interchain_tester ) try {
   CHECK_STATS(dan,   "8.0000 PROXY", "400.0000 BEOS", "3750000");
 
   for(const auto& _acc : accounts) {
-    BOOST_REQUIRE_EQUAL( success(), withdrawall( StN(_acc.c_str()), asset::from_string("16.0000 PROXY") ) );
+    BOOST_REQUIRE_EQUAL( success(), withdraw( StN(_acc.c_str()), asset::from_string("8.0000 PROXY") ) );
   }
 
   produce_blocks(6);
@@ -1583,7 +1578,7 @@ BOOST_FIXTURE_TEST_CASE( main_commands_test_2, eosio_interchain_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( main_commands_test_3, eosio_interchain_tester ) try {
-  BOOST_TEST_MESSAGE( " Test issue, withdraw and withdrawall for n dynamic accounts");
+  BOOST_TEST_MESSAGE( " Test issue, withdraw for n dynamic accounts");
 
   test_global_state tgs;
   BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
@@ -1636,7 +1631,7 @@ BOOST_FIXTURE_TEST_CASE( main_commands_test_3, eosio_interchain_tester ) try {
   CHECK_STATS(weles,    "5.0000 PROXY", "320.0000 BEOS", "6000000");
 
   for(const auto& _acc : accounts) {
-    BOOST_REQUIRE_EQUAL( success(), withdrawall( StN(_acc.c_str()), asset::from_string("8.0000 PROXY") ) );
+    BOOST_REQUIRE_EQUAL( success(), withdraw( StN(_acc.c_str()), asset::from_string("5.0000 PROXY") ) );
   }
 
   produce_blocks(5);
@@ -1645,7 +1640,7 @@ BOOST_FIXTURE_TEST_CASE( main_commands_test_3, eosio_interchain_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( main_commands_test_4, eosio_interchain_tester ) try {
-  BOOST_TEST_MESSAGE( "Test issue, withdraw and withdrawall for created and dynamic accounts");
+  BOOST_TEST_MESSAGE( "Test issue, withdraw for created and dynamic accounts");
 
   test_global_state tgs;
   BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
@@ -1686,11 +1681,8 @@ BOOST_FIXTURE_TEST_CASE( main_commands_test_4, eosio_interchain_tester ) try {
   CHECK_STATS(alice,    "0.0000 PROXY", "133.3333 BEOS", "833333");
   CHECK_STATS(dan,      "0.0000 PROXY", "133.3333 BEOS", "833333");
 
-  //
-  //BOOST_REQUIRE_EQUAL( success(), withdrawall( N(dan), asset::from_string("0.0000 PROXY") ) );
-  //BOOST_REQUIRE_EQUAL( success(), withdrawall( N(alice), asset::from_string("0.0000 PROXY") ) );
-  BOOST_REQUIRE_EQUAL( success(), withdrawall( N(perun), asset::from_string("10.0000 PROXY") ) );
-  BOOST_REQUIRE_EQUAL( success(), withdrawall( N(swiatowid), asset::from_string("10.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( success(), withdraw( N(perun), asset::from_string("10.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( success(), withdraw( N(swiatowid), asset::from_string("10.0000 PROXY") ) );
 
   produce_blocks(8);
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 260u );
