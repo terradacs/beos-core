@@ -17,7 +17,7 @@ build:
   stage: build
   script:
    - cd cd-scripts
-   - cp ./config-ci.py ./config.py
+   - cp config-ci.py config.py
    - ./deploy.py --build-beos
    - cat beos_deploy_main.log
    - ./deploy.py --initialize-beos
@@ -35,8 +35,6 @@ deploy:
    - pwd
    - ls -l
   allow_failure: true
-  dependencies:
-   - build
   environment:
     name: development
     url: http://192.168.6.144:8888/v1/chain/get_info
@@ -45,7 +43,7 @@ integration-test:
   stage: integration-test
   script: 
   - cd cd-scripts
-  - cp ./config-ci.py ./config.py
+  - cp config-ci.py config.py
   - ./deploy.py --build-beos
   - cat beos_deploy_main.log
   - ./deploy.py --initialize-beos
@@ -64,7 +62,7 @@ unit-test:
   stage: unit-test
   script: 
   - cd cd-scripts
-  - cp ./config-ci.py ./config.py
+  - cp config-ci.py config.py
   - ./deploy.py --build-beos
   - ./deploy.py --initialize-beos
   - cat beos_deploy_main.log
