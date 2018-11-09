@@ -4,16 +4,17 @@ stages:
  - unit-test
 #  - plugin-test
 
+before_script:
+ - pwd
+ - rm -rf ./build
+ - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
+ - eval $(ssh-agent -s)
+ - ssh-add <(echo "$SSH_PRIVATE_KEY")
+ - git submodule update --init --recursive
+ - pip3 install distro
+
 build:
   stage: build
-  before_script:
-   - pwd
-   - rm -rf ./build
-   - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
-   - eval $(ssh-agent -s)
-   - ssh-add <(echo "$SSH_PRIVATE_KEY")
-   - git submodule update --init --recursive
-   - pip3 install distro
   script:
    - cd cd-scripts
    - cp config-ci.py config.py
@@ -26,14 +27,16 @@ build:
   tags:
    - ryzen
   allow_failure: false
-  artifacts:
-    paths:
-     - build/
   
 integration-test:
   stage: integration-test
   script: 
-  - cd build/beos-autobuild
+  - cd cd-scripts
+  - cp config-ci.py config.py
+  - ./deploy.py --build-beos
+  - ./deploy.py --initialize-beos
+  - cat beos_deploy_main.log
+  - cd ../build/beos-autobuild
   - make test
   when: manual
   cache: {}
@@ -42,14 +45,16 @@ integration-test:
   allow_failure: true
   dependencies:
   - build
-  artifacts:
-   paths:
-    - build/
 
 unit-test:
   stage: unit-test
   script: 
-  - cd build/beos-autobuild/unittests
+  - cd cd-scripts
+  - cp config-ci.py config.py
+  - ./deploy.py --build-beos
+  - ./deploy.py --initialize-beos
+  - cat beos_deploy_main.log
+  - cd ../build/beos-autobuild/unittests
   - ./unit_test
   when: manual
   cache: {}
@@ -57,10 +62,7 @@ unit-test:
   - ryzen
   allow_failure: true
   dependencies:
-  - integration-test
-  # artifacts:
-  #  paths
-  #   - build/
+  - build
 
 # currently disabled and not fully configured
 # plugin-test:
@@ -73,5 +75,3 @@ unit-test:
 #   tags:
 #   - ryzen
 #   allow_failure: true
-#   dependencies:
-#   - unit-test
