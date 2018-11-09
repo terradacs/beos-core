@@ -26,6 +26,9 @@ build:
   tags:
    - ryzen
   allow_failure: false
+  artifacts:
+    paths:
+     - build/
   
 integration-test:
   stage: integration-test
@@ -39,6 +42,9 @@ integration-test:
   allow_failure: true
   dependencies:
   - build
+  artifacts:
+   paths:
+    - build/
 
 unit-test:
   stage: unit-test
@@ -51,7 +57,10 @@ unit-test:
   - ryzen
   allow_failure: true
   dependencies:
-  - build
+  - integration-test
+  # artifacts:
+  #  paths
+  #   - build/
 
 # currently disabled and not fully configured
 # plugin-test:
@@ -65,4 +74,4 @@ unit-test:
 #   - ryzen
 #   allow_failure: true
 #   dependencies:
-#   - build
+#   - unit-test
