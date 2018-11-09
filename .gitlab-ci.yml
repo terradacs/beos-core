@@ -22,13 +22,23 @@ build:
    - cat beos_deploy_main.log
    - ./deploy.py --initialize-beos
    - cat beos_deploy_main.log
-   - kill $(sudo lsof -t -i:8900) || true
-   - ../build/beos-autobuild/programs/keosd/keosd --http-server-address 192.168.6.144:8900 --wallet-dir /home/gitlab-runner/eosio-wallet
+  # - kill $(sudo lsof -t -i:8900) || true
+  # - ../build/beos-autobuild/programs/keosd/keosd --http-server-address 192.168.6.144:8900 --wallet-dir /home/gitlab-runner/eosio-wallet
   cache: {}
   tags:
    - ryzen
   allow_failure: false
   
+deploy:
+  stage: build
+  script:
+   - pwd
+   - ls -l
+  allow_failure: true
+  environment:
+    name: development
+    url: http://192.168.6.144:8888/v1/chain/get_info
+
 integration-test:
   stage: integration-test
   script: 

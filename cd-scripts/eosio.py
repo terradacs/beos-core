@@ -168,7 +168,7 @@ def run_keosd(ip_address, port, wallet_dir, use_https = False, forceWalletCleanu
             "--wallet-dir", wallet_dir,
         ]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
-    return run_service("KEOSD", parameters, "add api url: /v1/wallet/unlock", True)
+    return run_service("KEOSD", parameters, "add api url: /v1/wallet/unlock", False)
 
 def unlock_wallet(wallet_name, wallet_password):
     parameters = [config.CLEOS_EXECUTABLE, 
