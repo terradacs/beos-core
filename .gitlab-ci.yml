@@ -29,11 +29,15 @@ build:
    - ryzen
   allow_failure: false
   
-deploy:
+deploy-dev:
   stage: build
   script:
    - pwd
    - ls -l
+  when: manual
+  cache: {}
+  tags:
+  - ryzen
   allow_failure: true
   environment:
     name: development
