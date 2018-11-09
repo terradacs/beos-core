@@ -7,21 +7,27 @@ import datetime
 from eosrpcexecutor import EOSRPCExecutor
 
 class TestScenarios(object):
-    def __init__(self, _nodeos_addres, _nodeos_port, _wallet_address, _wallet_port):
+    def __init__(self, _nodeos_addres, _nodeos_port, _wallet_address, _wallet_port, _scenarios_file_name):
         self.summary_file = "Scenarios_summary_"+str(datetime.datetime.now())[:-7]
+        self.scenarios_file = _scenarios_file_name
         self.actions      = None
+        self.after_block  = {}
         self.scenarios    = None
         self.scenariosNr  = None
         self.blockNumber  = 0
+        self.after_block_result = {}
         self.eos_rpc      = EOSRPCExecutor(_nodeos_addres, _nodeos_port, _wallet_address, _wallet_port)
         self.load_scenarios()
 
         self.blockGetter = threading.Thread(target=self.block_id_getter)
         self.blockGetter.setDaemon(daemonic=True)
+        self.user_status_getter = threading.Thread(target=self.check_user_status_after_block)
+        self.user_status_getter.setDaemon(daemonic=True)
         self.runScenarios = threading.Event()
         self.runScenarios.set()
         self.askForBlockNumber = threading.Event()
         self.blockGetter.start()
+        self.user_status_getter.start()
         
 
     def __iter__(self):
@@ -55,7 +61,7 @@ class TestScenarios(object):
 
     def load_scenarios(self):
         try:
-            with open("scenarios.json") as scenarios:
+            with open(self.scenarios_file) as scenarios:
                 self.scenarios = json.load(scenarios)["scenarios"]
         except Exception as _ex:
             print("Error while loading scenarios ", str(_ex))
@@ -63,6 +69,9 @@ class TestScenarios(object):
 
  
     def get_scenario_summary(self, _symbol="PXBTS"):
+        print("AFTER BLOCK")
+        print(self.after_block_result)
+        print(20*"***")
         self.askForBlockNumber.clear()
         expected_result_for_user = self.scenarios[self.scenariosNr]["expected_results"]
         with open(self.summary_file,"a+") as sf:
@@ -113,14 +122,39 @@ class TestScenarios(object):
         self.set_scenario_params()
         return self.execute_scenatio_actions()
 
+
     def stop_scenarios(self):
         self.runScenarios.clear()
         self.askForBlockNumber.clear()
 
+
+    def check_user_status_after_block(self, _symbol="PXBTS"):
+        while self.runScenarios.is_set():
+            while self.askForBlockNumber.is_set():
+                if self.after_block:
+                    for user, after_blocks in self.after_block.items():
+                        if after_blocks and self.blockNumber > after_blocks[0]["after_block"]:
+                            asked_at_block = self.blockNumber
+                            after_blocks.pop(0)
+                            if self.blockNumber >= self.scenarios[self.scenariosNr]["scenario_blocks"]:
+                                return
+                            balance = self.eos_rpc.get_currency_balance(user, _symbol)
+                            account_after_block = self.eos_rpc.get_account(user)
+                            result = account_after_block["total_resources"] if "total_resources" in account_after_block else None
+                            if result and "owner" in result:
+                                result.pop("owner")
+                            result["balance"]=balance["balance"]
+                            result["asked_at_block"] = asked_at_block
+                            if user in self.after_block_result:
+                                self.after_block_result[user].append(result)
+                            else:
+                                self.after_block_result[user] = [result]
+
+
     def execute_scenatio_actions(self):
         if not self.askForBlockNumber.is_set():
             self.askForBlockNumber.set()
-        self.actions = sorted(self.scenarios[self.scenariosNr]["actions"], key=lambda k: k['start_block'])
+        print("ALL BLOCK", self.after_block)
         if self.actions:
             for action in self.actions:
                 startBlock = action.pop("start_block")
@@ -135,4 +169,16 @@ class TestScenarios(object):
         else:
             print("There are no actions.")
 
+
+    def prepare_data(self):
+        self.actions     = sorted(self.scenarios[self.scenariosNr]["actions"], key=lambda k: k['start_block'])
+        after_block = self.scenarios[self.scenariosNr]["expected_results"]
+        for after in after_block:
+            if after["user"] in self.after_block:
+                for a in after["after_block"]:
+                    self.after_block[after["user"]].append(a)    
+            else:
+                self.after_block[after["user"]]=after["after_block"]
+        for key, value in self.after_block.items():
+            self.after_block[key] = sorted(value, key=lambda k:k['after_block'])
 
