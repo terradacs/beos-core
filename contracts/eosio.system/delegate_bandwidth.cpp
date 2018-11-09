@@ -78,7 +78,6 @@ namespace eosiosystem {
     *  These tables are designed to be constructed in the scope of the relevant user, this
     *  facilitates simpler API for per-user queries
     */
-   typedef eosio::multi_index< N(userres), user_resources>      user_resources_table;
    typedef eosio::multi_index< N(delband), delegated_bandwidth> del_bandwidth_table;
    typedef eosio::multi_index< N(refunds), refund_request>      refunds_table;
 
@@ -149,19 +148,7 @@ namespace eosiosystem {
       _gstate.total_ram_bytes_reserved += uint64_t(bytes_out);
       _gstate.total_ram_stake          += quant_after_fee.amount;
 
-      user_resources_table  userres( _self, receiver );
-      auto res_itr = userres.find( receiver );
-      if( res_itr ==  userres.end() ) {
-         res_itr = userres.emplace( receiver, [&]( auto& res ) {
-               res.owner = receiver;
-               res.ram_bytes = bytes_out;
-            });
-      } else {
-         userres.modify( res_itr, receiver, [&]( auto& res ) {
-               res.ram_bytes += bytes_out;
-            });
-      }
-      set_resource_limits( res_itr->owner, res_itr->ram_bytes, res_itr->net_weight.amount, res_itr->cpu_weight.amount );
+      change_resource_limits( receiver, bytes_out, 0, 0 );
    }
 
   void system_contract::initresource( account_name receiver, int64_t bytes, asset stake_net_quantity, asset stake_cpu_quantity )
@@ -169,26 +156,7 @@ namespace eosiosystem {
     require_auth( _self );
 
     //Delegate RAM from payer to receiver
-    user_resources_table userres( _self, receiver );
-
-    auto res_itr = userres.find( receiver );
-
-    if( res_itr ==  userres.end() ) {
-        res_itr = userres.emplace( receiver, [&]( auto& res ) {
-              res.owner = receiver;
-              res.ram_bytes = bytes;
-              res.net_weight = stake_net_quantity;
-              res.cpu_weight = stake_cpu_quantity;
-          });
-    } else {
-        userres.modify( res_itr, receiver, [&]( auto& res ) {
-              res.ram_bytes += bytes;
-              res.net_weight += stake_net_quantity;
-              res.cpu_weight += stake_cpu_quantity;
-          });
-    }
-
-    set_resource_limits( res_itr->owner, res_itr->ram_bytes, res_itr->net_weight.amount, res_itr->cpu_weight.amount );
+    change_resource_limits( receiver, bytes, stake_net_quantity.amount, stake_cpu_quantity.amount );
   }
 
   void system_contract::delegateram( account_name payer, account_name receiver, int64_t bytes )
@@ -196,34 +164,10 @@ namespace eosiosystem {
     require_auth( payer );
 
     //Check amount of RAM for payer
-    user_resources_table userres_payer( _self, payer );
-    auto res_itr = userres_payer.find( payer );
-    eosio_assert( res_itr != userres_payer.end(), "payer must exist" );
-
-    eosio_assert( res_itr->ram_bytes >= bytes, "not enough RAM" );
-
-    //Decrease amount of RAM for payer
-    userres_payer.modify( res_itr, payer, [&]( auto& res ) {
-          res.ram_bytes -= bytes;
-      });
+    change_resource_limits( payer, -bytes, 0, 0 );
 
     //Delegate RAM from payer to receiver
-    user_resources_table  userres( _self, receiver );
-
-    res_itr = userres.find( receiver );
-
-    if( res_itr ==  userres.end() ) {
-        res_itr = userres.emplace( receiver, [&]( auto& res ) {
-              res.owner = receiver;
-              res.ram_bytes = bytes;
-          });
-    } else {
-        userres.modify( res_itr, receiver, [&]( auto& res ) {
-              res.ram_bytes += bytes;
-          });
-    }
-
-    set_resource_limits( res_itr->owner, res_itr->ram_bytes, res_itr->net_weight.amount, res_itr->cpu_weight.amount );
+    change_resource_limits( receiver, bytes, 0, 0 );
   }
 
    /**
@@ -238,11 +182,6 @@ namespace eosiosystem {
 
       require_auth( account );
       eosio_assert( bytes > 0, "cannot sell negative byte" );
-
-      user_resources_table  userres( _self, account );
-      auto res_itr = userres.find( account );
-      eosio_assert( res_itr != userres.end(), "no resource row" );
-      eosio_assert( res_itr->ram_bytes >= bytes, "insufficient quota" );
 
       asset tokens_out;
       auto itr = _rammarket.find(S(4,RAMCORE));
@@ -259,10 +198,7 @@ namespace eosiosystem {
       //// this shouldn't happen, but just in case it does we should prevent it
       eosio_assert( _gstate.total_ram_stake >= 0, "error, attempt to unstake more tokens than previously staked" );
 
-      userres.modify( res_itr, account, [&]( auto& res ) {
-          res.ram_bytes -= bytes;
-      });
-      set_resource_limits( res_itr->owner, res_itr->ram_bytes, res_itr->net_weight.amount, res_itr->cpu_weight.amount );
+      change_resource_limits( account, -bytes, 0, 0 );
 
       INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio.ram),N(active)},
                                                        { N(eosio.ram), account, asset(tokens_out), std::string("sell ram") } );
@@ -324,30 +260,7 @@ namespace eosiosystem {
       } // itr can be invalid, should go out of scope
 
       // update totals of "receiver"
-      {
-         user_resources_table   totals_tbl( _self, receiver );
-         auto tot_itr = totals_tbl.find( receiver );
-         if( tot_itr ==  totals_tbl.end() ) {
-            tot_itr = totals_tbl.emplace( from, [&]( auto& tot ) {
-                  tot.owner = receiver;
-                  tot.net_weight    = stake_net_delta;
-                  tot.cpu_weight    = stake_cpu_delta;
-               });
-         } else {
-            totals_tbl.modify( tot_itr, from == receiver ? from : 0, [&]( auto& tot ) {
-                  tot.net_weight    += stake_net_delta;
-                  tot.cpu_weight    += stake_cpu_delta;
-               });
-         }
-         eosio_assert( asset(0) <= tot_itr->net_weight, "insufficient staked total net bandwidth" );
-         eosio_assert( asset(0) <= tot_itr->cpu_weight, "insufficient staked total cpu bandwidth" );
-
-         set_resource_limits( receiver, tot_itr->ram_bytes, tot_itr->net_weight.amount, tot_itr->cpu_weight.amount );
-
-         if ( tot_itr->net_weight == asset(0) && tot_itr->cpu_weight == asset(0)  && tot_itr->ram_bytes == 0 ) {
-            totals_tbl.erase( tot_itr );
-         }
-      } // tot_itr can be invalid, should go out of scope
+      change_resource_limits( receiver, 0, stake_net_delta.amount, stake_cpu_delta.amount );
 
       // create refund or update from existing refund
       if ( N(eosio.stake) != source_stake_from ) { //for eosio both transfer and refund make no sense

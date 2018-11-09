@@ -6,6 +6,7 @@
 #include <eosio/chain/controller.hpp>
 #include <eosio/chain/transaction.hpp>
 #include <eosio/chain/contract_table_objects.hpp>
+#include <eosio/chain/asset.hpp>
 #include <fc/utility.hpp>
 #include <sstream>
 #include <algorithm>
@@ -574,6 +575,19 @@ class apply_context {
 
       void add_ram_usage( account_name account, int64_t ram_delta );
       void finalize_trace( action_trace& trace, const fc::time_point& start );
+
+   /// Distribution methods:
+   public:
+
+      void reward_all( uint32_t block_nr, uint64_t gathered_amount,
+                       asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/,
+                       bool is_beos_mode );
+      void reward_done( asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/,
+                        bool is_beos_mode );
+
+   private:
+      void reward_stake( const account_name& account, int64_t val );
+      void reward_ram( const account_name& account, int64_t val );
 
    private:
 

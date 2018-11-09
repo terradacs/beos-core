@@ -12,6 +12,7 @@
 #include <eosio/chain/wasm_eosio_injection.hpp>
 #include <eosio/chain/global_property_object.hpp>
 #include <eosio/chain/account_object.hpp>
+#include <eosio/chain/asset.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/crypto/sha256.hpp>
 #include <fc/crypto/sha1.hpp>
@@ -138,7 +139,7 @@ class privileged_api : public context_aware_api {
        * @param net_weight - the weight for determining share of network capacity
        * @param cpu_weight - the weight for determining share of compute capacity
        */
-      void set_resource_limits( account_name account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight) {
+      void set_resource_limits( account_name account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight ) {
          EOS_ASSERT(ram_bytes >= -1, wasm_execution_error, "invalid value for ram resource limit expected [-1,INT64_MAX]");
          EOS_ASSERT(net_weight >= -1, wasm_execution_error, "invalid value for net resource weight expected [-1,INT64_MAX]");
          EOS_ASSERT(cpu_weight >= -1, wasm_execution_error, "invalid value for cpu resource weight expected [-1,INT64_MAX]");
@@ -149,6 +150,20 @@ class privileged_api : public context_aware_api {
 
       void get_resource_limits( account_name account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight ) {
          context.control.get_resource_limits_manager().get_account_limits( account, ram_bytes, net_weight, cpu_weight);
+      }
+
+      void change_resource_limits( account_name account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight ) {
+         int64_t _ram_bytes = 0;
+         int64_t _net_weight = 0;
+         int64_t _cpu_weight = 0;
+
+         get_resource_limits( account, _ram_bytes, _net_weight, _cpu_weight );
+
+         _ram_bytes += ram_bytes;
+         _net_weight += net_weight;
+         _cpu_weight += cpu_weight;
+
+         set_resource_limits( account, _ram_bytes, _net_weight, _cpu_weight );
       }
 
       int64_t set_proposed_producers( array_ptr<char> packed_producer_schedule, size_t datalen) {
@@ -1673,23 +1688,35 @@ class distribution_api : public context_aware_api {
       distribution_api( apply_context& ctx )
       : context_aware_api( ctx, true ) {}
 
-      void reward_all( uint32_t total_amount,
+      void reward_all( uint32_t block_nr, uint64_t gathered_amount,
                        array_ptr<char> symbol, size_t symbol_len, //asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/,
                        bool is_beos_mode )
       {
-         ilog( "From inside reward_all! total_amount == ${n}", ("n", total_amount) );
+         //elog( "From inside reward_all! block_nr == ${n}, gathered_amount = ${a}", ("n", block_nr) ("a", gathered_amount) );
+
+         datastream<const char*> ds( symbol, symbol_len );
+         asset _symbol;
+         fc::raw::unpack(ds, _symbol);
+
+         context.reward_all( block_nr, gathered_amount, _symbol, is_beos_mode );
       }
 
       void reward_done( array_ptr<char> symbol, size_t symbol_len, //asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/,
                         bool is_beos_mode )
       {
-         idump(("from inside reward_done!"));
+         //edump(("from inside reward_done!"));
+
+         datastream<const char*> ds( symbol, symbol_len );
+         asset _symbol;
+         fc::raw::unpack(ds, _symbol);
+
+         context.reward_done( _symbol, is_beos_mode );
       }
 };
 
 REGISTER_INTRINSICS( distribution_api,
-   (reward_all,  void(int,int,int,int))
-   (reward_done, void(int,int,int))
+   (reward_all,  void(int, int64_t, int, int, int) )
+   (reward_done, void(int, int, int)               )
 );
 
 REGISTER_INJECTED_INTRINSICS(call_depth_api,
@@ -1747,6 +1774,7 @@ REGISTER_INTRINSICS(privileged_api,
    (activate_feature,                 void(int64_t)                         )
    (get_resource_limits,              void(int64_t,int,int,int)             )
    (set_resource_limits,              void(int64_t,int64_t,int64_t,int64_t) )
+   (change_resource_limits,           void(int64_t,int64_t,int64_t,int64_t) )
    (set_proposed_producers,           int64_t(int,int)                      )
    (get_blockchain_parameters_packed, int(int, int)                         )
    (set_blockchain_parameters_packed, void(int,int)                         )

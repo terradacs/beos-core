@@ -1710,15 +1710,33 @@ read_only::get_account_results read_only::get_account( const get_account_params&
          }
       }
 
-      t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple( config::system_account_name, params.account_name, N(userres) ));
-      if (t_id != nullptr) {
-         const auto &idx = d.get_index<key_value_index, by_scope_primary>();
-         auto it = idx.find(boost::make_tuple( t_id->id, params.account_name ));
-         if ( it != idx.end() ) {
-            vector<char> data;
-            copy_inline_row(*it, data);
-            result.total_resources = abis.binary_to_variant( "user_resources", data, abi_serializer_max_time, shorten_abi_errors );
-         }
+      {
+      int64_t ram_bytes = 0;
+      int64_t net_weight = 0;
+      int64_t cpu_weight = 0;
+
+      rm.get_account_limits( params.account_name, ram_bytes, net_weight, cpu_weight );
+
+      asset a_net_weight( net_weight );
+      asset a_cpu_weight( cpu_weight );
+
+   /*struct user_resources {
+      account_name  owner;
+      asset         net_weight;
+      asset         cpu_weight;
+      int64_t       ram_bytes = 0;
+
+      uint64_t primary_key()const { return owner; }
+
+      // explicit serialization macro is not necessary, used here only to improve compilation time
+      EOSLIB_SERIALIZE( user_resources, (owner)(net_weight)(cpu_weight)(ram_bytes) )
+   };*/
+
+      result.total_resources = mutable_variant_object()
+        ( "owner", params.account_name )
+        ( "net_weight", a_net_weight )
+        ( "cpu_weight", a_cpu_weight )
+        ( "ram_bytes", ram_bytes );
       }
 
       t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple( config::system_account_name, params.account_name, N(delband) ));
