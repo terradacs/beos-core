@@ -401,6 +401,9 @@ def make_beos_plugin_test():
     params = ["./test03.py", "--main-dir", config.BEOS_BUILD_DIR]
     run_command(params, tests_working_dir)
 
+    params = ["./test05_account_creation_with_delegate_ram.py", "--main-dir", config.BEOS_BUILD_DIR, "--ip-address", config.NODEOS_IP_ADDRESS, '--port', str(config.NODEOS_PORT)]
+    run_command(params, tests_working_dir)
+
 if __name__ == '__main__':
     from optparse import OptionParser, OptionGroup
     parser = OptionParser(usage = "Usage: %prog options")

@@ -19,6 +19,7 @@ def run(args):
 
 def importKeys():
     run(args.cleos +'wallet import -n default-test05 --private-key ' + args.private_key)
+    run(args.cleos +'wallet import -n default-test05 --private-key ' + args.gateway_private_key)
 
 def startWallet():
     run('rm -f ' + "~/eosio-wallet/default-test05.wallet" )
@@ -118,10 +119,12 @@ def createAccountsWithDelegateRAM():
 # Command Line Arguments
 parser = argparse.ArgumentParser()
 
+
+parser.add_argument('--gateway-private-key', metavar='', help="BEOS.GATEWAY Private Key", default='5Ka14byMGwBqE4Q149pffSjXf547otfZ1NKdTEq1ivwg9DjMoi6', dest="gateway_private_key")
 parser.add_argument('--public-key', metavar='', help="EOSIO Public Key", default='EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV', dest="public_key")
 parser.add_argument('--private-Key', metavar='', help="EOSIO Private Key", default='5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3', dest="private_key")
 parser.add_argument('--ip-address', metavar='', help="Ip address of nodeos and keosd", default='127.0.0.1', dest="ip_address")
-parser.add_argument('--port', metavar='', help="Port", default='8888')
+parser.add_argument('--port', metavar='', help="Port", default=8888)
 parser.add_argument('--main-dir', metavar='', help="Main dictory for: cleos, nodeos, keosd", default='')
 parser.add_argument('--cleos', metavar='', help="Cleos command", default='programs/cleos/cleos ')
 parser.add_argument('--wallet-dir', metavar='', help="Path to wallet directory", default='./wallet/')
