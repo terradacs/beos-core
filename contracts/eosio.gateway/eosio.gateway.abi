@@ -25,17 +25,6 @@
         }
       ]
     },{
-      "name": "withdrawall",
-      "base": "",
-      "fields": [{
-          "name": "removed",
-          "type": "name"
-        },{
-          "name": "symbol",
-          "type": "asset"
-        }
-      ]
-    },{
       "name": "init_data",
       "base": "",
       "fields": [
@@ -57,10 +46,6 @@
     },{
       "name": "withdraw",
       "type": "withdraw",
-      "ricardian_contract": ""
-    },{
-      "name": "withdrawall",
-      "type": "withdrawall",
       "ricardian_contract": ""
     }
   ],

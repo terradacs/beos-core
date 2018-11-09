@@ -74,17 +74,6 @@ void gateway::withdraw( account_name owner, asset quantity )
                                                { owner, N(beos.gateway), quantity, std::string("withdraw") } );
 }
 
-void gateway::withdrawall( account_name removed, asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/ )
-{
-  checker( removed, symbol );
-
-  auto balance = eosio::token( N(eosio.token) ).check_balance( removed, symbol.symbol );
-  if( balance.amount == 0 )
-    return;
-
-  withdraw( removed, balance );
-}
-
 void gateway::checker( account_name any_account, asset value )
 {
   require_recipient( any_account );
@@ -110,4 +99,4 @@ void gateway::add( account_name owner, account_name ram_payer )
 
 } /// namespace eosio
 
-EOSIO_ABI( eosio::gateway, (issue)(withdraw)(withdrawall) )
+EOSIO_ABI( eosio::gateway, (issue)(withdraw) )

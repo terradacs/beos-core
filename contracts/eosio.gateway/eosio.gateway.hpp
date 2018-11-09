@@ -62,17 +62,6 @@ namespace eosio {
       */
       void withdraw( account_name owner, asset quantity );
 
-      /**
-      * Executed by any user at any time. If the user doesn't want to participate within BEOS distribution anymore
-      * then can call this action via wallet.
-      * All data connected with given user are removed.
-      * At the end of distribution period the user gets nothing.
-      * 
-      * `removed` - account, that will be removed
-      * `symbol`  - correct symbol of BEOS coin, for example: `0.0000 BEOS`
-      */
-      void withdrawall( account_name removed, asset symbol );
-
       void add( account_name owner, account_name ram_payer );
     private:
 
