@@ -523,6 +523,15 @@ chain::action create_action(const vector<permission_level>& authorization, const
    return chain::action{authorization, code, act, variant_to_bin(code, act, args)};
 }
 
+chain::action create_delegateram(const name& creator, const name& newaccount, uint32_t numbytes) {
+   fc::variant act_payload = fc::mutable_variant_object()
+         ("payer", creator.to_string())
+         ("receiver", newaccount.to_string())
+         ("bytes", numbytes);
+   return create_action(tx_permission.empty() ? vector<chain::permission_level>{{creator,config::active_name}} : get_account_permissions(tx_permission),
+                        config::system_account_name, N(delegateram), act_payload);
+}
+
 chain::action create_buyram(const name& creator, const name& newaccount, const asset& quantity) {
    fc::variant act_payload = fc::mutable_variant_object()
          ("payer", creator.to_string())
@@ -893,6 +902,7 @@ struct create_account_subcommand {
    string stake_cpu;
    uint32_t buy_ram_bytes_in_kbytes = 0;
    uint32_t buy_ram_bytes = 0;
+   int32_t transfer_ram_in_kbytes = -1;
    string buy_ram_eos;
    bool transfer;
    bool simple;
@@ -909,18 +919,20 @@ struct create_account_subcommand {
       createAccount->add_option("ActiveKey", active_key_str, localized("The active public key for the new account"));
 
       if (!simple) {
-         createAccount->add_option("--stake-net", stake_net,
-                                   (localized("The amount of EOS delegated for net bandwidth")))->required();
-         createAccount->add_option("--stake-cpu", stake_cpu,
-                                   (localized("The amount of EOS delegated for CPU bandwidth")))->required();
-         createAccount->add_option("--buy-ram-kbytes", buy_ram_bytes_in_kbytes,
-                                   (localized("The amount of RAM bytes to purchase for the new account in kibibytes (KiB)")));
-         createAccount->add_option("--buy-ram-bytes", buy_ram_bytes,
-                                   (localized("The amount of RAM bytes to purchase for the new account in bytes")));
-         createAccount->add_option("--buy-ram", buy_ram_eos,
-                                   (localized("The amount of RAM bytes to purchase for the new account in EOS")));
-         createAccount->add_flag("--transfer", transfer,
-                                 (localized("Transfer voting power and right to unstake EOS to receiver")));
+        createAccount->add_option("--transfer-ram-kbytes", transfer_ram_in_kbytes,
+                                  (localized("The amount of RAM bytes transferred to the new account in kibibytes (KiB)")));
+        createAccount->add_option("--stake-net", stake_net,
+                                  (localized("The amount of EOS delegated for net bandwidth")));
+        createAccount->add_option("--stake-cpu", stake_cpu,
+                                  (localized("The amount of EOS delegated for CPU bandwidth")));
+        createAccount->add_option("--buy-ram-kbytes", buy_ram_bytes_in_kbytes,
+                                  (localized("The amount of RAM bytes to purchase for the new account in kibibytes (KiB)")));
+        createAccount->add_option("--buy-ram-bytes", buy_ram_bytes,
+                                  (localized("The amount of RAM bytes to purchase for the new account in bytes")));
+        createAccount->add_option("--buy-ram", buy_ram_eos,
+                                  (localized("The amount of RAM bytes to purchase for the new account in EOS")));
+        createAccount->add_flag("--transfer", transfer,
+                                (localized("Transfer voting power and right to unstake EOS to receiver")));
       }
 
       add_standard_transaction_options(createAccount);
@@ -937,17 +949,42 @@ struct create_account_subcommand {
             } EOS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid active public key: ${public_key}", ("public_key", active_key_str));
             auto create = create_newaccount(creator, account_name, owner_key, active_key);
             if (!simple) {
-               EOSC_ASSERT( buy_ram_eos.size() || buy_ram_bytes_in_kbytes || buy_ram_bytes, "ERROR: One of --buy-ram, --buy-ram-kbytes or --buy-ram-bytes should have non-zero value" );
-               EOSC_ASSERT( !buy_ram_bytes_in_kbytes || !buy_ram_bytes, "ERROR: --buy-ram-kbytes and --buy-ram-bytes cannot be set at the same time" );
-               action buyram = !buy_ram_eos.empty() ? create_buyram(creator, account_name, to_asset(buy_ram_eos))
-                  : create_buyrambytes(creator, account_name, (buy_ram_bytes_in_kbytes) ? (buy_ram_bytes_in_kbytes * 1024) : buy_ram_bytes);
-               auto net = to_asset(stake_net);
-               auto cpu = to_asset(stake_cpu);
-               if ( net.get_amount() != 0 || cpu.get_amount() != 0 ) {
-                  action delegate = create_delegate( creator, account_name, net, cpu, transfer);
-                  send_actions( { create, buyram, delegate } );
-               } else {
-                  send_actions( { create, buyram } );
+               if( transfer_ram_in_kbytes == -1 )
+               {
+                  if ( buy_ram_eos.empty() && buy_ram_bytes_in_kbytes == 0) {
+                      std::cerr << "ERROR: Either --buy-ram or --buy-ram-kbytes with non-zero value is required" << std::endl;
+                      return;
+                  }
+                  if ( stake_net.empty() || stake_cpu.empty() ) {
+                      if( stake_net.empty())
+                        std::cerr << "ERROR: --stake_net with non-zero value is required" << std::endl;
+                      if( stake_cpu.empty())
+                        std::cerr << "ERROR: --stake_cpu with non-zero value is required" << std::endl;
+                      return;
+                  }
+
+                  action buyram = !buy_ram_eos.empty() ? create_buyram(creator, account_name, to_asset(buy_ram_eos))
+                      : create_buyrambytes(creator, account_name, buy_ram_bytes_in_kbytes * 1024);
+                  auto net = to_asset(stake_net);
+                  auto cpu = to_asset(stake_cpu);
+                  if ( net.get_amount() != 0 || cpu.get_amount() != 0 ) {
+                      action delegate = create_delegate( creator, account_name, net, cpu, transfer);
+                      send_actions( { create, buyram, delegate } );
+                  } else {
+                      send_actions( { create, buyram } );
+                  }
+               }
+               else
+               {
+                 if ( transfer_ram_in_kbytes <= 0 ) {
+                    std::cerr << "ERROR: --transfer_ram_in_kbytes with non-zero value is required" << std::endl;
+                    return;
+                 }
+
+                 uint32_t ram_total = transfer_ram_in_kbytes * 1024;
+                 ram_total += buy_ram_bytes_in_kbytes * 1024;
+                 action delegateram =  create_delegateram(creator, account_name, ram_total );
+                 send_actions( { create, delegateram } );
                }
             } else {
                send_actions( { create } );
