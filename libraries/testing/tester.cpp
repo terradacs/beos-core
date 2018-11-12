@@ -313,6 +313,7 @@ namespace eosio { namespace testing {
                                    .name     = a,
                                    .owner    = owner_auth,
                                    .active   = active_auth,
+                                   .init_ram = false
                                 });
 
       set_transaction_headers(trx);

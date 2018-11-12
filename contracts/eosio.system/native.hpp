@@ -77,15 +77,15 @@ namespace eosiosystem {
           *  characters long without '.' until a future account auction process is implemented
           *  which prevents name squatting.
           *
-          *  2. new accounts must stake a minimal number of tokens (as set in system parameters)
-          *     therefore, this method will execute an inline buyram from receiver for newacnt in
-          *     an amount equal to the current new account creation fee.
+          *  2. 'init_ram' describes initial ram for new account
+                init_ram - 'true' : new account gets RAM equal to basic usage. The RAM is transferred from creator.
+                init_ram - 'false' :  new account gets zero RAM from creator. It is necessary to run buyram in the same transaction.
           */
          void newaccount( account_name     creator,
-                          account_name     newact
-                          /*  no need to parse authorites
+                          account_name     newact,
                           const authority& owner,
-                          const authority& active*/ );
+                          const authority& active,
+                          bool init_ram );
 
 
          void updateauth( /*account_name     account,

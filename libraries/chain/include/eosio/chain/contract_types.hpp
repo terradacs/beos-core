@@ -14,6 +14,7 @@ struct newaccount {
    account_name                     name;
    authority                        owner;
    authority                        active;
+   bool                             init_ram = false;
 
    static account_name get_account() {
       return config::system_account_name;
@@ -156,7 +157,7 @@ struct onerror {
 
 } } /// namespace eosio::chain
 
-FC_REFLECT( eosio::chain::newaccount                       , (creator)(name)(owner)(active) )
+FC_REFLECT( eosio::chain::newaccount                       , (creator)(name)(owner)(active)(init_ram) )
 FC_REFLECT( eosio::chain::setcode                          , (account)(vmtype)(vmversion)(code) )
 FC_REFLECT( eosio::chain::setabi                           , (account)(abi) )
 FC_REFLECT( eosio::chain::updateauth                       , (account)(permission)(parent)(auth) )

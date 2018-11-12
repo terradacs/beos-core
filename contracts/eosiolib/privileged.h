@@ -39,6 +39,12 @@ extern "C" {
    void set_resource_limits( account_name account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight );
 
    /**
+    * @brief Retrieves the current ram usage for an account
+    * @param account - name of the account
+    */
+   int64_t get_account_ram_usage( account_name account );
+
+   /**
     * @brief Change the resource limits of an account
     * Change the resource limits of an account
     * @param account - name of the account whose resource limit to be change
