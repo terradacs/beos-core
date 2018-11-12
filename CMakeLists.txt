@@ -382,3 +382,5 @@ endif()
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cd-scripts/resources/config.ini.in ${CMAKE_CURRENT_BINARY_DIR}/resources/config.ini @ONLY)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cd-scripts/resources/genesis.json.in ${CMAKE_CURRENT_BINARY_DIR}/resources/genesis.json)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cd-scripts/resources/run.py.in ${CMAKE_CURRENT_BINARY_DIR}/run.py)
