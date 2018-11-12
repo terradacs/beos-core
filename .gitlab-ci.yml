@@ -22,23 +22,27 @@ build:
    - cat beos_deploy_main.log
    - ./deploy.py --initialize-beos
    - cat beos_deploy_main.log
-  # - kill $(sudo lsof -t -i:8900) || true
-  # - ../build/beos-autobuild/programs/keosd/keosd --http-server-address 192.168.6.144:8900 --wallet-dir /home/gitlab-runner/eosio-wallet
+   - cd ..
+   - echo "Stopping old keosd instance"
+   - kill $(sudo lsof -t -i:8900) || true
+   - echo "Starting keosd"
+   - ./build/beos-autobuild/programs/keosd/keosd --http-server-address 192.168.6.144:8900 --wallet-dir /home/gitlab-runner/eosio-wallet
+   - echo "Unlocking the wallet"
+   - ./build/beos-autobuild/programs/cleos/cleos wallet unlock -n beos_master_wallet --password <(echo "$CI_CI_MASTER_WALLET_PASSWORD")
+   - echo "Stopping old nodeos instance"
+   - kill $(sudo lsof -t -i:8888) || true
+   - ./build/beos-autobuild/programs/nodeos/nodeos --max-irreversible-block-age -1 \ 
+     --contracts-console --blocks-dir /home/gitlab-runner/tmp/0-eosio/blocks \ 
+     --config-dir /home/gitlab-runner/tmp/0-eosio --data-dir /home/gitlab-runner/tmp/0-eosio \
+     --chain-state-db-size-mb 1024 --enable-stale-production --producer-name eosio \
+     --signature-provider <(echo "$CI_EOSIO_PUBLIC_KEY")=KEOSD:http://192.168.6.144:8900/v1/wallet/sign_digest \
+     --http-server-address 192.168.6.144:8888 --plugin eosio::http_plugin \
+     --plugin eosio::chain_api_plugin --plugin eosio::producer_plugin --plugin eosio::beos_plugin \
+     --plugin eosio::beos_api_plugin --plugin eosio::history_plugin --plugin eosio::history_api_plugin
   cache: {}
   tags:
    - ryzen
   allow_failure: false
-  
-deploy-dev:
-  stage: build
-  script:
-   - pwd
-   - ls -l
-  when: manual
-  cache: {}
-  tags:
-  - ryzen
-  allow_failure: true
   environment:
     name: development
     url: http://192.168.6.144:8888/v1/chain/get_info
