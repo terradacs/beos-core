@@ -21,10 +21,10 @@ build:
    - ./deploy.py --build-beos
    - cat beos_deploy_main.log
    - echo "Stopping old keosd instance"
-   - kill $(sudo lsof -t -i:8900) || true
+   - sudo kill $(sudo lsof -t -i:8900) || true
    - ./deploy.py --initialize-beos
    - echo "Stopping old nodeos instance"
-   - kill $(sudo lsof -t -i:8888) || true
+   - sudo kill $(sudo lsof -t -i:8888) || true
    - cat beos_deploy_main.log
    - cd ..
    - echo "Starting keosd"
