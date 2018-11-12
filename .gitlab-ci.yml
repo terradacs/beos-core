@@ -20,17 +20,18 @@ build:
    - cp config-ci.py config.py
    - ./deploy.py --build-beos
    - cat beos_deploy_main.log
-   - ./deploy.py --initialize-beos
-   - cat beos_deploy_main.log
-   - cd ..
    - echo "Stopping old keosd instance"
    - kill $(sudo lsof -t -i:8900) || true
-   - echo "Starting keosd"
-   - ./build/beos-autobuild/programs/keosd/keosd --http-server-address 192.168.6.144:8900 --wallet-dir /home/gitlab-runner/eosio-wallet
-   - echo "Unlocking the wallet"
-   - ./build/beos-autobuild/programs/cleos/cleos wallet unlock -n beos_master_wallet --password <(echo "$CI_CI_MASTER_WALLET_PASSWORD")
+   - ./deploy.py --initialize-beos
    - echo "Stopping old nodeos instance"
    - kill $(sudo lsof -t -i:8888) || true
+   - cat beos_deploy_main.log
+   - cd ..
+   - echo "Starting keosd"
+   - ./build/beos-autobuild/programs/keosd/keosd --http-server-address 192.168.6.144:8900 --wallet-dir /home/gitlab-runner/eosio-wallet &
+   - echo "Unlocking the wallet"
+   - ./build/beos-autobuild/programs/cleos/cleos wallet unlock -n beos_master_wallet --password <(echo "$CI_CI_MASTER_WALLET_PASSWORD") &
+   - echo "Starting nodeos"
    - ./build/beos-autobuild/programs/nodeos/nodeos --max-irreversible-block-age -1 \ 
      --contracts-console --blocks-dir /home/gitlab-runner/tmp/0-eosio/blocks \ 
      --config-dir /home/gitlab-runner/tmp/0-eosio --data-dir /home/gitlab-runner/tmp/0-eosio \
@@ -38,7 +39,7 @@ build:
      --signature-provider <(echo "$CI_EOSIO_PUBLIC_KEY")=KEOSD:http://192.168.6.144:8900/v1/wallet/sign_digest \
      --http-server-address 192.168.6.144:8888 --plugin eosio::http_plugin \
      --plugin eosio::chain_api_plugin --plugin eosio::producer_plugin --plugin eosio::beos_plugin \
-     --plugin eosio::beos_api_plugin --plugin eosio::history_plugin --plugin eosio::history_api_plugin
+     --plugin eosio::beos_api_plugin --plugin eosio::history_plugin --plugin eosio::history_api_plugin &
   cache: {}
   tags:
    - ryzen
