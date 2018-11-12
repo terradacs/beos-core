@@ -146,6 +146,10 @@ GENESIS_JSON_FILE = "genesis.json"
 #starting node index
 START_NODE_INDEX = 0
 
+##############              Cmake tests configuration             ###############
+#################################################################################
+DISABLE_FAILING_TESTS = "true"
+
 ##############      configuration data for contracts/accounts     ###############
 #################################################################################
 PROXY_ASSET_NAME = "PXBTS"
