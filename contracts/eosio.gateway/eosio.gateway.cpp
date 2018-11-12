@@ -38,7 +38,7 @@ void gateway::issue( account_name to, asset quantity )
 
   if( gateway_balance.amount == 0 )//a
   {
-    //Sending PROXY to the user `to` during every lock.
+    //Sending PXBTS to the user `to` during every lock.
     INLINE_ACTION_SENDER(eosio::token, issue)( N(eosio.token), {{from,N(active)}},
                                             { to, quantity, std::string("issue - distribution period")} );
   }
@@ -57,8 +57,6 @@ void gateway::issue( account_name to, asset quantity )
     INLINE_ACTION_SENDER(eosio::token, issue)( N(eosio.token), {{from,N(active)}},
                                             { to, quantity, std::string("issue - distribution period")} );
   }
-
-  add( to, from );
 }
 
 void gateway::withdraw( account_name owner, asset quantity )
@@ -81,20 +79,6 @@ void gateway::checker( account_name any_account, asset value )
 
   asset token_supply = eosio::token(N(eosio.token)).get_supply( value.symbol.name() );
   eosio_assert( value.symbol == token_supply.symbol, "symbol precision mismatch" );
-}
-
-void gateway::add( account_name owner, account_name ram_payer )
-{
-  inits _init( _self, _self );
-
-  auto itr = _init.find( owner );
-
-  if( itr == _init.end() )
-  {
-    _init.emplace( ram_payer, [&]( auto& a ){
-      a.owner = owner;
-    });
-  }
 }
 
 } /// namespace eosio

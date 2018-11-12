@@ -37,7 +37,6 @@ void beos_api_plugin::plugin_startup() {
    auto rw_api = app().get_plugin<beos_plugin>().get_read_write_api();
 
    app().get_plugin<http_plugin>().add_api({
-      CHAIN_RW_CALL(transfer, 200l),
       CHAIN_RW_CALL(address_validator, 200l)
    });
 }

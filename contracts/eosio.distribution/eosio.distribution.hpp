@@ -18,8 +18,6 @@ namespace eosio {
 
       private:
 
-        using ConstModifier = std::function< void( const init_data& a )>;
-
         uint64_t get_sum();
 
         void execute( uint32_t block_nr, asset proxy_asset, uint32_t starting_block_for_any_distribution, uint32_t ending_block_for_any_distribution,
