@@ -32,7 +32,7 @@ build:
    - echo "Unlocking the wallet"
    - ./build/beos-autobuild/programs/cleos/cleos wallet unlock -n beos_master_wallet --password $(cat ./build/beos-autobuild/wallet/wallet.dat) &
    - echo "Starting nodeos"
-   - ./build/beos-autobuild/programs/nodeos/nodeos --max-irreversible-block-age -1 --contracts-console --blocks-dir /home/gitlab-runner/tmp/0-eosio/blocks --config-dir /home/gitlab-runner/tmp/0-eosio --data-dir /home/gitlab-runner/tmp/0-eosio --chain-state-db-size-mb 1024 --enable-stale-production --producer-name eosio --signature-provider EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV=KEOSD:http://192.168.6.144:8900/v1/wallet/sign_digest --http-server-address 192.168.6.144:8888 --plugin eosio::http_plugin --plugin eosio::chain_api_plugin --plugin eosio::producer_plugin --plugin eosio::beos_plugin --plugin eosio::beos_api_plugin --plugin eosio::history_plugin --plugin eosio::history_api_plugin &
+   - ./build/beos-autobuild/programs/nodeos/nodeos --max-irreversible-block-age -1 --contracts-console --blocks-dir /home/gitlab-runner/tmp/0-eosio/blocks --config-dir /home/gitlab-runner/tmp/0-eosio --data-dir /home/gitlab-runner/tmp/0-eosio --chain-state-db-size-mb 1024 --enable-stale-production --producer-name eosio --signature-provider EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV=KEOSD:http://192.168.6.144:8900/v1/wallet/sign_digest --http-server-address 192.168.6.144:8888 --plugin eosio::http_plugin --plugin eosio::chain_api_plugin --plugin eosio::producer_plugin --plugin eosio::beos_plugin --plugin eosio::beos_api_plugin --plugin eosio::history_plugin --plugin eosio::history_api_plugin > .temp-log
   cache: {}
   tags:
    - ryzen
