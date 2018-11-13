@@ -114,8 +114,13 @@ def kill_process(pid_file_name):
                 if pid_name in line:
                     line = line.strip().split(".")
                     pid = int(line[0])
+<<<<<<< HEAD
                     os.kill(pid, signal.SIGINT)
                     os.kill(pid + 1, signal.SIGINT)
+=======
+                    os.kill(pid, signal.SIGTERM)
+                    os.kill(pid + 1, signal.SIGTERM)
+>>>>>>> Check for running nodeos and keosd before initialize. Upgraded run.py script with lock files and cleaning command
                     os.remove(pid_file_name)
     except Exception as ex:
         print("Error processing pid file: {0}".format(ex))
