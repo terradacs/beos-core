@@ -94,6 +94,13 @@ BEOS_GATEWAY_PRIVATE_KEY = "5Ka14byMGwBqE4Q149pffSjXf547otfZ1NKdTEq1ivwg9DjMoi6"
 BEOS_DISTRIB_PUBLIC_KEY = "EOS5FUjQDE6QLiGZKt7hGwBypCAJPL53X3SYf6Gf4JxMkdyH1wMrF"
 BEOS_DISTRIB_PRIVATE_KEY = "5HvT4NQKyLMojJpa2qPCquwkGmppC6dqCJQK7cBcMFPR2i3Ei4p"
 
+#Keys for beos.trustee
+TRUSTEE_OWNER_PUBLIC_KEY = "EOS5X4pqjE68BCu4qexP66xLNtTzVvGHjQmgQ9zsjLG6husPwN81G"
+TRUSTEE_OWNER_PRIVATE_KEY = "5JivSPSm7QRsvf7DZ1mMdYRgmagfGGs3xNTRtALwR2PXc7LMMri"
+
+TRUSTEE_ACTIVE_PUBLIC_KEY = "EOS591VeMZCaZP5eXKv4TvyEXetFUyM2veA7hxKkFteJc62VUikmn"
+TRUSTEE_ACTIVE_PRIVATE_KEY = "5JUqt5QsguMa1emcQuV6UvwYQHN89uXqeYqtt2dMkp2hzwGyCR6"
+
 # path to keosd executable
 KEOSD_EXECUTABLE = BEOS_BUILD_DIR + "/programs/keosd/keosd"
 # keosd ip address
@@ -135,10 +142,12 @@ SYSTEM_ACCOUNT_KEYS = [
     BEOS_GATEWAY_PRIVATE_KEY,
     BEOS_DISTRIB_PRIVATE_KEY,
     COMMON_SYSTEM_ACCOUNT_OWNER_PRIVATE_KEY,
-    COMMON_SYSTEM_ACCOUNT_ACTIVE_PRIVATE_KEY
+    COMMON_SYSTEM_ACCOUNT_ACTIVE_PRIVATE_KEY,
+    TRUSTEE_OWNER_PRIVATE_KEY,
+    TRUSTEE_ACTIVE_PRIVATE_KEY,
 ]
 # source file for beos config
-BEOS_CONFIG_FILE_SRC =  BEOS_BUILD_DIR + "/resources/config.ini"
+BEOS_CONFIG_FILE_SRC = BEOS_BUILD_DIR + "/resources/config.ini"
 # beos config file name
 BEOS_CONFIG_FILE = "config.ini"
 # source file for genesis file
@@ -147,6 +156,10 @@ GENESIS_JSON_FILE_SRC = BEOS_BUILD_DIR + "/resources/genesis.json"
 GENESIS_JSON_FILE = "genesis.json"
 #starting node index
 START_NODE_INDEX = 0
+
+##############              Cmake tests configuration             ###############
+#################################################################################
+DISABLE_FAILING_TESTS = "true"
 
 ##############      configuration data for contracts/accounts     ###############
 #################################################################################
@@ -157,13 +170,25 @@ BEOS_SYMBOL_PRECISION = 10000 # 10^4
 CORE_INITIAL_AMOUNT = "100000.0000" # as string to preserve zeros
 INIT_RAM = "1000000"
 STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION = 100
-STARTING_BLOCK_FOR_BEOS_DISTRIBUTION = 7 * 24 * 3600 * 2 # days(7).to_seconds() * 2
-ENDING_BLOCK_FOR_BEOS_DISTRIBUTION = 98 * 24 * 3600 * 2 # days(98).to_seconds() * 2
-DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION = 1 * 3600 * 2 # hours(1).to_seconds() * 2
+#STARTING_BLOCK_FOR_BEOS_DISTRIBUTION = 7 * 24 * 3600 * 2 # days(7).to_seconds() * 2
+STARTING_BLOCK_FOR_BEOS_DISTRIBUTION = 1800 * 2 # 30 minutes * 2
+
+#ENDING_BLOCK_FOR_BEOS_DISTRIBUTION = 98 * 24 * 3600 * 2 # days(98).to_seconds() * 2
+ENDING_BLOCK_FOR_BEOS_DISTRIBUTION = 7200 * 2 # 2 hours * 2
+
+#DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION = 1 * 3600 * 2 # hours(1).to_seconds() * 2
+DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION = 900 * 2 # 15 minutes *2
+
 AMOUNT_OF_REWARD_BEOS = 800 * BEOS_SYMBOL_PRECISION # 800 * asset().symbol.precision()
-STARTING_BLOCK_FOR_RAM_DISTRIBUTION = 7 * 24 * 3600 * 2 # days(7).to_seconds() * 2
-ENDING_BLOCK_FOR_RAM_DISTRIBUTION = 280 * 24 * 3600 * 2 # days(280).to_seconds() * 2
-DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION = 1 * 3600 * 2 # hours(1).to_seconds() * 2
+#STARTING_BLOCK_FOR_RAM_DISTRIBUTION = 7 * 24 * 3600 * 2 # days(7).to_seconds() * 2
+STARTING_BLOCK_FOR_RAM_DISTRIBUTION = 1800 * 2 # 30 minutes * 2
+
+#ENDING_BLOCK_FOR_RAM_DISTRIBUTION = 280 * 24 * 3600 * 2 # days(280).to_seconds() * 2
+ENDING_BLOCK_FOR_RAM_DISTRIBUTION = 7200 * 2 # 2 hour * 2
+
+#DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION = 1 * 3600 * 2 # hours(1).to_seconds() * 2
+DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION = 900 * 2 # 15 minutes * 2
+
 AMOUNT_OF_REWARD_RAM = 5000000 # 5000000 is a number not asset
 STARTING_BLOCK_FOR_TRUSTEE_DISTRIBUTION = 7 * 24 * 3600 * 2 # days(7).to_seconds() * 2
 ENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION = 98 * 24 * 3600 * 2 # days(98).to_seconds() * 2
