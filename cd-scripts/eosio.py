@@ -131,9 +131,22 @@ def show_nodeos_postconf(node_index, name, public_key, use_https = False):
     parameters = parameters + https_opts + plugins
     logger.info("Configuration complete, you can now run nodeos with command (consider running in screen): {0}".format(" ".join(parameters)))
 
+def detect_process_by_name(proc_name, ip_address, port):
+    pids = []
+    for line in os.popen("ps ax | grep " + proc_name + " | grep -v grep"):
+        if ip_address in line and str(port) in line:
+            line = line.strip().split()
+            pids.append(line[0])
+    if pids:
+        msg = "{0} process is running on {1}:{2}. Please terminate that process and try again.".format(proc_name, ip_address, port)
+        logger.error(msg)
+        raise EOSIOException(msg)
+
 def run_keosd(ip_address, port, wallet_dir, use_https = False, forceWalletCleanup = False):
-    logger.info("*** Running KLEOSD at {0}:{1} in {2}".format(ip_address, port, wallet_dir))
     from sys import exit
+    logger.info("*** Running KLEOSD at {0}:{1} in {2}".format(ip_address, port, wallet_dir))
+    detect_process_by_name("keosd", ip_address, port)
+    
     from shutil import rmtree
     if os.path.exists(config.DEFAULT_WALLET_DIR):
         if forceWalletCleanup:
@@ -231,6 +244,7 @@ def create_wallet(wallet_url = None, unlock = False):
         import_key(config.MASTER_WALLET_NAME, key, wallet_url)
 
 def run_nodeos(node_index, name, public_key, use_https = False):
+    detect_process_by_name("nodeos", config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
     if not public_key:
         logger.error("Public key is empty, aborting")
         raise EOSIOException("Public key is empty, aborting")
