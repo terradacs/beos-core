@@ -217,6 +217,9 @@ class eosio_interchain_tester : public actions
                                                   )
                         );
 
+    // [MK]: need to change creation with multisig
+    create_account_with_resources( config::system_account_name, N(beos.trustee) );
+
     create_account_with_resources( config::system_account_name, N(alice) );
     create_account_with_resources( config::system_account_name, N(bob) );
     create_account_with_resources( config::system_account_name, N(carol) );

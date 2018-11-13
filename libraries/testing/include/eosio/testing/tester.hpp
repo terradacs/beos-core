@@ -520,9 +520,9 @@ namespace eosio { namespace testing {
      uint32_t starting_block_for_distribution;
      uint32_t ending_block_for_distribution;
      uint32_t distribution_payment_block_interval_for_distribution;
-     uint32_t amount_of_reward;
+     uint64_t amount_of_reward;
 
-     test_global_state_element(uint32_t s, uint32_t e, uint32_t d, uint32_t a)
+     test_global_state_element(uint32_t s, uint32_t e, uint32_t d, uint64_t a)
         : starting_block_for_distribution(s),
         ending_block_for_distribution(e),
         distribution_payment_block_interval_for_distribution(d),

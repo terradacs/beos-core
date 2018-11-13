@@ -9,7 +9,7 @@
         {"name":"starting_block_for_distribution",                      "type":"uint32"},
         {"name":"ending_block_for_distribution",                        "type":"uint32"},
         {"name":"distribution_payment_block_interval_for_distribution", "type":"uint32"},
-        {"name":"amount_of_reward",            	                        "type":"uint32"}
+        {"name":"amount_of_reward",            	                        "type":"uint64"}
       ]
     },{
       "name": "beos_global_state",

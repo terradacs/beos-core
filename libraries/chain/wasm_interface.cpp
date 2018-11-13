@@ -1688,7 +1688,7 @@ class distribution_api : public context_aware_api {
       distribution_api( apply_context& ctx )
       : context_aware_api( ctx, true ) {}
 
-      void reward_all( uint32_t block_nr, uint64_t gathered_amount,
+      void reward_all( uint64_t amount_of_reward, uint64_t amount_of_reward_for_trustee, uint64_t gathered_amount,
                        array_ptr<char> symbol, size_t symbol_len, //asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/,
                        bool is_beos_mode )
       {
@@ -1698,7 +1698,7 @@ class distribution_api : public context_aware_api {
          asset _symbol;
          fc::raw::unpack(ds, _symbol);
 
-         context.reward_all( block_nr, gathered_amount, _symbol, is_beos_mode );
+         context.reward_all( amount_of_reward, amount_of_reward_for_trustee, gathered_amount, _symbol, is_beos_mode );
       }
 
       void reward_done( array_ptr<char> symbol, size_t symbol_len, //asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/,
@@ -1715,8 +1715,8 @@ class distribution_api : public context_aware_api {
 };
 
 REGISTER_INTRINSICS( distribution_api,
-   (reward_all,  void(int, int64_t, int, int, int) )
-   (reward_done, void(int, int, int)               )
+   (reward_all,  void(int64_t, int64_t, int64_t, int, int, int) )
+   (reward_done, void(int, int, int)                            )
 );
 
 REGISTER_INJECTED_INTRINSICS(call_depth_api,
