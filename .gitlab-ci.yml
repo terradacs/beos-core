@@ -26,14 +26,13 @@ build:
    - sudo kill $(sudo lsof -t -i:8888) || true
    - ./deploy.py --initialize-beos
    - cat beos_deploy_main.log
-   - echo "Starting keosd and nodeos"
-   - python3 ../build/beos-autobuild/run.py
   cache:
+    {}
+  artifacts:
     paths:
-      - build/*
-      - cd-script/beos_deploy_main.log
-      - cd-script/config.py
-      
+    - build/*
+    - cd-scripts/beos_deploy_main.log
+    - cd-scripts/config.py
   tags:
    - ryzen
   allow_failure: false
@@ -44,21 +43,25 @@ build:
 integration-test:
   stage: integration-test
   script: 
-  - pwd
-  - cd ./build/beos-autobuild
-  - make test
+    - cd ./build/beos-autobuild
+    - echo "Stopping old keosd instance"
+    - sudo kill $(sudo lsof -t -i:8900) || true
+    - echo "Stopping old nodeos instance"
+    - sudo kill $(sudo lsof -t -i:8888) || true
+    - echo "Starting keosd and nodeos"
+    - python3 ./run.py
+    - make test
   when: manual
-  cache:
-    paths:
-      - build/*
-      - cd-script/beos_deploy_main.log
-      - cd-script/config.py
-
   tags:
   - ryzen
   allow_failure: true
   dependencies:
   - build
+  artifacts:
+    paths:
+    - build/*
+    - cd-scripts/beos_deploy_main.log
+    - cd-scripts/config.py
 
 unit-test:
   stage: unit-test
@@ -66,17 +69,17 @@ unit-test:
   - cd ./build/beos-autobuild/unittests
   - ./unit_test
   when: manual
-  cache:
-    paths:
-      - build/*
-      - cd-script/beos_deploy_main.log
-      - cd-script/config.py
 
   tags:
   - ryzen
   allow_failure: true
   dependencies:
   - build
+  artifacts:
+    paths:
+    - build/*
+    - cd-scripts/beos_deploy_main.log
+    - cd-scripts/config.py
 
 # currently disabled and not fully configured
 # plugin-test:
