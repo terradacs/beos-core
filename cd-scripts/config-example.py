@@ -158,6 +158,7 @@ START_NODE_INDEX = 0
 ##############              Cmake tests configuration             ###############
 #################################################################################
 DISABLE_FAILING_TESTS = "true"
+DISABLE_WASM_TESTS = "true"
 
 ##############      configuration data for contracts/accounts     ###############
 #################################################################################
