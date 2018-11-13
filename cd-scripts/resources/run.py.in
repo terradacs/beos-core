@@ -3,6 +3,7 @@
 import subprocess
 import os
 import sys
+import datetime
 
 def run_wallet_unlock_postconf():
     wallet_password = None
@@ -21,7 +22,8 @@ def run_keosd_postconf(ip_address, port, wallet_dir, use_https = False):
     parameters = None
     if use_https:
         # run kleosd in https mode
-        parameters = ["${KEOSD_EXECUTABLE}",
+        parameters = [
+            "${KEOSD_EXECUTABLE}",
             "--https-server-address","{0}:{1}".format(ip_address, port),
             "--https-certificate-chain-file", "${KEOSD_CERTIFICATE_CHAIN_FILE}",
             "--https-private-key-file", "${KEOSD_PRIVATE_KEY_FILE}",
@@ -33,8 +35,18 @@ def run_keosd_postconf(ip_address, port, wallet_dir, use_https = False):
             "--http-server-address","{0}:{1}".format(ip_address, port) ,
             "--wallet-dir", wallet_dir,
         ]
+    
+    screen_parameters = [
+        "screen",
+        "-d",
+        "-m",
+        "-S",
+        "{0}-{1}".format("keosd", datetime.datetime.now().strftime("%Y-%m-%d")),
+    ]
+    parameters = screen_parameters + parameters
     print("Running keosd with command: {0}".format(" ".join(parameters)))
     subprocess.Popen(parameters)
+    run_wallet_unlock_postconf()
 
 def run_nodeos_postconf(node_index, name, public_key, use_https = False):
     working_dir = "{0}{1}-{2}/".format("${NODEOS_WORKING_DIR}", node_index, name)
@@ -75,11 +87,18 @@ def run_nodeos_postconf(node_index, name, public_key, use_https = False):
     ]
 
     parameters = parameters + https_opts + plugins
+    screen_parameters = [
+        "screen",
+        "-d",
+        "-m",
+        "-S",
+        "{0}-{1}".format("nodeos", datetime.datetime.now().strftime("%Y-%m-%d")),
+    ]
+    parameters = screen_parameters + parameters
     print("Running nodeos with command: {0}".format(" ".join(parameters)))
     subprocess.Popen(parameters)
 
 
 if __name__ == "__main__":
   run_keosd_postconf("${KEOSD_IP_ADDRESS}", "${KEOSD_PORT}", "${DEFAULT_WALLET_DIR}")
-  run_wallet_unlock_postconf()
   run_nodeos_postconf(0, "eosio", "${EOSIO_ROOT_KEY}")
