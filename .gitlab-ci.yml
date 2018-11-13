@@ -6,16 +6,16 @@ stages:
 
 before_script:
  - pwd
- - rm -rf ./build
- - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
- - eval $(ssh-agent -s)
- - ssh-add <(echo "$SSH_PRIVATE_KEY")
- - git submodule update --init --recursive
- - pip3 install distro
 
 build:
   stage: build
   script:
+   - rm -rf ./build
+   - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
+   - eval $(ssh-agent -s)
+   - ssh-add <(echo "$SSH_PRIVATE_KEY")
+   - git submodule update --init --recursive
+   - pip3 install distro
    - cd cd-scripts
    - cp config-ci.py config.py
    - ./deploy.py --build-beos
@@ -28,7 +28,12 @@ build:
    - cat beos_deploy_main.log
    - echo "Starting keosd and nodeos"
    - python3 ../build/beos-autobuild/run.py
-  cache: {}
+  cache:
+    paths:
+      - build/*
+      - cd-script/beos_deploy_main.log
+      - cd-script/config.py
+      
   tags:
    - ryzen
   allow_failure: false
@@ -43,7 +48,12 @@ integration-test:
   - cd ./build/beos-autobuild
   - make test
   when: manual
-  cache: {}
+  cache:
+    paths:
+      - build/*
+      - cd-script/beos_deploy_main.log
+      - cd-script/config.py
+
   tags:
   - ryzen
   allow_failure: true
@@ -56,7 +66,12 @@ unit-test:
   - cd ./build/beos-autobuild/unittests
   - ./unit_test
   when: manual
-  cache: {}
+  cache:
+    paths:
+      - build/*
+      - cd-script/beos_deploy_main.log
+      - cd-script/config.py
+
   tags:
   - ryzen
   allow_failure: true
