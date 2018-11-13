@@ -579,7 +579,7 @@ class apply_context {
    /// Distribution methods:
    public:
 
-      void reward_all( uint32_t block_nr, uint64_t gathered_amount,
+      void reward_all( uint64_t amount_of_reward, uint64_t amount_of_reward_for_trustee, uint64_t gathered_amount,
                        asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/,
                        bool is_beos_mode );
       void reward_done( asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/,

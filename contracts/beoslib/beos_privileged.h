@@ -17,7 +17,7 @@ extern "C" {
    /**
     *  Defined in distribution_api
     */
-   void reward_all(uint32_t, uint64_t, const void*, int, bool);
+   void reward_all(uint64_t, uint64_t, uint64_t, const void*, int, bool);
    void reward_done(const void*, int, bool);
 
 #ifdef __cplusplus

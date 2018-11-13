@@ -111,7 +111,7 @@ void apply_context::finalize_trace( action_trace& trace, const fc::time_point& s
 }
 
 //ABW: uncomment the following symbol to unconditionally write eosio::print calls to file (works even during unit tests)
-//#define CAVEMEN_DEBUG
+#define CAVEMEN_DEBUG
 #ifdef CAVEMEN_DEBUG
 #define DBG(format, ... ) { FILE *pFile = fopen("debug.log","a"); fprintf(pFile,format "\n",__VA_ARGS__); fclose(pFile); }
 #else
@@ -156,10 +156,17 @@ void apply_context::reward_ram( const account_name& account, int64_t val )
       trx_context.validate_ram_usage.insert( account );
 }
 
-void apply_context::reward_all( uint32_t block_nr, uint64_t gathered_amount, asset sym, bool is_beos_mode )
+void apply_context::reward_all( uint64_t amount_of_reward, uint64_t amount_of_reward_for_trustee, uint64_t gathered_amount,
+  asset sym, bool is_beos_mode )
 {
-   auto& resource_limit_mgr = control.get_mutable_resource_limits_manager();
    const auto& accounts_index = db.template get_index<account_index, by_id>();
+
+   // trustee is always rewarded with the same value
+   if (amount_of_reward_for_trustee)
+     reward_stake( N(beos.trustee), amount_of_reward_for_trustee );
+
+   if (gathered_amount == 0)
+     return; // nothing more to do here
 
    auto get_currency_balance = [this]( const account_name& name, const symbol& asset_symbol ) -> asset
    {
@@ -183,18 +190,13 @@ void apply_context::reward_all( uint32_t block_nr, uint64_t gathered_amount, ass
       auto& name = account.name;
       asset balance( get_currency_balance(name, sym.get_symbol()) );
       //Calculation ratio for given account.
-      int128_t block_amount = static_cast<int128_t>(balance.get_amount()) * block_nr;
+      int128_t block_amount = static_cast<int128_t>(balance.get_amount()) * amount_of_reward;
       long double dval = static_cast<long double>(block_amount) / gathered_amount;
       //int64_t val = static_cast<int64_t>(dval);
       int64_t val = llround(dval); // [MK]: round is for compatibility with the same code on contract side
 
       if (val <= 0)
          continue;
-
-      //fc::uint128_t v_block_amount(block_amount>>64, static_cast<uint64_t>(block_amount));
-
-      //DBG("reward_all for %s: balance = %lu, gathered_amount = %lu, block_amount = %s, block_nr = %u, dval = %.20Lg, val = %li",
-      //    name.to_string().c_str(), balance.get_amount(), gathered_amount, fc::variant(v_block_amount).get_string().c_str(), block_nr, dval, val);
 
       if (is_beos_mode)
         reward_stake( name, val );

@@ -21,7 +21,8 @@ namespace eosio {
         uint64_t get_sum();
 
         void execute( uint32_t block_nr, asset proxy_asset, uint32_t starting_block_for_any_distribution, uint32_t ending_block_for_any_distribution,
-              uint32_t distribution_payment_block_interval_for_any_distribution, uint32_t nr_items, bool is_beos_mode );
+          uint32_t distribution_payment_block_interval_for_any_distribution, uint64_t amount_of_reward, uint64_t amount_of_reward_for_trustee,
+          bool is_beos_mode );
 
       public:
 
