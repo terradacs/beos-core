@@ -31,6 +31,11 @@ build:
    - cd ../build/beos-autobuild/
    - echo "Starting keosd and nodeos"
    - python3 ./run.py
+   - echo "Started keosd instance:"
+   - sudo lsof -t -i:8900
+   - echo "Started nodeos instance:"
+   - sudo sudo lsof -t -i:8888
+   - screen -list
    - echo "Starting integration tests"
    - make test || true
    - cd ./unittests
