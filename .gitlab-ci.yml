@@ -19,21 +19,30 @@ build:
    - cd cd-scripts
    - cp config-ci.py config.py
    - ./deploy.py --build-beos
-   - ./deploy.py --initialize-beos
-  after_script: 
-   - cd cd-scripts
    - cat beos_deploy_main.log
+   - echo "Stopping old keosd instance"
+   - sudo kill $(sudo lsof -t -i:8900) || true
+   - ./deploy.py --initialize-beos
+   - echo "Stopping old nodeos instance"
+   - sudo kill $(sudo lsof -t -i:8888) || true
+   - cat beos_deploy_main.log
+   - echo "Starting keosd and nodeos"
+   - python3 ../build/beos-autobuild/run.py
   cache: {}
   tags:
    - ryzen
   allow_failure: false
-  
+  environment:
+    name: development
+    url: http://192.168.6.144:8888/v1/chain/get_info
+
 integration-test:
   stage: integration-test
   script: 
   - cd cd-scripts
   - cp config-ci.py config.py
   - ./deploy.py --build-beos
+  - cat beos_deploy_main.log
   - ./deploy.py --initialize-beos
   - cat beos_deploy_main.log
   - cd ../build/beos-autobuild

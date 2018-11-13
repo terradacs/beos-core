@@ -69,28 +69,30 @@ OPENSSL_ROOT_DIR = "/usr/include/openssl"
 # When account is created, its public keys (owner & active) are set. The keys below are given to all system accounts, i.e.
 # eosio.msig, eosio.names, eosio.saving, eosio.bpay, eosio.vpay, eosio.unregd, eosio.ram, eosio.ramfee,
 # eosio.token, eosio.stake, beos.token, beos.init, beos.market
-COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY = "EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3"
-COMMON_SYSTEM_ACCOUNT_OWNER_PRIVATE_KEY = "5JpSDcXq6TfzQxkFmYFXQygHR6jG3pWjtGnRmtHQd7YmCxoqLtU"
+COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY = os.environ["CI_COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY"]
+COMMON_SYSTEM_ACCOUNT_OWNER_PRIVATE_KEY = os.environ["CI_COMMON_SYSTEM_ACCOUNT_OWNER_PRIVATE_KEY"]
 
-COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY = "EOS53QRGWCMxxHtKqFjiMQo8isf3so1dUSMhPezceFBknF8T5ht9b"
-COMMON_SYSTEM_ACCOUNT_ACTIVE_PRIVATE_KEY = "5Hw8qBPp4Hpbf2wja6bA34t3x58cp4XBmDxkz7HKQGsFZ4vJ2HT"
+COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY = os.environ["CI_COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY"]
+COMMON_SYSTEM_ACCOUNT_ACTIVE_PRIVATE_KEY = os.environ["CI_COMMON_SYSTEM_ACCOUNT_ACTIVE_PRIVATE_KEY"]
+
 # path to contracts directory
 CONTRACTS_DIR = BEOS_BUILD_DIR + "/contracts/"
 
 # The main keys to the blockchain net, that allow creation of system accounts
 # EOSIO public key
-EOSIO_PUBLIC_KEY = "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
+EOSIO_PUBLIC_KEY = os.environ["CI_EOSIO_PUBLIC_KEY"]
+
 # KEEPING KEYS IN PUBLIC FILE IS NOT WISE!
 # EOSIO private key
-EOSIO_PRIVATE_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
+EOSIO_PRIVATE_KEY = os.environ["CI_EOSIO_PRIVATE_KEY"]
 
 # Keys for `beos.gateway`
-BEOS_GATEWAY_PUBLIC_KEY = "EOS6Y1LJCZC1Mrp9EoLcmkobJHoNnVQMqLcNAxU5xL5iXwqzctjmd"
-BEOS_GATEWAY_PRIVATE_KEY = "5Ka14byMGwBqE4Q149pffSjXf547otfZ1NKdTEq1ivwg9DjMoi6"
+BEOS_GATEWAY_PUBLIC_KEY = os.environ["CI_BEOS_GATEWAY_PUBLIC_KEY"]
+BEOS_GATEWAY_PRIVATE_KEY = os.environ["CI_BEOS_GATEWAY_PRIVATE_KEY"]
 
 # Keys for `beos.distrib`
-BEOS_DISTRIB_PUBLIC_KEY = "EOS5FUjQDE6QLiGZKt7hGwBypCAJPL53X3SYf6Gf4JxMkdyH1wMrF"
-BEOS_DISTRIB_PRIVATE_KEY = "5HvT4NQKyLMojJpa2qPCquwkGmppC6dqCJQK7cBcMFPR2i3Ei4p"
+BEOS_DISTRIB_PUBLIC_KEY = os.environ["CI_BEOS_DISTRIB_PUBLIC_KEY"]
+BEOS_DISTRIB_PRIVATE_KEY = os.environ["CI_BEOS_DISTRIB_PRIVATE_KEY"]
 
 #Keys for beos.trustee
 TRUSTEE_OWNER_PUBLIC_KEY = "EOS7WSRAFdYGcNQ6YWp2bA1Sjba8dXbf6kVbYxMkzvdF92StS2kxS"
@@ -102,7 +104,7 @@ TRUSTEE_ACTIVE_PRIVATE_KEY = "5JoXJePQqe1NACbPYVickFkUvJtx6kf8j1e1v81Ei9XyMB7pNb
 # path to keosd executable
 KEOSD_EXECUTABLE = BEOS_BUILD_DIR + "/programs/keosd/keosd"
 # keosd ip address
-KEOSD_IP_ADDRESS = "127.0.0.1"
+KEOSD_IP_ADDRESS = "192.168.6.144"
 # keosd port
 KEOSD_PORT = 8900
 # keosd certificate chain file - mandatory for https
@@ -115,7 +117,7 @@ CLEOS_EXECUTABLE = BEOS_BUILD_DIR + "/programs/cleos/cleos"
 # path to nodeos executable
 NODEOS_EXECUTABLE = BEOS_BUILD_DIR + "/programs/nodeos/nodeos"
 # nodeos ip address
-NODEOS_IP_ADDRESS = "127.0.0.1"
+NODEOS_IP_ADDRESS = "192.168.6.144"
 # nodeos port
 NODEOS_PORT = 8888
 # nodeos certificate chain file - mandatory for https
