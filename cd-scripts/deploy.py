@@ -397,8 +397,6 @@ def make_unit_test():
 def make_beos_plugin_test():
     logger.info("Running BEOS plugin tests")
     tests_working_dir = "{0}/{1}".format(config.BEOS_BUILD_DIR, "tests/beos_plugin_tests/")
-    params = ["./test01.py", "--main-dir", config.BEOS_BUILD_DIR]
-    run_command(params, tests_working_dir)
 
     params = ["./test03.py", "--main-dir", config.BEOS_BUILD_DIR]
     run_command(params, tests_working_dir)

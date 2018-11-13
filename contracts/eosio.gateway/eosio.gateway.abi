@@ -24,19 +24,6 @@
           "type": "asset"
         }
       ]
-    },{
-      "name": "init_data",
-      "base": "",
-      "fields": [
-        {"name":"balance", "type":"asset"},
-        {"name":"owner", "type":"name"}
-      ]
-    },{
-      "name": "init_global_state",
-      "base": "",
-      "fields": [
-        {"name":"sum", "type":"uint64"}
-      ]
     }
   ],
   "actions": [{

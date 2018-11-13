@@ -14,24 +14,6 @@ namespace eosio {
 
   using std::string;
 
-  /**
-   * This structure holds all informations needed during distribution period.
-  */
-  struct init_data
-  {
-    /**
-     * An owner of given data.
-     */
-    account_name  owner;
-
-    uint64_t primary_key()const { return owner; }
-
-    EOSLIB_SERIALIZE( init_data, (owner) )
-
-  };
-
-  typedef eosio::multi_index<N(initproxy), init_data> inits;
-
   class gateway : public contract {
     public:
 
@@ -41,12 +23,11 @@ namespace eosio {
       }
 
       /**
-      * Triggered by `transfer` action. The `transfer` action is executed
-      * when user from bitshares blockchain wants to exchange BTS to staked BEOS.
-      * The `transfer` method exists in BEOS plugin( method `transfer` in `beos_plugin.cpp` )
+      * Triggered by user. This action is executed
+      * when user from bitshares blockchain wants to exchange BTS to PXBTS.
       * 
       * `to`        - given account
-      * `quantity`  - number of BEOS-es. Ratio is `1` - when an user sends 125 BTS, then 125 staked BEOS-es are saved
+      * `quantity`  - number of PXBTS-es.
       */
       void issue(account_name to, asset quantity );
 
@@ -61,8 +42,6 @@ namespace eosio {
       * `quantity`  - amount which will be withdrawn
       */
       void withdraw( account_name owner, asset quantity );
-
-      void add( account_name owner, account_name ram_payer );
     private:
 
       void checker( account_name any_account, asset value );

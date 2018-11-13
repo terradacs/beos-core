@@ -79,7 +79,6 @@ def startNode(nodeIndex, account):
         '    --enable-stale-production' +
         '    --wasm-runtime binaryen' +
         '    --producer-name ' + account['name'] +
-        '    --beos-config-file ' + args.beos_config +
         '    --signature-provider ' + account['pub'] + '=' + 'KEY:' + account['pvt'] + ' '
         '    --plugin eosio::http_plugin'
         '    --plugin eosio::chain_api_plugin'
