@@ -27,7 +27,7 @@ build:
    - sudo kill $(sudo lsof -t -i:8888) || true
    - cat beos_deploy_main.log
    - echo "Starting keosd and nodeos"
-   - ./run.py
+   - python3 ../build/run.py
   cache: {}
   tags:
    - ryzen
