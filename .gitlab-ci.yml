@@ -33,7 +33,7 @@ build:
    - python3 ./run.py
    - echo "Starting integration tests"
    - make test || true
-   - cd ../build/beos-autobuild/unittests
+   - cd ./unittests
    - echo "Starting unit tests"
    - ./unit_test --log_level=test_suite || true
    
