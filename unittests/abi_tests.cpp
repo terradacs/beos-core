@@ -2778,6 +2778,7 @@ BOOST_AUTO_TEST_CASE(packed_transaction)
          newaccount{
                .creator  = config::system_account_name,
                .name     = a,
+               .init_ram = false,
                .owner    = authority( get_public_key( a, "owner" )),
                .active   = authority( get_public_key( a, "active" ) )
          });

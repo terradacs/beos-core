@@ -85,9 +85,9 @@
       "fields": [
         {"name":"creator",    "type":"account_name"},
         {"name":"name",       "type":"account_name"},
+        {"name":"init_ram",   "type":"bool"},
         {"name":"owner",      "type":"authority"},
-        {"name":"active",     "type":"authority"},
-        {"name":"init_ram",   "type":"bool"}
+        {"name":"active",     "type":"authority"}
       ]
     },{
       "name": "setcode",

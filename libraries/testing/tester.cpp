@@ -311,9 +311,9 @@ namespace eosio { namespace testing {
                                 newaccount{
                                    .creator  = creator,
                                    .name     = a,
+                                   .init_ram = false,
                                    .owner    = owner_auth,
-                                   .active   = active_auth,
-                                   .init_ram = false
+                                   .active   = active_auth
                                 });
 
       set_transaction_headers(trx);

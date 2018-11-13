@@ -629,6 +629,7 @@ BOOST_FIXTURE_TEST_CASE(cfa_stateful_api, TESTER)  try {
                                  newaccount{
                                  .creator  = creator,
                                  .name     = a,
+                                 .init_ram = false,
                                  .owner    = authority( get_public_key( a, "owner" ) ),
                                  .active   = authority( get_public_key( a, "active" ) )
                                  });
@@ -659,6 +660,7 @@ BOOST_FIXTURE_TEST_CASE(deferred_cfa_failed, TESTER)  try {
                                  newaccount{
                                  .creator  = creator,
                                  .name     = a,
+                                 .init_ram = false,
                                  .owner    = authority( get_public_key( a, "owner" ) ),
                                  .active   = authority( get_public_key( a, "active" ) )
                                  });
@@ -695,6 +697,7 @@ BOOST_FIXTURE_TEST_CASE(deferred_cfa_success, TESTER)  try {
                                  newaccount{
                                  .creator  = creator,
                                  .name     = a,
+                                 .init_ram = false,
                                  .owner    = authority( get_public_key( a, "owner" ) ),
                                  .active   = authority( get_public_key( a, "active" ) )
                                  });

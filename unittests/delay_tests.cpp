@@ -34,6 +34,7 @@ BOOST_FIXTURE_TEST_CASE( delay_create_account, validating_tester) { try {
                              newaccount{
                                 .creator  = creator,
                                 .name     = a,
+                                .init_ram = false,
                                 .owner    = owner_auth,
                                 .active   = authority( get_public_key( a, "active" ) )
                              });
@@ -61,6 +62,7 @@ BOOST_FIXTURE_TEST_CASE( delay_error_create_account, validating_tester) { try {
                              newaccount{
                                 .creator  = N(bad), /// a does not exist, this should error when execute
                                 .name     = a,
+                                .init_ram = false,
                                 .owner    = owner_auth,
                                 .active   = authority( get_public_key( a, "active" ) )
                              });
@@ -2361,6 +2363,7 @@ BOOST_FIXTURE_TEST_CASE( delay_expired, validating_tester) { try {
                              newaccount{
                                 .creator  = creator,
                                 .name     = a,
+                                .init_ram = false,
                                 .owner    = owner_auth,
                                 .active   = authority( get_public_key( a, "active" ) )
                              });

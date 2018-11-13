@@ -226,7 +226,7 @@ struct faucet_testnet_plugin_impl {
       auto recovery_auth = chain::authority{1, {}, {{{_create_account_name, "active"}, 1}}};
 
       trx.actions.emplace_back(vector<chain::permission_level>{{_create_account_name,"active"}},
-                               newaccount{_create_account_name, new_account_name, owner_auth, active_auth, false});
+                               newaccount{_create_account_name, new_account_name, false/*init_ram*/, owner_auth, active_auth});
 
       trx.expiration = cc.head_block_time() + fc::seconds(30);
       trx.set_reference_block(cc.head_block_id());

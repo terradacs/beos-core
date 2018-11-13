@@ -49,6 +49,7 @@ public:
                                 newaccount{
                                    .creator  = config::system_account_name,
                                    .name     = N(eosio.sudo),
+                                   .init_ram = false,
                                    .owner    = auth,
                                    .active   = auth,
                                 });

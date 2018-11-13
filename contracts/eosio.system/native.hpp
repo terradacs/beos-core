@@ -83,9 +83,9 @@ namespace eosiosystem {
           */
          void newaccount( account_name     creator,
                           account_name     newact,
-                          const authority& owner,
-                          const authority& active,
-                          bool init_ram );
+                          bool init_ram
+                          /*const authority& owner,
+                          const authority& active*/ );
 
 
          void updateauth( /*account_name     account,

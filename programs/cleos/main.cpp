@@ -513,9 +513,9 @@ chain::action create_newaccount(const name& creator, const name& newaccount, pub
       eosio::chain::newaccount{
          .creator      = creator,
          .name         = newaccount,
+         .init_ram     = init_ram,
          .owner        = eosio::chain::authority{1, {{owner, 1}}, {}},
-         .active       = eosio::chain::authority{1, {{active, 1}}, {}},
-         .init_ram     = init_ram
+         .active       = eosio::chain::authority{1, {{active, 1}}, {}}
       }
    };
 }
