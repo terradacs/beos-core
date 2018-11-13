@@ -46,6 +46,8 @@ def run_keosd_postconf(ip_address, port, wallet_dir, use_https = False):
     parameters = screen_parameters + parameters
     print("Running keosd with command: {0}".format(" ".join(parameters)))
     subprocess.Popen(parameters)
+    with open("run_keosd.pid", "w") as pid_file:
+        pid_file.write("{0}-{1}".format("keosd", datetime.datetime.now().strftime("%Y-%m-%d")))
     run_wallet_unlock_postconf()
 
 def run_nodeos_postconf(node_index, name, public_key, use_https = False):
@@ -97,8 +99,50 @@ def run_nodeos_postconf(node_index, name, public_key, use_https = False):
     parameters = screen_parameters + parameters
     print("Running nodeos with command: {0}".format(" ".join(parameters)))
     subprocess.Popen(parameters)
+    with open("run_nodeos.pid", "w") as pid_file:
+        pid_file.write("{0}-{1}".format("nodeos", datetime.datetime.now().strftime("%Y-%m-%d")))
 
+def kill_process(pid_file_name):
+    import signal
+    try:
+        pid_name = None
+        with open(pid_file_name, "r") as pid_file:
+            line = pid_file.readline()
+            pid_name = line.strip()
+        if pid_name is not None:
+            for line in os.popen("screen -list"):
+                if pid_name in line:
+                    line = line.strip().split(".")
+                    pid = int(line[0])
+                    os.kill(pid, signal.SIGTERM)
+                    os.kill(pid + 1, signal.SIGTERM)
+                    os.remove(pid_file_name)
+    except Exception as ex:
+        print("Error processing pid file: {0}".format(ex))
+        sys.exit(1)
+
+def usage():
+    print("Usage:")
+    print("To run beos wallet and node use: python3 run.py")
+    print("To kill running beos wallet and node use: python3 run.py --cancel")
 
 if __name__ == "__main__":
-  run_keosd_postconf("${KEOSD_IP_ADDRESS}", "${KEOSD_PORT}", "${DEFAULT_WALLET_DIR}")
-  run_nodeos_postconf(0, "eosio", "${EOSIO_ROOT_KEY}")
+    argc = len(sys.argv)
+    if argc == 1:
+        if os.path.exists("run_keosd.pid"):
+            print("run_keosd.pid exists in the filesystem. Please use --cancel option first")
+            sys.exit(1)
+        if os.path.exists("run_nodeos.pid"):
+            print("run_nodeos.pid exists in the filesystem. Please use --cancel option first")
+            sys.exit(1)
+        run_keosd_postconf("${KEOSD_IP_ADDRESS}", "${KEOSD_PORT}", "${DEFAULT_WALLET_DIR}")
+        run_nodeos_postconf(0, "eosio", "${EOSIO_ROOT_KEY}")
+    elif argc == 2 and sys.argv[1] == "--cancel":
+        kill_process("run_keosd.pid")
+        kill_process("run_nodeos.pid")
+    else:
+        usage()
+        sys.exit(1)
+
+
+
