@@ -1,0 +1,104 @@
+#!/usr/bin/env python3
+
+import subprocess
+import os
+import sys
+import datetime
+
+def run_wallet_unlock_postconf():
+    wallet_password = None
+    with open("${WALLET_PASSWORD_PATH}", "r") as password_file:
+        wallet_password = password_file.readline()
+
+    parameters = ["${CLEOS_EXECUTABLE}", 
+        "wallet", "unlock", 
+        "-n", "${MASTER_WALLET_NAME}", 
+        "--password", wallet_password
+    ]
+    print("Unlocking your wallet with command: {0}".format(" ".join(parameters)))
+    subprocess.Popen(parameters)
+
+def run_keosd_postconf(ip_address, port, wallet_dir, use_https = False):
+    parameters = None
+    if use_https:
+        # run kleosd in https mode
+        parameters = [
+            "${KEOSD_EXECUTABLE}",
+            "--https-server-address","{0}:{1}".format(ip_address, port),
+            "--https-certificate-chain-file", "${KEOSD_CERTIFICATE_CHAIN_FILE}",
+            "--https-private-key-file", "${KEOSD_PRIVATE_KEY_FILE}",
+            "--wallet-dir", wallet_dir,
+        ]
+    else:
+        # run kleosd in http mode
+        parameters = ["${KEOSD_EXECUTABLE}",
+            "--http-server-address","{0}:{1}".format(ip_address, port) ,
+            "--wallet-dir", wallet_dir,
+        ]
+    
+    screen_parameters = [
+        "screen",
+        "-d",
+        "-m",
+        "-S",
+        "{0}-{1}".format("keosd", datetime.datetime.now().strftime("%Y-%m-%d")),
+    ]
+    parameters = screen_parameters + parameters
+    print("Running keosd with command: {0}".format(" ".join(parameters)))
+    subprocess.Popen(parameters)
+    run_wallet_unlock_postconf()
+
+def run_nodeos_postconf(node_index, name, public_key, use_https = False):
+    working_dir = "{0}{1}-{2}/".format("${NODEOS_WORKING_DIR}", node_index, name)
+
+    https_opts = [
+        "--signature-provider", "{0}=KEOSD:http://{1}:{2}/v1/wallet/sign_digest".format(public_key, "${KEOSD_IP_ADDRESS}", "${KEOSD_PORT}"),
+        "--http-server-address", "{0}:{1}".format("${NODEOS_IP_ADDRESS}", "${NODEOS_PORT}")
+    ]
+
+    if use_https:
+        https_opts = [
+            "--signature-provider", "{0}=KEOSD:https://{1}:{2}/v1/wallet/sign_digest".format(public_key, "${KEOSD_IP_ADDRESS}", "${KEOSD_PORT}"),
+            "--https-server-address", "{0}:{1}".format("${NODEOS_IP_ADDRESS}", "${NODEOS_PORT}"),
+            "--https-certificate-chain-file", "${KEOSD_CERTIFICATE_CHAIN_FILE}",
+            "--https-private-key-file", "${KEOSD_PRIVATE_KEY_FILE}"
+        ]
+
+    parameters = [
+        "${NODEOS_EXECUTABLE}",
+        "--max-irreversible-block-age", "-1",
+        "--contracts-console",
+        "--blocks-dir", os.path.abspath(working_dir) + '/blocks',
+        "--config-dir", os.path.abspath(working_dir),
+        "--data-dir", os.path.abspath(working_dir),
+        "--chain-state-db-size-mb", "1024",
+        "--enable-stale-production",
+        "--producer-name", name,
+    ]
+
+    plugins = [
+        "--plugin", "eosio::http_plugin",
+        "--plugin", "eosio::chain_api_plugin",
+        "--plugin", "eosio::producer_plugin",
+        "--plugin", "eosio::beos_plugin",
+        "--plugin", "eosio::beos_api_plugin",
+        "--plugin", "eosio::history_plugin",
+        "--plugin", "eosio::history_api_plugin"
+    ]
+
+    parameters = parameters + https_opts + plugins
+    screen_parameters = [
+        "screen",
+        "-d",
+        "-m",
+        "-S",
+        "{0}-{1}".format("nodeos", datetime.datetime.now().strftime("%Y-%m-%d")),
+    ]
+    parameters = screen_parameters + parameters
+    print("Running nodeos with command: {0}".format(" ".join(parameters)))
+    subprocess.Popen(parameters)
+
+
+if __name__ == "__main__":
+  run_keosd_postconf("${KEOSD_IP_ADDRESS}", "${KEOSD_PORT}", "${DEFAULT_WALLET_DIR}")
+  run_nodeos_postconf(0, "eosio", "${EOSIO_ROOT_KEY}")

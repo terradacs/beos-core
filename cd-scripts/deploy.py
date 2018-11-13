@@ -300,6 +300,19 @@ def build_eosio(c_compiler, cxx_compiler):
         "-DNODEOS_HTTP_SERVER_PORT={0}".format("http://{0}:{1}".format(config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)),
         "-DSIGNATURE_PROVIDER={0}".format("{0}=KEOSD:http://{1}:{2}/v1/wallet/sign_digest".format(config.EOSIO_PUBLIC_KEY, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)),
         "-DDISABLE_FAILING_TESTS={0}".format(config.DISABLE_FAILING_TESTS),
+        "-DWALLET_PASSWORD_PATH={0}".format(config.WALLET_PASSWORD_PATH),
+        "-DDEFAULT_WALLET_DIR={0}".format(config.DEFAULT_WALLET_DIR),
+        "-DMASTER_WALLET_NAME={0}".format(config.MASTER_WALLET_NAME),
+        "-DCLEOS_EXECUTABLE={0}".format(config.CLEOS_EXECUTABLE),
+        "-DKEOSD_EXECUTABLE={0}".format(config.KEOSD_EXECUTABLE),
+        "-DKEOSD_CERTIFICATE_CHAIN_FILE={0}".format(config.KEOSD_CERTIFICATE_CHAIN_FILE),
+        "-DKEOSD_PRIVATE_KEY_FILE={0}".format(config.KEOSD_PRIVATE_KEY_FILE),
+        "-DKEOSD_IP_ADDRESS={0}".format(config.KEOSD_IP_ADDRESS),
+        "-DKEOSD_PORT={0}".format(config.KEOSD_PORT),
+        "-DNODEOS_WORKING_DIR={0}".format(config.NODEOS_WORKING_DIR),
+        "-DNODEOS_IP_ADDRESS={0}".format(config.NODEOS_IP_ADDRESS),
+        "-DNODEOS_PORT={0}".format(config.NODEOS_PORT),
+        "-DNODEOS_EXECUTABLE={0}".format(config.NODEOS_EXECUTABLE),
         config.BEOS_DIR
     ]
     logger.info("Running cmake with params {0}".format(" ".join(params)))
