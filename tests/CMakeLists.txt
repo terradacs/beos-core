@@ -49,9 +49,9 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/launcher_test.py ${CMAKE_CURRENT_BINA
 execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/beos_plugin_tests ${CMAKE_CURRENT_BINARY_DIR}/beos_plugin_tests)
 execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/beos_transfer_tests ${CMAKE_CURRENT_BINARY_DIR}/beos_transfer_tests)
 
-add_test(NAME test04_account_creation_and_get_account_deploy COMMAND tests/beos_plugin_tests/test04_account_creation_and_get_account_deploy.py WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+add_test(NAME test04_account_creation_and_get_account_deploy COMMAND tests/beos_plugin_tests/test04_account_creation_and_get_account_deploy.py  --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --public-key ${EOSIO_ROOT_KEY}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_property(TEST test04_account_creation_and_get_account_deploy PROPERTY LABELS nonparallelizable_tests)
-add_test(NAME test06_account_creation_and_account_validator_deploy COMMAND tests/beos_plugin_tests/test06_account_creation_and_account_validator_deploy.py WORKING_DIRECTORY ${CMAKE_BINARY_DIR} )
+add_test(NAME test06_account_creation_and_account_validator_deploy COMMAND tests/beos_plugin_tests/test06_account_creation_and_account_validator_deploy.py  --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --public-key ${EOSIO_ROOT_KEY}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR} )
 set_property(TEST test06_account_creation_and_account_validator_deploy PROPERTY LABELS nonparallelizable_tests)
 
 #To run plugin_test with all log from blockchain displayed, put --verbose after --, i.e. plugin_test -- --verbose
