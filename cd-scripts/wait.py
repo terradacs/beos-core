@@ -15,7 +15,7 @@ if __name__ == "__main__":
             pid = int(sys.argv[1])
             tries = 10000 # infinite lock protection
             while tries > 0:
-                time.sleep(1)
+                time.sleep(0.5)
                 try:
                     os.kill(pid, 0) 
                 except ProcessLookupError: # errno.ESRCH
