@@ -149,9 +149,9 @@ namespace eosiosystem {
     *
     */
    void native::newaccount( account_name     creator,
-                            account_name     newact
-                            /*  no need to parse authorities
-                            const authority& owner,
+                            account_name     newact,
+                            bool init_ram
+                            /*const authority& owner,
                             const authority& active*/ ) {
 
       if( creator != N(beos.gateway) && creator != _self ) {
@@ -177,7 +177,22 @@ namespace eosiosystem {
          }
       }
 
-      set_resource_limits( newact, 0, 0, 0 );
+    int64_t bytes = 0;
+    if( init_ram ) {
+       bytes = get_account_ram_usage( newact );
+       /*
+        Basic RAM usage = 2724 bytes
+
+        Unfortunately, this is not enough for making transfer, as result is an exception:
+        'account has insufficient ram; needs 2852 bytes has 2724 bytes'
+
+        Solution: increasing RAM
+       */
+       bytes *= 2;
+       change_resource_limits( creator, -bytes, 0, 0 );
+    }
+
+    set_resource_limits( newact, bytes, 0, 0 );
    }
 
 } /// eosio.system
@@ -185,7 +200,7 @@ namespace eosiosystem {
 
 EOSIO_ABI( eosiosystem::system_contract,
      // native.hpp (newaccount definition is actually in eosio.system.cpp)
-     (initresource)(delegateram)(reward)(newaccount)(updateauth)(deleteauth)(linkauth)(unlinkauth)(canceldelay)(onerror)
+     (initresource)(reward)(newaccount)(updateauth)(deleteauth)(linkauth)(unlinkauth)(canceldelay)(onerror)
      // eosio.system.cpp
      (setram)(setparams)(setpriv)(rmvproducer)(bidname)
      // delegate_bandwidth.cpp

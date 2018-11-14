@@ -10,7 +10,6 @@ extern "C" {
     * @brief Get the number of actual block in blockchain
     */
    int tapos_block_num();
-   void newaccount();
 
    ///@ } privilegedcapi
 

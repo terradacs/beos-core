@@ -2268,6 +2268,7 @@ BOOST_AUTO_TEST_CASE(newaccount_test)
    {
      "creator" : "newacct.crtr",
      "name" : "newacct.name",
+     "init_ram" : 0,
      "owner" : {
         "threshold" : 2147483145,
         "keys" : [ {"key" : "EOS65rXebLhtk2aTTzP4e9x1AQZs7c5NNXJp89W8R3HyaA6Zyd4im", "weight" : 57005},
@@ -2778,6 +2779,7 @@ BOOST_AUTO_TEST_CASE(packed_transaction)
          newaccount{
                .creator  = config::system_account_name,
                .name     = a,
+               .init_ram = false,
                .owner    = authority( get_public_key( a, "owner" )),
                .active   = authority( get_public_key( a, "active" ) )
          });

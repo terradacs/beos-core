@@ -27,14 +27,6 @@
          {"name":"stake_cpu_quantity", "type":"asset"}
       ]
     },{
-      "name": "delegateram",
-      "base": "",
-      "fields": [
-         {"name":"payer", "type":"account_name"},
-         {"name":"receiver", "type":"account_name"},
-         {"name":"bytes", "type":"uint64"}
-      ]
-    },{
       "name": "permission_level",
       "base": "",
       "fields": [
@@ -83,10 +75,11 @@
       "name": "newaccount",
       "base": "",
       "fields": [
-        {"name":"creator", "type":"account_name"},
-        {"name":"name",    "type":"account_name"},
-        {"name":"owner",   "type":"authority"},
-        {"name":"active",  "type":"authority"}
+        {"name":"creator",    "type":"account_name"},
+        {"name":"name",       "type":"account_name"},
+        {"name":"init_ram",   "type":"bool"},
+        {"name":"owner",      "type":"authority"},
+        {"name":"active",     "type":"authority"}
       ]
     },{
       "name": "setcode",
@@ -426,10 +419,6 @@
    "actions": [{
      "name": "initresource",
      "type": "initresource",
-     "ricardian_contract": ""
-   },{
-     "name": "delegateram",
-     "type": "delegateram",
      "ricardian_contract": ""
    },{
      "name": "newaccount",

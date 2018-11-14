@@ -28,6 +28,7 @@ def createUserAccounts(_accouns_name):
     "args":{
             "creator": "beos.gateway",
             "name": _accouns_name,
+            "init_ram": 1,
             "owner": {
             "threshold": 1,
             "keys": [{

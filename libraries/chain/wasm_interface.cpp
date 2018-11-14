@@ -152,6 +152,10 @@ class privileged_api : public context_aware_api {
          context.control.get_resource_limits_manager().get_account_limits( account, ram_bytes, net_weight, cpu_weight);
       }
 
+      int64_t get_account_ram_usage( account_name account ) {
+         return context.control.get_resource_limits_manager().get_account_ram_usage( account );
+      }
+
       void change_resource_limits( account_name account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight ) {
          int64_t _ram_bytes = 0;
          int64_t _net_weight = 0;
@@ -1774,6 +1778,7 @@ REGISTER_INTRINSICS(privileged_api,
    (activate_feature,                 void(int64_t)                         )
    (get_resource_limits,              void(int64_t,int,int,int)             )
    (set_resource_limits,              void(int64_t,int64_t,int64_t,int64_t) )
+   (get_account_ram_usage,            int64_t(int64_t)                      )
    (change_resource_limits,           void(int64_t,int64_t,int64_t,int64_t) )
    (set_proposed_producers,           int64_t(int,int)                      )
    (get_blockchain_parameters_packed, int(int, int)                         )

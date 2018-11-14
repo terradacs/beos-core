@@ -139,8 +139,9 @@ abi_def eosio_contract_abi(const abi_def& eosio_system_abi)
       "newaccount", "", {
          {"creator", "account_name"},
          {"name", "account_name"},
+         {"init_ram", "bool"},
          {"owner", "authority"},
-         {"active", "authority"},
+         {"active", "authority"}
       }
    });
 

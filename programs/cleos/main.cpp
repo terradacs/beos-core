@@ -507,12 +507,13 @@ void send_transaction( signed_transaction& trx, int32_t extra_kcpu, packed_trans
    }
 }
 
-chain::action create_newaccount(const name& creator, const name& newaccount, public_key_type owner, public_key_type active) {
+chain::action create_newaccount(const name& creator, const name& newaccount, public_key_type owner, public_key_type active, bool init_ram ) {
    return action {
       tx_permission.empty() ? vector<chain::permission_level>{{creator,config::active_name}} : get_account_permissions(tx_permission),
       eosio::chain::newaccount{
          .creator      = creator,
          .name         = newaccount,
+         .init_ram     = init_ram,
          .owner        = eosio::chain::authority{1, {{owner, 1}}, {}},
          .active       = eosio::chain::authority{1, {{active, 1}}, {}}
       }
@@ -521,15 +522,6 @@ chain::action create_newaccount(const name& creator, const name& newaccount, pub
 
 chain::action create_action(const vector<permission_level>& authorization, const account_name& code, const action_name& act, const fc::variant& args) {
    return chain::action{authorization, code, act, variant_to_bin(code, act, args)};
-}
-
-chain::action create_delegateram(const name& creator, const name& newaccount, uint32_t numbytes) {
-   fc::variant act_payload = fc::mutable_variant_object()
-         ("payer", creator.to_string())
-         ("receiver", newaccount.to_string())
-         ("bytes", numbytes);
-   return create_action(tx_permission.empty() ? vector<chain::permission_level>{{creator,config::active_name}} : get_account_permissions(tx_permission),
-                        config::system_account_name, N(delegateram), act_payload);
 }
 
 chain::action create_buyram(const name& creator, const name& newaccount, const asset& quantity) {
@@ -902,7 +894,7 @@ struct create_account_subcommand {
    string stake_cpu;
    uint32_t buy_ram_bytes_in_kbytes = 0;
    uint32_t buy_ram_bytes = 0;
-   int32_t transfer_ram_in_kbytes = -1;
+   bool transfer_ram = false;
    string buy_ram_eos;
    bool transfer;
    bool simple;
@@ -919,8 +911,8 @@ struct create_account_subcommand {
       createAccount->add_option("ActiveKey", active_key_str, localized("The active public key for the new account"));
 
       if (!simple) {
-        createAccount->add_option("--transfer-ram-kbytes", transfer_ram_in_kbytes,
-                                  (localized("The amount of RAM bytes transferred to the new account in kibibytes (KiB)")));
+        createAccount->add_flag("--transfer-ram", transfer_ram,
+                                  (localized("Minimal amount of RAM required will be transferred from creator")));
         createAccount->add_option("--stake-net", stake_net,
                                   (localized("The amount of EOS delegated for net bandwidth")));
         createAccount->add_option("--stake-cpu", stake_cpu,
@@ -947,9 +939,9 @@ struct create_account_subcommand {
             try {
                active_key = public_key_type(active_key_str);
             } EOS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid active public key: ${public_key}", ("public_key", active_key_str));
-            auto create = create_newaccount(creator, account_name, owner_key, active_key);
+            auto create = create_newaccount(creator, account_name, owner_key, active_key, transfer_ram );
             if (!simple) {
-               if( transfer_ram_in_kbytes == -1 )
+               if( !transfer_ram )
                {
                   if ( buy_ram_eos.empty() && buy_ram_bytes_in_kbytes == 0) {
                       std::cerr << "ERROR: Either --buy-ram or --buy-ram-kbytes with non-zero value is required" << std::endl;
@@ -976,15 +968,7 @@ struct create_account_subcommand {
                }
                else
                {
-                 if ( transfer_ram_in_kbytes <= 0 ) {
-                    std::cerr << "ERROR: --transfer_ram_in_kbytes with non-zero value is required" << std::endl;
-                    return;
-                 }
-
-                 uint32_t ram_total = transfer_ram_in_kbytes * 1024;
-                 ram_total += buy_ram_bytes_in_kbytes * 1024;
-                 action delegateram =  create_delegateram(creator, account_name, ram_total );
-                 send_actions( { create, delegateram } );
+                 send_actions( { create } );
                }
             } else {
                send_actions( { create } );

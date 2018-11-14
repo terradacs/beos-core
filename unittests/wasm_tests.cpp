@@ -1163,6 +1163,7 @@ BOOST_FIXTURE_TEST_CASE(eosio_abi, TESTER) try {
                              newaccount{
                                    .creator  = config::system_account_name,
                                    .name     = a,
+                                   .init_ram = false,
                                    .owner    = owner_auth,
                                    .active   = authority( get_public_key( a, "active" ) )
                              });

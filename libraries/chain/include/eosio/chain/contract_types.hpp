@@ -12,6 +12,7 @@ using action_name    = eosio::chain::action_name;
 struct newaccount {
    account_name                     creator;
    account_name                     name;
+   bool                             init_ram = false;
    authority                        owner;
    authority                        active;
 
@@ -156,7 +157,7 @@ struct onerror {
 
 } } /// namespace eosio::chain
 
-FC_REFLECT( eosio::chain::newaccount                       , (creator)(name)(owner)(active) )
+FC_REFLECT( eosio::chain::newaccount                       , (creator)(name)(init_ram)(owner)(active) )
 FC_REFLECT( eosio::chain::setcode                          , (account)(vmtype)(vmversion)(code) )
 FC_REFLECT( eosio::chain::setabi                           , (account)(abi) )
 FC_REFLECT( eosio::chain::updateauth                       , (account)(permission)(parent)(auth) )
