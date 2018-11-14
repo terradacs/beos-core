@@ -37,10 +37,10 @@ build:
    - sudo lsof -t -i:8888 || true
    - screen -list || true
    - echo "Starting integration tests"
-   - make test || true
+   - make test
    - cd ./unittests
    - echo "Starting unit tests"
-   - ./unit_test --log_level=test_suite || true
+   - ./unit_test --log_level=test_suite
    
   cache:
     {}
