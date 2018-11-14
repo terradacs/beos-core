@@ -76,6 +76,8 @@ def run_nodeos_postconf(node_index, name, public_key, use_https = False):
         "--chain-state-db-size-mb", "1024",
         "--enable-stale-production",
         "--producer-name", name,
+        "--hard-replay",
+        "--replay-blockchain"
     ]
 
     plugins = [
