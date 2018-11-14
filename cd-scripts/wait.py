@@ -19,10 +19,14 @@ if __name__ == "__main__":
             tries = 10000 # infinite lock protection
             while tries > 0:
 <<<<<<< HEAD
+<<<<<<< HEAD
                 time.sleep(0.5)
 =======
                 time.sleep(1)
 >>>>>>> Sigint instead of sigterm in run.py. Wait.py helper script
+=======
+                time.sleep(0.5)
+>>>>>>> Waiting time reduced to 0.5 sec per iteration
                 try:
                     os.kill(pid, 0) 
                 except ProcessLookupError: # errno.ESRCH
