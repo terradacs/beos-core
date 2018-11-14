@@ -50,15 +50,6 @@ def createUserAccounts(_accouns_name):
             "waits": []
             }
         }
-    }, {
-    "code":"eosio",
-    "action":"delegateram",
-    "authorized_by":"beos.gateway",
-    "args":{
-            "payer":"beos.gateway",
-            "receiver":_accouns_name,
-            "bytes":10000
-        }
     }]
     eosrpc.push_action(cmd)
 
