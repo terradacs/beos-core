@@ -27,14 +27,6 @@
          {"name":"stake_cpu_quantity", "type":"asset"}
       ]
     },{
-      "name": "delegateram",
-      "base": "",
-      "fields": [
-         {"name":"payer", "type":"account_name"},
-         {"name":"receiver", "type":"account_name"},
-         {"name":"bytes", "type":"uint64"}
-      ]
-    },{
       "name": "permission_level",
       "base": "",
       "fields": [
@@ -427,10 +419,6 @@
    "actions": [{
      "name": "initresource",
      "type": "initresource",
-     "ricardian_contract": ""
-   },{
-     "name": "delegateram",
-     "type": "delegateram",
      "ricardian_contract": ""
    },{
      "name": "newaccount",

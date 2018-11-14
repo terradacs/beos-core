@@ -159,17 +159,6 @@ namespace eosiosystem {
     change_resource_limits( receiver, bytes, stake_net_quantity.amount, stake_cpu_quantity.amount );
   }
 
-  void system_contract::delegateram( account_name payer, account_name receiver, int64_t bytes )
-  {
-    require_auth( payer );
-
-    //Check amount of RAM for payer
-    change_resource_limits( payer, -bytes, 0, 0 );
-
-    //Delegate RAM from payer to receiver
-    change_resource_limits( receiver, bytes, 0, 0 );
-  }
-
    /**
     *  The system contract now buys and sells RAM allocations at prevailing market prices.
     *  This may result in traders buying RAM today in anticipation of potential shortages

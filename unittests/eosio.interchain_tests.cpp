@@ -27,7 +27,8 @@ using namespace std;
 
 using mvo = fc::mutable_variant_object;
 
-static const uint64_t DEFAULT_RAM = 10000;
+//Below value is set according to 'native::newaccount' action.
+static const uint64_t DEFAULT_RAM = 2724 * 2;
 
 struct actions: public tester
 {
@@ -251,7 +252,7 @@ class eosio_interchain_tester : public actions
       ( "staked_ram", ram_bytes );
   }
 
-  transaction_trace_ptr create_account_with_resources( account_name creator, account_name a, int64_t bytes = DEFAULT_RAM ) {
+  transaction_trace_ptr create_account_with_resources( account_name creator, account_name a ) {
     signed_transaction trx;
     set_transaction_headers(trx);
 
@@ -263,17 +264,10 @@ class eosio_interchain_tester : public actions
                               newaccount{
                                   .creator  = creator,
                                   .name     = a,
-                                  .init_ram = false,
+                                  .init_ram = true,
                                   .owner    = owner_auth,
                                   .active   = authority( get_public_key( a, "active" ) )
                               });
-
-    trx.actions.emplace_back( get_action( config::system_account_name, N(delegateram), vector<permission_level>{{creator,config::active_name}},
-                                          mvo()
-                                          ("payer", creator)
-                                          ("receiver", a)
-                                          ("bytes", bytes) )
-                            );
 
     set_transaction_headers(trx);
     trx.sign( get_private_key( creator, "active" ), control->get_chain_id()  );
