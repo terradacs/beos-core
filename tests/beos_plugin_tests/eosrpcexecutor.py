@@ -1,3 +1,4 @@
+import re
 import json
 import time
 import queue
@@ -15,6 +16,7 @@ class EOSRPCExecutor():
         self.action_executer_th = threading.Thread(target=self.execute_pending_actions)
         self.action_executer_th.setDaemon(daemonic=True)
         self.action_executer_th.start()
+        self.actions_call_summary = []
 
 
     def execute_pending_actions(self):
@@ -53,37 +55,117 @@ class EOSRPCExecutor():
             command = {"account":_account_name,"symbol":_symbol, "code":"eosio.token"}
             response = requests.post(url, json=command)
             text = response.text
-            whole = text[text.find("\"")+1:text.rfind("\"")]
+            dig = re.search("\d", text)
+            if dig:
+                whole = text[text.find("\"")+1:text.rfind("\"")]
+            else:
+                whole = ""
             response_json ={"balance":whole}
             return response_json
         except Exception as _ex:
             print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] exception  %s occures during get_currency_balance"%str(_ex))            
 
 
+    def get_public_keys(self):
+        try:
+            url = self.wallet_url+'/v1/wallet/get_public_keys'
+            response = requests.post(url)
+            text = response.text
+            keys = text[text.find("[")+1:text.rfind("]")]
+            keys = keys.split(",")
+            av = []
+            for k in keys:
+                temp = k[k.find("\"")+1:k.rfind("\"")]
+                av.append(temp)
+            return av
+        except Exception as _ex:
+            print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] exception  %s occures during get_currency_balance"%str(_ex))            
+
+
+    def create_account_action(self, _newaccount):
+        name      = _newaccount["name"]
+        owner_key = _newaccount["owner_pub"]
+        activ_key = _newaccount["activ_pub"]
+        bytes_num = _newaccount["bytes"]
+        cmd = [{
+        "code":"eosio",
+        "action":"newaccount",
+        "authorized_by":"beos.gateway",
+        "args":{
+              "creator": "beos.gateway",
+              "name": name,
+              "init_ram":True,
+              "owner": {
+                "threshold": 1,
+                "keys": [{
+                    "key": owner_key,
+                    "weight": 1
+                  }
+                ],
+                "accounts": [],
+                "waits": []
+              },
+              "active": {
+                "threshold": 1,
+                "keys": [{
+                    "key": activ_key,
+                    "weight": 1
+                  }
+                ],
+                "accounts": [],
+                "waits": []
+              }
+            }
+        }
+        ]
+        return cmd
+
     def prepare_and_push_transaction(self, _actions):
         try:
             actions =[]
+            expected_result = True
             if isinstance(_actions, list):
                 actions = _actions
             else:
                 actions.append(_actions)
 
             prepared_actions = []
-            for action in actions:
-                binargs = self.abi_to_json_bin(action)
-                prepared_actions = self.prepare_action(action, binargs, prepared_actions)
-            last_block_id = self.get_info()
-            last_block_info = self.get_block(last_block_id)
-            required_key    = self.get_required_keys(prepared_actions, binargs, last_block_info)
-            signed_trasnaction = self.sign_transaction(prepared_actions, binargs, last_block_id, last_block_info, required_key)
-            transaction_status = self.push_transaction(prepared_actions, binargs, signed_trasnaction)
-            if "transaction_id" in transaction_status:
-                print(str(datetime.datetime.now())[:-3], "[ACTION][OK] %s pushed to block %d"%(actions, transaction_status["processed"]["block_num"]))
-            else:
+            try:
+                for action in actions:
+                    if action["action"] == "newaccount_pattern":
+                        new_action = self.create_account_action(action)
+                        for na in new_action:
+                            binargs = self.abi_to_json_bin(na)
+                            prepared_actions = self.prepare_action(na, binargs, prepared_actions)
+                            if "expected_result" in na:
+                                if expected_result:
+                                    expected_result = na.pop("expected_result")
+                    else:
+                        binargs = self.abi_to_json_bin(action)
+                        prepared_actions = self.prepare_action(action, binargs, prepared_actions)
+                        if "expected_result" in action:
+                            if expected_result:
+                                expected_result = action.pop("expected_result")
+                last_block_id   = self.get_info()
+                last_block_info = self.get_block(last_block_id)
+                public_keys     = self.get_public_keys()
+                required_key    = self.get_required_keys(prepared_actions, binargs, last_block_info, public_keys)
+                signed_trasnaction = self.sign_transaction(prepared_actions, binargs, last_block_id, last_block_info, required_key)
+                transaction_status = self.push_transaction(prepared_actions, binargs, signed_trasnaction)
+                if "transaction_id" in transaction_status:
+                    print(str(datetime.datetime.now())[:-3], "[ACTION][OK] %s pushed to block %d"%(actions, transaction_status["processed"]["block_num"]))
+                    self.actions_call_summary.append([actions, expected_result, True])
+                else:
+                    print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] failed to push action %s to block"%(actions))
+                    self.actions_call_summary.append([actions, expected_result, False])
+            except Exception as _ex:
+                print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] exception %s occures during prepare_and_push_transaction"%str(_ex))
                 print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] failed to push action %s to block"%(actions))
+                self.actions_call_summary.append([actions, expected_result, False])
         except Exception as _ex:
             print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] exception %s occures during prepare_and_push_transaction"%str(_ex))
             print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] failed to push action %s to block"%(actions))
+            self.actions_call_summary.append([actions, expected_result, False])
 
  
     def prepare_action(self, _action, _binargs, _prepared_actions):
@@ -126,15 +208,10 @@ class EOSRPCExecutor():
             print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] exception  %s occures during get_block"%str(_ex))            
 
  
-    def get_required_keys(self, _action, _binargs, _last_block_info):
+    def get_required_keys(self, _action, _binargs, _last_block_info, _keys):
         try:
             data = {
-                "available_keys":["EOS53QRGWCMxxHtKqFjiMQo8isf3so1dUSMhPezceFBknF8T5ht9b",
-                                "EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
-                                "EOS8imf2TDq6FKtLZ8mvXPWcd6EF2rQwo8zKdLNzsbU9EiMSt9Lwz",
-                                "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV",
-                                "EOS6Y1LJCZC1Mrp9EoLcmkobJHoNnVQMqLcNAxU5xL5iXwqzctjmd",
-                                "EOS5FUjQDE6QLiGZKt7hGwBypCAJPL53X3SYf6Gf4JxMkdyH1wMrF"],
+                "available_keys":_keys,
                 "transaction":{
                 "actions":_action, 
                     "context_free_actions": [],
@@ -193,3 +270,10 @@ class EOSRPCExecutor():
             return response.json()
         except Exception as _ex:
             print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] exception  %s occures during push_transaction"%str(_ex))
+
+
+    def get_actions_call_summary(self):
+        return self.actions_call_summary
+
+    def clear_actions_call_summary(self):
+        self.actions_call_summary = []

@@ -1,0 +1,540 @@
+{
+    "scenarios": [
+        {
+            "name": "Basic issue test.",
+            "scenario_blocks": 100,
+            "params":{
+                "authorized_by":"beos.init",
+                "code":"beos.init",
+                "action":"changeparams",
+                "args":{
+                    "new_params":["0.0000 PXBTS", 40, [ 50,90,10,8000000 ],[ 50, 58, 4,5000000 ], [ 50, 90, 10, 200000 ]]
+                }
+            },
+            "actions": [
+                {
+                    "start_block":20,
+                    "action":"newaccount_pattern",
+                    "name":"${user_1}",
+                    "owner_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
+                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
+                    "bytes":10000
+                },{
+                    "start_block": 35,
+                    "authorized_by":"beos.gateway",
+                    "code": "beos.gateway",
+                    "action": "issue",
+                    "args": {
+                        "from": "beos.gateway",
+                        "to": "${user_1}",
+                        "quantity": "5.0000 PXBTS"
+                    },
+                    "expected_result":true
+                }
+            ],
+            "expected_results": [
+                {
+                    "user":"${user_1}",
+                    "at_end": {
+                        "balance": "5.0000 PXBTS",
+                        "net_weight": "2000.0000 BEOS",
+                        "cpu_weight": "2000.0000 BEOS",
+                        "ram_bytes" : 15005448
+                    },"after_block":[{
+                        "after_block":40,
+                        "balance": "5.0000 PXBTS",
+                        "net_weight": "0.0000 BEOS",
+                        "cpu_weight": "0.0000 BEOS",
+                        "ram_bytes" : 5448
+                    },{
+                        "after_block":50,
+                        "balance": "5.0000 PXBTS",
+                        "net_weight": "400.0000 BEOS",
+                        "cpu_weight": "400.0000 BEOS",
+                        "ram_bytes" : 5005448
+                    },{
+                        "after_block":60,
+                        "balance": "5.0000 PXBTS",
+                        "net_weight": "800.0000 BEOS",
+                        "cpu_weight": "800.0000 BEOS",
+                        "ram_bytes" : 15005448
+                    },{
+                        "after_block":70,
+                        "balance": "5.0000 PXBTS",
+                        "net_weight": "1200.0000 BEOS",
+                        "cpu_weight": "1200.0000 BEOS",
+                        "ram_bytes" : 15005448
+                    }]
+                }
+            ]
+        },{
+            "name": "Basic issue test 2.",
+            "scenario_blocks": 200,
+            "params":{
+                "authorized_by":"beos.init",
+                "code":"beos.init",
+                "action":"changeparams",
+                "args":{
+                    "new_params":["0.0000 PXBTS", 120, [ 140,180,10,8000000 ],[ 140, 148, 4,5000000 ], [ 140, 180, 10, 200000 ]]
+                }
+            },
+            "actions": [
+                {
+                    "start_block":110,
+                    "action":"newaccount_pattern",
+                    "name":"${user_2}",
+                    "owner_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
+                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
+                    "bytes":10000
+                },{
+                    "start_block": 110,
+                    "authorized_by":"${user_1}",
+                    "code": "beos.gateway",
+                    "action": "withdraw",
+                    "args": {
+                        "owner": "${user_1}",
+                        "quantity": "5.0000 PXBTS"
+                    },
+                    "expected_result":true
+                },{
+                    "start_block": 130,
+                    "authorized_by":"beos.gateway",
+                    "code": "beos.gateway",
+                    "action": "issue",
+                    "args": {
+                        "from": "beos.gateway",
+                        "to": "${user_2}",
+                        "quantity": "5.0000 PXBTS"
+                    },
+                    "expected_result":true
+                },{
+                    "start_block": 140,
+                    "authorized_by":"beos.gateway",
+                    "code": "beos.gateway",
+                    "action": "issue",
+                    "args": {
+                        "from": "beos.gateway",
+                        "to": "${user_2}",
+                        "quantity": "5.0000 PXBTS"
+                    },
+                    "expected_result":true
+                },{
+                    "start_block": 150,
+                    "authorized_by":"beos.gateway",
+                    "code": "beos.gateway",
+                    "action": "issue",
+                    "args": {
+                        "from": "beos.gateway",
+                        "to": "${user_2}",
+                        "quantity": "5.0000 PXBTS"
+                    },
+                    "expected_result":true
+                },{
+                    "start_block": 160,
+                    "authorized_by":"beos.gateway",
+                    "code": "beos.gateway",
+                    "action": "issue",
+                    "args": {
+                        "from": "beos.gateway",
+                        "to": "${user_2}",
+                        "quantity": "5.0000 PXBTS"
+                    },
+                    "expected_result":true
+                }
+            ],
+            "expected_results": [
+                {
+                    "user":"${user_2}",
+                    "at_end": {
+                        "balance": "20.0000 PXBTS",
+                        "net_weight": "2000.0000 BEOS",
+                        "cpu_weight": "2000.0000 BEOS",
+                        "ram_bytes" : 15005448
+                    },"after_block":[{
+                        "after_block":130,
+                        "balance": "",
+                        "net_weight": "0.0000 BEOS",
+                        "cpu_weight": "0.0000 BEOS",
+                        "ram_bytes" : 5448
+                    },{
+                        "after_block":140,
+                        "balance": "5.0000 PXBTS",
+                        "net_weight": "400.0000 BEOS",
+                        "cpu_weight": "400.0000 BEOS",
+                        "ram_bytes" : 5005448
+                    },{
+                        "after_block":150,
+                        "balance": "10.0000 PXBTS",
+                        "net_weight": "800.0000 BEOS",
+                        "cpu_weight": "800.0000 BEOS",
+                        "ram_bytes" : 15005448
+                    },{
+                        "after_block":160,
+                        "balance": "15.0000 PXBTS",
+                        "net_weight": "1200.0000 BEOS",
+                        "cpu_weight": "1200.0000 BEOS",
+                        "ram_bytes" : 15005448
+                    }]
+                }
+            ]
+        },{
+            "name": "Basic issue test 3.",
+            "scenario_blocks": 300,
+            "params":{
+                "authorized_by":"beos.init",
+                "code":"beos.init",
+                "action":"changeparams",
+                "args":{
+                    "new_params":["0.0000 PXBTS", 280, [ 240,280,10,8000000 ],[ 240, 248, 4,5000000 ], [ 240, 280, 10, 200000 ]]
+                }
+            },
+            "actions": [
+                {
+                    "start_block":210,
+                    "action":"newaccount_pattern",
+                    "name":"${user_3}",
+                    "owner_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
+                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
+                    "bytes":10000
+                },{
+                    "start_block":210,
+                    "action":"newaccount_pattern",
+                    "name":"${user_4}",
+                    "owner_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
+                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
+                    "bytes":10000
+                },{
+                    "start_block": 210,
+                    "authorized_by":"${user_2}",
+                    "code": "beos.gateway",
+                    "action": "withdraw",
+                    "args": {
+                        "owner": "${user_2}",
+                        "quantity": "20.0000 PXBTS"
+                    }
+                },{
+                    "start_block": 220,
+                    "authorized_by":"beos.gateway",
+                    "code": "beos.gateway",
+                    "action": "issue",
+                    "args": {
+                        "from": "beos.gateway",
+                        "to": "${user_3}",
+                        "quantity": "5.0000 PXBTS"
+                    }
+                },{
+                    "start_block": 240,
+                    "authorized_by":"beos.gateway",
+                    "code": "beos.gateway",
+                    "action": "issue",
+                    "args": {
+                        "from": "beos.gateway",
+                        "to": "${user_3}",
+                        "quantity": "5.0000 PXBTS"
+                    }
+                },{
+                    "start_block": 240,
+                    "authorized_by":"beos.gateway",
+                    "code": "beos.gateway",
+                    "action": "issue",
+                    "args": {
+                        "from": "beos.gateway",
+                        "to": "${user_4}",
+                        "quantity": "5.0000 PXBTS"
+                    }
+                },{
+                    "start_block": 250,
+                    "authorized_by":"beos.gateway",
+                    "code": "beos.gateway",
+                    "action": "issue",
+                    "args": {
+                        "from": "beos.gateway",
+                        "to": "${user_3}",
+                        "quantity": "5.0000 PXBTS"
+                    }
+                },{
+                    "start_block": 250,
+                    "authorized_by":"beos.gateway",
+                    "code": "beos.gateway",
+                    "action": "issue",
+                    "args": {
+                        "from": "beos.gateway",
+                        "to": "${user_4}",
+                        "quantity": "5.0000 PXBTS"
+                    }
+                },{
+                    "start_block": 260,
+                    "authorized_by":"beos.gateway",
+                    "code": "beos.gateway",
+                    "action": "issue",
+                    "args": {
+                        "from": "beos.gateway",
+                        "to": "${user_3}",
+                        "quantity": "5.0000 PXBTS"
+                    }
+                },{
+                    "start_block": 260,
+                    "authorized_by":"beos.gateway",
+                    "code": "beos.gateway",
+                    "action": "issue",
+                    "args": {
+                        "from": "beos.gateway",
+                        "to": "${user_4}",
+                        "quantity": "5.0000 PXBTS"
+                    }
+                }
+            ],
+            "expected_results": [
+                {
+                    "user":"${user_3}",
+                    "at_end": {
+                        "balance": "20.0000 PXBTS",
+                        "net_weight": "1363.8094 BEOS",
+                        "cpu_weight": "1363.8097 BEOS",
+                        "ram_bytes" : 11672114
+                    },"after_block":[{
+                        "after_block":240,
+                        "balance": "5.0000 PXBTS",
+                        "net_weight": "400.0000 BEOS",
+                        "cpu_weight": "400.0000 BEOS",
+                        "ram_bytes" : 5005448
+                    },{
+                        "after_block":250,
+                        "balance": "10.0000 PXBTS",
+                        "net_weight": "666.6666 BEOS",
+                        "cpu_weight": "666.6667 BEOS",
+                        "ram_bytes" : 11672114
+                    },{
+                        "after_block":260,
+                        "balance": "15.0000 PXBTS",
+                        "net_weight": "906.6666 BEOS",
+                        "cpu_weight": "906.6667 BEOS",
+                        "ram_bytes" : 11672114
+                    },{
+                        "after_block":270,
+                        "balance": "20.0000 PXBTS",
+                        "net_weight": "1135.2380 BEOS",
+                        "cpu_weight": "1135.2382 BEOS",
+                        "ram_bytes" : 11672114
+                    },{
+                        "after_block":280,
+                        "balance": "20.0000 PXBTS",
+                        "net_weight": "1363.8094 BEOS",
+                        "cpu_weight": "1363.8097 BEOS",
+                        "ram_bytes" : 11672114
+                    }]
+                },{
+                    "user":"${user_4}",
+                    "at_end": {
+                        "balance": "15.0000 PXBTS",
+                        "net_weight": "636.1903 BEOS",
+                        "cpu_weight": "636.1906 BEOS",
+                        "ram_bytes" : 3338782
+                    },"after_block":[{
+                        "after_block":240,
+                        "balance": "",
+                        "net_weight": "0.0000 BEOS",
+                        "cpu_weight": "0.0000 BEOS",
+                        "ram_bytes" : 5448
+                    },{
+                        "after_block":250,
+                        "balance": "5.0000 PXBTS",
+                        "net_weight": "133.3333 BEOS",
+                        "cpu_weight": "133.3334 BEOS",
+                        "ram_bytes" : 3338782
+                    },{
+                        "after_block":260,
+                        "balance": "10.0000 PXBTS",
+                        "net_weight": "293.3333 BEOS",
+                        "cpu_weight": "293.3334 BEOS",
+                        "ram_bytes" : 3338782
+                    },{
+                        "after_block":270,
+                        "balance": "15.0000 PXBTS",
+                        "net_weight": "464.7618 BEOS",
+                        "cpu_weight": "464.7620 BEOS",
+                        "ram_bytes" : 3338782
+                    },{
+                        "after_block":280,
+                        "balance": "15.0000 PXBTS",
+                        "net_weight": "636.1903 BEOS",
+                        "cpu_weight": "636.1906 BEOS",
+                        "ram_bytes" : 3338782
+                    }]
+                }
+            ]
+        },{
+            "name": "Basic issue test 4 [issue before distr and ends before it].",
+            "scenario_blocks": 350,
+            "params":{
+                "authorized_by":"beos.init",
+                "code":"beos.init",
+                "action":"changeparams",
+                "args":{
+                    "new_params":["0.0000 PXBTS", 410, [ 1000,1001,10,8000000 ],[ 1000, 1001, 4,5000000 ], [ 1000, 1001, 10, 200000 ]]
+                }
+            },
+            "actions": [
+                {
+                    "start_block":310,
+                    "action":"newaccount_pattern",
+                    "name":"${user_5}",
+                    "owner_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
+                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
+                    "bytes":10000
+                },{
+                    "start_block":310,
+                    "action":"newaccount_pattern",
+                    "name":"${user_6}",
+                    "owner_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
+                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
+                    "bytes":10000
+                },{
+                    "start_block": 320,
+                    "authorized_by":"${user_3}",
+                    "code": "beos.gateway",
+                    "action": "withdraw",
+                    "args": {
+                        "owner": "${user_3}",
+                        "quantity": "20.0000 PXBTS"
+                    }
+                },{
+                    "start_block": 320,
+                    "authorized_by":"${user_4}",
+                    "code": "beos.gateway",
+                    "action": "withdraw",
+                    "args": {
+                        "owner": "${user_4}",
+                        "quantity": "15.0000 PXBTS"
+                    }
+                },{
+                    "start_block": 330,
+                    "authorized_by":"beos.gateway",
+                    "code": "beos.gateway",
+                    "action": "issue",
+                    "args": {
+                        "from": "beos.gateway",
+                        "to": "${user_5}",
+                        "quantity": "20.0000 PXBTS"
+                    }
+                },{
+                    "start_block": 330,
+                    "authorized_by":"beos.gateway",
+                    "code": "beos.gateway",
+                    "action": "issue",
+                    "args": {
+                        "from": "beos.gateway",
+                        "to": "${user_6}",
+                        "quantity": "20.0000 PXBTS"
+                    }
+                }
+            ],
+            "expected_results": [
+                {
+                    "user":"${user_5}",
+                    "at_end": {
+                        "balance": "20.0000 PXBTS",
+                        "net_weight": "0.0000 BEOS",
+                        "cpu_weight": "0.0000 BEOS",
+                        "ram_bytes" : 5448
+                    },"after_block":[]
+                },{
+                    "user":"${user_6}",
+                    "at_end": {
+                        "balance": "20.0000 PXBTS",
+                        "net_weight": "0.0000 BEOS",
+                        "cpu_weight": "0.0000 BEOS",
+                        "ram_bytes" : 5448
+                    },"after_block":[]
+                }
+            ]
+        },{
+            "name": "Basic issue test 5 [issue after distribution period].",
+            "scenario_blocks": 400,
+            "params":{
+                "authorized_by":"beos.init",
+                "code":"beos.init",
+                "action":"changeparams",
+                "args":{
+                    "new_params":["0.0000 PXBTS", 420, [ 50,51,10,8000000 ],[ 50, 51, 4,5000000 ], [ 50, 51, 10, 200000 ]]
+                }
+            },
+            "actions": [
+                {
+                    "start_block":360,
+                    "action":"newaccount_pattern",
+                    "name":"${user_7}",
+                    "owner_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
+                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
+                    "bytes":10000
+                },{
+                    "start_block":360,
+                    "action":"newaccount_pattern",
+                    "name":"${user_8}",
+                    "owner_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
+                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
+                    "bytes":10000
+                },{
+                    "start_block": 370,
+                    "authorized_by":"${user_5}",
+                    "code": "beos.gateway",
+                    "action": "withdraw",
+                    "args": {
+                        "owner": "${user_5}",
+                        "quantity": "20.0000 PXBTS"
+                    },
+                    "expected_result":false
+                },{
+                    "start_block": 370,
+                    "authorized_by":"${user_6}",
+                    "code": "beos.gateway",
+                    "action": "withdraw",
+                    "args": {
+                        "owner": "${user_6}",
+                        "quantity": "20.0000 PXBTS"
+                    }, 
+                    "expected_result":false
+                },{
+                    "start_block": 380,
+                    "authorized_by":"beos.gateway",
+                    "code": "beos.gateway",
+                    "action": "issue",
+                    "args": {
+                        "from": "beos.gateway",
+                        "to": "${user_7}",
+                        "quantity": "20.0000 PXBTS"
+                    }
+                },{
+                    "start_block": 380,
+                    "authorized_by":"beos.gateway",
+                    "code": "beos.gateway",
+                    "action": "issue",
+                    "args": {
+                        "from": "beos.gateway",
+                        "to": "${user_8}",
+                        "quantity": "20.0000 PXBTS"
+                    }
+                }
+            ],
+            "expected_results": [
+                {
+                    "user":"${user_7}",
+                    "at_end": {
+                        "balance": "20.0000 PXBTS",
+                        "net_weight": "0.0000 BEOS",
+                        "cpu_weight": "0.0000 BEOS",
+                        "ram_bytes" : 5448
+                    },"after_block":[]
+                },{
+                    "user":"${user_8}",
+                    "at_end": {
+                        "balance": "20.0000 PXBTS",
+                        "net_weight": "0.0000 BEOS",
+                        "cpu_weight": "0.0000 BEOS",
+                        "ram_bytes" : 5448
+                    },"after_block":[]
+                }
+            ]
+        }
+    ]
+}
