@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
 
-def usage():
-    print("Wait for process PID to close")
-    print("wait.py pid")
-
 if __name__ == "__main__":
     import os
     import sys
@@ -28,6 +24,3 @@ if __name__ == "__main__":
         except Exception as ex:
             print("Error running script: {0}".format(ex))
             sys.exit(1)
-    else:
-        usage()
-        sys.exit(1)
