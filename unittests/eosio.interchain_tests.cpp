@@ -722,6 +722,33 @@ BOOST_FIXTURE_TEST_CASE( undelegate_block_test, eosio_init_tester ) try {
 
 } FC_LOG_AND_RETHROW()
 
+BOOST_FIXTURE_TEST_CASE( trustee_reward_test, eosio_init_tester ) try {
+
+  test_global_state tgs;
+
+  tgs.beos.starting_block_for_distribution = 100;
+  tgs.beos.ending_block_for_distribution = 110;
+  tgs.beos.distribution_payment_block_interval_for_distribution = 8;
+  tgs.beos.amount_of_reward = 200000;
+  tgs.trustee.amount_of_reward = 100000;
+
+  BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
+
+  CHECK_STATS(beos.trustee, "0.0000 PROXY", "0.0000 BEOS", "");
+
+  produce_blocks( 100 - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 100u );
+
+  CHECK_STATS(beos.trustee, "0.0000 PROXY", "10.0000 BEOS", "");
+
+  issue( N(beos.trustee), asset::from_string("10.0000 PROXY") );
+
+  produce_blocks( 110 - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 110u );
+
+  CHECK_STATS(beos.trustee, "10.0000 PROXY", "40.0000 BEOS", "");
+
+} FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()
 
