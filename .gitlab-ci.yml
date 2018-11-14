@@ -19,15 +19,15 @@ build:
    - ./deploy.py --build-beos
    - cat beos_deploy_main.log
    - echo "Stopping old keosd instance"
-   - sudo kill $(sudo lsof -t -i:8900) || true
+   - sudo kill -2 $(sudo lsof -t -i:8900) || true
    - echo "Stopping old nodeos instance"
-   - sudo kill $(sudo lsof -t -i:8888) || true
+   - sudo kill -2 $(sudo lsof -t -i:8888) || true
    - ./deploy.py --initialize-beos
    - cat beos_deploy_main.log
    - echo "Stopping old keosd instance"
-   - sudo kill $(sudo lsof -t -i:8900) || true
+   - sudo kill -2 $(sudo lsof -t -i:8900) || true
    - echo "Stopping old nodeos instance"
-   - sudo kill $(sudo lsof -t -i:8888) || true
+   - sudo kill -2 $(sudo lsof -t -i:8888) || true
    - cd ../build/beos-autobuild/
    - echo "Starting keosd and nodeos"
    - python3 ./run.py
