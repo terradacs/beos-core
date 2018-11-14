@@ -16,7 +16,7 @@ build:
    - pip3 install distro
    - cd cd-scripts
    - cp config-ci.py config.py
-   - ./deploy.py --build-beos
+   - sudo ./deploy.py --build-beos
    - cat beos_deploy_main.log
    - echo "Stopping old keosd instance"
    - sudo kill -2 $(sudo lsof -t -i:8900)
@@ -24,7 +24,7 @@ build:
    - echo "Stopping old nodeos instance"
    - sudo kill -2 $(sudo lsof -t -i:8888)
    - sudo python3 ./wait.py $(sudo lsof -t -i:8888)
-   - ./deploy.py --initialize-beos
+   - sudo ./deploy.py --initialize-beos
    - cat beos_deploy_main.log
    - cd ../build/beos-autobuild/
    - echo "Starting keosd and nodeos"
