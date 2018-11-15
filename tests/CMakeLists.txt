@@ -51,6 +51,7 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURC
 
 
 add_test(NAME test03_scenarios_deploy COMMAND test03_scenarios_deploy.py --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --public-key ${EOSIO_ROOT_KEY}
+--add-block-number
 --restore-node-params
 --starting-block-for-initial-witness_election ${STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION}
 --starting-block-for-beos_distribution ${STARTING_BLOCK_FOR_BEOS_DISTRIBUTION}
