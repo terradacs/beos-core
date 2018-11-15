@@ -240,3 +240,40 @@ class TestScenarios(object):
         for key, value in self.after_block.items():
             self.after_block[key] = sorted(value, key=lambda k:k['after_block'])
 
+
+    def restore_node_params(self,
+                _starting_block_for_initial_witness_election,
+                _starting_block_for_beos_distribution,
+                _ending_block_for_beos_distribution,
+                _distribution_payment_block_interval_for_beos_distribution,
+                _amount_of_reward_beos,
+                _starting_block_for_ram_distribution,
+                _ending_block_for_ram_distribution,
+                _distribution_payment_block_interval_for_ram_distribution,
+                _amount_of_reward_ram,
+                _starting_block_for_trustee_distribution,
+                _ending_block_for_trustee_distribution,
+                _distribution_payment_block_interval_for_trustee_distribution,
+                _amount_of_reward_trustee):
+        params={
+                "authorized_by":"beos.init",
+                "code":"beos.init",
+                "action":"changeparams",
+                "args":{
+                    "new_params":["0.0000 PXBTS", _starting_block_for_initial_witness_election,
+                                                     [ _starting_block_for_beos_distribution,
+                                                       _ending_block_for_beos_distribution,
+                                                       _distribution_payment_block_interval_for_beos_distribution,
+                                                       _amount_of_reward_beos ]
+                                                    ,[ _starting_block_for_ram_distribution,
+                                                       _ending_block_for_ram_distribution,
+                                                       _distribution_payment_block_interval_for_ram_distribution,
+                                                       _amount_of_reward_ram ],
+                                                    [ _starting_block_for_trustee_distribution,
+                                                      _ending_block_for_trustee_distribution,
+                                                      _distribution_payment_block_interval_for_trustee_distribution,
+                                                      _amount_of_reward_trustee ]
+                                                    ]
+                }
+            }
+        self.eos_rpc.prepare_and_push_transaction(params)
