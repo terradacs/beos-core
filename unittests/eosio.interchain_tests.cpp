@@ -38,6 +38,8 @@ struct actions: public tester
   abi_serializer beos_distrib_abi_ser;
   abi_serializer system_abi_ser;
 
+  actions(uint64_t state_size = 1024*1024*8) : tester(true, db_read_mode::SPECULATIVE, state_size) {}
+
   action_result push_actions( std::vector<action>&& acts, uint64_t authorizer )
   {
     signed_transaction trx;
@@ -190,7 +192,8 @@ class eosio_interchain_tester : public actions
 
   public:
 
-  eosio_interchain_tester()
+  eosio_interchain_tester(uint64_t state_size = 1024*1024*8)
+    : actions(state_size)
   {
     produce_blocks( 2 );
 
@@ -296,10 +299,8 @@ class eosio_init_tester: public eosio_interchain_tester
 {
   public:
  
-  eosio_init_tester()
-  {
-
-  } 
+  eosio_init_tester(uint64_t state_size = 1024*1024*8)
+    : eosio_interchain_tester(state_size) {}
 
   fc::variant get_producer_info( const account_name& act )
   {
@@ -410,7 +411,166 @@ class eosio_init_tester: public eosio_interchain_tester
   amount_of_reward_ram										                    500 * 10000
 */
 
-#define CHECK_STATS(_accName, _expectedBalance, _expectedStakedBalance, _expectedStakedRam)   \
+class eosio_init_bigstate_tester : public eosio_init_tester
+{
+public:
+  using account_names_t = vector<account_name>;
+
+public:
+  eosio_init_bigstate_tester() : eosio_init_tester(state_size) {}
+
+  account_names_t generate_account_list( size_t no_of_accounts = eosio_init_bigstate_tester::no_of_accounts )
+  {
+    if (no_of_accounts == 0)
+      return account_names_t();
+
+    const char chars[] = "12345abcdefghijklmnopqrstuvwxyz";
+    const size_t no_of_chars = sizeof(chars) - 1;
+    account_names_t names;
+    names.reserve( no_of_accounts );
+
+    auto generate_part = [&] (const std::string& prefix) -> bool
+      {
+      for (size_t i = 0; i < no_of_chars && no_of_accounts != 0; ++i, --no_of_accounts)
+        names.emplace_back( prefix + chars[i] );
+
+      return no_of_accounts != 0;
+      };
+
+    auto generate_range = [&] (size_t begin, size_t end) -> bool
+      {
+      for (; begin < end; ++begin)
+        {
+        if (generate_part( names[begin].to_string() ) == false)
+          return false;
+        }
+
+      return true;
+      };
+
+    names.emplace_back("1");
+
+    if (--no_of_accounts == 0)
+      return std::move(names);
+
+    size_t begin = 0;
+    size_t end = names.size();
+
+    while (generate_range( begin, end ))
+      {
+      begin = end;
+      end = names.size();
+      }
+
+    /*FILE* file = fopen("accounts", "w");
+    for (auto& name : names)
+      fprintf(file, "%s\n", name.to_string().c_str());
+    fclose(file);*/
+
+    return std::move(names);
+  }
+
+  account_names_t create_accounts_with_resources( account_name creator, size_t no_of_accounts = eosio_init_bigstate_tester::no_of_accounts,
+    int64_t bytes = DEFAULT_RAM )
+  {
+    account_names_t names( generate_account_list( no_of_accounts ) );
+    size_t i = 0;
+
+    while ( i < no_of_accounts )
+    {
+      size_t no_of_actions = std::min(actions_per_trx, no_of_accounts - i);
+      signed_transaction trx;
+      trx.actions.reserve(no_of_actions);
+
+      set_transaction_headers(trx);
+
+      for (size_t j = 0; j < no_of_actions; ++j, ++i)
+      {
+        account_name name = names[i];
+
+        trx.actions.emplace_back( vector<permission_level>{{creator,config::active_name}},
+                                  newaccount{
+                                      .creator  = creator,
+                                      .name     = name,
+                                      .init_ram = true,
+                                      .owner    = authority( get_public_key( name, "owner" ) ),
+                                      .active   = authority( get_public_key( name, "active" ) )
+                                  });
+      }
+
+      set_transaction_headers(trx);
+      trx.sign( get_private_key( creator, "active" ), control->get_chain_id() );
+
+      try
+      {
+         push_transaction(trx);
+      }
+      catch (const fc::exception& ex)
+      {
+         edump((ex.to_detail_string()));
+         return account_names_t();
+      }
+
+      produce_block();
+      BOOST_REQUIRE_EQUAL(true, chain_has_transaction(trx.id()));
+    }
+
+    return std::move(names);
+  }
+
+  void issue_for_accounts( const account_names_t& accounts, const asset& quantity )
+  {
+    size_t i = 0;
+
+    while ( i < accounts.size() )
+    {
+      size_t no_of_actions = std::min(actions_per_trx, accounts.size() - i);
+      signed_transaction trx;
+      trx.actions.reserve(no_of_actions);
+
+      set_transaction_headers(trx);
+
+      for (size_t j = 0; j < no_of_actions; ++j, ++i)
+      {
+        account_name name = accounts[i];
+        action act = create_issue_action( name, quantity );
+        act.authorization = vector<permission_level>{{config::gateway_account_name, config::active_name}};
+        trx.actions.emplace_back(std::move(act));
+      }
+
+      set_transaction_headers(trx);
+      trx.sign(get_private_key(config::gateway_account_name, "active"), control->get_chain_id());
+
+      try
+      {
+        push_transaction(trx);
+      }
+      catch (const fc::exception& ex)
+      {
+        edump((ex.to_detail_string()));
+        return;
+      }
+
+      produce_block();
+      BOOST_REQUIRE_EQUAL(true, chain_has_transaction(trx.id()));
+    }
+  }
+
+protected:
+  test_global_state     tgs;
+  uint32_t              reward_period = 0;
+
+protected:
+  static uint64_t       state_size; //< could be changed before run particular test case
+  static size_t         no_of_accounts; //< could be changed before run particular test case
+  static const size_t   actions_per_trx;
+};
+
+uint64_t eosio_init_bigstate_tester::state_size = 1 * 1024 * 1024 * 1024ll;
+size_t eosio_init_bigstate_tester::no_of_accounts = 50'000; //< it passed succesfuly for 100k accounts and 1G state
+const size_t eosio_init_bigstate_tester::actions_per_trx = 2000;
+
+#define CHECK_STATS_(_accName, _expectedBalance, _expectedStakedBalance, _expectedStakedRam)  \
 {                                                                                             \
     std::string _expectedStakedRam2 = _expectedStakedRam;                                     \
     if( _expectedStakedRam2.size() )                                                          \
@@ -418,7 +578,7 @@ class eosio_init_tester: public eosio_interchain_tester
       auto val = std::stol( _expectedStakedRam2 );                                            \
       _expectedStakedRam2 = std::to_string( DEFAULT_RAM + val );                              \
     }                                                                                         \
-    auto stats = check_data( N(_accName) );                                                   \
+    auto stats = check_data( _accName );                                                      \
     const bool expected_balance_empty = strlen(_expectedBalance) == 0;                        \
     const bool expected_staked_balance_empty = strlen(_expectedStakedBalance) == 0;           \
     const bool expected_staked_ram_empty = _expectedStakedRam2.size() == 0 ;                  \
@@ -431,7 +591,18 @@ class eosio_init_tester: public eosio_interchain_tester
     if(!expected_staked_ram_empty) {                                                          \
       BOOST_REQUIRE_EQUAL( stats["staked_ram"].as_string(), ( _expectedStakedRam2 ) );        \
     }                                                                                         \
-};  
+};
+
+#define CHECK_STATS(_accName, _expectedBalance, _expectedStakedBalance, _expectedStakedRam)   \
+  CHECK_STATS_(N(_accName), _expectedBalance, _expectedStakedBalance, _expectedStakedRam)
+
+inline uint64_t check_asset_value(uint64_t value)
+  {
+  BOOST_REQUIRE_EQUAL( value, (value / 10000) * 10000);
+  return value / 10000;
+  }
+
+#define ASSET_STRING(INTEGER, SYMBOL) std::string(std::to_string(check_asset_value(INTEGER)) + ".0000 " + #SYMBOL).c_str()
 
 BOOST_AUTO_TEST_SUITE(eosio_init_tests)
 
@@ -747,6 +918,169 @@ BOOST_FIXTURE_TEST_CASE( trustee_reward_test, eosio_init_tester ) try {
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 110u );
 
   CHECK_STATS(beos.trustee, "10.0000 PROXY", "40.0000 BEOS", "");
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(eosio_reward_tests)
+
+BOOST_FIXTURE_TEST_CASE( many_accounts_test1, eosio_init_bigstate_tester ) try {
+  /*
+      Reward periods for stake and ram are different. No proxies for accounts.
+  */
+
+  reward_period = 20;
+
+  tgs.beos.starting_block_for_distribution = 180;
+  tgs.beos.ending_block_for_distribution = tgs.beos.starting_block_for_distribution + reward_period - 1;
+  tgs.beos.distribution_payment_block_interval_for_distribution = 1;
+  tgs.beos.amount_of_reward = 10000;
+
+  tgs.ram.starting_block_for_distribution = 280;
+  tgs.ram.ending_block_for_distribution = tgs.ram.starting_block_for_distribution + reward_period - 1;
+  tgs.ram.distribution_payment_block_interval_for_distribution = 1;
+  tgs.ram.amount_of_reward = 1000;
+
+  tgs.trustee.amount_of_reward = 10000;
+
+  BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
+
+  create_accounts_with_resources( config::system_account_name, no_of_accounts );
+
+  BOOST_CHECK( control->head_block_num() < tgs.beos.starting_block_for_distribution );
+
+  produce_blocks( tgs.beos.ending_block_for_distribution - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), tgs.beos.ending_block_for_distribution );
+
+  produce_blocks( tgs.ram.ending_block_for_distribution - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), tgs.ram.ending_block_for_distribution );
+
+  CHECK_STATS(beos.trustee, "0.0000 PROXY", ASSET_STRING(reward_period * tgs.trustee.amount_of_reward, BEOS), "");
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( many_accounts_test2, eosio_init_bigstate_tester ) try {
+  /*
+      Reward periods for stake and ram are the same. No proxies for accounts.
+  */
+
+  reward_period = 20;
+
+  tgs.beos.starting_block_for_distribution = 180;
+  tgs.beos.ending_block_for_distribution = tgs.beos.starting_block_for_distribution + reward_period - 1;
+  tgs.beos.distribution_payment_block_interval_for_distribution = 1;
+  tgs.beos.amount_of_reward = 10000;
+
+  tgs.ram.starting_block_for_distribution = tgs.beos.starting_block_for_distribution;
+  tgs.ram.ending_block_for_distribution = tgs.beos.ending_block_for_distribution;
+  tgs.ram.distribution_payment_block_interval_for_distribution = tgs.beos.distribution_payment_block_interval_for_distribution;
+  tgs.ram.amount_of_reward = 1000;
+
+  tgs.trustee.amount_of_reward = 10000;
+
+  BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
+
+  create_accounts_with_resources( config::system_account_name, no_of_accounts );
+
+  BOOST_CHECK( control->head_block_num() < tgs.beos.starting_block_for_distribution );
+
+  produce_blocks( tgs.beos.ending_block_for_distribution - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), tgs.beos.ending_block_for_distribution );
+
+  CHECK_STATS(beos.trustee, "0.0000 PROXY", ASSET_STRING(reward_period * tgs.trustee.amount_of_reward, BEOS), "");
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( many_accounts_test3, eosio_init_bigstate_tester ) try {
+  /*
+      Reward periods for stake and ram are different. Proxies for accounts.
+  */
+
+  reward_period = 20;
+
+  tgs.beos.starting_block_for_distribution = 180 + no_of_accounts;
+  tgs.beos.ending_block_for_distribution = tgs.beos.starting_block_for_distribution + reward_period - 1;
+  tgs.beos.distribution_payment_block_interval_for_distribution = 1;
+  tgs.beos.amount_of_reward = 10000 * no_of_accounts;
+
+  tgs.ram.starting_block_for_distribution = 280 + no_of_accounts;
+  tgs.ram.ending_block_for_distribution = tgs.ram.starting_block_for_distribution + reward_period - 1;
+  tgs.ram.distribution_payment_block_interval_for_distribution = 1;
+  tgs.ram.amount_of_reward = 1000 * no_of_accounts;
+
+  tgs.trustee.amount_of_reward = 10000;
+
+  BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
+
+  const uint64_t stake_reward_per_account = reward_period * tgs.beos.amount_of_reward / no_of_accounts;
+  const uint64_t ram_reward_per_account = reward_period * tgs.ram.amount_of_reward / no_of_accounts;
+
+  account_names_t accounts( create_accounts_with_resources( config::system_account_name, no_of_accounts ) );
+
+  issue_for_accounts( accounts, asset::from_string("1.0000 PROXY") );
+
+  for (auto& account : accounts)
+    CHECK_STATS_(account, "1.0000 PROXY", "0.0000 BEOS", "");
+
+  BOOST_CHECK( control->head_block_num() < tgs.beos.starting_block_for_distribution );
+
+  produce_blocks( tgs.beos.ending_block_for_distribution - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), tgs.beos.ending_block_for_distribution );
+
+  for (auto& account : accounts)
+    CHECK_STATS_(account, "1.0000 PROXY", ASSET_STRING(stake_reward_per_account, BEOS), "");
+
+  produce_blocks( tgs.ram.ending_block_for_distribution - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), tgs.ram.ending_block_for_distribution );
+
+  CHECK_STATS(beos.trustee, "0.0000 PROXY", ASSET_STRING(reward_period * tgs.trustee.amount_of_reward, BEOS), "");
+
+  for (auto& account : accounts)
+    CHECK_STATS_(account, "1.0000 PROXY", ASSET_STRING(stake_reward_per_account, BEOS), std::to_string(ram_reward_per_account).c_str());
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( many_accounts_test4, eosio_init_bigstate_tester ) try {
+  /*
+      Reward periods for stake and ram are the same. Proxies for accounts.
+  */
+
+  reward_period = 20;
+
+  tgs.beos.starting_block_for_distribution = 180 + no_of_accounts;
+  tgs.beos.ending_block_for_distribution = tgs.beos.starting_block_for_distribution + reward_period - 1;
+  tgs.beos.distribution_payment_block_interval_for_distribution = 1;
+  tgs.beos.amount_of_reward = 10000 * no_of_accounts;
+
+  tgs.ram.starting_block_for_distribution = tgs.beos.starting_block_for_distribution;
+  tgs.ram.ending_block_for_distribution = tgs.beos.ending_block_for_distribution;
+  tgs.ram.distribution_payment_block_interval_for_distribution = 1;
+  tgs.ram.amount_of_reward = 1000 * no_of_accounts;
+
+  tgs.trustee.amount_of_reward = 10000;
+
+  BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
+
+  const uint64_t stake_reward_per_account = reward_period * tgs.beos.amount_of_reward / no_of_accounts;
+  const uint64_t ram_reward_per_account = reward_period * tgs.ram.amount_of_reward / no_of_accounts;
+
+  account_names_t accounts( create_accounts_with_resources( config::system_account_name, no_of_accounts ) );
+
+  issue_for_accounts( accounts, asset::from_string("1.0000 PROXY") );
+
+  for (auto& account : accounts)
+    CHECK_STATS_(account, "1.0000 PROXY", "0.0000 BEOS", "");
+
+  BOOST_CHECK( control->head_block_num() < tgs.beos.starting_block_for_distribution );
+
+  produce_blocks( tgs.beos.ending_block_for_distribution - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), tgs.beos.ending_block_for_distribution );
+
+  for (auto& account : accounts)
+    CHECK_STATS_(account, "1.0000 PROXY", ASSET_STRING(stake_reward_per_account, BEOS), std::to_string(ram_reward_per_account).c_str());
+
+  CHECK_STATS(beos.trustee, "0.0000 PROXY", ASSET_STRING(reward_period * tgs.trustee.amount_of_reward, BEOS), "");
 
 } FC_LOG_AND_RETHROW()
 

@@ -82,7 +82,7 @@ namespace eosio { namespace testing {
 
          virtual ~base_tester() {};
 
-         void              init(bool push_genesis = true, db_read_mode read_mode = db_read_mode::SPECULATIVE);
+         void              init(bool push_genesis = true, db_read_mode read_mode = db_read_mode::SPECULATIVE, uint64_t state_size = 1024*1024*8);
          void              init(controller::config config, const snapshot_reader_ptr& snapshot = nullptr);
 
          void              close();
@@ -294,8 +294,8 @@ namespace eosio { namespace testing {
 
    class tester : public base_tester {
    public:
-      tester(bool push_genesis = true, db_read_mode read_mode = db_read_mode::SPECULATIVE ) {
-         init(push_genesis, read_mode);
+      tester(bool push_genesis = true, db_read_mode read_mode = db_read_mode::SPECULATIVE, uint64_t state_size = 1024*1024*8) {
+         init(push_genesis, read_mode, state_size);
       }
 
       tester(controller::config config) {
