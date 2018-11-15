@@ -1294,14 +1294,14 @@ class Cluster(object):
 
     def killall(self, silent=True, allInstances=False):
         """Kill cluster nodeos instances. allInstances will kill all nodeos instances running on the system."""
-        cmd="%s -k 9" % (Utils.EosLauncherPath)
+        cmd="%s -k 2" % (Utils.EosLauncherPath)
         if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
         if 0 != subprocess.call(cmd.split(), stdout=Utils.FNull):
             if not silent: Utils.Print("Launcher failed to shut down eos cluster.")
 
         if allInstances:
             # ocassionally the launcher cannot kill the eos server
-            cmd="pkill -9 %s" % (Utils.EosServerName)
+            cmd="pkill -2 %s" % (Utils.EosServerName)
             if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
             if 0 != subprocess.call(cmd.split(), stdout=Utils.FNull):
                 if not silent: Utils.Print("Failed to shut down eos cluster.")
