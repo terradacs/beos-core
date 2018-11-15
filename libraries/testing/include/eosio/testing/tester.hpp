@@ -156,7 +156,8 @@ namespace eosio { namespace testing {
          transaction_trace_ptr create_account( account_name name,
                                                account_name creator = config::system_account_name,
                                                bool multisig = false,
-                                               bool include_code = true
+                                               bool include_code = true,
+                                               int32_t buy_ram = 0
                                              );
 
          transaction_trace_ptr push_reqauth( account_name from, const vector<permission_level>& auths, const vector<private_key_type>& keys );
@@ -206,6 +207,8 @@ namespace eosio { namespace testing {
          asset                         get_currency_balance( const account_name& contract,
                                                              const symbol&       asset_symbol,
                                                              const account_name& account ) const;
+         //returns ram_bytes/net_weight/cpu_weight triple
+         fc::variant                   get_staked_balance( const account_name& account ) const;
 
          vector<char> get_row_by_account( uint64_t code, uint64_t scope, uint64_t table, const account_name& act ) const;
 
