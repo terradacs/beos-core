@@ -17,8 +17,7 @@
                     "action":"newaccount_pattern",
                     "name":"${user_1}",
                     "owner_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
-                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
-                    "bytes":10000
+                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3"
                 },{
                     "start_block": 35,
                     "authorized_by":"beos.gateway",
@@ -84,8 +83,7 @@
                     "action":"newaccount_pattern",
                     "name":"${user_2}",
                     "owner_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
-                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
-                    "bytes":10000
+                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3"
                 },{
                     "start_block": 110,
                     "authorized_by":"${user_1}",
@@ -194,15 +192,13 @@
                     "action":"newaccount_pattern",
                     "name":"${user_3}",
                     "owner_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
-                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
-                    "bytes":10000
+                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3"
                 },{
                     "start_block":210,
                     "action":"newaccount_pattern",
                     "name":"${user_4}",
                     "owner_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
-                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
-                    "bytes":10000
+                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3"
                 },{
                     "start_block": 210,
                     "authorized_by":"${user_2}",
@@ -380,15 +376,13 @@
                     "action":"newaccount_pattern",
                     "name":"${user_5}",
                     "owner_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
-                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
-                    "bytes":10000
+                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3"
                 },{
                     "start_block":310,
                     "action":"newaccount_pattern",
                     "name":"${user_6}",
                     "owner_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
-                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
-                    "bytes":10000
+                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3"
                 },{
                     "start_block": 320,
                     "authorized_by":"${user_3}",
@@ -465,15 +459,13 @@
                     "action":"newaccount_pattern",
                     "name":"${user_7}",
                     "owner_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
-                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
-                    "bytes":10000
+                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3"
                 },{
                     "start_block":360,
                     "action":"newaccount_pattern",
                     "name":"${user_8}",
                     "owner_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
-                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3",
-                    "bytes":10000
+                    "activ_pub":"EOS6AAWx6uvqu5LMBt8vCNYXcxjrGmd3WvffxkBM4Uozs4e1dgBF3"
                 },{
                     "start_block": 370,
                     "authorized_by":"${user_5}",
