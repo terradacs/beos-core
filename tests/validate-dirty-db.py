@@ -101,9 +101,11 @@ try:
 
     if debug: Print("Setting test result to success.")
     testSuccessful=True
+    cluster.cleanup()
 finally:
     if debug: Print("Cleanup in finally block.")
     TestHelper.shutdown(cluster, None, testSuccessful, killEosInstances, False, keepLogs, killAll, dumpErrorDetails)
+    cluster.cleanup()
 
 if debug: Print("Exiting test, exit value 0.")
 exit(0)
