@@ -31,6 +31,9 @@ build:
    - make test
    - echo "Cancel previous instance of keosd and nodeos"
    - sudo python3 ./run.py --cancel
+   - echo "Removing old .pid files"
+   - sudo rm -rf ./run_keosd.pid
+   - sudo rm -rf ./run_nodeos.pid
    - echo "Starting keosd and nodeos"
    - sudo python3 ./run.py
    - echo "Started keosd instance:"
