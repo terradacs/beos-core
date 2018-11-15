@@ -86,7 +86,6 @@ class EOSRPCExecutor():
         name      = _newaccount["name"]
         owner_key = _newaccount["owner_pub"]
         activ_key = _newaccount["activ_pub"]
-        bytes_num = _newaccount["bytes"]
         cmd = [{
         "code":"eosio",
         "action":"newaccount",

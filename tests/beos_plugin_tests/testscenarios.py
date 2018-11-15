@@ -165,12 +165,23 @@ class TestScenarios(object):
 
     def wait_for_end(self):
         scenario_block = self.scenarios[self.scenariosNr]["scenario_blocks"]
-        while scenario_block >= self.blockNumber:
+        while scenario_block >= (self.blockNumber - self.join_block_number):
             time.sleep(0.5)
 
 
     def set_scenario_params(self):
         params = self.scenarios[self.scenariosNr]["params"]
+        if self.join_block_number:
+            new_params   = params["args"]["new_params"]
+            distribution = new_params[2]
+            distribution[0] = distribution[0]+self.join_block_number
+            distribution[1] = distribution[1]+self.join_block_number
+            ram          = new_params[3]
+            ram[0] = ram[0]+self.join_block_number
+            ram[1] = ram[1]+self.join_block_number
+            trustee      = new_params[4]
+            trustee[0] = trustee[0]+self.join_block_number
+            trustee[1] = trustee[1]+self.join_block_number
         self.eos_rpc.prepare_and_push_transaction(params)
 
 
@@ -189,10 +200,10 @@ class TestScenarios(object):
             while self.askForBlockNumber.is_set():
                 if self.after_block:
                     for user, after_blocks in self.after_block.items():
-                        if after_blocks and self.blockNumber > (after_blocks[0]["after_block"]  ):
+                        if after_blocks and (self.blockNumber - self.join_block_number) > (after_blocks[0]["after_block"]  ):
                             after_block = (after_blocks[0]["after_block"]  )
                             after_blocks.pop(0)
-                            if self.blockNumber >= (self.scenarios[self.scenariosNr]["scenario_blocks"]  ):
+                            if (self.blockNumber - self.join_block_number) >= (self.scenarios[self.scenariosNr]["scenario_blocks"]  ):
                                 return
                             balance = self.eos_rpc.get_currency_balance(user, _symbol)
                             account_after_block = self.eos_rpc.get_account(user)
@@ -216,11 +227,11 @@ class TestScenarios(object):
                     startBlock = (action[0].pop("start_block")  )
                 else:
                     startBlock = (action.pop("start_block")  )
-                while startBlock and (startBlock + self.join_block_number) >= self.blockNumber:
-                    if self.blockNumber >= (self.scenarios[self.scenariosNr]["scenario_blocks"] + self.join_block_number):
+                while startBlock and startBlock >= (self.blockNumber - self.join_block_number):
+                    if (self.blockNumber - self.join_block_number) >= (self.scenarios[self.scenariosNr]["scenario_blocks"] ):
                         return
                     time.sleep(0.1)
-                if self.blockNumber >= (self.scenarios[self.scenariosNr]["scenario_blocks"] + self.join_block_number):
+                if (self.blockNumber - self.join_block_number) >= (self.scenarios[self.scenariosNr]["scenario_blocks"]):
                     return
 
                 self.eos_rpc.push_action(action)
@@ -240,3 +251,40 @@ class TestScenarios(object):
         for key, value in self.after_block.items():
             self.after_block[key] = sorted(value, key=lambda k:k['after_block'])
 
+
+    def restore_node_params(self,
+                _starting_block_for_initial_witness_election,
+                _starting_block_for_beos_distribution,
+                _ending_block_for_beos_distribution,
+                _distribution_payment_block_interval_for_beos_distribution,
+                _amount_of_reward_beos,
+                _starting_block_for_ram_distribution,
+                _ending_block_for_ram_distribution,
+                _distribution_payment_block_interval_for_ram_distribution,
+                _amount_of_reward_ram,
+                _starting_block_for_trustee_distribution,
+                _ending_block_for_trustee_distribution,
+                _distribution_payment_block_interval_for_trustee_distribution,
+                _amount_of_reward_trustee):
+        params={
+                "authorized_by":"beos.init",
+                "code":"beos.init",
+                "action":"changeparams",
+                "args":{
+                    "new_params":["0.0000 PXBTS", _starting_block_for_initial_witness_election,
+                                                     [ _starting_block_for_beos_distribution,
+                                                       _ending_block_for_beos_distribution,
+                                                       _distribution_payment_block_interval_for_beos_distribution,
+                                                       _amount_of_reward_beos ]
+                                                    ,[ _starting_block_for_ram_distribution,
+                                                       _ending_block_for_ram_distribution,
+                                                       _distribution_payment_block_interval_for_ram_distribution,
+                                                       _amount_of_reward_ram ],
+                                                    [ _starting_block_for_trustee_distribution,
+                                                      _ending_block_for_trustee_distribution,
+                                                      _distribution_payment_block_interval_for_trustee_distribution,
+                                                      _amount_of_reward_trustee ]
+                                                    ]
+                }
+            }
+        self.eos_rpc.prepare_and_push_transaction(params)

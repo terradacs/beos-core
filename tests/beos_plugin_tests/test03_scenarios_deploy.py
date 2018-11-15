@@ -8,7 +8,6 @@ import datetime
 import argparse
 
 from string import Template
-
 from testscenarios  import TestScenarios
 from eosrpcexecutor import EOSRPCExecutor
 
@@ -90,8 +89,20 @@ parser.add_argument('--nodeos-port', metavar='', help="Port", default='8888')
 parser.add_argument('--keosd-port', metavar='', help="Port", default='8900')
 parser.add_argument('--scenario-file-name-pattern', metavar='', help="Path to to scenarios.", default="scenarios_continues.in" )
 parser.add_argument('--add-block-number', action="store_true", help="", default=False )
-
-
+parser.add_argument('--restore-node-params', action="store_true", help="", default=False )
+parser.add_argument('--starting-block-for-initial-witness_election', default=100)
+parser.add_argument('--starting-block-for-beos_distribution', default=7 * 24 * 3600 * 2)
+parser.add_argument('--ending-block-for-beos-distribution', default=98 * 24 * 3600 * 2)
+parser.add_argument('--distribution-payment-block-interval-for-beos-distribution', default=1 * 3600 * 2)
+parser.add_argument('--amount-of-reward-beos', default=800 * 10000)
+parser.add_argument('--starting-block-for-ram-distribution', default= 7 * 24 * 3600 * 2)
+parser.add_argument('--ending-block-for-ram-distribution', default=280 * 24 * 3600 * 2)
+parser.add_argument('--distribution-payment-block-interval-for-ram-distribution', default=1 * 3600 * 2)
+parser.add_argument('--amount-of-reward-ram', default=5000000)
+parser.add_argument('--starting-block-for-trustee-distribution', default=7 * 24 * 3600 * 2)
+parser.add_argument('--ending-block-for-trustee-distribution', default= 98 * 24 * 3600 * 2)
+parser.add_argument('--distribution-payment-block-interval-for-trustee-distribution', default=1 * 3600 * 2)
+parser.add_argument('--amount-of-reward-trustee', default=800 * 10000)
 
 if __name__ == "__main__":
   args = parser.parse_args()
@@ -114,6 +125,21 @@ if __name__ == "__main__":
     error = True
   finally:
     scenarios.stop_scenarios()
+    if args.restore_node_params :
+      scenario.restore_node_params(
+                args.starting_block_for_initial_witness_election,
+                args.starting_block_for_beos_distribution,
+                args.ending_block_for_beos_distribution,
+                args.distribution_payment_block_interval_for_beos_distribution,
+                args.amount_of_reward_beos,
+                args.starting_block_for_ram_distribution,
+                args.ending_block_for_ram_distribution,
+                args.distribution_payment_block_interval_for_ram_distribution,
+                args.amount_of_reward_ram,
+                args.starting_block_for_trustee_distribution,
+                args.ending_block_for_trustee_distribution,
+                args.distribution_payment_block_interval_for_trustee_distribution,
+                args.amount_of_reward_trustee)
 
   if error:
     exit(1)
