@@ -6,6 +6,7 @@
 #include <eosio/chain/wasm_interface.hpp>
 #include <eosio/chain/generated_transaction_object.hpp>
 #include <eosio/chain/authorization_manager.hpp>
+#include <eosio/chain/voting_manager.hpp>
 #include <eosio/chain/resource_limits.hpp>
 #include <eosio/chain/account_object.hpp>
 #include <eosio/chain/global_property_object.hpp>
@@ -118,7 +119,7 @@ void apply_context::finalize_trace( action_trace& trace, const fc::time_point& s
 #define DBG(format, ... )
 #endif
 
-void apply_context::reward_stake( const account_name& account, int64_t val )
+void apply_context::reward_stake( const account_name& account, int64_t val, const voting_manager::producer_info_index& _producers)
 {
    int64_t stake_net = val / 2;
    int64_t stake_cpu = val - stake_net;
@@ -133,6 +134,9 @@ void apply_context::reward_stake( const account_name& account, int64_t val )
    net_weight += stake_net;
    cpu_weight += stake_cpu;
 
+   //std::string accName = account.to_string();
+   //std::cout << "Account name " << accName << " rewarded with stake: " << net_weight + cpu_weight << std::endl;
+
    // [MK]: ram stay unchanged, so no need to check?
    //if (resource_limit_mgr.set_account_limits( name, ram_bytes, net_weight, cpu_weight ))
      //trx_context.validate_ram_usage.insert( name );
@@ -140,6 +144,8 @@ void apply_context::reward_stake( const account_name& account, int64_t val )
    EOS_ASSERT( need_validation == false,
                resource_limit_exception,
                "new ram_bytes limit cannot be more restrictive than the previously set one (account '{account}')", ("account", account) );
+
+   control.get_mutable_voting_manager().update_voting_power(account, val, _producers);
 }
 
 void apply_context::reward_ram( const account_name& account, int64_t val )
@@ -157,13 +163,14 @@ void apply_context::reward_ram( const account_name& account, int64_t val )
 }
 
 void apply_context::reward_all( uint64_t amount_of_reward, uint64_t amount_of_reward_for_trustee, uint64_t gathered_amount,
-  asset sym, bool is_beos_mode )
+   asset sym, bool is_beos_mode,
+   const voting_manager::producer_info_index& _producers)
 {
    const auto& accounts_index = db.template get_index<account_index, by_id>();
 
    // trustee is always rewarded with the same value
    if (amount_of_reward_for_trustee)
-     reward_stake( N(beos.trustee), amount_of_reward_for_trustee );
+     reward_stake( N(beos.trustee), amount_of_reward_for_trustee, _producers );
 
    if (gathered_amount == 0)
      return; // nothing more to do here
@@ -199,7 +206,7 @@ void apply_context::reward_all( uint64_t amount_of_reward, uint64_t amount_of_re
          continue;
 
       if (is_beos_mode)
-        reward_stake( name, val );
+        reward_stake( name, val, _producers);
       else
         reward_ram( name, val );
    }

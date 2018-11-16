@@ -7,6 +7,7 @@
 #include <boost/core/ignore_unused.hpp>
 #include <eosio/chain/authorization_manager.hpp>
 #include <eosio/chain/resource_limits.hpp>
+#include <eosio/chain/voting_manager.hpp>
 #include <eosio/chain/wasm_interface_private.hpp>
 #include <eosio/chain/wasm_eosio_validation.hpp>
 #include <eosio/chain/wasm_eosio_injection.hpp>
@@ -24,9 +25,31 @@
 #include <boost/bind.hpp>
 #include <fstream>
 
+FC_REFLECT(block_producer_voting_info, (owner_account_name)(total_votes)(is_active))
+
 namespace eosio { namespace chain {
    using namespace webassembly;
    using namespace webassembly::common;
+
+   namespace
+   {
+   inline voting_manager::producer_info_index prepare_producers(array_ptr<block_producer_voting_info> _producerInfos,
+      size_t producerInfoSize)
+      {
+      voting_manager::producer_info_index _producers;
+
+      block_producer_voting_info* producerInfos = _producerInfos;
+
+      for(size_t i = 0; i < producerInfoSize; ++i)
+         {
+         account_name owner(producerInfos[i].owner_account_name);
+         _producers[owner] = producerInfos + i;
+         }
+
+      return _producers;
+      }
+
+   } /// anonymous
 
    wasm_interface::wasm_interface(vm_type vm) : my( new wasm_interface_impl(vm) ) {}
 
@@ -100,6 +123,29 @@ class context_free_api : public context_aware_api {
          return context.get_context_free_data( index, buffer, buffer_size );
       }
 };
+
+class system_api : public context_aware_api {
+public:
+   using context_aware_api::context_aware_api;
+
+   uint64_t current_time() {
+      return static_cast<uint64_t>(context.control.pending_block_time().time_since_epoch().count());
+      }
+
+   /**
+   *  Returns the time in seconds from 1970 of the block including this action
+   *  @brief Get time (rounded down to the nearest second) of the current block (i.e. the block including this action)
+   *  @return time in seconds from 1970 of the current block
+   */
+   uint32_t  now() {
+      return (uint32_t)(current_time() / 1000000);
+      }
+
+   uint64_t publication_time() {
+      return static_cast<uint64_t>(context.trx_context.published.time_since_epoch().count());
+      }
+
+   };
 
 class privileged_api : public context_aware_api {
    public:
@@ -231,12 +277,52 @@ class privileged_api : public context_aware_api {
          });
       }
 
+      void register_voting_proxy(const account_name proxy, bool is_proxy,
+         array_ptr<block_producer_voting_info> producerInfos, size_t producerInfoSize) {
+         voting_manager::producer_info_index _producers = prepare_producers(producerInfos, producerInfoSize);
+         context.control.get_mutable_voting_manager().register_voting_proxy(proxy, is_proxy, _producers);
+      }
+
+      void update_voting_power(const account_name voter, int64_t stake_delta,
+         array_ptr<block_producer_voting_info> producerInfos, size_t producerInfoSize) {
+         
+         voting_manager::producer_info_index _producers = prepare_producers(producerInfos, producerInfoSize);
+
+         context.control.get_mutable_voting_manager().update_voting_power(voter, stake_delta, _producers);
+      }
+
+      void update_votes(const account_name voter_name, const account_name proxy, array_ptr<account_name> voter_producers, size_t producer_size,
+         bool voting,
+         array_ptr<block_producer_voting_info> producerInfos, size_t producerInfoSize) {
+         std::vector<account_name> _voter_producers;
+         _voter_producers.insert(_voter_producers.end(), voter_producers.value, voter_producers.value + producer_size);
+
+         voting_manager::producer_info_index _producers = prepare_producers(producerInfos, producerInfoSize);
+
+         context.control.get_mutable_voting_manager().update_votes(voter_name, proxy, _voter_producers, voting, _producers);
+      }
+
+      void get_voting_stats(int64_t* total_activated_stake, uint64_t* thresh_activated_stake_time,
+         double* total_producer_vote_weight) const
+         {
+         context.control.get_voting_manager().get_voting_stats(total_activated_stake, thresh_activated_stake_time,
+            total_producer_vote_weight);
+         }
+
+      void store_voting_stats(int64_t total_activated_stake, uint64_t thresh_activated_stake_time,
+         double total_producer_vote_weight)
+         {
+         context.control.get_mutable_voting_manager().store_voting_stats(total_activated_stake, thresh_activated_stake_time,
+            total_producer_vote_weight);
+         }
+
    private:
       inline void set_resource_limits_impl( account_name account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight ) {
          if( context.control.get_mutable_resource_limits_manager().set_account_limits(account, ram_bytes, net_weight, cpu_weight) ) {
             context.trx_context.validate_ram_usage.insert( account );
          }
       }
+
 };
 
 class softfloat_api : public context_aware_api {
@@ -933,20 +1019,6 @@ class authorization_api : public context_aware_api {
    bool is_account( const account_name& account )const {
       return context.is_account( account );
    }
-
-};
-
-class system_api : public context_aware_api {
-   public:
-      using context_aware_api::context_aware_api;
-
-      uint64_t current_time() {
-         return static_cast<uint64_t>( context.control.pending_block_time().time_since_epoch().count() );
-      }
-
-      uint64_t publication_time() {
-         return static_cast<uint64_t>( context.trx_context.published.time_since_epoch().count() );
-      }
 
 };
 
@@ -1715,7 +1787,8 @@ class distribution_api : public context_aware_api {
 
       void reward_all( uint64_t amount_of_reward, uint64_t amount_of_reward_for_trustee, uint64_t gathered_amount,
                        array_ptr<char> symbol, size_t symbol_len, //asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/,
-                       bool is_beos_mode )
+                       bool is_beos_mode,
+                       array_ptr<block_producer_voting_info> producerInfos, size_t producerInfoSize)
       {
          //elog( "From inside reward_all! block_nr == ${n}, gathered_amount = ${a}", ("n", block_nr) ("a", gathered_amount) );
 
@@ -1723,7 +1796,10 @@ class distribution_api : public context_aware_api {
          asset _symbol;
          fc::raw::unpack(ds, _symbol);
 
-         context.reward_all( amount_of_reward, amount_of_reward_for_trustee, gathered_amount, _symbol, is_beos_mode );
+         voting_manager::producer_info_index _producers = prepare_producers(producerInfos, producerInfoSize);
+
+         context.reward_all( amount_of_reward, amount_of_reward_for_trustee, gathered_amount, _symbol, is_beos_mode,
+            _producers);
       }
 
       void reward_done( array_ptr<char> symbol, size_t symbol_len, //asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/,
@@ -1740,7 +1816,7 @@ class distribution_api : public context_aware_api {
 };
 
 REGISTER_INTRINSICS( distribution_api,
-   (reward_all,  void(int64_t, int64_t, int64_t, int, int, int) )
+   (reward_all,  void(int64_t, int64_t, int64_t, int, int, int, int, int) )
    (reward_done, void(int, int, int)                            )
 );
 
@@ -1806,6 +1882,11 @@ REGISTER_INTRINSICS(privileged_api,
    (set_blockchain_parameters_packed, void(int,int)                         )
    (is_privileged,                    int(int64_t)                          )
    (set_privileged,                   void(int64_t, int)                    )
+   (register_voting_proxy,            void(int64_t, int, int, int)          )
+   (update_voting_power,              void(int64_t, int64_t, int, int)      )
+   (update_votes,                     void(int64_t, int64_t, int, int, int, int, int) )
+   (get_voting_stats,                 void(int, int, int)                   )
+   (store_voting_stats,               void(int64_t, int64_t, double)        )
 );
 
 REGISTER_INJECTED_INTRINSICS(transaction_context,

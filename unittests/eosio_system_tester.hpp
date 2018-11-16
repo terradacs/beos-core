@@ -6,6 +6,7 @@
 
 #include <eosio/testing/tester.hpp>
 #include <eosio/chain/abi_serializer.hpp>
+#include <eosio/chain/voting_manager.hpp>
 
 #include <eosio.system/eosio.system.wast.hpp>
 #include <eosio.system/eosio.system.abi.hpp>
@@ -377,8 +378,37 @@ public:
    }
 
    fc::variant get_voter_info( const account_name& act ) {
-      vector<char> data = get_row_by_account( config::system_account_name, config::system_account_name, N(voters), act );
-      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "voter_info", data, abi_serializer_max_time );
+      const auto* v = control->get_voting_manager().find_voter_info(act);
+
+      if(v == nullptr)
+         return fc::variant();
+
+      /*
+      struct voter_info {
+      account_name                owner = 0; /// the voter
+      account_name                proxy = 0; /// the proxy set by the voter, if any
+      std::vector<account_name>   producers; /// the producers approved by this voter if no proxy set
+      int64_t                     staked = 0;
+
+      double                      last_vote_weight = 0; /// the vote weight cast the last time the vote was updated
+
+      double                      proxied_vote_weight = 0; /// the total vote weight delegated to this voter as a proxy
+      bool                        is_proxy = 0; /// whether the voter is a proxy for others
+
+      uint32_t                    reserved1 = 0;
+      beos_time                   reserved2 = 0;
+      eosio::asset                reserved3;
+      */
+
+      return mvo()
+         ("owner", v->owner)
+         ("proxy", v->proxy)
+         ("producers", v->producers)
+         ("staked", v->staked)
+         ("last_vote_weight", v->last_vote_weight)
+         ("proxied_vote_weight", v->proxied_vote_weight)
+         ("is_proxy", v->is_proxy)
+         ;
    }
 
    fc::variant get_producer_info( const account_name& act ) {

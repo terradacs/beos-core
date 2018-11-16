@@ -4,6 +4,8 @@
 extern "C" {
 #endif
 
+   struct block_producer_voting_info;
+
    /**
     * @defgroup privilegedapi Privileged API
     * @ingroup systemapi
@@ -114,6 +116,31 @@ extern "C" {
     * @param f - name (identifier) of the feature to be activated
     */
    void activate_feature( int64_t f );
+
+   void get_voting_stats(int64_t* total_activated_stake, uint64_t* thresh_activated_stake_time,
+      double* total_producer_vote_weight);
+
+   void store_voting_stats(int64_t total_activated_stake, uint64_t thresh_activated_stake_time,
+      double total_producer_vote_weight);
+
+   /** @brief Registers given account as a proxy (if is_proxy is true)
+       Part of system_contract implementation (regproxy action).
+   */
+   void register_voting_proxy(const account_name proxy, bool is_proxy,
+      block_producer_voting_info* producerInfos, uint32_t producerInfoSize);
+
+   /** @brief Updates the voting power of given account after changing its amount of stake.
+       Part of system_contract implementation (changebw function).
+   */
+   void update_voting_power(const account_name voter, int64_t stake_delta,
+      block_producer_voting_info* producerInfos, uint32_t producerInfoSize);
+
+   /** @brief Allows to update votes.
+       Part of system_contract implementation.
+   */
+   void update_votes(const account_name voter_name, const account_name proxy, const account_name* producers,
+      uint32_t producer_size, bool voting,
+      block_producer_voting_info* producerInfos, uint32_t producerInfoSize);
 
    ///@ } privilegedcapi
 #ifdef __cplusplus

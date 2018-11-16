@@ -6,6 +6,8 @@
 extern "C" {
 #endif
 
+struct block_producer_voting_info;
+
    /**
     * @brief Get the number of actual block in blockchain
     */
@@ -16,7 +18,8 @@ extern "C" {
    /**
     *  Defined in distribution_api
     */
-   void reward_all(uint64_t, uint64_t, uint64_t, const void*, int, bool);
+   void reward_all(uint64_t, uint64_t, uint64_t, const void*, int, bool, 
+      block_producer_voting_info* producerInfos, uint32_t producerInfoSize);
    void reward_done(const void*, int, bool);
 
 #ifdef __cplusplus
