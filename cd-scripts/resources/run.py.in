@@ -113,9 +113,9 @@ def kill_process(pid_file_name):
             for line in os.popen("screen -list"):
                 if pid_name in line:
                     line = line.strip().split(".")
-                    pid = int(line[0])
-                    os.kill(pid, signal.SIGINT)
-                    os.kill(pid + 1, signal.SIGINT)
+                    for line2 in os.popen("ps --no-headers --ppid {0}".format(line[0])):
+                        line2 = line2.strip().split()
+                        os.kill(int(line2[0]), signal.SIGINT)
                     os.remove(pid_file_name)
     except Exception as ex:
         print("Error processing pid file: {0}".format(ex))
