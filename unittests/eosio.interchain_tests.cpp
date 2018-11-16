@@ -216,7 +216,7 @@ class eosio_interchain_tester : public actions
     prepare_account( config::gateway_account_name, eosio_gateway_wast, eosio_gateway_abi, &beos_gateway_abi_ser );
     prepare_account( config::distribution_account_name, eosio_distribution_wast, eosio_distribution_abi, &beos_distrib_abi_ser );
 
-    BOOST_REQUIRE_EQUAL( success(), initresource( config::system_account_name,
+    BOOST_REQUIRE_EQUAL( success(), initresource( config::gateway_account_name,
                                                     100'000'000,
                                                     asset::from_string("1000.0000 BEOS"),
                                                     asset::from_string("1000.0000 BEOS")
@@ -224,12 +224,12 @@ class eosio_interchain_tester : public actions
                         );
 
     // [MK]: need to change creation with multisig
-    create_account_with_resources( config::system_account_name, N(beos.trustee) );
+    create_account_with_resources( config::gateway_account_name, N(beos.trustee) );
 
-    create_account_with_resources( config::system_account_name, N(alice) );
-    create_account_with_resources( config::system_account_name, N(bob) );
-    create_account_with_resources( config::system_account_name, N(carol) );
-    create_account_with_resources( config::system_account_name, N(dan) );
+    create_account_with_resources( config::gateway_account_name, N(alice) );
+    create_account_with_resources( config::gateway_account_name, N(bob) );
+    create_account_with_resources( config::gateway_account_name, N(carol) );
+    create_account_with_resources( config::gateway_account_name, N(dan) );
     produce_blocks( 1 );
   }
 
@@ -664,15 +664,15 @@ BOOST_FIXTURE_TEST_CASE( liquid_ram_test, eosio_init_tester ) try {
   test_global_state tgs;
   BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
 
-  BOOST_REQUIRE_EQUAL( success(), initresource( config::distribution_account_name,
+  BOOST_REQUIRE_EQUAL( success(), initresource( config::gateway_account_name,
                                                   100'000'000,
                                                   asset::from_string("1000.0000 BEOS"),
                                                   asset::from_string("1000.0000 BEOS")
                                                 )
                       );
 
-  create_account_with_resources( config::distribution_account_name, N(xxxxxxxmario) );
-  create_account_with_resources( config::distribution_account_name, N(xxxxxxmario2) );
+  create_account_with_resources( config::gateway_account_name, N(xxxxxxxmario) );
+  create_account_with_resources( config::gateway_account_name, N(xxxxxxmario2) );
 
   BOOST_REQUIRE_EQUAL( wasm_assert_msg("RAM shouldn't be liquid during distribution period"), sellram( "xxxxxxxmario", 5600 ) );
   BOOST_REQUIRE_EQUAL( wasm_assert_msg("RAM shouldn't be liquid during distribution period"), sellram( "xxxxxxmario2", 15600 ) );
@@ -700,14 +700,14 @@ BOOST_FIXTURE_TEST_CASE( liquid_ram_test2, eosio_init_tester ) try {
   tgs.ram.ending_block_for_distribution = 81;
   BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
 
-  BOOST_REQUIRE_EQUAL( success(), initresource( config::distribution_account_name,
+  BOOST_REQUIRE_EQUAL( success(), initresource( config::gateway_account_name,
                                                   100'000'000,
                                                   asset::from_string("1000.0000 BEOS"),
                                                   asset::from_string("1000.0000 BEOS")
                                                 )
                       );
 
-  create_account_with_resources( config::distribution_account_name, N(xxxxxxxmario) );
+  create_account_with_resources( config::gateway_account_name, N(xxxxxxxmario) );
   BOOST_REQUIRE_EQUAL( wasm_assert_msg("RAM shouldn't be liquid during distribution period"), sellram( "xxxxxxxmario", 5600 ) );
 
   produce_blocks( 81 - control->head_block_num() );
@@ -749,14 +749,14 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test, eosio_init_tester ) try {
   tgs.beos.starting_block_for_distribution = 55;
   BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
 
-  BOOST_REQUIRE_EQUAL( success(), initresource( config::distribution_account_name,
+  BOOST_REQUIRE_EQUAL( success(), initresource( config::gateway_account_name,
                                                   100'000'000,
                                                   asset::from_string("1000.0000 BEOS"),
                                                   asset::from_string("1000.0000 BEOS")
                                                 )
                       );
 
-  create_account_with_resources( config::distribution_account_name, N(xxxxxxxmario) );
+  create_account_with_resources( config::gateway_account_name, N(xxxxxxxmario) );
 
   BOOST_REQUIRE_EQUAL( success(), issue( N(bob), asset::from_string("5.0000 PROXY") ) );
   BOOST_REQUIRE_EQUAL( success(), issue( N(xxxxxxxmario), asset::from_string("5.0000 PROXY") ) );
@@ -796,15 +796,15 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test2, eosio_init_tester ) try {
   tgs.beos.starting_block_for_distribution = 55;
   BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
 
-  BOOST_REQUIRE_EQUAL( success(), initresource( config::distribution_account_name,
+  BOOST_REQUIRE_EQUAL( success(), initresource( config::gateway_account_name,
                                                   100'000'000,
                                                   asset::from_string("1000.0000 BEOS"),
                                                   asset::from_string("1000.0000 BEOS")
                                                 )
                       );
 
-  create_account_with_resources( config::distribution_account_name, N(xxxxxxxmario) );
-  create_account_with_resources( config::distribution_account_name, N(xxxxxxmario2) );
+  create_account_with_resources( config::gateway_account_name, N(xxxxxxxmario) );
+  create_account_with_resources( config::gateway_account_name, N(xxxxxxmario2) );
 
   BOOST_REQUIRE_EQUAL( success(), issue( N(xxxxxxxmario), asset::from_string("5.0000 PROXY") ) );
   BOOST_REQUIRE_EQUAL( success(), issue( N(xxxxxxmario2), asset::from_string("5.0000 PROXY") ) );
@@ -1940,7 +1940,7 @@ BOOST_FIXTURE_TEST_CASE( main_commands_test_3, eosio_interchain_tester ) try {
   Accounts accounts = { "bozydar", "bogumil", "perun", "swiatowid", "weles"};
 
   for(const auto& _acc : accounts ) {
-    create_account_with_resources( config::system_account_name, _acc.c_str() );
+    create_account_with_resources( config::gateway_account_name, _acc.c_str() );
   }
 
   for(const auto& _acc : accounts) {
@@ -2002,7 +2002,7 @@ BOOST_FIXTURE_TEST_CASE( main_commands_test_4, eosio_interchain_tester ) try {
   Accounts accounts = { "perun", "swiatowid" };
 
   for(const auto& _acc : accounts ) {
-    create_account_with_resources( config::system_account_name, _acc.c_str() );
+    create_account_with_resources( config::gateway_account_name, _acc.c_str() );
   }
 
   accounts.push_back("alice");
