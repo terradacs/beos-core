@@ -64,7 +64,7 @@ try:
         errorExit("MongoDb doesn't seem to be running.")
 
     if localTest and not dontLaunch:
-        cluster.killall(allInstances=killAll, 2)
+        cluster.killall(allInstances=killAll)
         cluster.cleanup()
         Print("Stand up cluster")
         if cluster.launch(prodCount=prodCount, onlyBios=onlyBios, dontBootstrap=dontBootstrap, p2pPlugin=p2pPlugin) is False:
