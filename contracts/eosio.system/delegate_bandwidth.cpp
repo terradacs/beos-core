@@ -156,7 +156,7 @@ namespace eosiosystem {
     require_auth( _self );
 
     //Delegate RAM from payer to receiver
-    change_resource_limits( receiver, bytes, stake_net_quantity.amount, stake_cpu_quantity.amount );
+    set_resource_limits( receiver, bytes, stake_net_quantity.amount, stake_cpu_quantity.amount );
   }
 
    /**
