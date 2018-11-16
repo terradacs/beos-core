@@ -25,7 +25,7 @@ namespace eosiosystem {
          auto system_token_supply   = eosio::token(N(eosio.token)).get_supply(eosio::symbol_type(system_token_symbol).name()).amount;
          if( system_token_supply > 0 ) {
             itr = _rammarket.emplace( _self, [&]( auto& m ) {
-               m.supply.amount = 100000000000000ll;
+               m.supply.amount = 100'000'000'000'000ll;
                m.supply.symbol = S(4,RAMCORE);
                m.base.balance.amount = int64_t(_gstate.free_ram());
                m.base.balance.symbol = S(0,RAM);

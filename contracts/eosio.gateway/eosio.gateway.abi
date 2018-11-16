@@ -17,11 +17,17 @@
       "name": "withdraw",
       "base": "",
       "fields": [{
-          "name": "owner",
+          "name": "from",
           "type": "name"
+        },{
+          "name": "bts_to",
+          "type": "string"
         },{
           "name": "quantity",
           "type": "asset"
+        },{
+          "name": "original_memo",
+          "type": "string"
         }
       ]
     }

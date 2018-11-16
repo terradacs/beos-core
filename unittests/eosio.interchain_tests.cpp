@@ -133,11 +133,13 @@ struct actions: public tester
     return base_tester::push_action( std::move( act ), config::gateway_account_name );
   }
 
-  action_result withdraw( account_name owner, asset quantity )
+  action_result withdraw( account_name from, asset quantity )
   {
-    return push_action( owner, N(withdraw), mvo()
-        ( "owner", owner )
-        ( "quantity", quantity ),
+    return push_action( from, N(withdraw), mvo()
+        ( "from", from )
+        ( "bts_to", "any_bts_account" )
+        ( "quantity", quantity )
+        ( "original_memo", "any_memo" ),
         beos_gateway_abi_ser,
         N(beos.gateway)
       );
@@ -451,7 +453,7 @@ public:
     names.emplace_back("1");
 
     if (--no_of_accounts == 0)
-      return std::move(names);
+      return names;
 
     size_t begin = 0;
     size_t end = names.size();
@@ -467,7 +469,7 @@ public:
       fprintf(file, "%s\n", name.to_string().c_str());
     fclose(file);*/
 
-    return std::move(names);
+    return names;
   }
 
   account_names_t create_accounts_with_resources( account_name creator, size_t no_of_accounts = eosio_init_bigstate_tester::no_of_accounts,
@@ -515,7 +517,7 @@ public:
       BOOST_REQUIRE_EQUAL(true, chain_has_transaction(trx.id()));
     }
 
-    return std::move(names);
+    return names;
   }
 
   void issue_for_accounts( const account_names_t& accounts, const asset& quantity )
@@ -1515,7 +1517,7 @@ BOOST_FIXTURE_TEST_CASE( performance_lock_test, eosio_interchain_tester ) try {
   std::vector< action > v;
 
   for( int32_t i = 0; i < 1000; ++i )
-    v.emplace_back( std::move( create_issue_action( N(alice), asset::from_string("0.0001 PROXY") ) ) );
+    v.emplace_back( create_issue_action( N(alice), asset::from_string("0.0001 PROXY") ) );
   locks( N(beos.gateway), std::move( v ) );
 
   produce_blocks( 240 - control->head_block_num() );
@@ -1524,7 +1526,7 @@ BOOST_FIXTURE_TEST_CASE( performance_lock_test, eosio_interchain_tester ) try {
 
   v.clear();
   for( int32_t i = 0; i < 5000; ++i )
-    v.emplace_back( std::move( create_issue_action( N(alice), asset::from_string("0.0001 PROXY") ) ) );
+    v.emplace_back( create_issue_action( N(alice), asset::from_string("0.0001 PROXY") ) );
   locks( N(beos.gateway), std::move( v ) );
 
   produce_blocks( 9 );
@@ -1534,7 +1536,7 @@ BOOST_FIXTURE_TEST_CASE( performance_lock_test, eosio_interchain_tester ) try {
 
   v.clear();
   for( int32_t i = 0; i < 5000; ++i )
-    v.emplace_back( std::move( create_issue_action( N(alice), asset::from_string("1000.0000 PROXY") ) ) );
+    v.emplace_back( create_issue_action( N(alice), asset::from_string("1000.0000 PROXY") ) );
   locks( N(beos.gateway), std::move( v ) );
 
   produce_blocks( 9 );
@@ -1544,7 +1546,7 @@ BOOST_FIXTURE_TEST_CASE( performance_lock_test, eosio_interchain_tester ) try {
 
   v.clear();
   for( int32_t i = 0; i < 1000; ++i )
-    v.emplace_back( std::move( create_issue_action( N(alice), asset::from_string("10000.0000 PROXY") ) ) );
+    v.emplace_back( create_issue_action( N(alice), asset::from_string("10000.0000 PROXY") ) );
   locks( N(beos.gateway), std::move( v ) );
 
   produce_blocks( 9 );
@@ -1564,10 +1566,10 @@ BOOST_FIXTURE_TEST_CASE( performance_lock_test2, eosio_interchain_tester ) try {
 
   for( int32_t i = 0; i < 1000; ++i )
   {
-    v.emplace_back( std::move( create_issue_action( N(alice), asset::from_string("0.0001 PROXY") ) ) );
-    v.emplace_back( std::move( create_issue_action( N(bob),   asset::from_string("0.0001 PROXY") ) ) );
-    v.emplace_back( std::move( create_issue_action( N(carol), asset::from_string("0.0001 PROXY") ) ) );
-    v.emplace_back( std::move( create_issue_action( N(dan),   asset::from_string("0.0001 PROXY") ) ) );
+    v.emplace_back( create_issue_action( N(alice), asset::from_string("0.0001 PROXY") ) );
+    v.emplace_back( create_issue_action( N(bob),   asset::from_string("0.0001 PROXY") ) );
+    v.emplace_back( create_issue_action( N(carol), asset::from_string("0.0001 PROXY") ) );
+    v.emplace_back( create_issue_action( N(dan),   asset::from_string("0.0001 PROXY") ) );
   }
   locks( N(beos.gateway), std::move( v ) );
 
@@ -1584,15 +1586,15 @@ BOOST_FIXTURE_TEST_CASE( performance_lock_test2, eosio_interchain_tester ) try {
   {
     if(i==0) 
     {
-      v.emplace_back( std::move( create_issue_action( N(alice), asset::from_string("1.9000 PROXY") ) ) );
-      v.emplace_back( std::move( create_issue_action( N(carol), asset::from_string("0.9000 PROXY") ) ) );
-      v.emplace_back( std::move( create_issue_action( N(bob),   asset::from_string("1.9000 PROXY") ) ) );
+      v.emplace_back( create_issue_action( N(alice), asset::from_string("1.9000 PROXY") ) );
+      v.emplace_back( create_issue_action( N(carol), asset::from_string("0.9000 PROXY") ) );
+      v.emplace_back( create_issue_action( N(bob),   asset::from_string("1.9000 PROXY") ) );
     }
     else
     {
-      v.emplace_back( std::move( create_issue_action( N(alice), asset::from_string("2.0000 PROXY") ) ) );
-      v.emplace_back( std::move( create_issue_action( N(carol), asset::from_string("1.0000 PROXY") ) ) );
-      v.emplace_back( std::move( create_issue_action( N(bob),   asset::from_string("2.0000 PROXY") ) ) );
+      v.emplace_back( create_issue_action( N(alice), asset::from_string("2.0000 PROXY") ) );
+      v.emplace_back( create_issue_action( N(carol), asset::from_string("1.0000 PROXY") ) );
+      v.emplace_back( create_issue_action( N(bob),   asset::from_string("2.0000 PROXY") ) );
     }
   }
 
@@ -1617,12 +1619,12 @@ BOOST_FIXTURE_TEST_CASE( performance_lock_test2, eosio_interchain_tester ) try {
   v.clear();
   for( int32_t i = 0; i < 1000; ++i )
   {
-    v.emplace_back( std::move( create_issue_action( N(carol), asset::from_string("5.0000 PROXY") ) ) );
+    v.emplace_back( create_issue_action( N(carol), asset::from_string("5.0000 PROXY") ) );
 
     if( i == 0 )
-      v.emplace_back( std::move( create_issue_action( N(dan), asset::from_string("4.9000 PROXY") ) ) );
+      v.emplace_back( create_issue_action( N(dan), asset::from_string("4.9000 PROXY") ) );
     else
-      v.emplace_back( std::move( create_issue_action( N(dan), asset::from_string("5.0000 PROXY") ) ) );
+      v.emplace_back( create_issue_action( N(dan), asset::from_string("5.0000 PROXY") ) );
   }
   locks( N(beos.gateway), std::move( v ) );
 
@@ -1645,8 +1647,8 @@ BOOST_FIXTURE_TEST_CASE( performance_lock_test2, eosio_interchain_tester ) try {
   //for( int32_t i = 0; i < 3000; ++i )
   for( int32_t i = 0; i < 2000; ++i )
   {
-    v.emplace_back( std::move( create_issue_action( N(alice), asset::from_string("5.0000 PROXY") ) ) );
-    v.emplace_back( std::move( create_issue_action( N(bob), asset::from_string("5.0000 PROXY") ) ) );
+    v.emplace_back( create_issue_action( N(alice), asset::from_string("5.0000 PROXY") ) );
+    v.emplace_back( create_issue_action( N(bob), asset::from_string("5.0000 PROXY") ) );
   }
   locks( N(beos.gateway), std::move( v ) );
 
