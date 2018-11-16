@@ -1310,7 +1310,7 @@ class Cluster(object):
         for node in self.nodes:
             try:
                 if node.pid is not None:
-                    os.kill(node.pid, signal.SIGKILL)
+                    os.kill(node.pid, signal)
             except OSError as _:
                 pass
 
