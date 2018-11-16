@@ -7,6 +7,8 @@
 #include <eosio/chain/transaction.hpp>
 #include <eosio/chain/contract_table_objects.hpp>
 #include <eosio/chain/asset.hpp>
+#include <eosio/chain/voting_manager.hpp>
+
 #include <fc/utility.hpp>
 #include <sstream>
 #include <algorithm>
@@ -581,12 +583,16 @@ class apply_context {
 
       void reward_all( uint64_t amount_of_reward, uint64_t amount_of_reward_for_trustee, uint64_t gathered_amount,
                        asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/,
-                       bool is_beos_mode );
+                       bool is_beos_mode,
+                       const voting_manager::producer_info_index& _producers);
+
       void reward_done( asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/,
                         bool is_beos_mode );
 
    private:
-      void reward_stake( const account_name& account, int64_t val );
+      void reward_stake( const account_name& account, int64_t val,
+         const voting_manager::producer_info_index& _producers);
+
       void reward_ram( const account_name& account, int64_t val );
 
    private:

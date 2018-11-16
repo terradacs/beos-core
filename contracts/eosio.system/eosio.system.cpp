@@ -10,14 +10,15 @@
 namespace eosiosystem {
 
    system_contract::system_contract( account_name s )
-   :native(s),
+   :immutable_system_contract(s),
     _voters(_self,_self),
-    _producers(_self,_self),
     _global(_self,_self),
     _rammarket(_self,_self)
    {
       //print( "construct system\n" );
       _gstate = _global.exists() ? _global.get() : get_default_parameters();
+
+      flush_voting_stats();
 
       auto itr = _rammarket.find(S(4,RAMCORE));
 
@@ -47,9 +48,9 @@ namespace eosiosystem {
 
    system_contract::~system_contract() {
       //print( "destruct system\n" );
-      _global.set( _gstate, _self );
+      _global.set(_gstate, _self);
       //eosio_exit(0);
-   }
+      }
 
    void system_contract::setram( uint64_t max_ram_size ) {
       require_auth( _self );
@@ -194,6 +195,15 @@ namespace eosiosystem {
 
     set_resource_limits( newact, bytes, 0, 0 );
    }
+
+   void system_contract::flush_voting_stats()
+      {
+      get_voting_stats(&_gstate.total_activated_stake, &_gstate.thresh_activated_stake_time,
+         &_gstate.total_producer_vote_weight);
+
+      /// Save just updated _gstate to the global table.
+      _global.set(_gstate, _self);
+      }
 
 } /// eosio.system
 

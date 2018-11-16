@@ -17,6 +17,8 @@
 #include <eosio/chain/resource_limits.hpp>
 #include <eosio/chain/chain_snapshot.hpp>
 
+#include <eosio/chain/voting_manager.hpp>
+
 #include <chainbase/chainbase.hpp>
 #include <fc/io/json.hpp>
 #include <fc/scoped_exit.hpp>
@@ -124,6 +126,7 @@ struct controller_impl {
    wasm_interface                 wasmif;
    resource_limits_manager        resource_limits;
    authorization_manager          authorization;
+   voting_manager                 voting_mgr;
    controller::config             conf;
    chain_id_type                  chain_id;
    bool                           replaying= false;
@@ -181,6 +184,7 @@ struct controller_impl {
     wasmif( cfg.wasm_runtime ),
     resource_limits( db ),
     authorization( s, db ),
+    voting_mgr(s, db),
     conf( cfg ),
     chain_id( cfg.genesis.compute_chain_id() ),
     read_mode( cfg.read_mode )
@@ -408,6 +412,7 @@ struct controller_impl {
 
       authorization.add_indices();
       resource_limits.add_indices();
+      voting_mgr.add_indices();
    }
 
    void clear_all_undo() {
@@ -509,6 +514,7 @@ struct controller_impl {
 
       authorization.add_to_snapshot(snapshot);
       resource_limits.add_to_snapshot(snapshot);
+      voting_mgr.add_to_snapshot(snapshot);
    }
 
    void read_from_snapshot( const snapshot_reader_ptr& snapshot ) {
@@ -553,6 +559,7 @@ struct controller_impl {
 
       authorization.read_from_snapshot(snapshot);
       resource_limits.read_from_snapshot(snapshot);
+      voting_mgr.read_from_snapshot(snapshot);
 
       db.set_revision( head->block_num );
    }
@@ -639,6 +646,7 @@ struct controller_impl {
 
       authorization.initialize_database();
       resource_limits.initialize_database();
+      voting_mgr.initialize_database();
 
       authority system_auth(conf.genesis.initial_key);
       authority system_auth_gateway(conf.genesis.initial_key_gateway);
@@ -1589,6 +1597,16 @@ authorization_manager&         controller::get_mutable_authorization_manager()
 {
    return my->authorization;
 }
+
+const voting_manager& controller::get_voting_manager() const
+   {
+   return my->voting_mgr;
+   }
+
+voting_manager& controller::get_mutable_voting_manager()
+   {
+   return my->voting_mgr;
+   }
 
 controller::controller( const controller::config& cfg )
 :my( new controller_impl( cfg, *this ) )

@@ -129,7 +129,7 @@ extern "C" {
     * eosio_print(tm);
     * @endcode
     */
-   time expiration();
+   beos_time expiration();
 
    /**
     * Retrieves the indicated action from the active transaction.

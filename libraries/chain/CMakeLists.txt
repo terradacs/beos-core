@@ -37,6 +37,8 @@ add_library( eosio_chain
               asset.cpp
               snapshot.cpp
 
+              voting_manager.cpp
+
              webassembly/wavm.cpp
              webassembly/wabt.cpp
 
@@ -58,6 +60,7 @@ target_include_directories( eosio_chain
                                    "${CMAKE_CURRENT_SOURCE_DIR}/../wasm-jit/Include"
                                    "${CMAKE_SOURCE_DIR}/libraries/wabt"
                                    "${CMAKE_BINARY_DIR}/libraries/wabt"
+                                   "${CMAKE_SOURCE_DIR}/contracts"
                             )
 
 install( TARGETS eosio_chain

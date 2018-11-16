@@ -41,7 +41,7 @@ typedef uint64_t table_name;
  * @brief Time
  * @details Time
  */
-typedef uint32_t time;
+typedef uint32_t beos_time;
 
 /**
  * @brief Name of a scope

@@ -29,7 +29,11 @@ void distribution::execute( uint32_t block_nr, asset proxy_asset,
         //Rewarding all accounts.
         uint64_t gathered_amount = get_sum();
 
-        reward_all( amount_of_reward, amount_of_reward_for_trustee, gathered_amount, &proxy_asset, sizeof(asset), is_beos_mode );
+        eosiosystem::immutable_system_contract sc(N(eosio));
+        eosiosystem::eosio_voting_data vud = sc.prepare_data_for_voting_update();
+
+        reward_all( amount_of_reward, amount_of_reward_for_trustee, gathered_amount, &proxy_asset, sizeof(asset), is_beos_mode,
+           vud.producer_infos.data(), vud.producer_infos.size());
 
         //Total end of distribution period. Transferring from staked BEOS/RAM to liquid BEOS/RAM.
         //It depends on `is_beos_mode` variable.
