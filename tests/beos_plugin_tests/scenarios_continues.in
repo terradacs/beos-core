@@ -90,8 +90,10 @@
                     "code": "beos.gateway",
                     "action": "withdraw",
                     "args": {
-                        "owner": "${user_1}",
-                        "quantity": "5.0000 PXBTS"
+                        "from": "${user_1}",
+                        "bts_to": "any_account",
+                        "quantity": "5.0000 PXBTS",
+                        "original_memo": "any_memo"
                     },
                     "expected_result":true
                 },{
@@ -205,8 +207,10 @@
                     "code": "beos.gateway",
                     "action": "withdraw",
                     "args": {
-                        "owner": "${user_2}",
-                        "quantity": "20.0000 PXBTS"
+                        "from": "${user_2}",
+                        "bts_to": "any_account",
+                        "quantity": "20.0000 PXBTS",
+                        "original_memo": "any_memo"
                     }
                 },{
                     "start_block": 220,
@@ -389,8 +393,10 @@
                     "code": "beos.gateway",
                     "action": "withdraw",
                     "args": {
-                        "owner": "${user_3}",
-                        "quantity": "20.0000 PXBTS"
+                        "from": "${user_3}",
+                        "bts_to": "any_account",
+                        "quantity": "20.0000 PXBTS",
+                        "original_memo": "any_memo"
                     }
                 },{
                     "start_block": 320,
@@ -398,8 +404,10 @@
                     "code": "beos.gateway",
                     "action": "withdraw",
                     "args": {
-                        "owner": "${user_4}",
-                        "quantity": "15.0000 PXBTS"
+                        "from": "${user_4}",
+                        "bts_to": "any_account",
+                        "quantity": "15.0000 PXBTS",
+                        "original_memo": "any_memo"
                     }
                 },{
                     "start_block": 330,
@@ -472,8 +480,10 @@
                     "code": "beos.gateway",
                     "action": "withdraw",
                     "args": {
-                        "owner": "${user_5}",
-                        "quantity": "20.0000 PXBTS"
+                        "from": "${user_5}",
+                        "bts_to": "any_account",
+                        "quantity": "20.0000 PXBTS",
+                        "original_memo": "any_memo"
                     },
                     "expected_result":false
                 },{
@@ -482,8 +492,10 @@
                     "code": "beos.gateway",
                     "action": "withdraw",
                     "args": {
-                        "owner": "${user_6}",
-                        "quantity": "20.0000 PXBTS"
+                        "from": "${user_6}",
+                        "bts_to": "any_account",
+                        "quantity": "20.0000 PXBTS",
+                        "original_memo": "any_memo"
                     }, 
                     "expected_result":false
                 },{
