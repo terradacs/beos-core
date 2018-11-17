@@ -550,12 +550,6 @@
       "key_names" : [],
       "key_types" : []
     },{
-      "name": "voters",
-      "type": "voter_info",
-      "index_type": "i64",
-      "key_names" : ["owner"],
-      "key_types" : ["account_name"]
-    },{
       "name": "delband",
       "type": "delegated_bandwidth",
       "index_type": "i64",

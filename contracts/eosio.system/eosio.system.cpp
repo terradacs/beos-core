@@ -11,7 +11,6 @@ namespace eosiosystem {
 
    system_contract::system_contract( account_name s )
    :immutable_system_contract(s),
-    _voters(_self,_self),
     _global(_self,_self),
     _rammarket(_self,_self)
    {

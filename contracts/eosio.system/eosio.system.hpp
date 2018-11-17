@@ -98,8 +98,6 @@ namespace eosiosystem {
 
    typedef eosio::singleton<N(global), eosio_global_state> global_state_singleton;
 
-   typedef eosio::multi_index< N(voters), voter_info>  voters_table;
-
    //   static constexpr uint32_t     max_inflation_rate = 5;  // 5% annual inflation
    static constexpr uint32_t     seconds_per_day = 24 * 3600;
    static constexpr uint64_t     system_token_symbol = CORE_SYMBOL;
@@ -138,7 +136,6 @@ namespace eosiosystem {
 
    class system_contract : public immutable_system_contract {
       private:
-         voters_table           _voters;
          global_state_singleton _global;
 
          eosio_global_state     _gstate;
