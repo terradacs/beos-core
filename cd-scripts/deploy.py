@@ -106,7 +106,7 @@ def install_boost():
         return cmake_options
     # check if boost is installed in BOOST_INSTALL_DIR
     if os.path.exists(config.BOOST_INSTALL_DIR):
-        logger.info("Boost is already installed in: {0}".format(config.BOOST_INSTALL_DIR))    
+        logger.info("Boost is already installed in: {0}".format(config.BOOST_INSTALL_DIR))
         cmake_options["BOOST_ROOT"] = config.BOOST_INSTALL_PREFIX
         return cmake_options
     # installing boost from sources
@@ -114,7 +114,7 @@ def install_boost():
     boost_download_url = "https://sourceforge.net/projects/boost/files/boost/1.67.0/boost_1_67_0.tar.bz2/download"
     boost_archive_name = "{0}/{1}".format(config.SOURCES_DOWNLOAD_DIR, "boost_1.67.0.tar.bz2")
     boost_root = "{0}/{1}".format(config.SOURCES_DOWNLOAD_DIR, "boost_1_67_0")
-    
+
     logger.info("Downloading boost...")
     res = requests.get(boost_download_url)
     with open(boost_archive_name, 'wb') as f:
@@ -124,15 +124,15 @@ def install_boost():
     import tarfile
     boost_tar = tarfile.open(boost_archive_name, mode = 'r:bz2')
     boost_tar.extractall(config.SOURCES_DOWNLOAD_DIR)
-    
+
     logger.info("Bootstraping boost..")
     params = ["./bootstrap.sh", "--prefix={0}".format(config.BOOST_INSTALL_PREFIX)]
     run_command(params, boost_root)
-    
+
     logger.info("Installing boost..")
     params = ["sudo", "./b2", "install"]
     run_command(params, boost_root)
-    
+
     cmake_options["BOOST_ROOT"] = config.BOOST_INSTALL_PREFIX
     os.environ["BOOST_ROOT"] = config.BOOST_INSTALL_PREFIX
     return cmake_options
@@ -221,12 +221,17 @@ def install_wasm():
     except Exception as ex:
         logger.error(ex)
         sys.exit(1)
-    
+
+    platform_name, platform_version, platform_type =  distro.linux_distribution(full_distribution_name = False)
+    if platform_name == "ubuntu":
+        if platform_version == "18.10":
+            run_command(['sh', '-c','curl https://bugzilla.redhat.com/attachment.cgi?id=1389687 | patch -p1'], wasm_root + '/llvm')
+
     wasm_build_dir = wasm_root + "/llvm/build"
     if not os.path.exists(wasm_build_dir):
         from os import makedirs
         makedirs(wasm_build_dir)
-        
+
     params = ["cmake", "-G", "Unix Makefiles", "-DCMAKE_INSTALL_PREFIX={0}".format(config.WASM_INSTALL_DIR), "-DLLVM_TARGETS_TO_BUILD=", "-DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=WebAssembly", "-DCMAKE_BUILD_TYPE=Release", ".."]
     run_command(params, wasm_build_dir)
 
@@ -319,7 +324,7 @@ def build_eosio(c_compiler, cxx_compiler):
     ]
     logger.info("Running cmake with params {0}".format(" ".join(params)))
     run_command(params, config.BEOS_BUILD_DIR)
-    
+
     logger.info("Running make in {0}".format(config.BEOS_BUILD_DIR))
     params = ["make"]
     pcnt = get_processor_count()
@@ -347,7 +352,7 @@ def initialize_beos():
         eosio.create_account("eosio", "eosio.saving", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
         eosio.create_account("eosio", "eosio.vpay", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
         eosio.create_account("eosio", "eosio.unregd", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-        
+
         eosio.create_account("eosio", "eosio.bpay", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
 
         eosio.create_account("eosio", "eosio.ram", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
@@ -385,11 +390,11 @@ def clear_initialization_data(node_index, name):
     if os.path.exists(config.DEFAULT_WALLET_DIR):
         logger.info("{0} exists. Deleting.".format(config.DEFAULT_WALLET_DIR))
         rmtree(config.DEFAULT_WALLET_DIR)
-    
+
     if os.path.exists(config.WALLET_PASSWORD_DIR):
         logger.info("{0} exists. Deleting.".format(config.WALLET_PASSWORD_DIR))
         rmtree(config.WALLET_PASSWORD_DIR)
-    
+
     working_dir = "{0}{1}-{2}/".format(config.NODEOS_WORKING_DIR, node_index, name)
     if os.path.exists(working_dir):
         logger.info("{0} exists. Deleting.".format(working_dir))
@@ -460,7 +465,7 @@ if __name__ == '__main__':
     parser.add_option_group(testsGroup)
 
     (options, args) = parser.parse_args()
-    
+
     from sys import argv, exit
     if len(argv) == 1:
         parser.print_help()
@@ -476,7 +481,7 @@ if __name__ == '__main__':
         else:
             beos_repo = Repo.clone_from(config.BEOS_REPOSITORY_PATH, config.BEOS_DIR, branch = config.BEOS_REPOSITORY_BRANCH)
             beos_repo.git.submodule('update', '--init', '--recursive')
-    
+
     c_compiler = options.c_compiler
     cxx_compiler = options.cxx_compiler
 
@@ -513,11 +518,11 @@ if __name__ == '__main__':
 
     if options.build_eosio:
         build_eosio(c_compiler, cxx_compiler)
-        
+
     if options.install_all:
         install_libraries()
         install_beos(c_compiler, cxx_compiler)
-        
+
     if options.install_beos:
         install_beos(c_compiler, cxx_compiler)
 
