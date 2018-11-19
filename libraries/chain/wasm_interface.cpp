@@ -1778,7 +1778,7 @@ class call_depth_api : public context_aware_api {
 };
 
 /*
- * This api is dedicated for using from eosio::distribution contract.
+ * This api is dedicated for using from eosio::distribution::onblock action called from `eosio` level.
  */
 class distribution_api : public context_aware_api {
    public:
@@ -1788,9 +1788,10 @@ class distribution_api : public context_aware_api {
          name actor = ctx.trx_context.trx.first_authorizor();
          DBG("distribution_api::distribution_api: actor = %s", actor.to_string().c_str());
 
-         // System account 'eosio' and 'beos.distrib' are the only accounts able to use distribution_api (from inside 'onblock')
-         EOS_ASSERT( actor == config::distribution_account_name || actor == config::system_account_name,
-                     unaccessible_api,
+         /* [MK]: System account 'eosio' is the only account able to use distribution_api
+                  (from inside 'onblock' pushed in implicit transaction)
+         */
+         EOS_ASSERT( ctx.privileged && actor == config::system_account_name, unaccessible_api,
                      "${code} does not have permission to call this API", ("code",actor) );
       }
 
