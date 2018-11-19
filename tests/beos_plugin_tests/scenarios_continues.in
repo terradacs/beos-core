@@ -92,8 +92,7 @@
                     "args": {
                         "from": "${user_1}",
                         "bts_to": "any_account",
-                        "quantity": "5.0000 PXBTS",
-                        "original_memo": "any_memo"
+                        "quantity": "5.0000 PXBTS"
                     },
                     "expected_result":true
                 },{
@@ -209,8 +208,7 @@
                     "args": {
                         "from": "${user_2}",
                         "bts_to": "any_account",
-                        "quantity": "20.0000 PXBTS",
-                        "original_memo": "any_memo"
+                        "quantity": "20.0000 PXBTS"
                     }
                 },{
                     "start_block": 220,
@@ -395,8 +393,7 @@
                     "args": {
                         "from": "${user_3}",
                         "bts_to": "any_account",
-                        "quantity": "20.0000 PXBTS",
-                        "original_memo": "any_memo"
+                        "quantity": "20.0000 PXBTS"
                     }
                 },{
                     "start_block": 320,
@@ -406,8 +403,7 @@
                     "args": {
                         "from": "${user_4}",
                         "bts_to": "any_account",
-                        "quantity": "15.0000 PXBTS",
-                        "original_memo": "any_memo"
+                        "quantity": "15.0000 PXBTS"
                     }
                 },{
                     "start_block": 330,
@@ -482,8 +478,7 @@
                     "args": {
                         "from": "${user_5}",
                         "bts_to": "any_account",
-                        "quantity": "20.0000 PXBTS",
-                        "original_memo": "any_memo"
+                        "quantity": "20.0000 PXBTS"
                     },
                     "expected_result":false
                 },{
@@ -494,8 +489,7 @@
                     "args": {
                         "from": "${user_6}",
                         "bts_to": "any_account",
-                        "quantity": "20.0000 PXBTS",
-                        "original_memo": "any_memo"
+                        "quantity": "20.0000 PXBTS"
                     }, 
                     "expected_result":false
                 },{

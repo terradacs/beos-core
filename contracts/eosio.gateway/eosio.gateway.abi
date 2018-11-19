@@ -25,9 +25,6 @@
         },{
           "name": "quantity",
           "type": "asset"
-        },{
-          "name": "original_memo",
-          "type": "string"
         }
       ]
     }

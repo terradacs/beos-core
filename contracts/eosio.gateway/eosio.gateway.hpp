@@ -41,9 +41,8 @@ namespace eosio {
       * `from`     - owner of account
       * `bts_to`     - owner of account in 'bitshares' blockchain
       * `quantity`  - amount which will be withdrawn
-      * `original_memo`  - original memo, which will be merged with additional data required by PXBTS->BTS transfer
       */
-      void withdraw( account_name from, std::string bts_to, asset quantity, std::string original_memo );
+      void withdraw( account_name from, std::string bts_to, asset quantity );
     private:
 
       void checker( account_name any_account, asset value );

@@ -138,8 +138,7 @@ struct actions: public tester
     return push_action( from, N(withdraw), mvo()
         ( "from", from )
         ( "bts_to", "any_bts_account" )
-        ( "quantity", quantity )
-        ( "original_memo", "any_memo" ),
+        ( "quantity", quantity ),
         beos_gateway_abi_ser,
         N(beos.gateway)
       );
