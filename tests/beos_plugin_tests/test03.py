@@ -21,13 +21,13 @@ def jsonArg(a):
     return " '" + json.dumps(a) + "' "
 
 def run(args):
-    print(' test02.py:', args)
+    print(' test03.py:', args)
     if subprocess.call(args, shell=True):
-      print(datetime.datetime.now,'test02.py: exiting because of error')
+      print(datetime.datetime.now,'test03.py: exiting because of error')
       sys.exit(1)
 
 def background(args, is_pipe = False ):
-    print('test02.py:', args)
+    print('test03.py:', args)
     if is_pipe:
       return subprocess.Popen( args, stdout=subprocess.PIPE, shell=True )
     else:

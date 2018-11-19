@@ -3,10 +3,15 @@
 #include <eosio/testing/tester.hpp>
 #include <eosio/chain/wast_to_wasm.hpp>
 #include <eosio/chain/eosio_contract.hpp>
+#include <eosio/chain/resource_limits.hpp>
 
 #include <eosio.bios/eosio.bios.wast.hpp>
 #include <eosio.bios/eosio.bios.abi.hpp>
 #include <fstream>
+
+#include <fc/variant_object.hpp>
+
+using mvo = fc::mutable_variant_object;
 
 eosio::chain::asset core_from_string(const std::string& s) {
   return eosio::chain::asset::from_string(s + " " CORE_SYMBOL_NAME);
@@ -65,7 +70,7 @@ namespace eosio { namespace testing {
    }
 
    fc::variant_object filter_fields(const fc::variant_object& filter, const fc::variant_object& value) {
-      fc::mutable_variant_object res;
+      mvo res;
       for( auto& entry : filter ) {
          auto it = value.find(entry.key());
          res( it->key(), it->value() );
@@ -82,10 +87,11 @@ namespace eosio { namespace testing {
      return control->head_block_id() == other.control->head_block_id();
    }
 
-   void base_tester::init(bool push_genesis, db_read_mode read_mode) {
+   void base_tester::init(bool push_genesis, db_read_mode read_mode, uint64_t state_size) {
       cfg.blocks_dir      = tempdir.path() / config::default_blocks_dir_name;
       cfg.state_dir  = tempdir.path() / config::default_state_dir_name;
-      cfg.state_size = 1024*1024*8;
+      //cfg.state_size = 1024*1024*8;
+      cfg.state_size = state_size;
       cfg.state_guard_size = 0;
       cfg.reversible_cache_size = 1024*1024*8;
       cfg.reversible_guard_size = 0;
@@ -274,7 +280,7 @@ namespace eosio { namespace testing {
   }
 
 
-   transaction_trace_ptr base_tester::create_account( account_name a, account_name creator, bool multisig, bool include_code ) {
+   transaction_trace_ptr base_tester::create_account( account_name a, account_name creator, bool multisig, bool include_code, int32_t buy_ram ) {
       signed_transaction trx;
       set_transaction_headers(trx);
 
@@ -311,9 +317,19 @@ namespace eosio { namespace testing {
                                 newaccount{
                                    .creator  = creator,
                                    .name     = a,
+                                   .init_ram = false,
                                    .owner    = owner_auth,
-                                   .active   = active_auth,
+                                   .active   = active_auth
                                 });
+
+      if( buy_ram > 0 ) {
+         trx.actions.emplace_back( get_action(config::system_account_name, N(buyram), vector<permission_level>{{creator,config::active_name}}, 
+                                   mvo()
+                                      ("payer", creator)
+                                      ("receiver", a)
+                                      ("quant", asset(buy_ram))
+                                 ));
+      }
 
       set_transaction_headers(trx);
       trx.sign( get_private_key( creator, "active" ), control->get_chain_id()  );
@@ -444,14 +460,13 @@ namespace eosio { namespace testing {
    } FC_CAPTURE_AND_RETHROW() }
 
    transaction_trace_ptr base_tester::push_reqauth( account_name from, const vector<permission_level>& auths, const vector<private_key_type>& keys ) {
-      variant pretty_trx = fc::mutable_variant_object()
+      variant pretty_trx = mvo()
          ("actions", fc::variants({
-            fc::mutable_variant_object()
+            mvo()
                ("account", name(config::system_account_name))
                ("name", "reqauth")
                ("authorization", auths)
-               ("data", fc::mutable_variant_object()
-                  ("from", from)
+               ("data", mvo()("from", from)
                )
             })
         );
@@ -478,24 +493,24 @@ namespace eosio { namespace testing {
 
    transaction_trace_ptr base_tester::push_dummy(account_name from, const string& v, uint32_t billed_cpu_time_us) {
       // use reqauth for a normal action, this could be anything
-      variant pretty_trx = fc::mutable_variant_object()
+      variant pretty_trx = mvo()
          ("actions", fc::variants({
-            fc::mutable_variant_object()
+            mvo()
                ("account", name(config::system_account_name))
                ("name", "reqauth")
                ("authorization", fc::variants({
-                  fc::mutable_variant_object()
+                  mvo()
                      ("actor", from)
                      ("permission", name(config::active_name))
                }))
-               ("data", fc::mutable_variant_object()
+               ("data", mvo()
                   ("from", from)
                )
             })
         )
         // lets also push a context free action, the multi chain test will then also include a context free action
         ("context_free_actions", fc::variants({
-            fc::mutable_variant_object()
+            mvo()
                ("account", name(config::null_account_name))
                ("name", "nonce")
                ("data", fc::raw::pack(v))
@@ -517,17 +532,17 @@ namespace eosio { namespace testing {
 
 
    transaction_trace_ptr base_tester::transfer( account_name from, account_name to, asset amount, string memo, account_name currency ) {
-      variant pretty_trx = fc::mutable_variant_object()
+      variant pretty_trx = mvo()
          ("actions", fc::variants({
-            fc::mutable_variant_object()
+            mvo()
                ("account", currency)
                ("name", "transfer")
                ("authorization", fc::variants({
-                  fc::mutable_variant_object()
+                  mvo()
                      ("actor", from)
                      ("permission", name(config::active_name))
                }))
-               ("data", fc::mutable_variant_object()
+               ("data", mvo()
                   ("from", from)
                   ("to", to)
                   ("quantity", amount)
@@ -546,17 +561,17 @@ namespace eosio { namespace testing {
 
 
    transaction_trace_ptr base_tester::issue( account_name to, string amount, account_name currency ) {
-      variant pretty_trx = fc::mutable_variant_object()
+      variant pretty_trx = mvo()
          ("actions", fc::variants({
-            fc::mutable_variant_object()
+            mvo()
                ("account", currency)
                ("name", "issue")
                ("authorization", fc::variants({
-                  fc::mutable_variant_object()
+                  mvo()
                      ("actor", currency )
                      ("permission", name(config::active_name))
                }))
-               ("data", fc::mutable_variant_object()
+               ("data", mvo()
                   ("to", to)
                   ("quantity", amount)
                )
@@ -777,6 +792,19 @@ namespace eosio { namespace testing {
       return asset(result, asset_symbol);
    }
 
+   fc::variant base_tester::get_staked_balance( const account_name& account ) const {
+      const auto& resource_limit_mgr = control->get_resource_limits_manager();
+      int64_t ram_bytes = 0;
+      int64_t net_weight = 0;
+      int64_t cpu_weight = 0;
+
+      resource_limit_mgr.get_account_limits( account, ram_bytes, net_weight, cpu_weight );
+
+      return mvo()
+        ( "ram_bytes", ram_bytes )
+        ( "net_weight", net_weight )
+        ( "cpu_weight", cpu_weight );
+   }
 
    vector<char> base_tester::get_row_by_account( uint64_t code, uint64_t scope, uint64_t table, const account_name& act ) const {
       vector<char> data;
@@ -874,7 +902,7 @@ namespace eosio { namespace testing {
       auto schedule = get_producer_keys( producer_names );
 
       return push_action( config::system_account_name, N(setprods), config::system_account_name,
-                          fc::mutable_variant_object()("schedule", schedule));
+                          mvo()("schedule", schedule));
    }
 
    const table_id_object* base_tester::find_table( name code, name scope, name table ) {

@@ -128,12 +128,16 @@ namespace eosiosystem {
       });
 
       if( producer_per_block_pay > 0 ) {
-         INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio.bpay),N(active)},
-                                                       { N(eosio.bpay), owner, asset(producer_per_block_pay), std::string("producer block pay") } );
+         int64_t cpu = producer_per_block_pay / 2;
+         int64_t net = producer_per_block_pay - cpu;
+         INLINE_ACTION_SENDER(eosiosystem::system_contract, delegatebw)( N(eosio), {N(eosio.bpay),N(active)},
+            { N(eosio.bpay), owner, asset(net), asset(cpu), true } );
       }
       if( producer_per_vote_pay > 0 ) {
-         INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio.vpay),N(active)},
-                                                       { N(eosio.vpay), owner, asset(producer_per_vote_pay), std::string("producer vote pay") } );
+         int64_t cpu = producer_per_vote_pay / 2;
+         int64_t net = producer_per_vote_pay - cpu;
+         INLINE_ACTION_SENDER(eosiosystem::system_contract, delegatebw)( N(eosio), {N(eosio.vpay),N(active)},
+            { N(eosio.vpay), owner, asset(net), asset(cpu), true } );
       }
    }
 

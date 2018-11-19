@@ -402,6 +402,7 @@ try {
                                 newaccount{
                                    .creator  = acc1,
                                    .name     = a,
+                                   .init_ram = false,
                                    .owner    = owner_auth,
                                    .active   = authority( chain.get_public_key( a, "active" ) )
                                 });
@@ -454,6 +455,7 @@ try {
                                 newaccount{
                                    .creator  = creator,
                                    .name     = a,
+                                   .init_ram = false,
                                    .owner    = authority( chain.get_public_key( a, "owner" ) ),
                                    .active   = invalid_auth//authority( chain.get_public_key( a, "active" ) ),
                                 });

@@ -75,6 +75,7 @@ public:
                                 newaccount{
                                    .creator  = creator,
                                    .name     = a,
+                                   .init_ram = false,
                                    .owner    = owner_auth,
                                    .active   = authority( get_public_key( a, "active" ) )
                                 });

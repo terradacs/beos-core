@@ -586,9 +586,8 @@ BOOST_FIXTURE_TEST_CASE(cpu_usage_tests, tester ) try {
 } FC_LOG_AND_RETHROW()
 */
 
-
 // test weighted cpu limit
-BOOST_FIXTURE_TEST_CASE(weighted_cpu_limit_tests, tester ) try {
+BOOST_FIXTURE_TEST_CASE(weighted_cpu_limit_tests, tester, *boost::unit_test::disabled() ) try {
 // TODO Increase the robustness of this test.
    resource_limits_manager mgr = control->get_mutable_resource_limits_manager();
    create_accounts( {N(f_tests)} );
@@ -1163,6 +1162,7 @@ BOOST_FIXTURE_TEST_CASE(eosio_abi, TESTER) try {
                              newaccount{
                                    .creator  = config::system_account_name,
                                    .name     = a,
+                                   .init_ram = false,
                                    .owner    = owner_auth,
                                    .active   = authority( get_public_key( a, "active" ) )
                              });

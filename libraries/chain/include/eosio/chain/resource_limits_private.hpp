@@ -136,6 +136,12 @@ namespace eosio { namespace chain { namespace resource_limits {
       account_name owner;
       bool pending = false;
 
+      //ABW: it looks dangerous that all accounts start with unlimited resources, however they need
+      //them for two reasons:
+      // - before system contract is set all accounts are special, even if they are not native;
+      //   for them newaccount is never called and they are supposed to stay on unlimited resources
+      // - regular accounts still need minimal memory between apply_eosio_newaccount and call to
+      //   newaccount or check that runs there will fail
       int64_t net_weight = -1;
       int64_t cpu_weight = -1;
       int64_t ram_bytes = -1;

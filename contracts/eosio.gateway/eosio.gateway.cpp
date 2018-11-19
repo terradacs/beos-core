@@ -59,17 +59,21 @@ void gateway::issue( account_name to, asset quantity )
   }
 }
 
-void gateway::withdraw( account_name owner, asset quantity )
+void gateway::withdraw( account_name from, std::string bts_to, asset quantity, std::string original_memo )
 {
-  checker( owner, quantity );
+  checker( from, quantity );
 
   eosio_assert( quantity.amount > 0, "must withdraw positive quantity" );
 
-  auto balance = eosio::token( N(eosio.token) ).check_balance( owner, quantity.symbol );
+  auto balance = eosio::token( N(eosio.token) ).check_balance( from, quantity.symbol );
   eosio_assert( balance >= quantity, "overdrawn balance during withdraw" );
 
-  INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {owner,N(active)},
-                                               { owner, N(beos.gateway), quantity, std::string("withdraw") } );
+  std::string new_memo = "bts";
+  new_memo += ":" + bts_to;
+  new_memo += ":" + original_memo;
+
+  INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {from,N(active)},
+                                               { from, N(beos.gateway), quantity, new_memo } );
 }
 
 void gateway::checker( account_name any_account, asset value )

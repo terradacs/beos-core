@@ -219,24 +219,20 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
         auto actual = get_balance(config::system_account_name);
         BOOST_REQUIRE_EQUAL(initial_supply, actual);
 
-        // Create genesis accounts
-        for( const auto& a : test_genesis ) {
-           create_account( a.aname, config::system_account_name );
-        }
-
         // Set eosio.system to eosio
         set_code_abi(config::system_account_name, eosio_system_wast, eosio_system_abi);
 
         initial_settings(eosio_init_wast, eosio_init_abi, eosio_gateway_wast, eosio_gateway_abi, eosio_distribution_wast, eosio_distribution_abi);
 
-        // Buy ram and stake cpu and net for each genesis accounts
+        // Create genesis accounts, buy ram and stake cpu and net for them
         for( const auto& a : test_genesis ) {
            auto ib = a.initial_balance;
            auto ram = 1000;
            auto net = (ib - ram) / 2;
            auto cpu = ib - net - ram;
+           ram += 2724; //2724 is minimal amount of RAM for account - with exactly that amount after creation it has 0 free RAM
 
-           auto r = buyram(config::system_account_name, a.aname, asset(ram));
+           auto r = create_account( a.aname, config::system_account_name, false, true, ram );
            BOOST_REQUIRE( !r->except_ptr );
 
            r = delegate_bandwidth(N(eosio.stake), a.aname, asset(net), asset(cpu));
@@ -317,8 +313,11 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
         // Spend some time so the producer pay pool is filled by the inflation rate
         produce_min_num_of_blocks_to_spend_time_wo_inactive_prod(fc::seconds(30 * 24 * 3600)); // 30 days
         // Since the total activated stake is larger than 150,000,000, pool should be filled reward should be bigger than zero
+        auto old_stake = get_staked_balance(N(runnerup1));
         claim_rewards(N(runnerup1));
-        BOOST_TEST(get_balance(N(runnerup1)).get_amount() > 0);
+        auto new_stake = get_staked_balance(N(runnerup1));
+        BOOST_TEST(new_stake["net_weight"].as_int64() > old_stake["net_weight"].as_int64());
+        BOOST_TEST(new_stake["cpu_weight"].as_int64() > old_stake["cpu_weight"].as_int64());
 
         const auto first_june_2018 = fc::seconds(1527811200); // 2018-06-01
         const auto first_june_2028 = fc::seconds(1843430400); // 2028-06-01

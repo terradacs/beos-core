@@ -140,16 +140,18 @@ class privileged_api : public context_aware_api {
        * @param cpu_weight - the weight for determining share of compute capacity
        */
       void set_resource_limits( account_name account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight ) {
-         EOS_ASSERT(ram_bytes >= -1, wasm_execution_error, "invalid value for ram resource limit expected [-1,INT64_MAX]");
-         EOS_ASSERT(net_weight >= -1, wasm_execution_error, "invalid value for net resource weight expected [-1,INT64_MAX]");
-         EOS_ASSERT(cpu_weight >= -1, wasm_execution_error, "invalid value for cpu resource weight expected [-1,INT64_MAX]");
-         if( context.control.get_mutable_resource_limits_manager().set_account_limits(account, ram_bytes, net_weight, cpu_weight) ) {
-            context.trx_context.validate_ram_usage.insert( account );
-         }
+         EOS_ASSERT(ram_bytes >= 0, wasm_execution_error, "invalid value for ram resource limit, expected [0,INT64_MAX]");
+         EOS_ASSERT(net_weight >= 0, wasm_execution_error, "invalid value for net resource weight, expected [0,INT64_MAX]");
+         EOS_ASSERT(cpu_weight >= 0, wasm_execution_error, "invalid value for cpu resource weight, expected [0,INT64_MAX]");
+         set_resource_limits_impl( account, ram_bytes, net_weight, cpu_weight );
       }
 
       void get_resource_limits( account_name account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight ) {
          context.control.get_resource_limits_manager().get_account_limits( account, ram_bytes, net_weight, cpu_weight);
+      }
+
+      int64_t get_account_ram_usage( account_name account ) {
+         return context.control.get_resource_limits_manager().get_account_ram_usage( account );
       }
 
       void change_resource_limits( account_name account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight ) {
@@ -159,11 +161,22 @@ class privileged_api : public context_aware_api {
 
          get_resource_limits( account, _ram_bytes, _net_weight, _cpu_weight );
 
-         _ram_bytes += ram_bytes;
-         _net_weight += net_weight;
-         _cpu_weight += cpu_weight;
+         if (_ram_bytes >= 0) {
+            _ram_bytes += ram_bytes;
+            EOS_ASSERT(_ram_bytes >= 0, wasm_execution_error, "invalid value for ram resource limit, expected [0,INT64_MAX]");
+         }
+            
+         if (_net_weight >= 0) {
+            _net_weight += net_weight;
+            EOS_ASSERT(_net_weight >= 0, wasm_execution_error, "invalid value for net resource weight, expected [0,INT64_MAX]");
+         }
+            
+         if (_cpu_weight >= 0) {
+            _cpu_weight += cpu_weight;
+            EOS_ASSERT(_cpu_weight >= 0, wasm_execution_error, "invalid value for cpu resource weight, expected [0,INT64_MAX]");
+         }
 
-         set_resource_limits( account, _ram_bytes, _net_weight, _cpu_weight );
+         set_resource_limits_impl( account, _ram_bytes, _net_weight, _cpu_weight );
       }
 
       int64_t set_proposed_producers( array_ptr<char> packed_producer_schedule, size_t datalen) {
@@ -218,6 +231,12 @@ class privileged_api : public context_aware_api {
          });
       }
 
+   private:
+      inline void set_resource_limits_impl( account_name account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight ) {
+         if( context.control.get_mutable_resource_limits_manager().set_account_limits(account, ram_bytes, net_weight, cpu_weight) ) {
+            context.trx_context.validate_ram_usage.insert( account );
+         }
+      }
 };
 
 class softfloat_api : public context_aware_api {
@@ -1026,21 +1045,21 @@ class console_api : public context_aware_api {
       }
 
       void printi(int64_t val) {
-         DBG("%lli",val)
+         DBG("%li",val)
          if ( !ignore ) {
             context.console_append(val);
          }
       }
 
       void printui(uint64_t val) {
-         DBG("%lli",val)
+         DBG("%lu",val)
          if ( !ignore ) {
             context.console_append(val);
          }
       }
 
       void printi128(const __int128& val) {
-         DBG("%lli",val)
+         DBG("%lli",static_cast<const long long int>(val))
          if ( !ignore ) {
             bool is_negative = (val < 0);
             unsigned __int128 val_magnitude;
@@ -1061,7 +1080,7 @@ class console_api : public context_aware_api {
       }
 
       void printui128(const unsigned __int128& val) {
-         DBG("%lli",val)
+         DBG("%lli",static_cast<const unsigned long long int>(val))
          if ( !ignore ) {
             fc::uint128_t v(val>>64, static_cast<uint64_t>(val) );
             context.console_append(fc::variant(v).get_string());
@@ -1069,7 +1088,7 @@ class console_api : public context_aware_api {
       }
 
       void printsf( float val ) {
-         DBG("%e",val)
+         DBG("%.6g",val)
          if ( !ignore ) {
             // Assumes float representation on native side is the same as on the WASM side
             auto& console = context.get_console_stream();
@@ -1083,7 +1102,7 @@ class console_api : public context_aware_api {
       }
 
       void printdf( double val ) {
-         DBG("%e",val)
+         DBG("%.6g",val)
          if ( !ignore ) {
             // Assumes double representation on native side is the same as on the WASM side
             auto& console = context.get_console_stream();
@@ -1097,7 +1116,6 @@ class console_api : public context_aware_api {
       }
 
       void printqf( const float128_t& val ) {
-         DBG("%Le",val)
          /*
           * Native-side long double uses an 80-bit extended-precision floating-point number.
           * The easiest solution for now was to use the Berkeley softfloat library to round the 128-bit
@@ -1121,6 +1139,13 @@ class console_api : public context_aware_api {
             context.console_append( *(long double*)(&val_approx) );
 
             console.precision( orig_prec );
+            DBG("%.6Lg",*(long double*)(&val_approx))
+         } else {
+#ifdef CAVEMEN_DEBUG
+            extFloat80_t val_approx;
+            f128M_to_extF80M(&val, &val_approx);
+            DBG("%.6Lg",*(long double*)(&val_approx))
+#endif //CAVEMEN_DEBUG
          }
       }
 
@@ -1774,6 +1799,7 @@ REGISTER_INTRINSICS(privileged_api,
    (activate_feature,                 void(int64_t)                         )
    (get_resource_limits,              void(int64_t,int,int,int)             )
    (set_resource_limits,              void(int64_t,int64_t,int64_t,int64_t) )
+   (get_account_ram_usage,            int64_t(int64_t)                      )
    (change_resource_limits,           void(int64_t,int64_t,int64_t,int64_t) )
    (set_proposed_producers,           int64_t(int,int)                      )
    (get_blockchain_parameters_packed, int(int, int)                         )
