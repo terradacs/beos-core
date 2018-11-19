@@ -74,6 +74,23 @@ struct actions: public tester
     act.data    = ser.variant_to_binary( action_type_name, data, abi_serializer_max_time );
   }
 
+  template <typename T>
+  void create_action( action& act, const action_name& name, const T& data, account_name owner )
+  {
+    act.account = owner;
+    act.name    = name;
+    act.data    = fc::raw::pack(data);
+  }
+
+  template <typename T>
+  action_result push_action( const account_name& signer, const action_name &name, const T& data, const account_name& owner)
+  {
+    action act;
+    create_action( act, name, data, owner );
+
+    return base_tester::push_action( std::move(act), uint64_t(signer));
+  }
+
   action_result push_action( const account_name& signer, const action_name &name, const variant_object &data, const abi_serializer& ser, const account_name& owner )
   {
     action act;
@@ -920,6 +937,44 @@ BOOST_FIXTURE_TEST_CASE( trustee_reward_test, eosio_init_tester ) try {
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 110u );
 
   CHECK_STATS(beos.trustee, "10.0000 PROXY", "40.0000 BEOS", "");
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( distrib_onblock_call_test, eosio_init_tester ) try {
+
+  test_global_state tgs;
+
+  tgs.beos.starting_block_for_distribution = 100;
+  tgs.beos.ending_block_for_distribution = 200;
+  tgs.beos.distribution_payment_block_interval_for_distribution = 1;
+  tgs.beos.amount_of_reward = 200'000;
+
+  tgs.ram.starting_block_for_distribution = 1100;
+  tgs.ram.ending_block_for_distribution = 1200;
+  tgs.ram.distribution_payment_block_interval_for_distribution = 1;
+  tgs.ram.amount_of_reward = 200'000;
+
+  tgs.trustee.amount_of_reward = 100'000;
+
+  BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
+
+  issue( N(alice), asset::from_string("1000.0000 PROXY") );
+
+  uint32_t block_nr;
+
+  block_nr = 20; // outside of distribution period
+  push_action( N(alice), N(onblock), block_nr, config::distribution_account_name );
+
+  CHECK_STATS(alice, "1000.0000 PROXY", "0.0000 BEOS", "");
+
+  block_nr = 150; // inside distribution period
+  try
+  {
+    push_action( N(alice), N(onblock), block_nr, config::distribution_account_name );
+  }
+  catch(...) {}
+
+  CHECK_STATS(alice, "1000.0000 PROXY", "0.0000 BEOS", "");
 
 } FC_LOG_AND_RETHROW()
 
