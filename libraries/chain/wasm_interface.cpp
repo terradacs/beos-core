@@ -1788,6 +1788,7 @@ class distribution_api : public context_aware_api {
          name actor = ctx.trx_context.trx.first_authorizor();
          DBG("distribution_api::distribution_api: actor = %s", actor.to_string().c_str());
 
+         // System account 'eosio' and 'beos.distrib' are the only accounts able to use distribution_api (from inside 'onblock')
          EOS_ASSERT( actor == config::distribution_account_name || actor == config::system_account_name,
                      unaccessible_api,
                      "${code} does not have permission to call this API", ("code",actor) );
