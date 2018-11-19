@@ -1,9 +1,11 @@
 stages:
  - build
+ - staging-deployment
 #  - plugin-test
 
 before_script:
  - pwd
+ - whoami
 
 build:
   stage: build
@@ -19,11 +21,11 @@ build:
    - ./deploy.py --build-beos
    - cat beos_deploy_main.log
    - echo "Stopping old keosd instance"
-   - sudo kill -2 $(sudo lsof -t -i:8900)
-   - sudo python3 ./wait.py $(sudo lsof -t -i:8900)
+   - kill -2 $(lsof -t -i:8900)
+   - python3 ./wait.py $(lsof -t -i:8900)
    - echo "Stopping old nodeos instance"
-   - sudo kill -2 $(sudo lsof -t -i:8888)
-   - sudo python3 ./wait.py $(sudo lsof -t -i:8888)
+   - kill -2 $(lsof -t -i:8888)
+   - python3 ./wait.py $(lsof -t -i:8888)
    - ./deploy.py --initialize-beos
    - cat beos_deploy_main.log
    - cd ../build/beos-autobuild/
@@ -32,11 +34,11 @@ build:
    - echo "Starting unit tests"
    - ./unittests/unit_test --log_level=test_suite
    - echo "Starting keosd and nodeos"
-   - sudo python3 ./run.py
+   - python3 ./run.py
    - echo "Started keosd instance:"
-   - sudo lsof -t -i:8900 || true
+   - lsof -t -i:8900 || true
    - echo "Started nodeos instance:"
-   - sudo lsof -t -i:8888 || true
+   - lsof -t -i:8888 || true
    - screen -list || true
    
   cache:
@@ -48,6 +50,14 @@ build:
     name: development
     url: http://192.168.6.144:8888/v1/chain/get_info
 
+staging:
+  stage: staging-deployment
+  script:
+   - pwd
+   - whoami
+   - git checkout $CI_COMMIT_SHA
+  when: manual
+ 
 # currently disabled and not fully configured
 # plugin-test:
 #   stage: plugin-test
