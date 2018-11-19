@@ -1778,20 +1778,26 @@ class call_depth_api : public context_aware_api {
 };
 
 /*
- * This api is dedicated for using from eosio::distribution.
+ * This api is dedicated for using from eosio::distribution contract.
  */
 class distribution_api : public context_aware_api {
    public:
       distribution_api( apply_context& ctx )
-      : context_aware_api( ctx, true ) {}
+      : context_aware_api( ctx )
+      {
+         name actor = ctx.trx_context.trx.first_authorizor();
+         DBG("distribution_api::distribution_api: actor = %s", actor.to_string().c_str());
+
+         EOS_ASSERT( actor == config::distribution_account_name || actor == config::system_account_name,
+                     unaccessible_api,
+                     "${code} does not have permission to call this API", ("code",actor) );
+      }
 
       void reward_all( uint64_t amount_of_reward, uint64_t amount_of_reward_for_trustee, uint64_t gathered_amount,
                        array_ptr<char> symbol, size_t symbol_len, //asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/,
                        bool is_beos_mode,
                        array_ptr<block_producer_voting_info> producerInfos, size_t producerInfoSize)
       {
-         //elog( "From inside reward_all! block_nr == ${n}, gathered_amount = ${a}", ("n", block_nr) ("a", gathered_amount) );
-
          datastream<const char*> ds( symbol, symbol_len );
          asset _symbol;
          fc::raw::unpack(ds, _symbol);
@@ -1805,8 +1811,6 @@ class distribution_api : public context_aware_api {
       void reward_done( array_ptr<char> symbol, size_t symbol_len, //asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/,
                         bool is_beos_mode )
       {
-         //edump(("from inside reward_done!"));
-
          datastream<const char*> ds( symbol, symbol_len );
          asset _symbol;
          fc::raw::unpack(ds, _symbol);

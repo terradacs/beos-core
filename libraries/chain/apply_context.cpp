@@ -12,6 +12,14 @@
 #include <eosio/chain/global_property_object.hpp>
 #include <boost/container/flat_set.hpp>
 
+//ABW: uncomment the following symbol to unconditionally write eosio::print calls to file (works even during unit tests)
+//#define CAVEMEN_DEBUG
+#ifdef CAVEMEN_DEBUG
+#define DBG(format, ... ) { FILE *pFile = fopen("debug.log","a"); fprintf(pFile,format "\n",__VA_ARGS__); fclose(pFile); }
+#else
+#define DBG(format, ... )
+#endif
+
 using boost::container::flat_set;
 
 namespace eosio { namespace chain {
@@ -45,6 +53,10 @@ void apply_context::exec_one( action_trace& trace )
    trace.act = act;
    trace.context_free = context_free;
 
+   DBG("apply_context::exec_one: receiver: %s, action.account: %s, action.name: %s",
+      receiver.to_string().c_str(), act.account.to_string().c_str(), act.name.to_string().c_str());
+   DBG("apply_context::exec_one: first_authorizor: %s", trx_context.trx.first_authorizor().to_string().c_str());
+
    const auto& cfg = control.get_global_properties().configuration;
    try {
       try {
@@ -72,6 +84,8 @@ void apply_context::exec_one( action_trace& trace )
          }
       } FC_RETHROW_EXCEPTIONS( warn, "pending console output: ${console}", ("console", _pending_console_output.str()) )
    } catch( fc::exception& e ) {
+      DBG("apply_context::exec_one exception: receiver: %s, action.account: %s, action.name: %s",
+         receiver.to_string().c_str(), act.account.to_string().c_str(), act.name.to_string().c_str());
       trace.receipt = r; // fill with known data
       trace.except = e;
       finalize_trace( trace, start );
@@ -110,14 +124,6 @@ void apply_context::finalize_trace( action_trace& trace, const fc::time_point& s
 
    trace.elapsed = fc::time_point::now() - start;
 }
-
-//ABW: uncomment the following symbol to unconditionally write eosio::print calls to file (works even during unit tests)
-#define CAVEMEN_DEBUG
-#ifdef CAVEMEN_DEBUG
-#define DBG(format, ... ) { FILE *pFile = fopen("debug.log","a"); fprintf(pFile,format "\n",__VA_ARGS__); fclose(pFile); }
-#else
-#define DBG(format, ... )
-#endif
 
 void apply_context::reward_stake( const account_name& account, int64_t val, const voting_manager::producer_info_index& _producers)
 {
@@ -192,24 +198,31 @@ void apply_context::reward_all( uint64_t amount_of_reward, uint64_t amount_of_re
       return asset(result, asset_symbol);
    };
 
+   uint64_t rewards_sum = 0;
+
    for (auto& account : accounts_index)
    {
       auto& name = account.name;
       asset balance( get_currency_balance(name, sym.get_symbol()) );
       //Calculation ratio for given account.
       int128_t block_amount = static_cast<int128_t>(balance.get_amount()) * amount_of_reward;
-      long double dval = static_cast<long double>(block_amount) / gathered_amount;
-      //int64_t val = static_cast<int64_t>(dval);
-      int64_t val = llround(dval); // [MK]: round is for compatibility with the same code on contract side
+      long double dreward = static_cast<long double>(block_amount) / gathered_amount;
+      //int64_t reward = static_cast<int64_t>(dreward);
+      int64_t reward = llround(dreward); // [MK]: round is for compatibility with the same code on contract side
 
-      if (val <= 0)
+      if (reward <= 0)
          continue;
 
+      rewards_sum += reward;
+
       if (is_beos_mode)
-        reward_stake( name, val, _producers);
+        reward_stake( name, reward, _producers);
       else
-        reward_ram( name, val );
+        reward_ram( name, reward );
    }
+
+   if (rewards_sum != 0 && is_beos_mode)
+     reward_stake( N(eosio.stake), rewards_sum, _producers);
 }
 
 void apply_context::reward_done( asset symbol, bool is_beos_mode )
