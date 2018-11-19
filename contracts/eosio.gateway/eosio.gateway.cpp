@@ -59,7 +59,7 @@ void gateway::issue( account_name to, asset quantity )
   }
 }
 
-void gateway::withdraw( account_name from, std::string bts_to, asset quantity, std::string original_memo )
+void gateway::withdraw( account_name from, std::string bts_to, asset quantity )
 {
   checker( from, quantity );
 
@@ -70,7 +70,6 @@ void gateway::withdraw( account_name from, std::string bts_to, asset quantity, s
 
   std::string new_memo = "bts";
   new_memo += ":" + bts_to;
-  new_memo += ":" + original_memo;
 
   INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {from,N(active)},
                                                { from, N(beos.gateway), quantity, new_memo } );
