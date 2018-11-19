@@ -19,28 +19,25 @@ build:
    - ./deploy.py --build-beos
    - cat beos_deploy_main.log
    - echo "Stopping old keosd instance"
-   - sudo kill $(sudo lsof -t -i:8900) || true
+   - kill -2 $(lsof -t -i:8900) || true
+   - python3 ./wait.py $(lsof -t -i:8900)
    - echo "Stopping old nodeos instance"
-   - sudo kill $(sudo lsof -t -i:8888) || true
+   - kill -2 $(lsof -t -i:8888) || true
+   - python3 ./wait.py $(lsof -t -i:8888)
    - ./deploy.py --initialize-beos
    - cat beos_deploy_main.log
-   - echo "Stopping old keosd instance"
-   - sudo kill $(sudo lsof -t -i:8900) || true
-   - echo "Stopping old nodeos instance"
-   - sudo kill $(sudo lsof -t -i:8888) || true
    - cd ../build/beos-autobuild/
+   - echo "Starting integration tests"
+   - make test
+   - echo "Starting unit tests"
+   - ./unittests/unit_test --log_level=test_suite
    - echo "Starting keosd and nodeos"
    - python3 ./run.py
    - echo "Started keosd instance:"
-   - sudo lsof -t -i:8900 || true
+   - lsof -t -i:8900 || true
    - echo "Started nodeos instance:"
-   - sudo lsof -t -i:8888 || true
+   - lsof -t -i:8888 || true
    - screen -list || true
-   - echo "Starting integration tests"
-   - make test
-   - cd ./unittests
-   - echo "Starting unit tests"
-   - ./unit_test --log_level=test_suite
    
   cache:
     {}

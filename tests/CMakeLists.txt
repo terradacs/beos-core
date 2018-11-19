@@ -49,30 +49,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/launcher_test.py ${CMAKE_CURRENT_BINA
 execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/beos_plugin_tests ${CMAKE_CURRENT_BINARY_DIR}/beos_plugin_tests)
 execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/beos_transfer_tests ${CMAKE_CURRENT_BINARY_DIR}/beos_transfer_tests)
 
-
-add_test(NAME test03_scenarios_deploy COMMAND test03_scenarios_deploy.py --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --public-key ${EOSIO_ROOT_KEY}
---add-block-number
---restore-node-params
---starting-block-for-initial-witness_election ${STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION}
---starting-block-for-beos_distribution ${STARTING_BLOCK_FOR_BEOS_DISTRIBUTION}
---ending-block-for-beos-distribution ${ENDING_BLOCK_FOR_BEOS_DISTRIBUTION}
---distribution-payment-block-interval-for-beos-distribution ${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION}
---amount-of-reward-beos ${AMOUNT_OF_REWARD_BEOS}
---starting-block-for-ram-distribution ${STARTING_BLOCK_FOR_RAM_DISTRIBUTION}
---ending-block-for-ram-distribution ${ENDING_BLOCK_FOR_RAM_DISTRIBUTION}
---distribution-payment-block-interval-for-ram-distribution ${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION}
---amount-of-reward-ram ${AMOUNT_OF_REWARD_RAM}
---starting-block-for-trustee-distribution ${STARTING_BLOCK_FOR_TRUSTEE_DISTRIBUTION}
---ending-block-for-trustee-distribution ${ENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION}
---distribution-payment-block-interval-for-trustee-distribution ${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_TRUSTEE_DISTRIBUTION}
---amount-of-reward-trustee ${AMOUNT_OF_REWARD_TRUSTEE}
- WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests/beos_plugin_tests/)
-set_property(TEST test03_scenarios_deploy PROPERTY LABELS nonparallelizable_tests)
-add_test(NAME test04_account_creation_and_get_account_deploy COMMAND tests/beos_plugin_tests/test04_account_creation_and_get_account_deploy.py  --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --public-key ${EOSIO_ROOT_KEY}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST test04_account_creation_and_get_account_deploy PROPERTY LABELS nonparallelizable_tests)
-add_test(NAME test06_account_creation_and_account_validator_deploy COMMAND tests/beos_plugin_tests/test06_account_creation_and_account_validator_deploy.py  --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --public-key ${EOSIO_ROOT_KEY}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR} )
-set_property(TEST test06_account_creation_and_account_validator_deploy PROPERTY LABELS nonparallelizable_tests)
-
 #To run plugin_test with all log from blockchain displayed, put --verbose after --, i.e. plugin_test -- --verbose
 add_test(NAME plugin_test COMMAND plugin_test --report_level=detailed --color_output)
 
@@ -198,6 +174,34 @@ if (NOT DISABLE_FAILING_TESTS)
 else()
   message(WARNING "nodeos_under_min_avail_ram_lr_test test has been disabled")
 endif()
+
+add_test(NAME start_nodeos_keosd_via_run_py COMMAND python3 run.py WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_property(TEST start_nodeos_keosd_via_run_py PROPERTY LABELS beos_tests)
+add_test(NAME test03_scenarios_deploy COMMAND test03_scenarios_deploy.py --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --public-key ${EOSIO_ROOT_KEY}
+--add-block-number
+--restore-node-params
+--starting-block-for-initial-witness_election ${STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION}
+--starting-block-for-beos_distribution ${STARTING_BLOCK_FOR_BEOS_DISTRIBUTION}
+--ending-block-for-beos-distribution ${ENDING_BLOCK_FOR_BEOS_DISTRIBUTION}
+--distribution-payment-block-interval-for-beos-distribution ${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION}
+--amount-of-reward-beos ${AMOUNT_OF_REWARD_BEOS}
+--starting-block-for-ram-distribution ${STARTING_BLOCK_FOR_RAM_DISTRIBUTION}
+--ending-block-for-ram-distribution ${ENDING_BLOCK_FOR_RAM_DISTRIBUTION}
+--distribution-payment-block-interval-for-ram-distribution ${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION}
+--amount-of-reward-ram ${AMOUNT_OF_REWARD_RAM}
+--starting-block-for-trustee-distribution ${STARTING_BLOCK_FOR_TRUSTEE_DISTRIBUTION}
+--ending-block-for-trustee-distribution ${ENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION}
+--distribution-payment-block-interval-for-trustee-distribution ${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_TRUSTEE_DISTRIBUTION}
+--amount-of-reward-trustee ${AMOUNT_OF_REWARD_TRUSTEE}
+ WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests/beos_plugin_tests/)
+set_property(TEST test03_scenarios_deploy PROPERTY LABELS nonparallelizable_tests)
+add_test(NAME test04_account_creation_and_get_account_deploy COMMAND tests/beos_plugin_tests/test04_account_creation_and_get_account_deploy.py  --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --public-key ${EOSIO_ROOT_KEY}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_property(TEST test04_account_creation_and_get_account_deploy PROPERTY LABELS nonparallelizable_tests)
+add_test(NAME test06_account_creation_and_account_validator_deploy COMMAND tests/beos_plugin_tests/test06_account_creation_and_account_validator_deploy.py  --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --public-key ${EOSIO_ROOT_KEY}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR} )
+set_property(TEST test06_account_creation_and_account_validator_deploy PROPERTY LABELS nonparallelizable_tests)
+
+add_test(NAME stop_nodeos_keosd_via_run_py COMMAND python3 run.py --cancel WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_property(TEST stop_nodeos_keosd_via_run_py PROPERTY LABELS beos_tests)
 
 if(ENABLE_COVERAGE_TESTING)
 

@@ -1292,16 +1292,16 @@ class Cluster(object):
         if self.useBiosBootFile:
             Cluster.dumpErrorDetailImpl(Cluster.__bootlog)
 
-    def killall(self, silent=True, allInstances=False):
+    def killall(self, silent=True, allInstances=False, signal=9):
         """Kill cluster nodeos instances. allInstances will kill all nodeos instances running on the system."""
-        cmd="%s -k 9" % (Utils.EosLauncherPath)
+        cmd="%s -k %i" % (Utils.EosLauncherPath, signal)
         if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
         if 0 != subprocess.call(cmd.split(), stdout=Utils.FNull):
             if not silent: Utils.Print("Launcher failed to shut down eos cluster.")
 
         if allInstances:
             # ocassionally the launcher cannot kill the eos server
-            cmd="pkill -9 %s" % (Utils.EosServerName)
+            cmd="pkill -%i %s" % (signal, Utils.EosServerName)
             if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
             if 0 != subprocess.call(cmd.split(), stdout=Utils.FNull):
                 if not silent: Utils.Print("Failed to shut down eos cluster.")
@@ -1310,7 +1310,7 @@ class Cluster(object):
         for node in self.nodes:
             try:
                 if node.pid is not None:
-                    os.kill(node.pid, signal.SIGKILL)
+                    os.kill(node.pid, signal)
             except OSError as _:
                 pass
 
