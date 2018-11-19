@@ -101,6 +101,8 @@ def run_nodeos_postconf(node_index, name, public_key, use_https = False):
     subprocess.Popen(parameters)
     with open("run_nodeos.pid", "w") as pid_file:
         pid_file.write("{0}-{1}".format("nodeos", datetime.datetime.now().strftime("%Y-%m-%d")))
+    import time
+    time.sleep(10) # for testing purposes only!
 
 def kill_process(pid_file_name):
     import signal
