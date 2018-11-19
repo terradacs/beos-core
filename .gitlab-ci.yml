@@ -7,6 +7,9 @@ before_script:
 
 build:
   stage: build
+  variables:
+    LC_ALL: "C"
+  
   script:
    - rm -rf ./build
    - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
