@@ -81,7 +81,7 @@ class voting_manager final
    public:
       typedef boost::container::flat_map<account_name, block_producer_voting_info*> producer_info_index;
 
-      voting_manager(controller& c, chainbase::database& d) : _controller(c), _db(d) {}
+      voting_manager( const controller& c, chainbase::database& d) : _controller(c), _db(d) {}
 
       void add_indices();
       void initialize_database();
@@ -136,7 +136,7 @@ class voting_manager final
 
    /// Class data:
    private:
-      controller& _controller;
+      const controller& _controller;
       chainbase::database& _db;
    };
 

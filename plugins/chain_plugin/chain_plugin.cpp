@@ -15,6 +15,7 @@
 #include <eosio/chain/controller.hpp>
 #include <eosio/chain/generated_transaction_object.hpp>
 #include <eosio/chain/snapshot.hpp>
+#include <eosio/chain/voting_manager.hpp>
 
 #include <eosio/chain/eosio_contract.hpp>
 
@@ -1761,16 +1762,10 @@ read_only::get_account_results read_only::get_account( const get_account_params&
          }
       }
 
-      t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple( config::system_account_name, config::system_account_name, N(voters) ));
-      if (t_id != nullptr) {
-         const auto &idx = d.get_index<key_value_index, by_scope_primary>();
-         auto it = idx.find(boost::make_tuple( t_id->id, params.account_name ));
-         if ( it != idx.end() ) {
-            vector<char> data;
-            copy_inline_row(*it, data);
-            result.voter_info = abis.binary_to_variant( "voter_info", data, abi_serializer_max_time, shorten_abi_errors );
-         }
-      }
+      voting_manager vm( db, const_cast< database& >( db.db() ) );
+      const voter_info_object* found = vm.find_voter_info( params.account_name );
+      if( found )
+        result.voter_info = *found;
    }
    return result;
 }
