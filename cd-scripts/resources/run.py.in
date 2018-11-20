@@ -55,11 +55,6 @@ def wait_for_string_in_file(log_file_name, string, timeout):
                     break
             if leave:
                 break
-        to_timeout = to_timeout + step
-        if to_timeout > timeout:
-            msg = "Timeout during wait for string {0}".format(string)
-            print(msg)
-            raise BeosRunnerException(msg)
 
 def run_keosd_postconf(ip_address, port, wallet_dir, use_https = False):
     parameters = None
