@@ -1762,10 +1762,23 @@ read_only::get_account_results read_only::get_account( const get_account_params&
          }
       }
 
-      voting_manager vm( db, const_cast< database& >( db.db() ) );
+      const voting_manager& vm = db.get_voting_manager();
       const voter_info_object* found = vm.find_voter_info( params.account_name );
-      if( found )
-        result.voter_info = *found;
+      if(found != nullptr)
+         {
+         result.voter_info = mutable_variant_object()
+            ("owner", found->owner)
+            ("proxy", found->proxy)
+            ("producers", found->producers)
+            ("staked", found->staked)
+            ("last_vote_weight", found->last_vote_weight)
+            ("proxied_vote_weight", found->proxied_vote_weight)
+            ("is_proxy", found->is_proxy)
+            ("reserved1", found->reserved1)
+            ("reserved2", found->reserved2)
+            ("reserved3", found->reserved3)
+            ;
+         }
    }
    return result;
 }

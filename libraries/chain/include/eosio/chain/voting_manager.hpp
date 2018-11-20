@@ -16,6 +16,7 @@ namespace eosio {
 namespace chain {
 
 class controller;
+struct controller_impl;
 
 struct voter_info_object : public chainbase::object<voter_info_object_type, voter_info_object> {
    
@@ -81,13 +82,6 @@ class voting_manager final
    public:
       typedef boost::container::flat_map<account_name, block_producer_voting_info*> producer_info_index;
 
-      voting_manager( const controller& c, chainbase::database& d) : _controller(c), _db(d) {}
-
-      void add_indices();
-      void initialize_database();
-      void add_to_snapshot(const snapshot_writer_ptr& snapshot) const;
-      void read_from_snapshot(const snapshot_reader_ptr& snapshot);
-
       /// Allows to retrieve data related to eosio.system stats which are also modified during voting process, thus stored at native side.
       void get_voting_stats(int64_t* total_activated_stake, uint64_t* thresh_activated_stake_time,
          double* total_producer_vote_weight) const;
@@ -113,6 +107,16 @@ class voting_manager final
 
       const voter_info_object* find_voter_info(const account_name& name) const;
 
+    private:
+      friend struct eosio::chain::controller_impl;
+
+      voting_manager(controller& c, chainbase::database& d) : _controller(c), _db(d) {}
+
+      void add_indices();
+      void initialize_database();
+      void add_to_snapshot(const snapshot_writer_ptr& snapshot) const;
+      void read_from_snapshot(const snapshot_reader_ptr& snapshot);
+
    private:
       double get_producer_vote_weight() const;
       void set_producer_vote_weight(double w);
@@ -136,7 +140,7 @@ class voting_manager final
 
    /// Class data:
    private:
-      const controller& _controller;
+      controller& _controller;
       chainbase::database& _db;
    };
 
