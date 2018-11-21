@@ -6,6 +6,8 @@ import threading
 import requests
 import datetime
 
+from logger import log
+
 class EOSRPCExecutor():
     def __init__(self, _nodeos_addres, _nodeos_port, _wallet_address, _wallet_port):
         self.nodeos_url = 'http://'+_nodeos_addres +":"+_nodeos_port
@@ -17,6 +19,10 @@ class EOSRPCExecutor():
         self.action_executer_th.setDaemon(daemonic=True)
         self.action_executer_th.start()
         self.actions_call_summary = []
+
+
+    def clear_action_flag(self):
+        self.action_execution_flag.clear()
 
 
     def execute_pending_actions(self):
@@ -46,7 +52,7 @@ class EOSRPCExecutor():
             response = requests.post(url, json=command)
             return response.json()
         except Exception as _ex:
-            print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] exception  %s occures during get_account"%str(_ex))        
+            log.error("[ACTION][ERROR] exception  %s occures during get_account"%str(_ex))        
             
 
     def get_currency_balance(self, _account_name, _symbol, ):
@@ -63,7 +69,7 @@ class EOSRPCExecutor():
             response_json ={"balance":whole}
             return response_json
         except Exception as _ex:
-            print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] exception  %s occures during get_currency_balance"%str(_ex))            
+            log.error("[ACTION][ERROR] exception  %s occures during get_currency_balance"%str(_ex))            
 
 
     def get_public_keys(self):
@@ -79,7 +85,7 @@ class EOSRPCExecutor():
                 av.append(temp)
             return av
         except Exception as _ex:
-            print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] exception  %s occures during get_currency_balance"%str(_ex))            
+            log.error("[ACTION][ERROR] exception  %s occures during get_currency_balance"%str(_ex))            
 
 
     def create_account_action(self, _newaccount):
@@ -122,7 +128,7 @@ class EOSRPCExecutor():
     def prepare_and_push_transaction(self, _actions):
         try:
             actions =[]
-            expected_result = True
+            expected_result = {"status":True}
             if isinstance(_actions, list):
                 actions = _actions
             else:
@@ -136,15 +142,15 @@ class EOSRPCExecutor():
                         for na in new_action:
                             binargs = self.abi_to_json_bin(na)
                             prepared_actions = self.prepare_action(na, binargs, prepared_actions)
-                            if "expected_result" in na:
-                                if expected_result:
-                                    expected_result = na.pop("expected_result")
+                            if "expected_result" in action:
+                                log.info("expected_result %s"%action["expected_result"])
+                                expected_result = action.pop("expected_result")
                     else:
                         binargs = self.abi_to_json_bin(action)
                         prepared_actions = self.prepare_action(action, binargs, prepared_actions)
                         if "expected_result" in action:
-                            if expected_result:
-                                expected_result = action.pop("expected_result")
+                            log.info("expected_result %s"%action["expected_result"])
+                            expected_result = action.pop("expected_result")
                 last_block_id   = self.get_info()
                 last_block_info = self.get_block(last_block_id)
                 public_keys     = self.get_public_keys()
@@ -152,18 +158,18 @@ class EOSRPCExecutor():
                 signed_trasnaction = self.sign_transaction(prepared_actions, binargs, last_block_id, last_block_info, required_key)
                 transaction_status = self.push_transaction(prepared_actions, binargs, signed_trasnaction)
                 if "transaction_id" in transaction_status:
-                    print(str(datetime.datetime.now())[:-3], "[ACTION][OK] %s pushed to block %d"%(actions, transaction_status["processed"]["block_num"]))
+                    log.info("[ACTION][OK] %s pushed to block %d"%(actions, transaction_status["processed"]["block_num"]))
                     self.actions_call_summary.append([actions, expected_result, True])
                 else:
-                    print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] failed to push action %s to block"%(actions))
-                    self.actions_call_summary.append([actions, expected_result, False])
+                    log.error("[ACTION][ERROR] failed to push action %s to block"%(actions))
+                    self.actions_call_summary.append([actions, expected_result, transaction_status["error"]["details"]])
             except Exception as _ex:
-                print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] exception %s occures during prepare_and_push_transaction"%str(_ex))
-                print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] failed to push action %s to block"%(actions))
+                log.error("[ACTION][ERROR] exception %s occures during prepare_and_push_transaction"%str(_ex))
+                log.error("[ACTION][ERROR] failed to push action %s to block"%(actions))
                 self.actions_call_summary.append([actions, expected_result, False])
         except Exception as _ex:
-            print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] exception %s occures during prepare_and_push_transaction"%str(_ex))
-            print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] failed to push action %s to block"%(actions))
+            log.error("[ACTION][ERROR] exception %s occures during prepare_and_push_transaction"%str(_ex))
+            log.error("[ACTION][ERROR] failed to push action %s to block"%(actions))
             self.actions_call_summary.append([actions, expected_result, False])
 
  
@@ -183,7 +189,7 @@ class EOSRPCExecutor():
             needed_data = { "binargs": response_json["binargs"]}
             return needed_data
         except Exception as _ex:
-            print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] exception  %s occures during abi_to_json_bin"%str(_ex))
+            log.error("[ACTION][ERROR] exception  %s occures during abi_to_json_bin"%str(_ex))
 
  
     def get_info(self):
@@ -192,7 +198,7 @@ class EOSRPCExecutor():
             response_json = response.json()
             return response_json
         except Exception as _ex:
-            print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] exception  %s occures during get_info"%str(_ex))
+            log.error("[ACTION][ERROR] exception  %s occures during get_info"%str(_ex))
 
 
  
@@ -204,7 +210,7 @@ class EOSRPCExecutor():
             needed_data = { "timestamp":response_json["timestamp"], "block_num":response_json["block_num"], "ref_block_prefix":response_json["ref_block_prefix"] }
             return needed_data
         except Exception as _ex:
-            print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] exception  %s occures during get_block"%str(_ex))            
+            log.error("[ACTION][ERROR] exception  %s occures during get_block"%str(_ex))            
 
  
     def get_required_keys(self, _action, _binargs, _last_block_info, _keys):
@@ -229,7 +235,7 @@ class EOSRPCExecutor():
             needed_data = { "required_keys":response_json["required_keys"] }
             return needed_data
         except Exception as _ex:
-            print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] exception  %s occures during get_required_keys"%str(_ex))
+            log.error("[ACTION][ERROR] exception  %s occures during get_required_keys"%str(_ex))
 
  
     def sign_transaction(self, _action, _binargs, _last_block_id, _last_block_info, _required_key):
@@ -246,7 +252,7 @@ class EOSRPCExecutor():
             response = requests.post(self.wallet_url+'/v1/wallet/sign_transaction', json=data)
             return response.json()
         except Exception as _ex:
-            print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] exception  %s occures during sign_transaction"%str(_ex))
+            log.error("[ACTION][ERROR] exception  %s occures during sign_transaction"%str(_ex))
 
  
     def push_transaction(self, _action, _binargs, _signed_transaction):
@@ -268,11 +274,12 @@ class EOSRPCExecutor():
             response = requests.post(self.nodeos_url+'/v1/chain/push_transaction', data=json.dumps(data))
             return response.json()
         except Exception as _ex:
-            print(str(datetime.datetime.now())[:-3], "[ACTION][ERROR] exception  %s occures during push_transaction"%str(_ex))
+            log.error("[ACTION][ERROR] exception  %s occures during push_transaction"%str(_ex))
 
 
     def get_actions_call_summary(self):
         return self.actions_call_summary
+
 
     def clear_actions_call_summary(self):
         self.actions_call_summary = []

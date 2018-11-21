@@ -8,18 +8,19 @@ import datetime
 import argparse
 
 from string import Template
+from logger import log
 from testscenarios  import TestScenarios
 from eosrpcexecutor import EOSRPCExecutor
 
 args        = None
 
-def prepare_scenario_from_pattern_file(_pattern_file):
+def prepare_scenario_from_pattern_file(_pattern_file, _creation_key):
   try:
     all_users=[]
     with open(_pattern_file) as pattern_file:
       lines = pattern_file.readlines()
       for line in lines:
-        users = re.findall('\$\{(.*?)\}', line)
+        users = re.findall('\$\{(user_.*?)\}', line)
         if users:
           for user in users:
             all_users.append(user)
@@ -28,12 +29,12 @@ def prepare_scenario_from_pattern_file(_pattern_file):
     testers = find_valid_testers_name(all_users)
     with open(_pattern_file) as pattern_file:
       src = Template(pattern_file.read())
-      prepared_scenarios = src.substitute(testers)
+      prepared_scenarios = src.substitute(testers, key = _creation_key)
       with open(os.getcwd()+"/"+"scenarios_continues.json","w") as scenarios:
         scenarios.write(prepared_scenarios)
     return "scenarios_continues.json"
   except Exception as _ex:
-    print("Faild to parse scenario pattern")
+    log.error("Faild to parse scenario pattern")
     return None
 
 def find_valid_testers_name(_users):
@@ -54,8 +55,8 @@ def find_valid_testers_name(_users):
         accounts[user] = name
       if ord(suffix_base_3) == ord('z'): 
         if ord(suffix_base_2)  == ord('z'):
-          if ord(suffix_base_2)  == ord('z'):
-            print("So many test accounts?")
+          if ord(suffix_base_1)  == ord('z'):
+            log.error("So many test accounts?")
             exit(1)
           else:
             suffix_base_1 = chr(ord(suffix_base_1)+1)  
@@ -63,7 +64,7 @@ def find_valid_testers_name(_users):
           suffix_base_2 = chr(ord(suffix_base_2)+1)
       else:
         suffix_base_3 = chr(ord(suffix_base_3)+1)
-  print("accounts", accounts)
+  log.info("accounts %s"%accounts)
   return accounts
 
 
@@ -76,15 +77,14 @@ def is_account_valid(_request) :
         response_json = response.json()
         return response_json['is_valid']
     except Exception as _ex:
-        print("Something goes wrong during account validation.")
+        log.error("Something goes wrong during account validation.")
         return False
 
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--nodeos-ip', metavar='', help="Ip address of nodeos ", default='127.0.0.1', dest="nodeos_ip")
 parser.add_argument('--keosd-ip', metavar='', help="Ip address of keosd", default='127.0.0.1', dest="keosd_ip")
-parser.add_argument('--public-key', metavar='', help="EOSIO Public Key", default='EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV', dest="public_key")
-parser.add_argument('--private-key', metavar='', help="EOSIO Private Key", default='5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3', dest="private_key")
+parser.add_argument('--public-key', metavar='', help="Beos.Gateway Public Key", default='EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV', dest="public_key")
 parser.add_argument('--nodeos-port', metavar='', help="Port", default='8888')
 parser.add_argument('--keosd-port', metavar='', help="Port", default='8900')
 parser.add_argument('--scenario-file-name-pattern', metavar='', help="Path to to scenarios.", default="scenarios_continues.in" )
@@ -107,9 +107,9 @@ parser.add_argument('--amount-of-reward-trustee', default=800 * 10000)
 if __name__ == "__main__":
   args = parser.parse_args()
   error = False
-  scenario_file_name = prepare_scenario_from_pattern_file( os.getcwd()+"/"+args.scenario_file_name_pattern)
+  scenario_file_name = prepare_scenario_from_pattern_file( os.getcwd()+"/"+args.scenario_file_name_pattern, args.public_key)
   if not scenario_file_name:
-    print("Wrong scenario generated.")
+    log.error("Wrong scenario generated.")
     exit(1)
   scenarios = TestScenarios(args.nodeos_ip, args.nodeos_port, args.keosd_ip, args.keosd_port, os.getcwd()+"/"+scenario_file_name, args.add_block_number)
   try:
@@ -121,7 +121,7 @@ if __name__ == "__main__":
       if scnenario_error:
         error = scnenario_error
   except Exception as _ex:
-    print("[ERROR] Exeption `%s` occured while executing scenario `%s`."%(str(_ex), scenario.get_current_scenario()))
+    log.error("[ERROR] Exeption `%s` occured while executing scenario `%s`."%(str(_ex), scenario.get_current_scenario()))
     error = True
   finally:
     scenarios.stop_scenarios()
