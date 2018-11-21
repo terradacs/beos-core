@@ -290,7 +290,7 @@ class WalletMgr(object):
             os.kill(self.__walletPid, signal.SIGKILL)
 
         if allInstances:
-            cmd="pkill -2 %s" % (Utils.EosWalletName)
+            cmd="pkill -9 %s" % (Utils.EosWalletName)
             if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
             subprocess.call(cmd.split())
 
