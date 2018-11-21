@@ -17,6 +17,22 @@ using voting_manager_index_set = index_set<
    global_vote_stat_index
 >;
 
+fc::mutable_variant_object voter_info_object::convert_to_public_voter_info() const
+   {
+   return mutable_variant_object()
+      ("owner", owner)
+      ("proxy", proxy)
+      ("producers", producers)
+      ("staked", staked)
+      ("last_vote_weight", last_vote_weight)
+      ("proxied_vote_weight", proxied_vote_weight)
+      ("is_proxy", is_proxy)
+      ("reserved1", reserved1)
+      ("reserved2", reserved2)
+      ("reserved3", reserved3)
+      ;
+   }
+
 void voting_manager::add_indices()
    {
    voting_manager_index_set::add_indices(_db);
@@ -303,6 +319,24 @@ const voter_info_object* voting_manager::find_voter_info(const account_name& nam
    {
    const auto* voter = _db.find<voter_info_object, by_owner>(name);
    return voter;
+   }
+
+void voting_manager::process_voters(const account_name& lowerBound, const account_name& upperBound, voter_processor processor) const
+   {
+   const auto& idx = _db.get_index<voter_info_index, by_owner>();
+
+   auto lbI = lowerBound.empty() ? idx.begin() : idx.lower_bound(lowerBound);
+   auto ubI = upperBound.empty() ? idx.end() : idx.lower_bound(upperBound);
+
+   bool canContinue = true;
+   for(; canContinue && lbI != ubI; ++lbI)
+      {
+      const voter_info_object& v = *lbI;
+      auto nextI = lbI;
+      ++nextI;
+      bool hasNext = nextI != ubI; 
+      canContinue = processor(v, hasNext);
+      }
    }
 
 inline uint64_t voting_manager::current_time() const {
