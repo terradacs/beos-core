@@ -303,7 +303,7 @@ def build_eosio(c_compiler, cxx_compiler):
         "-DENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION={0}".format(config.ENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION),
         "-DDISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_TRUSTEE_DISTRIBUTION={0}".format(config.DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_TRUSTEE_DISTRIBUTION),
         "-DAMOUNT_OF_REWARD_TRUSTEE={0}".format(config.AMOUNT_OF_REWARD_TRUSTEE),
-        "-DNODEOS_HTTP_SERVER_PORT={0}".format("http://{0}:{1}".format(config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)),
+        "-DNODEOS_HTTP_SERVER_PORT={0}".format("{0}:{1}".format(config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)),
         "-DSIGNATURE_PROVIDER={0}".format("{0}=KEOSD:http://{1}:{2}/v1/wallet/sign_digest".format(config.EOSIO_PUBLIC_KEY, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)),
         "-DDISABLE_FAILING_TESTS={0}".format(config.DISABLE_FAILING_TESTS),
         "-DDISABLE_WASM_TESTS={0}".format(config.DISABLE_WASM_TESTS),
@@ -320,6 +320,7 @@ def build_eosio(c_compiler, cxx_compiler):
         "-DNODEOS_IP_ADDRESS={0}".format(config.NODEOS_IP_ADDRESS),
         "-DNODEOS_PORT={0}".format(config.NODEOS_PORT),
         "-DNODEOS_EXECUTABLE={0}".format(config.NODEOS_EXECUTABLE),
+        "-DPRODUCER_NAME={0}".format(config.PRODUCER_NAME),
         config.BEOS_DIR
     ]
     logger.info("Running cmake with params {0}".format(" ".join(params)))
@@ -345,7 +346,7 @@ def initialize_beos():
     try:
         keosd = eosio.run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR, False, True)
         eosio.create_wallet("http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT), False)
-        nodeos = eosio.run_nodeos(config.START_NODE_INDEX, "eosio", config.EOSIO_PUBLIC_KEY)
+        nodeos = eosio.run_nodeos(config.START_NODE_INDEX, config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY)
 
         eosio.create_account("eosio", "eosio.msig", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
         eosio.create_account("eosio", "eosio.names", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
@@ -380,7 +381,7 @@ def initialize_beos():
         eosio.terminate_running_tasks(nodeos, keosd)
         eosio.show_keosd_postconf(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
         eosio.show_wallet_unlock_postconf()
-        eosio.show_nodeos_postconf(0, "eosio", config.EOSIO_PUBLIC_KEY)
+        eosio.show_nodeos_postconf(config.START_NODE_INDEX, config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY)
     except Exception as ex:
         eosio.terminate_running_tasks(nodeos, keosd)
         logger.error("Exception during initialize: {0}".format(ex))

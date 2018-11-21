@@ -347,10 +347,6 @@ endif()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/contracts/eosio.init/eosio.init.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/contracts/eosio.init/eosio.init.hpp)
 
-if ("${NODEOS_HTTP_SERVER_PORT}" STREQUAL "")
-    set(NODEOS_HTTP_SERVER_PORT "http://127.0.0.1:8888")
-endif()
-
 if ("${SIGNATURE_PROVIDER}" STREQUAL "")
     set(SIGNATURE_PROVIDER "${EOSIO_ROOT_KEY}=KEOSD:http://127.0.0.1:8900/v1/wallet/sign_digest")
 endif()
@@ -360,3 +356,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cd-scripts/resources/config.ini.in ${
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cd-scripts/resources/genesis.json.in ${CMAKE_CURRENT_BINARY_DIR}/resources/genesis.json)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cd-scripts/resources/run.py.in ${CMAKE_CURRENT_BINARY_DIR}/run.py)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/api.ini ${CMAKE_CURRENT_BINARY_DIR}/resources/api.ini COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/all_in_one.ini ${CMAKE_CURRENT_BINARY_DIR}/resources/all_in_one.ini COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/producer.ini ${CMAKE_CURRENT_BINARY_DIR}/resources/producer.ini COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/seed.ini ${CMAKE_CURRENT_BINARY_DIR}/resources/seed.ini COPYONLY)

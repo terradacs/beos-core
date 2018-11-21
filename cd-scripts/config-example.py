@@ -155,6 +155,8 @@ GENESIS_JSON_FILE = "genesis.json"
 #starting node index
 START_NODE_INDEX = 0
 
+PRODUCER_NAME = "eosio"
+
 ##############              Cmake tests configuration             ###############
 #################################################################################
 DISABLE_FAILING_TESTS = "true"
