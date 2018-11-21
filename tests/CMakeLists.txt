@@ -177,7 +177,7 @@ endif()
 
 add_test(NAME start_nodeos_keosd_via_run_py COMMAND run.py WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_property(TEST start_nodeos_keosd_via_run_py PROPERTY LABELS beos_tests)
-add_test(NAME test03_scenarios_deploy COMMAND test03_scenarios_deploy.py --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --public-key ${EOSIO_ROOT_KEY}
+add_test(NAME test03_scenarios_deploy COMMAND test03_scenarios_deploy.py --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --public-key ${GATEWAY_ROOT_KEY}
 --add-block-number
 --restore-node-params
 --starting-block-for-initial-witness_election ${STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION}
@@ -195,9 +195,9 @@ add_test(NAME test03_scenarios_deploy COMMAND test03_scenarios_deploy.py --nodeo
 --amount-of-reward-trustee ${AMOUNT_OF_REWARD_TRUSTEE}
  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests/beos_plugin_tests/)
 set_property(TEST test03_scenarios_deploy PROPERTY LABELS nonparallelizable_tests)
-add_test(NAME test04_account_creation_and_get_account_deploy COMMAND tests/beos_plugin_tests/test04_account_creation_and_get_account_deploy.py  --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --public-key ${EOSIO_ROOT_KEY}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+add_test(NAME test04_account_creation_and_get_account_deploy COMMAND tests/beos_plugin_tests/test04_account_creation_and_get_account_deploy.py  --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --public-key ${GATEWAY_ROOT_KEY}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_property(TEST test04_account_creation_and_get_account_deploy PROPERTY LABELS nonparallelizable_tests)
-add_test(NAME test06_account_creation_and_account_validator_deploy COMMAND tests/beos_plugin_tests/test06_account_creation_and_account_validator_deploy.py  --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --public-key ${EOSIO_ROOT_KEY}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR} )
+add_test(NAME test06_account_creation_and_account_validator_deploy COMMAND tests/beos_plugin_tests/test06_account_creation_and_account_validator_deploy.py  --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --public-key ${GATEWAY_ROOT_KEY}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR} )
 set_property(TEST test06_account_creation_and_account_validator_deploy PROPERTY LABELS nonparallelizable_tests)
 
 add_test(NAME stop_nodeos_keosd_via_run_py COMMAND run.py --cancel WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
