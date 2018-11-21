@@ -1109,6 +1109,13 @@ string get_table_type( const abi_def& abi, const name& table_name ) {
 read_only::get_table_rows_result read_only::get_table_rows( const read_only::get_table_rows_params& p )const {
    const abi_def abi = eosio::chain_apis::get_abi( db, p.code );
 
+   name system_account(config::system_account_name);
+   if(p.code == system_account && p.scope == system_account.to_string())
+   {
+      if(p.table == name(N(voters)))
+         return get_voters_table_rows(p);
+   }
+
    bool primary = false;
    auto table_with_index = get_table_index_name( p, primary );
    if( primary ) {
@@ -1765,20 +1772,7 @@ read_only::get_account_results read_only::get_account( const get_account_params&
       const voting_manager& vm = db.get_voting_manager();
       const voter_info_object* found = vm.find_voter_info( params.account_name );
       if(found != nullptr)
-         {
-         result.voter_info = mutable_variant_object()
-            ("owner", found->owner)
-            ("proxy", found->proxy)
-            ("producers", found->producers)
-            ("staked", found->staked)
-            ("last_vote_weight", found->last_vote_weight)
-            ("proxied_vote_weight", found->proxied_vote_weight)
-            ("is_proxy", found->is_proxy)
-            ("reserved1", found->reserved1)
-            ("reserved2", found->reserved2)
-            ("reserved3", found->reserved3)
-            ;
-         }
+        result.voter_info = found->convert_to_public_voter_info();
    }
    return result;
 }
@@ -1881,6 +1875,38 @@ chain::symbol read_only::extract_core_symbol()const {
 
    return core_symbol;
 }
+
+read_only::get_table_rows_result read_only::get_voters_table_rows(const get_table_rows_params& p) const
+   {
+   const auto& vm = db.get_voting_manager();
+
+   get_table_rows_result retVal;
+
+   auto timeout = fc::time_point::now() + fc::microseconds(1000 * 10); /// 10ms max time
+
+   auto lb = convert_to_type<uint64_t>(p.lower_bound, "lower_bound");
+   auto ub = convert_to_type<uint64_t>(p.upper_bound, "upper_bound");
+
+   account_name lbName(lb);
+   account_name ubName(ub);
+
+   vm.process_voters(lbName, ubName, [&p, &timeout, &retVal](const voter_info_object& v, bool hasNext) -> bool
+      {
+      if(retVal.rows.size() == p.limit || fc::time_point::now() > timeout)
+         {
+         retVal.more = hasNext;
+         return false; /// stop iteration.
+         }
+
+      retVal.rows.emplace_back(v.convert_to_public_voter_info());
+
+      return true;
+      }
+   );
+
+   return retVal;
+   }
+
 
 } // namespace chain_apis
 } // namespace eosio
