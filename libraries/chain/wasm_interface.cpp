@@ -206,20 +206,26 @@ class privileged_api : public context_aware_api {
          int64_t _cpu_weight = 0;
 
          get_resource_limits( account, _ram_bytes, _net_weight, _cpu_weight );
-
+         
          if (_ram_bytes >= 0) {
             _ram_bytes += ram_bytes;
             EOS_ASSERT(_ram_bytes >= 0, wasm_execution_error, "invalid value for ram resource limit, expected [0,INT64_MAX]");
+         } else {
+            EOS_ASSERT(ram_bytes == 0, wasm_execution_error, "cannot change unlimited ram resource limit");
          }
             
          if (_net_weight >= 0) {
             _net_weight += net_weight;
             EOS_ASSERT(_net_weight >= 0, wasm_execution_error, "invalid value for net resource weight, expected [0,INT64_MAX]");
+         } else {
+            EOS_ASSERT(net_weight == 0, wasm_execution_error, "cannot change unlimited net resource weight");
          }
             
          if (_cpu_weight >= 0) {
             _cpu_weight += cpu_weight;
             EOS_ASSERT(_cpu_weight >= 0, wasm_execution_error, "invalid value for cpu resource weight, expected [0,INT64_MAX]");
+         } else {
+            EOS_ASSERT(cpu_weight == 0, wasm_execution_error, "cannot change unlimited cpu resource weight");
          }
 
          set_resource_limits_impl( account, _ram_bytes, _net_weight, _cpu_weight );

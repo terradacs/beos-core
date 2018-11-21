@@ -11,6 +11,7 @@
 #include <eosio/chain/account_object.hpp>
 #include <eosio/chain/global_property_object.hpp>
 #include <boost/container/flat_set.hpp>
+#include <boost/scope_exit.hpp>
 
 //ABW: uncomment the following symbol to unconditionally write eosio::print calls to file (works even during unit tests)
 //#define CAVEMEN_DEBUG
@@ -36,6 +37,21 @@ static inline void print_debug(account_name receiver, const action_trace& ar) {
            + ar.console
            + prefix + ": CONSOLE OUTPUT END   =====================" );
    }
+}
+
+inline void apply_context::change_resource_limits( const account_name& acc, int64_t ram, int64_t net, int64_t cpu )const {
+   auto& resource_limit_mgr = control.get_mutable_resource_limits_manager();
+   int64_t ram_bytes = 0;
+   int64_t net_weight = 0;
+   int64_t cpu_weight = 0;
+
+   resource_limit_mgr.get_account_limits( acc, ram_bytes, net_weight, cpu_weight );
+   ram_bytes += ram;
+   net_weight += net;
+   cpu_weight += cpu;
+
+   if (resource_limit_mgr.set_account_limits( acc, ram_bytes, net_weight, cpu_weight ))
+      trx_context.validate_ram_usage.insert( acc );
 }
 
 void apply_context::exec_one( action_trace& trace )
@@ -130,42 +146,14 @@ void apply_context::reward_stake( const account_name& account, int64_t val, cons
    int64_t stake_net = val / 2;
    int64_t stake_cpu = val - stake_net;
 
-   auto& resource_limit_mgr = control.get_mutable_resource_limits_manager();
-   int64_t ram_bytes = 0;
-   int64_t net_weight = 0;
-   int64_t cpu_weight = 0;
-
-   resource_limit_mgr.get_account_limits( account, ram_bytes, net_weight, cpu_weight );
-
-   net_weight += stake_net;
-   cpu_weight += stake_cpu;
-
-   //std::string accName = account.to_string();
-   //std::cout << "Account name " << accName << " rewarded with stake: " << net_weight + cpu_weight << std::endl;
-
-   // [MK]: ram stay unchanged, so no need to check?
-   //if (resource_limit_mgr.set_account_limits( name, ram_bytes, net_weight, cpu_weight ))
-     //trx_context.validate_ram_usage.insert( name );
-   bool need_validation = resource_limit_mgr.set_account_limits( account, ram_bytes, net_weight, cpu_weight );
-   EOS_ASSERT( need_validation == false,
-               resource_limit_exception,
-               "new ram_bytes limit cannot be more restrictive than the previously set one (account '{account}')", ("account", account) );
-
+   change_resource_limits( account, 0, stake_net, stake_cpu );
+   
    control.get_mutable_voting_manager().update_voting_power(account, val, _producers);
 }
 
 void apply_context::reward_ram( const account_name& account, int64_t val )
 {
-   auto& resource_limit_mgr = control.get_mutable_resource_limits_manager();
-   int64_t ram_bytes = 0;
-   int64_t net_weight = 0;
-   int64_t cpu_weight = 0;
-
-   resource_limit_mgr.get_account_limits( account, ram_bytes, net_weight, cpu_weight );
-   ram_bytes += val;
-
-   if (resource_limit_mgr.set_account_limits( account, ram_bytes, net_weight, cpu_weight ))
-      trx_context.validate_ram_usage.insert( account );
+   change_resource_limits( account, val, 0, 0 );
 }
 
 void apply_context::reward_all( uint64_t amount_of_reward, uint64_t amount_of_reward_for_trustee, uint64_t gathered_amount,
@@ -177,6 +165,17 @@ void apply_context::reward_all( uint64_t amount_of_reward, uint64_t amount_of_re
    // trustee is always rewarded with the same value
    if (amount_of_reward_for_trustee)
      reward_stake( N(beos.trustee), amount_of_reward_for_trustee, _producers );
+
+   uint64_t actual_reward_sum = amount_of_reward_for_trustee;
+   BOOST_SCOPE_EXIT(this_,&actual_reward_sum,is_beos_mode) {
+      auto& resource_limit_mgr = this_->control.get_mutable_resource_limits_manager();
+      if (is_beos_mode) {
+         auto half = actual_reward_sum / 2; //resources are interchangable so it doesn't matter much which one we transfer
+         this_->change_resource_limits(config::distribution_account_name, 0, -half, half - actual_reward_sum );
+      } else {
+         this_->change_resource_limits(config::distribution_account_name, -actual_reward_sum, 0, 0);
+      }
+   } BOOST_SCOPE_EXIT_END;
 
    if (gathered_amount == 0)
      return; // nothing more to do here
@@ -198,8 +197,6 @@ void apply_context::reward_all( uint64_t amount_of_reward, uint64_t amount_of_re
       return asset(result, asset_symbol);
    };
 
-   uint64_t rewards_sum = 0;
-
    for (auto& account : accounts_index)
    {
       auto& name = account.name;
@@ -213,16 +210,13 @@ void apply_context::reward_all( uint64_t amount_of_reward, uint64_t amount_of_re
       if (reward <= 0)
          continue;
 
-      rewards_sum += reward;
+      actual_reward_sum += reward;
 
       if (is_beos_mode)
         reward_stake( name, reward, _producers);
       else
         reward_ram( name, reward );
    }
-
-   if (rewards_sum != 0 && is_beos_mode)
-     reward_stake( N(eosio.stake), rewards_sum, _producers);
 }
 
 void apply_context::reward_done( asset symbol, bool is_beos_mode )
