@@ -60,9 +60,9 @@ def run_command(parameters, working_dir, run_shell = False):
         sys.exit(1)
 
 def get_processor_count():
-    #from multiprocessing import cpu_count
-    #return cpu_count()
-    return 4 # :D
+    from multiprocessing import cpu_count
+    return cpu_count()
+    #return 4 # :D
 
 def install_system_packages():
     logger.info("=== Checking for system packages")
