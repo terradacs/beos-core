@@ -796,10 +796,9 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test, eosio_init_tester ) try {
 
   produce_blocks( 1 );
 
-  //Important!!! Voting( 'delegatebw' action ) must work.
-  // BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
-  // prod = get_producer_info( N(bob) );
-  // BOOST_REQUIRE_EQUAL( 120049322532.95502, prod["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
+  prod = get_producer_info( N(bob) );
+  BOOST_REQUIRE_EQUAL( 43654299102892.734, prod["total_votes"].as_double() );
 
 } FC_LOG_AND_RETHROW()
 
@@ -865,26 +864,25 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test2, eosio_init_tester ) try {
 
   produce_blocks( 1 );
 
-  //Important!!! Voting( 'delegatebw' action ) must work.
-  //BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
+  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
 
-  BOOST_REQUIRE_EQUAL( control->head_block_num(), 101u );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 102u );
 
   prod = get_producer_info( N(bob) );
-  //BOOST_REQUIRE_EQUAL( 120049322532.95502, prod["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( 21827149551446.367, prod["total_votes"].as_double() );
 
   prod = get_producer_info( N(carol) );
   BOOST_REQUIRE_EQUAL( 0, prod["total_votes"].as_double() );
 
-  //BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxmario2), { N(carol) } ) );
+  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxmario2), { N(carol) } ) );
 
-  BOOST_REQUIRE_EQUAL( control->head_block_num(), 101u );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 103u );
 
-  //prod = get_producer_info( N(bob) );
-  //BOOST_REQUIRE_EQUAL( 120049322532.95502, prod["total_votes"].as_double() );
+  prod = get_producer_info( N(bob) );
+  BOOST_REQUIRE_EQUAL( 21827149551446.367, prod["total_votes"].as_double() );
 
-  //prod = get_producer_info( N(carol) );
-  //BOOST_REQUIRE_EQUAL( 163703621635.84775, prod["total_votes"].as_double() );
+  prod = get_producer_info( N(carol) );
+  BOOST_REQUIRE_EQUAL( 21827149551446.367, prod["total_votes"].as_double() );
 
 } FC_LOG_AND_RETHROW()
 
