@@ -10,6 +10,9 @@
 
 #include <eosiolib/block_producer_voting_info.hpp>
 
+#include <fc/variant_object.hpp>
+
+#include <functional>
 #include <vector>
 
 namespace eosio {
@@ -47,6 +50,8 @@ struct voter_info_object : public chainbase::object<voter_info_object_type, vote
    uint32_t                    reserved1 = 0;
    uint32_t                    reserved2 = 0;
    asset                       reserved3;
+
+   fc::mutable_variant_object  convert_to_public_voter_info() const;
 };
 
 struct by_owner;
@@ -107,9 +112,20 @@ class voting_manager final
 
       const voter_info_object* find_voter_info(const account_name& name) const;
 
-    private:
-      friend struct eosio::chain::controller_impl;
+      typedef std::function<bool(const voter_info_object&, bool)> voter_processor;
 
+      /** Allows to process all entries included in `by_owner` index range <lowerBound, upperBound).
+          \param lowerBound lower bound of the query to start iteration from,
+          \param upperBound upper bound of the query to end iteration,
+          \param processor - processing lambda, which shall return false to stop iteration. Takes arguments: 
+               const voter_info_object& voter - entry to be processed,
+               bool hasNext - true if there is available next item during iteration.
+      */
+      void process_voters(const account_name& lowerBound, const account_name& upperBound, voter_processor processor) const;
+
+   private:
+      friend struct eosio::chain::controller_impl;
+      /// Can be instantiated only by controller.
       voting_manager(controller& c, chainbase::database& d) : _controller(c), _db(d) {}
 
       void add_indices();

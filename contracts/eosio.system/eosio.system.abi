@@ -537,44 +537,56 @@
       "type": "setparams",
       "ricardian_contract": ""
     }],
-   "tables": [{
+  "tables": [
+    {
       "name": "producers",
       "type": "producer_info",
       "index_type": "i64",
-      "key_names" : ["owner"],
-      "key_types" : ["uint64"]
-    },{
+      "key_names": [ "owner" ],
+      "key_types": [ "uint64" ]
+    },
+    {
       "name": "global",
       "type": "eosio_global_state",
       "index_type": "i64",
-      "key_names" : [],
-      "key_types" : []
+      "key_names": [],
+      "key_types": []
+    },
+    {
+      "name": "voters",
+      "type": "voter_info",
+      "index_type": "i64",
+      "key_names": [ "owner" ],
+      "key_types": [ "account_name" ]
     },{
       "name": "delband",
       "type": "delegated_bandwidth",
       "index_type": "i64",
-      "key_names" : ["to"],
-      "key_types" : ["uint64"]
-    },{
+      "key_names": [ "to" ],
+      "key_types": [ "uint64" ]
+    },
+    {
       "name": "rammarket",
       "type": "exchange_state",
       "index_type": "i64",
-      "key_names" : ["supply"],
-      "key_types" : ["uint64"]
-    },{
+      "key_names": [ "supply" ],
+      "key_types": [ "uint64" ]
+    },
+    {
       "name": "refunds",
       "type": "refund_request",
       "index_type": "i64",
-      "key_names" : ["owner"],
-      "key_types" : ["uint64"]
-    },{
-       "name": "namebids",
-       "type": "namebid_info",
-       "index_type": "i64",
-       "key_names" : ["newname"],
-       "key_types" : ["account_name"]
+      "key_names": [ "owner" ],
+      "key_types": [ "uint64" ]
+    },
+    {
+      "name": "namebids",
+      "type": "namebid_info",
+      "index_type": "i64",
+      "key_names": [ "newname" ],
+      "key_types": [ "account_name" ]
     }
-   ],
+  ],
    "ricardian_clauses": [],
    "abi_extensions": []
 }
