@@ -4,6 +4,13 @@ import subprocess
 import os
 import sys
 import datetime
+import time
+
+class BeosRunnerException(Exception):
+    def __init__(self, message):
+        self.message = message
+    def __str__(self):
+        return self.message
 
 def run_wallet_unlock_postconf():
     wallet_password = None
@@ -18,6 +25,36 @@ def run_wallet_unlock_postconf():
     print("Unlocking your wallet with command: {0}".format(" ".join(parameters)))
     subprocess.Popen(parameters)
 
+def save_screen_cfg(cfg_file_name, log_file_path):
+    with open(cfg_file_name, "w") as cfg:
+        cfg.write("logfile {0}\n".format(log_file_path))
+        cfg.write("deflog on\n")
+
+def save_pid_file(pid_file_name, exec_name):
+    with open(pid_file_name, "w") as pid_file:
+            pid_file.write("{0}-{1}\n".format(exec_name, datetime.datetime.now().strftime("%Y-%m-%d")))
+
+def wait_for_string_in_file(log_file_name, string, timeout):
+    step = 0.5
+    to_timeout = 0.
+    while True:
+        time.sleep(step)
+        to_timeout = to_timeout + step
+        if to_timeout > timeout:
+            msg = "Timeout during wait for string {0}".format(string)
+            print(msg)
+            raise BeosRunnerException(msg)
+        if not os.path.exists(log_file_name):
+            continue
+        with open(log_file_name, "r") as log_file:
+            leave = False
+            for line in log_file.readlines():
+                if string in line:
+                    leave = True
+                    break
+            if leave:
+                break
+
 def run_keosd_postconf(ip_address, port, wallet_dir, use_https = False):
     parameters = None
     if use_https:
@@ -31,24 +68,36 @@ def run_keosd_postconf(ip_address, port, wallet_dir, use_https = False):
         ]
     else:
         # run kleosd in http mode
-        parameters = ["${KEOSD_EXECUTABLE}",
+        parameters = [
+            "${KEOSD_EXECUTABLE}",
             "--http-server-address","{0}:{1}".format(ip_address, port) ,
             "--wallet-dir", wallet_dir,
         ]
     
-    screen_parameters = [
+    log_file_name = "./{0}-{1}.log".format("keosd", datetime.datetime.now().strftime("%Y-%m-%d"))
+    save_screen_cfg("./keosd_screen.cfg", log_file_name)
+    screen_params = [
         "screen",
-        "-d",
         "-m",
+        "-d",
+        "-L",
+        "-c",
+        "./keosd_screen.cfg",
         "-S",
-        "{0}-{1}".format("keosd", datetime.datetime.now().strftime("%Y-%m-%d")),
+        "{0}-{1}".format("keosd", datetime.datetime.now().strftime("%Y-%m-%d"))
     ]
-    parameters = screen_parameters + parameters
+
+    parameters = screen_params + parameters
     print("Running keosd with command: {0}".format(" ".join(parameters)))
-    subprocess.Popen(parameters)
-    with open("run_keosd.pid", "w") as pid_file:
-        pid_file.write("{0}-{1}".format("keosd", datetime.datetime.now().strftime("%Y-%m-%d")))
-    run_wallet_unlock_postconf()
+    try:
+        subprocess.Popen(parameters)
+        save_pid_file("./run_keosd.pid", "keosd")
+        wait_for_string_in_file(log_file_name, "add api url: /v1/wallet/unlock", 10.)
+        run_wallet_unlock_postconf()
+    except Exception as ex:
+        print("Exception during keosd run: {0}".format(ex))
+        kill_process("./run_keosd.pid", "keosd", "${KEOSD_IP_ADDRESS}", "${KEOSD_PORT}")
+        sys.exit(1)
 
 def run_nodeos_postconf(node_index, name, public_key, use_https = False):
     working_dir = "{0}{1}-{2}/".format("${NODEOS_WORKING_DIR}", node_index, name)
@@ -89,39 +138,40 @@ def run_nodeos_postconf(node_index, name, public_key, use_https = False):
     ]
 
     parameters = parameters + https_opts + plugins
-    screen_parameters = [
+    log_file_name = "./{0}-{1}.log".format("nodeos", datetime.datetime.now().strftime("%Y-%m-%d"))
+    save_screen_cfg("./nodeos_screen.cfg", log_file_name)
+    screen_params = [
         "screen",
-        "-d",
         "-m",
+        "-d",
+        "-L",
+        "-c",
+        "./nodeos_screen.cfg",
         "-S",
-        "{0}-{1}".format("nodeos", datetime.datetime.now().strftime("%Y-%m-%d")),
+        "{0}-{1}".format("nodeos", datetime.datetime.now().strftime("%Y-%m-%d"))
     ]
-    parameters = screen_parameters + parameters
-    print("Running nodeos with command: {0}".format(" ".join(parameters)))
-    subprocess.Popen(parameters)
-    with open("run_nodeos.pid", "w") as pid_file:
-        pid_file.write("{0}-{1}".format("nodeos", datetime.datetime.now().strftime("%Y-%m-%d")))
-    import time
-    time.sleep(10) # for testing purposes only!
 
-def kill_process(pid_file_name):
-    import signal
+    parameters = screen_params + parameters
+    print("Running nodeos with command: {0}".format(" ".join(parameters)))
     try:
-        pid_name = None
-        with open(pid_file_name, "r") as pid_file:
-            line = pid_file.readline()
-            pid_name = line.strip()
-        if pid_name is not None:
-            for line in os.popen("screen -list"):
-                if pid_name in line:
-                    line = line.strip().split(".")
-                    for line2 in os.popen("ps --no-headers --ppid {0}".format(line[0])):
-                        line2 = line2.strip().split()
-                        os.kill(int(line2[0]), signal.SIGINT)
-                    os.remove(pid_file_name)
+        subprocess.Popen(parameters)
+        save_pid_file("./run_nodeos.pid", "nodeos")
+        wait_for_string_in_file(log_file_name, "] Produced block", 60.)
     except Exception as ex:
-        print("Error processing pid file: {0}".format(ex))
+        print("Exception during nodeos run: {0}".format(ex))
+        kill_process("./run_nodeos.pid", "nodeos", "${NODEOS_IP_ADDRESS}", "${NODEOS_PORT}")
         sys.exit(1)
+
+def kill_process(pid_file_name, proc_name, ip_address, port):
+    pids = []
+    for line in os.popen("ps ax | grep " + proc_name + " | grep -v grep"):
+        if ip_address in line and str(port) in line:
+            line = line.strip().split()
+            pids.append(line[0])
+    for pid in pids:
+        os.kill(int(pid), 2)
+    if os.path.exists(pid_file_name):
+        os.remove(pid_file_name)
 
 def usage():
     print("Usage:")
@@ -131,17 +181,19 @@ def usage():
 if __name__ == "__main__":
     argc = len(sys.argv)
     if argc == 1:
-        if os.path.exists("run_keosd.pid"):
+        if os.path.exists("./run_keosd.pid"):
             print("run_keosd.pid exists in the filesystem. Please use --cancel option first")
             sys.exit(1)
-        if os.path.exists("run_nodeos.pid"):
+        if os.path.exists("./run_nodeos.pid"):
             print("run_nodeos.pid exists in the filesystem. Please use --cancel option first")
             sys.exit(1)
         run_keosd_postconf("${KEOSD_IP_ADDRESS}", "${KEOSD_PORT}", "${DEFAULT_WALLET_DIR}")
         run_nodeos_postconf(0, "eosio", "${EOSIO_ROOT_KEY}")
+        sys.exit(0)
     elif argc == 2 and sys.argv[1] == "--cancel":
-        kill_process("run_keosd.pid")
-        kill_process("run_nodeos.pid")
+        kill_process("./run_keosd.pid", "keosd", "${KEOSD_IP_ADDRESS}", "${KEOSD_PORT}")
+        kill_process("./run_nodeos.pid", "nodeos", "${NODEOS_IP_ADDRESS}", "${NODEOS_PORT}")
+        sys.exit(0)
     else:
         usage()
         sys.exit(1)

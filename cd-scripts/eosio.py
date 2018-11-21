@@ -53,7 +53,7 @@ def run_service(service_name, parameters, unblock_trigger, raise_on_error = Fals
             if raise_on_error:
                 raise EOSIOException("Error during {0} run".format(service_name))
         else:
-            logger.debug(line)
+            logger.info(line)
             if unblock_trigger in line:
                 logger.info("{0} is up and running".format(service_name))
                 break
@@ -357,53 +357,61 @@ def terminate_running_tasks(nodeos, keosd):
 
 if __name__ == '__main__':
     name = "eosio"
+    keosd = None
+    nodeos = None
 
-    from shutil import rmtree
-    if os.path.exists(config.DEFAULT_WALLET_DIR):
-        logger.info("{0} exists. Deleting.".format(config.DEFAULT_WALLET_DIR))
-        rmtree(config.DEFAULT_WALLET_DIR)
-    
-    if os.path.exists(config.WALLET_PASSWORD_DIR):
-        logger.info("{0} exists. Deleting.".format(config.WALLET_PASSWORD_DIR))
-        rmtree(config.WALLET_PASSWORD_DIR)
-    
-    working_dir = "{0}{1}-{2}/".format(config.NODEOS_WORKING_DIR, config.START_NODE_INDEX, name)
-    if os.path.exists(working_dir):
-        logger.info("{0} exists. Deleting.".format(working_dir))
-        rmtree(working_dir)
+    try:
+        from shutil import rmtree
+        if os.path.exists(config.DEFAULT_WALLET_DIR):
+            logger.info("{0} exists. Deleting.".format(config.DEFAULT_WALLET_DIR))
+            rmtree(config.DEFAULT_WALLET_DIR)
+        
+        if os.path.exists(config.WALLET_PASSWORD_DIR):
+            logger.info("{0} exists. Deleting.".format(config.WALLET_PASSWORD_DIR))
+            rmtree(config.WALLET_PASSWORD_DIR)
+        
+        working_dir = "{0}{1}-{2}/".format(config.NODEOS_WORKING_DIR, config.START_NODE_INDEX, name)
+        if os.path.exists(working_dir):
+            logger.info("{0} exists. Deleting.".format(working_dir))
+            rmtree(working_dir)
 
-    keosd = run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
-    create_wallet("http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT), False)
-    nodeos = run_nodeos(config.START_NODE_INDEX, "eosio", config.EOSIO_PUBLIC_KEY)
+        keosd = run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
+        create_wallet("http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT), False)
+        nodeos = run_nodeos(config.START_NODE_INDEX, "eosio", config.EOSIO_PUBLIC_KEY)
 
-    create_account("eosio", "eosio.msig", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-    create_account("eosio", "eosio.names", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-    create_account("eosio", "eosio.saving", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-    create_account("eosio", "eosio.vpay", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-    create_account("eosio", "eosio.unregd", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-    
-    create_account("eosio", "eosio.bpay", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+        create_account("eosio", "eosio.msig", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+        create_account("eosio", "eosio.names", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+        create_account("eosio", "eosio.saving", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+        create_account("eosio", "eosio.vpay", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+        create_account("eosio", "eosio.unregd", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+        
+        create_account("eosio", "eosio.bpay", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
 
-    create_account("eosio", "eosio.ram", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-    create_account("eosio", "eosio.ramfee", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-    create_account("eosio", "eosio.stake", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+        create_account("eosio", "eosio.ram", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+        create_account("eosio", "eosio.ramfee", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+        create_account("eosio", "eosio.stake", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
 
-    create_account("eosio", "eosio.token", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-    create_account("eosio", "beos.init", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY)
+        create_account("eosio", "eosio.token", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+        create_account("eosio", "beos.init", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY)
+        create_account("eosio", "beos.trustee", config.TRUSTEE_OWNER_PUBLIC_KEY, config.TRUSTEE_ACTIVE_PUBLIC_KEY)
 
-    set_contract("eosio.token", config.CONTRACTS_DIR + "/eosio.token", "eosio.token")
+        set_contract("eosio.token", config.CONTRACTS_DIR + "/eosio.token", "eosio.token")
 
-    push_action("eosio.token", "create", '[ "beos.distrib", "{0} {1}"]'.format(config.CORE_INITIAL_AMOUNT, config.CORE_SYMBOL_NAME), "eosio.token")
-    push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PROXY_INITIAL_AMOUNT, config.PROXY_ASSET_NAME), "eosio.token")
+        push_action("eosio.token", "create", '[ "beos.distrib", "{0} {1}"]'.format(config.CORE_INITIAL_AMOUNT, config.CORE_SYMBOL_NAME), "eosio.token")
+        push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PROXY_INITIAL_AMOUNT, config.PROXY_ASSET_NAME), "eosio.token")
 
-    set_contract("eosio", config.CONTRACTS_DIR + "eosio.system", "eosio")
-    set_contract("beos.init", config.CONTRACTS_DIR + "eosio.init", "beos.init")
-    set_contract("beos.gateway", config.CONTRACTS_DIR + "eosio.gateway", "beos.gateway")
-    set_contract("beos.distrib", config.CONTRACTS_DIR + "eosio.distribution", "beos.distrib")
+        set_contract("eosio", config.CONTRACTS_DIR + "eosio.system", "eosio")
+        set_contract("beos.init", config.CONTRACTS_DIR + "eosio.init", "beos.init")
+        set_contract("beos.gateway", config.CONTRACTS_DIR + "eosio.gateway", "beos.gateway")
+        set_contract("beos.distrib", config.CONTRACTS_DIR + "eosio.distribution", "beos.distrib")
 
-    push_action("eosio", "initram", '[ "beos.gateway", "{0}"]'.format(config.INIT_RAM), "eosio")
+        push_action("eosio", "initresource", '[ "beos.gateway", "{0}", "{1} {2}", "{3} {4}"]'.format(config.INIT_RAM, config.STAKE_NET_QUANTITY, config.CORE_SYMBOL_NAME, config.STAKE_CPU_QUANTITY, config.CORE_SYMBOL_NAME), "eosio")
 
-    terminate_running_tasks(nodeos, keosd)
-    show_keosd_postconf(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
-    show_wallet_unlock_postconf()
-    show_nodeos_postconf(0, "eosio", config.EOSIO_PUBLIC_KEY)
+        terminate_running_tasks(nodeos, keosd)
+        show_keosd_postconf(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
+        show_wallet_unlock_postconf()
+        show_nodeos_postconf(0, "eosio", config.EOSIO_PUBLIC_KEY)
+    except Exception as ex:
+        terminate_running_tasks(nodeos, keosd)
+        logger.error("Exception during initialize: {0}".format(ex))
+        sys.exit(1)

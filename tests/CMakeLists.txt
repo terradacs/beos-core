@@ -175,7 +175,7 @@ else()
   message(WARNING "nodeos_under_min_avail_ram_lr_test test has been disabled")
 endif()
 
-add_test(NAME start_nodeos_keosd_via_run_py COMMAND python3 run.py WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+add_test(NAME start_nodeos_keosd_via_run_py COMMAND run.py WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_property(TEST start_nodeos_keosd_via_run_py PROPERTY LABELS beos_tests)
 add_test(NAME test03_scenarios_deploy COMMAND test03_scenarios_deploy.py --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --public-key ${EOSIO_ROOT_KEY}
 --add-block-number
@@ -200,7 +200,7 @@ set_property(TEST test04_account_creation_and_get_account_deploy PROPERTY LABELS
 add_test(NAME test06_account_creation_and_account_validator_deploy COMMAND tests/beos_plugin_tests/test06_account_creation_and_account_validator_deploy.py  --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --public-key ${EOSIO_ROOT_KEY}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR} )
 set_property(TEST test06_account_creation_and_account_validator_deploy PROPERTY LABELS nonparallelizable_tests)
 
-add_test(NAME stop_nodeos_keosd_via_run_py COMMAND python3 run.py --cancel WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+add_test(NAME stop_nodeos_keosd_via_run_py COMMAND run.py --cancel WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_property(TEST stop_nodeos_keosd_via_run_py PROPERTY LABELS beos_tests)
 
 if(ENABLE_COVERAGE_TESTING)
