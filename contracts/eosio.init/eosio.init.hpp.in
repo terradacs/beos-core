@@ -35,7 +35,7 @@ namespace eosio {
 
       beos_global_state_element beos;
       beos_global_state_element ram;
-      beos_global_state_element trustee; //< For trustee only 'amount_of_reward' is valid now
+      beos_global_state_element trustee; ///< For trustee only 'amount_of_reward' is valid now
 
       EOSLIB_SERIALIZE( beos_global_state,
 
@@ -150,9 +150,9 @@ namespace eosio {
         */
         dp.ram.amount_of_reward = ${AMOUNT_OF_REWARD_RAM};
 
-        dp.trustee.starting_block_for_distribution = ${STARTING_BLOCK_FOR_TRUSTEE_DISTRIBUTION};
-        dp.trustee.ending_block_for_distribution = ${ENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION};
-        dp.trustee.distribution_payment_block_interval_for_distribution = ${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_TRUSTEE_DISTRIBUTION};
+        dp.trustee.starting_block_for_distribution = ${STARTING_BLOCK_FOR_TRUSTEE_DISTRIBUTION}; //unused
+        dp.trustee.ending_block_for_distribution = ${ENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION}; //unused
+        dp.trustee.distribution_payment_block_interval_for_distribution = ${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_TRUSTEE_DISTRIBUTION}; //unused
         dp.trustee.amount_of_reward = ${AMOUNT_OF_REWARD_TRUSTEE};
 
         checker( dp );

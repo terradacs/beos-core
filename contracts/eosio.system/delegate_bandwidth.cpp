@@ -151,13 +151,42 @@ namespace eosiosystem {
       change_resource_limits( receiver, bytes_out, 0, 0 );
    }
 
-  void system_contract::initresource( account_name receiver, int64_t bytes, asset stake_net_quantity, asset stake_cpu_quantity )
-  {
-    require_auth( _self );
+   void system_contract::initresource( account_name receiver, int64_t bytes, asset stake_net_quantity, asset stake_cpu_quantity )
+   {
+      require_auth( _self );
+      {
+         int64_t _ram_bytes, _net_weight, _cpu_weight;
+         get_resource_limits( receiver, &_ram_bytes, &_net_weight, &_cpu_weight );
+         eosio_assert( _ram_bytes < 0 && _net_weight < 0 && _cpu_weight < 0, "can only be called for unlimited account" );
+      }
+    
+      // replicate buyrambytes but without a fee
+      if ( bytes > 0 ) {
+         auto itr = _rammarket.find(S(4,RAMCORE));
+         eosio_assert( itr != _rammarket.end(), "ram market does not exist");
+         auto tmp = *itr;
+         auto ram_cost = tmp.convert( asset(bytes,S(0,RAM)), CORE_SYMBOL );
 
-    //Delegate RAM from payer to receiver
-    set_resource_limits( receiver, bytes, stake_net_quantity.amount, stake_cpu_quantity.amount );
-  }
+         INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {_self,N(active)},
+            { _self, N(eosio.ram), ram_cost, std::string("buy ram") } );
+
+         _rammarket.modify( *itr, 0, [&]( auto& es ) {
+            es.convert( ram_cost, S(0,RAM) );
+         });
+
+         _gstate.total_ram_bytes_reserved += uint64_t(bytes);
+         _gstate.total_ram_stake          += ram_cost.amount;
+      }
+
+      // replicate delegatebw but without votes and record for undelegate
+      auto transfer_amount = stake_net_quantity + stake_cpu_quantity;
+      if ( asset(0) < transfer_amount ) {
+         INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {_self, N(active)},
+            { _self, N(eosio.stake), asset(transfer_amount), std::string("stake bandwidth") } );
+      }
+
+      set_resource_limits( receiver, bytes, stake_net_quantity.amount, stake_cpu_quantity.amount );
+   }
 
    /**
     *  The system contract now buys and sells RAM allocations at prevailing market prices.

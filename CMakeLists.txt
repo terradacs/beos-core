@@ -293,22 +293,6 @@ if ("${PROXY_ASSET_PRECISION}" STREQUAL "")
     set(PROXY_ASSET_PRECISION "4")
 endif()
 
-if ("${PROXY_INITIAL_AMOUNT}" STREQUAL "")
-    set(PROXY_INITIAL_AMOUNT "100000.0000")
-endif()
-
-if ("${BEOS_SYMBOL_PRECISION}" STREQUAL "")
-    set(BEOS_SYMBOL_PRECISION "10000")
-endif()
-
-if ("${CORE_INITIAL_AMOUNT}" STREQUAL "")
-    set(CORE_INITIAL_AMOUNT "100000.0000")
-endif()
-
-if ("${INIT_RAM}" STREQUAL "")
-    set(INIT_RAM "1000000")
-endif()
-
 if ("${STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION}" STREQUAL "")
     set(STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION "100")
 endif()
@@ -359,14 +343,6 @@ endif()
 
 if ("${AMOUNT_OF_REWARD_TRUSTEE}" STREQUAL "")
     set(AMOUNT_OF_REWARD_TRUSTEE "asset().symbol.precision()")
-endif()
-
-if ("${STAKE_NET_QUANTITY}" STREQUAL "")
-    set(STAKE_NET_QUANTITY "10000.0000")
-endif()
-
-if ("${STAKE_CPU_QUANTITY}" STREQUAL "")
-    set(STAKE_CPU_QUANTITY "10000.0000")
 endif()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/contracts/eosio.init/eosio.init.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/contracts/eosio.init/eosio.init.hpp)

@@ -365,16 +365,17 @@ def initialize_beos():
 
         eosio.set_contract("eosio.token", config.CONTRACTS_DIR + "/eosio.token", "eosio.token")
 
-        eosio.push_action("eosio.token", "create", '[ "beos.distrib", "{0} {1}"]'.format(config.CORE_INITIAL_AMOUNT, config.CORE_SYMBOL_NAME), "eosio.token")
-        eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PROXY_INITIAL_AMOUNT, config.PROXY_ASSET_NAME), "eosio.token")
+        eosio.push_action("eosio.token", "create", '[ "eosio", "{0} {1}"]'.format(config.CORE_TOTAL_SUPPLY, config.CORE_SYMBOL_NAME), "eosio.token")
+        eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PROXY_TOTAL_SUPPLY, config.PROXY_ASSET_NAME), "eosio.token")
 
         eosio.set_contract("eosio", config.CONTRACTS_DIR + "eosio.system", "eosio")
         eosio.set_contract("beos.init", config.CONTRACTS_DIR + "eosio.init", "beos.init")
         eosio.set_contract("beos.gateway", config.CONTRACTS_DIR + "eosio.gateway", "beos.gateway")
         eosio.set_contract("beos.distrib", config.CONTRACTS_DIR + "eosio.distribution", "beos.distrib")
 
-        #eosio.push_action("eosio", "initram", '[ "beos.gateway", "{0}"]'.format(config.INIT_RAM), "eosio")
-        eosio.push_action("eosio", "initresource", '[ "beos.gateway", "{0}", "{1} {2}", "{3} {4}"]'.format(config.INIT_RAM, config.STAKE_NET_QUANTITY, config.CORE_SYMBOL_NAME, config.STAKE_CPU_QUANTITY, config.CORE_SYMBOL_NAME), "eosio")
+        eosio.push_action("eosio.token", "issue", '[ "eosio", "{0} {1}", "initial token creation" ]'.format(config.CORE_INITIAL_SUPPLY, config.CORE_SYMBOL_NAME), "eosio")
+        eosio.push_action("eosio", "initresource", '[ "beos.gateway", "{0}", "{1} {2}", "{3} {4}"]'.format(config.GATEWAY_INIT_RAM, config.GATEWAY_INIT_NET, config.CORE_SYMBOL_NAME, config.GATEWAY_INIT_CPU, config.CORE_SYMBOL_NAME), "eosio")
+        eosio.push_action("eosio", "initresource", '[ "beos.distrib", "{0}", "{1} {2}", "{3} {4}"]'.format(config.DISTRIB_INIT_RAM, config.DISTRIB_INIT_NET, config.CORE_SYMBOL_NAME, config.DISTRIB_INIT_CPU, config.CORE_SYMBOL_NAME), "eosio")
 
         eosio.terminate_running_tasks(nodeos, keosd)
         eosio.show_keosd_postconf(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)

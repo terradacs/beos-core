@@ -223,7 +223,7 @@ class eosio_interchain_tester : public actions
 
     prepare_account( N(eosio.token), eosio_token_wast, eosio_token_abi, &token_abi_ser );
 
-    create_currency( N(eosio.token), config::distribution_account_name, asset::from_string("10000000000.0000 BEOS") );
+    create_currency( N(eosio.token), config::system_account_name, asset::from_string("10000000000.0000 BEOS") );
     create_currency( N(eosio.token), config::gateway_account_name, asset::from_string("10000000000.0000 PROXY") );
     produce_blocks( 1 );
 
@@ -232,12 +232,23 @@ class eosio_interchain_tester : public actions
     prepare_account( config::gateway_account_name, eosio_gateway_wast, eosio_gateway_abi, &beos_gateway_abi_ser );
     prepare_account( config::distribution_account_name, eosio_distribution_wast, eosio_distribution_abi, &beos_distrib_abi_ser );
 
+    BOOST_REQUIRE_EQUAL( success(), issue( config::system_account_name, asset::from_string("1000000000.0000 BEOS"), config::system_account_name ) );
     BOOST_REQUIRE_EQUAL( success(), initresource( config::gateway_account_name,
                                                     100'000'000,
                                                     asset::from_string("1000.0000 BEOS"),
                                                     asset::from_string("1000.0000 BEOS")
                                                   )
                         );
+    BOOST_REQUIRE_EQUAL( success(), initresource( config::distribution_account_name,
+                                                    33'000'000'000,
+                                                    asset::from_string("100000000.0000 BEOS"),
+                                                    asset::from_string("100000000.0000 BEOS")
+                                                  )
+                        );
+    //ABW: problem - amount to be issued depends on amount needed to cover resources to be distributed, however these
+    //parameters are set in each test separately, not to mention they are set after this code is run, so we need to
+    //have enough resources to cover all tests (but in each case we will have extra liquid BEOS in eosio and undistributed
+    //resources in beos.distrib)
 
     // [MK]: need to change creation with multisig
     create_account_with_resources( config::gateway_account_name, N(beos.trustee) );
@@ -680,13 +691,6 @@ BOOST_FIXTURE_TEST_CASE( liquid_ram_test, eosio_init_tester ) try {
   test_global_state tgs;
   BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
 
-  BOOST_REQUIRE_EQUAL( success(), initresource( config::gateway_account_name,
-                                                  100'000'000,
-                                                  asset::from_string("1000.0000 BEOS"),
-                                                  asset::from_string("1000.0000 BEOS")
-                                                )
-                      );
-
   create_account_with_resources( config::gateway_account_name, N(xxxxxxxmario) );
   create_account_with_resources( config::gateway_account_name, N(xxxxxxmario2) );
 
@@ -715,13 +719,6 @@ BOOST_FIXTURE_TEST_CASE( liquid_ram_test2, eosio_init_tester ) try {
   tgs.ram.starting_block_for_distribution = 80;
   tgs.ram.ending_block_for_distribution = 81;
   BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
-
-  BOOST_REQUIRE_EQUAL( success(), initresource( config::gateway_account_name,
-                                                  100'000'000,
-                                                  asset::from_string("1000.0000 BEOS"),
-                                                  asset::from_string("1000.0000 BEOS")
-                                                )
-                      );
 
   create_account_with_resources( config::gateway_account_name, N(xxxxxxxmario) );
   BOOST_REQUIRE_EQUAL( wasm_assert_msg("RAM shouldn't be liquid during distribution period"), sellram( "xxxxxxxmario", 5600 ) );
@@ -765,13 +762,6 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test, eosio_init_tester ) try {
   tgs.beos.starting_block_for_distribution = 55;
   BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
 
-  BOOST_REQUIRE_EQUAL( success(), initresource( config::gateway_account_name,
-                                                  100'000'000,
-                                                  asset::from_string("1000.0000 BEOS"),
-                                                  asset::from_string("1000.0000 BEOS")
-                                                )
-                      );
-
   create_account_with_resources( config::gateway_account_name, N(xxxxxxxmario) );
 
   BOOST_REQUIRE_EQUAL( success(), issue( N(bob), asset::from_string("5.0000 PROXY") ) );
@@ -810,13 +800,6 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test2, eosio_init_tester ) try {
   tgs.beos.distribution_payment_block_interval_for_distribution = 5;
   tgs.beos.starting_block_for_distribution = 55;
   BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
-
-  BOOST_REQUIRE_EQUAL( success(), initresource( config::gateway_account_name,
-                                                  100'000'000,
-                                                  asset::from_string("1000.0000 BEOS"),
-                                                  asset::from_string("1000.0000 BEOS")
-                                                )
-                      );
 
   create_account_with_resources( config::gateway_account_name, N(xxxxxxxmario) );
   create_account_with_resources( config::gateway_account_name, N(xxxxxxmario2) );
@@ -2104,13 +2087,6 @@ BOOST_FIXTURE_TEST_CASE( main_commands_test_4, eosio_interchain_tester ) try {
 
 BOOST_FIXTURE_TEST_CASE( creating_short_names, eosio_interchain_tester ) try {
   BOOST_TEST_MESSAGE( "Creating names with length less than 12 chars - creator beos.gateway");
-
-  BOOST_REQUIRE_EQUAL( success(), initresource( config::gateway_account_name,
-                                                  100'000'000,
-                                                  asset::from_string("1000.0000 BEOS"),
-                                                  asset::from_string("1000.0000 BEOS")
-                                                )
-                      );
 
   create_account_with_resources( config::gateway_account_name, N(mario) );
   create_account_with_resources( config::gateway_account_name, N(mario.mar) );
