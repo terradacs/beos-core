@@ -29,6 +29,7 @@ def save_screen_cfg(cfg_file_name, log_file_path):
     with open(cfg_file_name, "w") as cfg:
         cfg.write("logfile {0}\n".format(log_file_path))
         cfg.write("deflog on\n")
+        cfg.write("logfile flush 1\n")
 
 def save_pid_file(pid_file_name, exec_name):
     with open(pid_file_name, "w") as pid_file:
