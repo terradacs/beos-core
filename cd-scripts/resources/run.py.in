@@ -137,11 +137,18 @@ def run_nodeos_postconf(node_index, name, public_key, use_https = False):
 
 def kill_process(pid_file_name, proc_name, ip_address, port):
     pids = []
+    pid_name = None
+    with open(pid_file_name, "r") as pid_file:
+        pid_name = pid_file.readline()
+        pid_name = pid_name.strip()
     for line in os.popen("ps ax | grep " + proc_name + " | grep -v grep"):
-        if ip_address in line and str(port) in line:
+        if pid_name is not None and pid_name in line:
             line = line.strip().split()
             pids.append(line[0])
     for pid in pids:
+        for line in os.popen("ps --no-header --ppid {0}".format(pid)):
+            line = line.strip().split()
+            os.kill(int(line[0]), 2)
         os.kill(int(pid), 2)
     if os.path.exists(pid_file_name):
         os.remove(pid_file_name)
