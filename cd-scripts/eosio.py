@@ -93,42 +93,14 @@ def show_keosd_postconf(ip_address, port, wallet_dir, use_https = False):
 def show_nodeos_postconf(node_index, name, public_key, use_https = False):
     working_dir = "{0}{1}-{2}/".format(config.NODEOS_WORKING_DIR, node_index, name)
 
-    https_opts = [
-        "--signature-provider", "{0}=KEOSD:http://{1}:{2}/v1/wallet/sign_digest".format(public_key, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
-        "--http-server-address", "{0}:{1}".format(config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
-    ]
-
-    if use_https:
-        https_opts = [
-            "--signature-provider", "{0}=KEOSD:https://{1}:{2}/v1/wallet/sign_digest".format(public_key, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
-            "--https-server-address", "{0}:{1}".format(config.NODEOS_IP_ADDRESS, config.NODEOS_PORT),
-            "--https-certificate-chain-file", config.KEOSD_CERTIFICATE_CHAIN_FILE,
-            "--https-private-key-file", config.KEOSD_PRIVATE_KEY_FILE
-        ]
-
     parameters = [
         config.NODEOS_EXECUTABLE,
-        "--max-irreversible-block-age", "-1",
         "--contracts-console",
         "--blocks-dir", os.path.abspath(working_dir) + '/blocks',
         "--config-dir", os.path.abspath(working_dir),
         "--data-dir", os.path.abspath(working_dir),
-        "--chain-state-db-size-mb", "1024",
-        "--enable-stale-production",
-        "--producer-name", name,
     ]
 
-    plugins = [
-        "--plugin", "eosio::http_plugin",
-        "--plugin", "eosio::chain_api_plugin",
-        "--plugin", "eosio::producer_plugin",
-        "--plugin", "eosio::beos_plugin",
-        "--plugin", "eosio::beos_api_plugin",
-        "--plugin", "eosio::history_plugin",
-        "--plugin", "eosio::history_api_plugin"
-    ]
-
-    parameters = parameters + https_opts + plugins
     logger.info("Configuration complete, you can now run nodeos with command (consider running in screen): {0}".format(" ".join(parameters)))
 
 def detect_process_by_name(proc_name, ip_address, port):
@@ -272,44 +244,15 @@ def run_nodeos(node_index, name, public_key, use_https = False):
         logger.error(msg)
         raise EOSIOException(msg)
 
-    https_opts = [
-        "--signature-provider", "{0}=KEOSD:http://{1}:{2}/v1/wallet/sign_digest".format(public_key, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
-        "--http-server-address", "{0}:{1}".format(config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
-    ]
-
-    if use_https:
-        https_opts = [
-            "--signature-provider", "{0}=KEOSD:https://{1}:{2}/v1/wallet/sign_digest".format(public_key, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
-            "--https-server-address", "{0}:{1}".format(config.NODEOS_IP_ADDRESS, config.NODEOS_PORT),
-            "--https-certificate-chain-file", config.KEOSD_CERTIFICATE_CHAIN_FILE, 
-            "--https-private-key-file", config.KEOSD_PRIVATE_KEY_FILE
-        ]
-
     parameters = [
         config.NODEOS_EXECUTABLE,
-        "--max-irreversible-block-age", "-1",
         "--contracts-console",
         "--genesis-json", os.path.abspath(working_dir + config.GENESIS_JSON_FILE),
         "--blocks-dir", os.path.abspath(working_dir) + '/blocks',
         "--config-dir", os.path.abspath(working_dir),
         "--data-dir", os.path.abspath(working_dir),
-        "--chain-state-db-size-mb", "1024",
-        "--enable-stale-production",
-        "--producer-name", name,
     ] 
     
-    plugins = [
-        "--plugin", "eosio::http_plugin",
-        "--plugin", "eosio::chain_api_plugin",
-        "--plugin", "eosio::producer_plugin",
-        "--plugin", "eosio::beos_plugin",
-        "--plugin", "eosio::beos_api_plugin",
-        "--plugin", "eosio::history_plugin",
-        "--plugin", "eosio::history_api_plugin"
-    ]
-
-    parameters = parameters + https_opts + plugins
-
     logger.info("Executing command: {0}".format(" ".join(parameters)))
     return run_service("NODEOS", parameters, "] Produced block", False)
 
@@ -377,7 +320,7 @@ if __name__ == '__main__':
 
         keosd = run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
         create_wallet("http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT), False)
-        nodeos = run_nodeos(config.START_NODE_INDEX, "eosio", config.EOSIO_PUBLIC_KEY)
+        nodeos = run_nodeos(config.START_NODE_INDEX, config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY)
 
         create_account("eosio", "eosio.msig", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
         create_account("eosio", "eosio.names", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
@@ -410,7 +353,7 @@ if __name__ == '__main__':
         terminate_running_tasks(nodeos, keosd)
         show_keosd_postconf(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
         show_wallet_unlock_postconf()
-        show_nodeos_postconf(0, "eosio", config.EOSIO_PUBLIC_KEY)
+        show_nodeos_postconf(config.START_NODE_INDEX, config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY)
     except Exception as ex:
         terminate_running_tasks(nodeos, keosd)
         logger.error("Exception during initialize: {0}".format(ex))

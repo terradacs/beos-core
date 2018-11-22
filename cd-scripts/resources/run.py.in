@@ -103,42 +103,14 @@ def run_keosd_postconf(ip_address, port, wallet_dir, use_https = False):
 def run_nodeos_postconf(node_index, name, public_key, use_https = False):
     working_dir = "{0}{1}-{2}/".format("${NODEOS_WORKING_DIR}", node_index, name)
 
-    https_opts = [
-        "--signature-provider", "{0}=KEOSD:http://{1}:{2}/v1/wallet/sign_digest".format(public_key, "${KEOSD_IP_ADDRESS}", "${KEOSD_PORT}"),
-        "--http-server-address", "{0}:{1}".format("${NODEOS_IP_ADDRESS}", "${NODEOS_PORT}")
-    ]
-
-    if use_https:
-        https_opts = [
-            "--signature-provider", "{0}=KEOSD:https://{1}:{2}/v1/wallet/sign_digest".format(public_key, "${KEOSD_IP_ADDRESS}", "${KEOSD_PORT}"),
-            "--https-server-address", "{0}:{1}".format("${NODEOS_IP_ADDRESS}", "${NODEOS_PORT}"),
-            "--https-certificate-chain-file", "${KEOSD_CERTIFICATE_CHAIN_FILE}",
-            "--https-private-key-file", "${KEOSD_PRIVATE_KEY_FILE}"
-        ]
-
     parameters = [
         "${NODEOS_EXECUTABLE}",
-        "--max-irreversible-block-age", "-1",
         "--contracts-console",
         "--blocks-dir", os.path.abspath(working_dir) + '/blocks',
         "--config-dir", os.path.abspath(working_dir),
         "--data-dir", os.path.abspath(working_dir),
-        "--chain-state-db-size-mb", "1024",
-        "--enable-stale-production",
-        "--producer-name", name
     ]
 
-    plugins = [
-        "--plugin", "eosio::http_plugin",
-        "--plugin", "eosio::chain_api_plugin",
-        "--plugin", "eosio::producer_plugin",
-        "--plugin", "eosio::beos_plugin",
-        "--plugin", "eosio::beos_api_plugin",
-        "--plugin", "eosio::history_plugin",
-        "--plugin", "eosio::history_api_plugin"
-    ]
-
-    parameters = parameters + https_opts + plugins
     log_file_name = "./{0}-{1}.log".format("nodeos", datetime.datetime.now().strftime("%Y-%m-%d"))
     save_screen_cfg("./nodeos_screen.cfg", log_file_name)
     screen_params = [
@@ -165,11 +137,18 @@ def run_nodeos_postconf(node_index, name, public_key, use_https = False):
 
 def kill_process(pid_file_name, proc_name, ip_address, port):
     pids = []
+    pid_name = None
+    with open(pid_file_name, "r") as pid_file:
+        pid_name = pid_file.readline()
+        pid_name = pid_name.strip()
     for line in os.popen("ps ax | grep " + proc_name + " | grep -v grep"):
-        if ip_address in line and str(port) in line:
+        if pid_name is not None and pid_name in line:
             line = line.strip().split()
             pids.append(line[0])
     for pid in pids:
+        for line in os.popen("ps --no-header --ppid {0}".format(pid)):
+            line = line.strip().split()
+            os.kill(int(line[0]), 2)
         os.kill(int(pid), 2)
     if os.path.exists(pid_file_name):
         os.remove(pid_file_name)
