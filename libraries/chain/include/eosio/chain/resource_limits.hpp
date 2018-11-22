@@ -2,10 +2,14 @@
 #include <eosio/chain/exceptions.hpp>
 #include <eosio/chain/types.hpp>
 #include <eosio/chain/snapshot.hpp>
+#include <eosio/chain/asset.hpp>
 #include <chainbase/chainbase.hpp>
 #include <set>
 
 namespace eosio { namespace chain { namespace resource_limits {
+
+   struct resource_limits_object;
+
    namespace impl {
       template<typename T>
       struct ratio {
@@ -77,6 +81,22 @@ namespace eosio { namespace chain { namespace resource_limits {
          account_resource_limit get_account_net_limit_ex( const account_name& name, bool elastic = true) const;
 
          int64_t get_account_ram_usage( const account_name& name ) const;
+
+         typedef std::function<bool(const resource_limits_object&, bool)> userres_processor;
+         typedef std::function<bool(fc::mutable_variant_object&&, bool)> userres_public_processor;
+
+         /** Allows to process all entries included in `by_owner` index range <lowerBound, upperBound).
+             \param lowerBound lower bound of the query to start iteration from,
+             \param upperBound upper bound of the query to end iteration,
+             \param processor - processing lambda, which shall return false to stop iteration. Takes arguments: 
+                                const resource_limits_object& voter - entry to be processed,
+                                bool hasNext - true if there is available next item during iteration.
+         */
+         void process_userres(const account_name& lowerBound, const account_name& upperBound, userres_processor processor) const;
+         void process_public_userres(const account_name& lowerBound, const account_name& upperBound, userres_public_processor processor) const;
+
+         static fc::mutable_variant_object convert_to_public( const account_name& account, int64_t ram_bytes, asset net_weight, asset cpu_weight );
+         static fc::mutable_variant_object convert_to_public( const resource_limits_object& object );
 
       private:
          chainbase::database& _db;
