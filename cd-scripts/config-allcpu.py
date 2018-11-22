@@ -5,9 +5,9 @@ from logging import INFO, DEBUG, ERROR, WARNING, CRITICAL
 LOG_LEVEL = INFO
 
 # directory where all sources will be downloaded
-SOURCES_DOWNLOAD_DIR = os.environ["HOME"] + "/wkedzierski/beos-core"
+SOURCES_DOWNLOAD_DIR = os.environ["HOME"] + "/ci/sources"
 # beos main directory
-BEOS_DIR = SOURCES_DOWNLOAD_DIR + "/beos-core"
+BEOS_DIR = os.environ["CI_PROJECT_DIR"]
 # path to beos sources repository
 #BEOS_REPOSITORY_PATH = "git@gitlab.syncad.com:blocktrades/beos-core.git"
 BEOS_REPOSITORY_PATH = "https://gitlab.syncad.com/blocktrades/beos-core.git" 
@@ -15,7 +15,7 @@ BEOS_REPOSITORY_PATH = "https://gitlab.syncad.com/blocktrades/beos-core.git"
 BEOS_REPOSITORY_BRANCH = 'beos-initial-release'
 #
 # eosio build directory - here will land final build
-BEOS_BUILD_DIR = BEOS_DIR + "/build/"
+BEOS_BUILD_DIR = os.environ["HOME"] + "/ci/build/" + os.environ["CI_COMMIT_REF_NAME"]
 
 MAIN_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
 ERROR_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
@@ -125,7 +125,7 @@ NODEOS_CERTIFICATE_CHAIN_FILE = None
 # nodeos private key file path - mandatory for https
 NODEOS_PRIVATE_KEY_FILE = None
 # direcotry with nodes data
-NODEOS_WORKING_DIR = "/tmp/"
+NODEOS_WORKING_DIR = os.environ["HOME"] + "/tmp/"
 # directory in which wallet files are held
 DEFAULT_WALLET_DIR = os.environ["HOME"] + "/eosio-wallet"
 # name of the master wallet
@@ -157,9 +157,12 @@ GENESIS_JSON_FILE = "genesis.json"
 #starting node index
 START_NODE_INDEX = 0
 
+PRODUCER_NAME = "eosio"
+
 ##############              Cmake tests configuration             ###############
 #################################################################################
 DISABLE_FAILING_TESTS = "true"
+DISABLE_WASM_TESTS = "true"
 
 ##############      configuration data for contracts/accounts     ###############
 #################################################################################
@@ -178,24 +181,13 @@ GATEWAY_INIT_NET = "10000.0000" # just for gateway needs
 GATEWAY_INIT_CPU = "10000.0000" # just for gateway needs
 
 STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION = 100
-#STARTING_BLOCK_FOR_BEOS_DISTRIBUTION = 7 * 24 * 3600 * 2 # days(7).to_seconds() * 2
-STARTING_BLOCK_FOR_BEOS_DISTRIBUTION = 1800 * 2 # 30 minutes * 2
-
-#ENDING_BLOCK_FOR_BEOS_DISTRIBUTION = 98 * 24 * 3600 * 2 # days(98).to_seconds() * 2
-ENDING_BLOCK_FOR_BEOS_DISTRIBUTION = 7200 * 2 # 2 hours * 2
-
-#DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION = 1 * 3600 * 2 # hours(1).to_seconds() * 2
-DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION = 900 * 2 # 15 minutes *2
-
+STARTING_BLOCK_FOR_BEOS_DISTRIBUTION = 7 * 24 * 3600 * 2 # days(7).to_seconds() * 2
+ENDING_BLOCK_FOR_BEOS_DISTRIBUTION = 98 * 24 * 3600 * 2 # days(98).to_seconds() * 2
+DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION = 1 * 3600 * 2 # hours(1).to_seconds() * 2
 AMOUNT_OF_REWARD_BEOS = 800 * CORE_SYMBOL_PRECISION # 800 * asset().symbol.precision()
-#STARTING_BLOCK_FOR_RAM_DISTRIBUTION = 7 * 24 * 3600 * 2 # days(7).to_seconds() * 2
-STARTING_BLOCK_FOR_RAM_DISTRIBUTION = 1800 * 2 # 30 minutes * 2
-
-#ENDING_BLOCK_FOR_RAM_DISTRIBUTION = 280 * 24 * 3600 * 2 # days(280).to_seconds() * 2
-ENDING_BLOCK_FOR_RAM_DISTRIBUTION = 7200 * 2 # 2 hour * 2
-
-#DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION = 1 * 3600 * 2 # hours(1).to_seconds() * 2
-DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION = 900 * 2 # 15 minutes * 2
+STARTING_BLOCK_FOR_RAM_DISTRIBUTION = 7 * 24 * 3600 * 2 # days(7).to_seconds() * 2
+ENDING_BLOCK_FOR_RAM_DISTRIBUTION = 280 * 24 * 3600 * 2 # days(280).to_seconds() * 2
+DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION = 1 * 3600 * 2 # hours(1).to_seconds() * 2
 
 AMOUNT_OF_REWARD_RAM = 5000000 # 5000000 is a number not asset
 STARTING_BLOCK_FOR_TRUSTEE_DISTRIBUTION = 7 * 24 * 3600 * 2 # days(7).to_seconds() * 2 [UNUSED]
@@ -205,13 +197,13 @@ AMOUNT_OF_REWARD_TRUSTEE = 800 * CORE_SYMBOL_PRECISION # 800 * asset().symbol.pr
 
 # reward_pool = ((end-start)/interval + 1) * reward_per_interval
 # beos.distrib needs enough to cover all rewards, plus some for its own needs
-DISTRIB_INIT_RAM = "35010000" # (7200-1800)/900 + 1 intervals * 5000000 per interval plus some 10000 for itself
-DISTRIB_INIT_NET = "15600.0000" # (7200-1800)/900 + 1 intervals * (800/2 (users) + 800/2 (trustee)) per interval plus some 10000 for itself
-DISTRIB_INIT_CPU = "15600.0000" # as above
+DISTRIB_INIT_RAM = "32765010000" # (280-7)*24 + 1 intervals * 5000000 per interval plus some 10000 for itself
+DISTRIB_INIT_NET = "1758000.0000" # (98-7)*24 + 1 intervals * (800/2 (users) + 800/2 (trustee)) per interval plus some 10000 for itself
+DISTRIB_INIT_CPU = "1758000.0000" # as above
 
 # sum of BEOS needed to cover gateway and distrib initial resources; note that the more we issue the more expensive ram will be, which means
-# we must issue even more; we are trying to buy 1/2000 of all ram
-CORE_INITIAL_SUPPLY = "32000.0000"
+# we must issue even more; we are trying to buy half of all available ram after all
+CORE_INITIAL_SUPPLY = "8000000.0000"
 
 ### init loggers
 global log_main
