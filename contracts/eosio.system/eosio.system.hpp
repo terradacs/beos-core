@@ -141,6 +141,8 @@ namespace eosiosystem {
          eosio_global_state     _gstate;
          rammarket              _rammarket;
 
+         int64_t                _min_activated_stake = 150'000'000'0000; // it should be: CORE_INITIAL_ISSUE * 15% * 10000 (precision)
+
       public:
          system_contract( account_name s );
          ~system_contract();

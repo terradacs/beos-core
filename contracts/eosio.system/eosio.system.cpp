@@ -19,6 +19,8 @@ namespace eosiosystem {
 
       flush_voting_stats();
 
+      _min_activated_stake = get_min_activated_stake();
+
       auto itr = _rammarket.find(S(4,RAMCORE));
 
       if( itr == _rammarket.end() ) {
@@ -204,7 +206,7 @@ namespace eosiosystem {
       _global.set(_gstate, _self);
       }
 
-} /// eosio.system
+} /// eosiosystem
 
 
 EOSIO_ABI( eosiosystem::system_contract,
