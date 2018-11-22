@@ -197,6 +197,8 @@ add_test(NAME test03_scenarios_deploy COMMAND test03_scenarios_deploy.py --nodeo
 set_property(TEST test03_scenarios_deploy PROPERTY LABELS nonparallelizable_tests)
 add_test(NAME test04_account_creation_and_get_account_deploy COMMAND tests/beos_plugin_tests/test04_account_creation_and_get_account_deploy.py  --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --public-key ${GATEWAY_ROOT_KEY}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_property(TEST test04_account_creation_and_get_account_deploy PROPERTY LABELS nonparallelizable_tests)
+add_test(NAME test05_account_creation_with_delegate_ram COMMAND tests/beos_plugin_tests/test05_account_creation_with_delegate_ram.py  --main-dir ${CMAKE_BINARY_DIR} --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_property(TEST test05_account_creation_with_delegate_ram PROPERTY LABELS nonparallelizable_tests)
 add_test(NAME test06_account_creation_and_account_validator_deploy COMMAND tests/beos_plugin_tests/test06_account_creation_and_account_validator_deploy.py  --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --public-key ${GATEWAY_ROOT_KEY}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR} )
 set_property(TEST test06_account_creation_and_account_validator_deploy PROPERTY LABELS nonparallelizable_tests)
 
