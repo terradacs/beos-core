@@ -691,24 +691,26 @@ BOOST_FIXTURE_TEST_CASE( liquid_ram_test, eosio_init_tester ) try {
   test_global_state tgs;
   BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
 
-  create_account_with_resources( config::gateway_account_name, N(xxxxxxxmario) );
-  create_account_with_resources( config::gateway_account_name, N(xxxxxxmario2) );
+  create_account_with_resources( config::gateway_account_name, N(mario) );
+  create_account_with_resources( config::gateway_account_name, N(mario2) );
 
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg("RAM shouldn't be liquid during distribution period"), sellram( "xxxxxxxmario", 5600 ) );
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg("RAM shouldn't be liquid during distribution period"), sellram( "xxxxxxmario2", 15600 ) );
+  BOOST_REQUIRE_EQUAL( success(), issue( N(mario), asset::from_string("5.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( success(), issue( N(mario2), asset::from_string("5.0000 PROXY") ) );
+
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("RAM shouldn't be liquid during distribution period"), sellram( "mario", 5600 ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("RAM shouldn't be liquid during distribution period"), sellram( "mario2", 15600 ) );
 
   produce_blocks( 248 - control->head_block_num() );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 248u );
 
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg("RAM shouldn't be liquid during distribution period"), sellram( "xxxxxxxmario", 5601 ) );
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg("RAM shouldn't be liquid during distribution period"), sellram( "xxxxxxmario2", 15601 ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("RAM shouldn't be liquid during distribution period"), sellram( "mario", 5601 ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("RAM shouldn't be liquid during distribution period"), sellram( "mario2", 15601 ) );
 
   produce_blocks( 1 );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 249u );
 
-  //Important!!! What to do, when RAM market doesn't exist.
-  //BOOST_REQUIRE_EQUAL( success(), sellram( "xxxxxxxmario", 5600 ) );
-  //BOOST_REQUIRE_EQUAL( success(), sellram( "xxxxxxmario2", 15600 ) );
+  BOOST_REQUIRE_EQUAL( success(), sellram( "mario", 5600 ) );
+  BOOST_REQUIRE_EQUAL( success(), sellram( "mario2", 15600 ) );
 
 } FC_LOG_AND_RETHROW()
 
@@ -716,11 +718,14 @@ BOOST_FIXTURE_TEST_CASE( liquid_ram_test2, eosio_init_tester ) try {
 
   test_global_state tgs;
 
+  tgs.beos.starting_block_for_distribution = 60;
+  tgs.beos.ending_block_for_distribution = 61;
   tgs.ram.starting_block_for_distribution = 80;
   tgs.ram.ending_block_for_distribution = 81;
   BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
 
   create_account_with_resources( config::gateway_account_name, N(xxxxxxxmario) );
+  BOOST_REQUIRE_EQUAL( success(), issue( N(xxxxxxxmario), asset::from_string("5.0000 PROXY") ) );
   BOOST_REQUIRE_EQUAL( wasm_assert_msg("RAM shouldn't be liquid during distribution period"), sellram( "xxxxxxxmario", 5600 ) );
 
   produce_blocks( 81 - control->head_block_num() );
@@ -729,9 +734,9 @@ BOOST_FIXTURE_TEST_CASE( liquid_ram_test2, eosio_init_tester ) try {
 
   produce_blocks( 1 );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 82 );
+  CHECK_STATS(xxxxxxxmario, "5.0000 PROXY", "800.0000 BEOS", "5000000");
 
-  //Important!!! What to do, when RAM market doesn't exist.
-  //BOOST_REQUIRE_EQUAL( success(), sellram( "xxxxxxxmario", 5600 ) );
+  BOOST_REQUIRE_EQUAL( success(), sellram( "xxxxxxxmario", 5600 ) );
 
 } FC_LOG_AND_RETHROW()
 
