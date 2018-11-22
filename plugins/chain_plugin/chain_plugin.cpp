@@ -1112,8 +1112,11 @@ read_only::get_table_rows_result read_only::get_table_rows( const read_only::get
    name system_account(config::system_account_name);
    if(p.code == system_account && p.scope == system_account.to_string())
    {
-      if(p.table == name(N(voters)))
+      if(p.table == N(voters))
          return get_voters_table_rows(p);
+
+      if(p.table == N(userres))
+         return get_userres_table_rows(p);
    }
 
    bool primary = false;
@@ -1728,23 +1731,7 @@ read_only::get_account_results read_only::get_account( const get_account_params&
       asset a_net_weight( net_weight );
       asset a_cpu_weight( cpu_weight );
 
-   /*struct user_resources {
-      account_name  owner;
-      asset         net_weight;
-      asset         cpu_weight;
-      int64_t       ram_bytes = 0;
-
-      uint64_t primary_key()const { return owner; }
-
-      // explicit serialization macro is not necessary, used here only to improve compilation time
-      EOSLIB_SERIALIZE( user_resources, (owner)(net_weight)(cpu_weight)(ram_bytes) )
-   };*/
-
-      result.total_resources = mutable_variant_object()
-        ( "owner", params.account_name )
-        ( "net_weight", a_net_weight )
-        ( "cpu_weight", a_cpu_weight )
-        ( "ram_bytes", ram_bytes );
+      result.total_resources = rm.convert_to_public( params.account_name, ram_bytes, a_net_weight, a_cpu_weight );
       }
 
       t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple( config::system_account_name, params.account_name, N(delband) ));
@@ -1907,6 +1894,32 @@ read_only::get_table_rows_result read_only::get_voters_table_rows(const get_tabl
    return retVal;
    }
 
+read_only::get_table_rows_result read_only::get_userres_table_rows(const get_table_rows_params& p) const
+  {
+  get_table_rows_result result;
+
+  const resource_limits_manager& resource_limit_mgr = db.get_resource_limits_manager();
+
+  auto timeout = fc::time_point::now() + fc::microseconds(1000 * 10); /// 10ms max time
+
+  auto lb = convert_to_type<uint64_t>(p.lower_bound, "lower_bound");
+  auto ub = convert_to_type<uint64_t>(p.upper_bound, "upper_bound");
+
+  resource_limit_mgr.process_public_userres(account_name(lb), account_name(ub), [&p, timeout, &result] (mutable_variant_object&& obj, bool hasNext) -> bool
+    {
+    if (result.rows.size() == p.limit || fc::time_point::now() > timeout)
+      {
+      result.more = hasNext;
+      return false; /// stop iteration.
+      }
+
+    result.rows.emplace_back(std::move(obj));
+    return true;
+    }
+  );
+
+  return result;
+  }
 
 } // namespace chain_apis
 } // namespace eosio

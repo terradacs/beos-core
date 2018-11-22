@@ -218,6 +218,72 @@ int64_t resource_limits_manager::get_account_ram_usage( const account_name& name
    return _db.get<resource_usage_object,by_owner>( name ).ram_usage;
 }
 
+void resource_limits_manager::process_userres(const account_name& lowerBound, const account_name& upperBound,
+  userres_processor processor) const
+  {
+  const auto& idx = _db.template get_index<resource_limits_index, by_owner>();
+
+  auto begin = lowerBound.empty() ? idx.begin() : idx.lower_bound(lowerBound);
+  auto end = upperBound.empty() ? idx.end() : idx.lower_bound(upperBound);
+
+  bool canContinue = (begin != end);
+
+  while (canContinue)
+    {
+    const resource_limits_object& obj = *begin;
+    bool hasNext = (++begin != end);
+    canContinue = processor(obj, hasNext) && hasNext;
+    }
+  }
+
+void resource_limits_manager::process_public_userres(const account_name& lowerBound, const account_name& upperBound,
+  userres_public_processor processor) const
+  {
+  const auto& idx = _db.template get_index<resource_limits_index, by_owner>();
+
+  auto begin = lowerBound.empty() ? idx.begin() : idx.lower_bound(lowerBound);
+  auto end = upperBound.empty() ? idx.end() : idx.lower_bound(upperBound);
+
+  bool canContinue = (begin != end);
+
+  while (canContinue)
+    {
+    const resource_limits_object& obj = *begin;
+    bool hasNext = (++begin != end);
+    canContinue = processor(convert_to_public(obj), hasNext) && hasNext;
+    }
+  }
+
+fc::mutable_variant_object resource_limits_manager::convert_to_public(
+  const account_name& account, int64_t ram_bytes, asset net_weight, asset cpu_weight )
+  {
+  /*struct user_resources {
+    account_name  owner;
+    asset         net_weight;
+    asset         cpu_weight;
+    int64_t       ram_bytes = 0;
+
+    uint64_t primary_key()const { return owner; }
+
+    // explicit serialization macro is not necessary, used here only to improve compilation time
+    EOSLIB_SERIALIZE( user_resources, (owner)(net_weight)(cpu_weight)(ram_bytes) )
+  };*/
+
+  return fc::mutable_variant_object()
+    ( "owner",      account )
+    ( "net_weight", net_weight )
+    ( "cpu_weight", cpu_weight )
+    ( "ram_bytes",  ram_bytes );
+  }
+
+fc::mutable_variant_object resource_limits_manager::convert_to_public( const resource_limits_object& object )
+  {
+  return fc::mutable_variant_object()
+    ( "owner",      object.owner )
+    ( "net_weight", asset(object.net_weight) )
+    ( "cpu_weight", asset(object.cpu_weight) )
+    ( "ram_bytes",  object.ram_bytes );
+  }
 
 bool resource_limits_manager::set_account_limits( const account_name& account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight) {
    //const auto& usage = _db.get<resource_usage_object,by_owner>( account );

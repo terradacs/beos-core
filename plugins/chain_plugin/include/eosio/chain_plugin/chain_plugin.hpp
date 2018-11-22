@@ -524,6 +524,8 @@ public:
    private:
       /// Helper function to emulate get_table_rows called on `system_contract::voters` which has been moved to native data structures.
       get_table_rows_result get_voters_table_rows(const get_table_rows_params& p) const;
+      /// Helper function to emulate get_table_rows called on `system_contract::userres` which has been moved to native data structures.
+      get_table_rows_result get_userres_table_rows(const get_table_rows_params& p) const;
 };
 
 class read_write {
