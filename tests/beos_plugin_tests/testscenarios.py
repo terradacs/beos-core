@@ -9,6 +9,7 @@ from eosrpcexecutor import EOSRPCExecutor
 
 class TestScenarios(object):
     def __init__(self, _nodeos_addres, _nodeos_port, _wallet_address, _wallet_port, _scenarios_file_name, _append_start_block):
+        self.append_block_numbers = _append_start_block
         self.summary_file = "Scenarios_summary_"+str(datetime.datetime.now())[:-7]
         self.scenarios_file = _scenarios_file_name
         self.actions      = []
@@ -16,13 +17,12 @@ class TestScenarios(object):
         self.scenarios    = None
         self.scenariosNr  = None
         self.blockNumber  = 0
+        self.join_block_number = 0
         self.after_block_result    = {}
         self.called_actions_result = {}
         self.eos_rpc      = EOSRPCExecutor(_nodeos_addres, _nodeos_port, _wallet_address, _wallet_port)
-        self.join_block_number = int(self.eos_rpc.get_info()["head_block_num"]) if _append_start_block else 0
-        log.info("self.join_block_number%d"%self.join_block_number)
-        self.load_scenarios()
 
+        self.load_scenarios()
         self.blockGetter = threading.Thread(target=self.block_id_getter)
         self.blockGetter.setDaemon(daemonic=True)
         self.user_status_getter = threading.Thread(target=self.check_user_status_after_block)
@@ -386,6 +386,9 @@ class TestScenarios(object):
 
     def prepare_data(self):
         try:
+            if self.append_block_numbers:
+                self.join_block_number = int(self.eos_rpc.get_info()["head_block_num"])
+                log.info("self.join_block_number: %d"%self.join_block_number)
             self.prepare_actions()
             self.prepare_after_block()
         except Exception as _ex:
