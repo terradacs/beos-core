@@ -322,6 +322,11 @@ class privileged_api : public context_aware_api {
             total_producer_vote_weight);
          }
 
+      int64_t get_min_activated_stake()
+        {
+        return context.control.get_mutable_voting_manager().get_min_activated_stake();
+        }
+
    private:
       inline void set_resource_limits_impl( account_name account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight ) {
          if( context.control.get_mutable_resource_limits_manager().set_account_limits(account, ram_bytes, net_weight, cpu_weight) ) {
@@ -1797,7 +1802,7 @@ class distribution_api : public context_aware_api {
          /* [MK]: System account 'eosio' is the only account able to use distribution_api
                   (from inside 'onblock' pushed in implicit transaction)
          */
-         EOS_ASSERT( ctx.privileged && actor == config::system_account_name, unaccessible_api,
+         EOS_ASSERT( actor == config::system_account_name, unaccessible_api,
                      "${code} does not have permission to call this API", ("code",actor) );
       }
 
@@ -1831,6 +1836,32 @@ REGISTER_INTRINSICS( distribution_api,
    (reward_all,  void(int64_t, int64_t, int64_t, int, int, int, int, int) )
    (reward_done, void(int, int, int)                            )
 );
+
+/*
+ * This api is dedicated for using from beos.init.
+ */
+class init_api : public context_aware_api {
+   public:
+      init_api( apply_context& ctx )
+      : context_aware_api( ctx )
+      {
+         name actor = ctx.trx_context.trx.first_authorizor();
+         DBG("init_api::init_api: actor = %s", actor.to_string().c_str());
+
+         EOS_ASSERT( ctx.privileged || actor == N(beos.init), unaccessible_api,
+                     "${code} does not have permission to call this API", ("code",actor) );
+      }
+
+      void set_min_activated_stake(int64_t min_activated_stake)
+      {
+         context.control.get_mutable_voting_manager().set_min_activated_stake( min_activated_stake );
+      }
+
+};
+
+REGISTER_INTRINSICS(init_api,
+   (set_min_activated_stake, void(int64_t))
+)
 
 REGISTER_INJECTED_INTRINSICS(call_depth_api,
    (call_depth_assert,  void()               )
@@ -1883,22 +1914,23 @@ REGISTER_INTRINSICS(compiler_builtins,
 );
 
 REGISTER_INTRINSICS(privileged_api,
-   (is_feature_active,                int(int64_t)                          )
-   (activate_feature,                 void(int64_t)                         )
-   (get_resource_limits,              void(int64_t,int,int,int)             )
-   (set_resource_limits,              void(int64_t,int64_t,int64_t,int64_t) )
-   (get_account_ram_usage,            int64_t(int64_t)                      )
-   (change_resource_limits,           void(int64_t,int64_t,int64_t,int64_t) )
-   (set_proposed_producers,           int64_t(int,int)                      )
-   (get_blockchain_parameters_packed, int(int, int)                         )
-   (set_blockchain_parameters_packed, void(int,int)                         )
-   (is_privileged,                    int(int64_t)                          )
-   (set_privileged,                   void(int64_t, int)                    )
-   (register_voting_proxy,            void(int64_t, int, int, int)          )
-   (update_voting_power,              void(int64_t, int64_t, int, int)      )
+   (is_feature_active,                int(int64_t)                                    )
+   (activate_feature,                 void(int64_t)                                   )
+   (get_resource_limits,              void(int64_t,int,int,int)                       )
+   (set_resource_limits,              void(int64_t,int64_t,int64_t,int64_t)           )
+   (get_account_ram_usage,            int64_t(int64_t)                                )
+   (change_resource_limits,           void(int64_t,int64_t,int64_t,int64_t)           )
+   (set_proposed_producers,           int64_t(int,int)                                )
+   (get_blockchain_parameters_packed, int(int, int)                                   )
+   (set_blockchain_parameters_packed, void(int,int)                                   )
+   (is_privileged,                    int(int64_t)                                    )
+   (set_privileged,                   void(int64_t, int)                              )
+   (register_voting_proxy,            void(int64_t, int, int, int)                    )
+   (update_voting_power,              void(int64_t, int64_t, int, int)                )
    (update_votes,                     void(int64_t, int64_t, int, int, int, int, int) )
-   (get_voting_stats,                 void(int, int, int)                   )
-   (store_voting_stats,               void(int64_t, int64_t, double)        )
+   (get_voting_stats,                 void(int, int, int)                             )
+   (store_voting_stats,               void(int64_t, int64_t, double)                  )
+   (get_min_activated_stake,          int64_t()                                       )
 );
 
 REGISTER_INJECTED_INTRINSICS(transaction_context,

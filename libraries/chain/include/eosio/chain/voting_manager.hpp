@@ -123,6 +123,11 @@ class voting_manager final
       */
       void process_voters(const account_name& lowerBound, const account_name& upperBound, voter_processor processor) const;
 
+      void set_min_activated_stake(int64_t _min_activated_stake)
+         { min_activated_stake = _min_activated_stake; }
+
+      int64_t get_min_activated_stake() const { return min_activated_stake; }
+
    private:
       friend struct eosio::chain::controller_impl;
       /// Can be instantiated only by controller.
@@ -158,6 +163,7 @@ class voting_manager final
    private:
       controller& _controller;
       chainbase::database& _db;
+      int64_t  min_activated_stake = 150'000'000'0000; // it should be: CORE_INITIAL_ISSUE * 15% * 10000 (precision)
    };
 
 } }

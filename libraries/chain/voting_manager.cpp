@@ -8,8 +8,6 @@
 namespace eosio {
 namespace chain {
 
-const int64_t  min_activated_stake = 150'000'000'0000;
-
 static constexpr uint32_t seconds_per_day = 24 * 3600;
 
 using voting_manager_index_set = index_set<
