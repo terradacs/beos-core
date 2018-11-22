@@ -21,7 +21,7 @@
 			"owner_pub": "${key}",
 			"activ_pub": "${key}"
 		}, {
-			"start_block": 1,
+			"start_block": 3,
 			"authorized_by": "beos.gateway",
 			"code": "beos.gateway",
 			"action": "issue",
@@ -66,26 +66,26 @@
 		}]
 	}, {
 		"name": "[Test 002] Basic issue test 2.",
-		"scenario_blocks": 80,
+		"scenario_blocks": 40,
 		"params": {
 			"authorized_by": "beos.init",
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS", 120, [50, 70, 5, 8000000],
-					[50, 60, 5, 5000000],
-					[50, 70, 10, 200000]
+				"new_params": ["0.0000 PXBTS", 120, [10, 30, 5, 8000000],
+					[10, 20, 5, 5000000],
+					[10, 30, 10, 200000]
 				]
 			}
 		},
 		"actions": [{
-			"start_block": 42,
+			"start_block": 2,
 			"action": "newaccount_pattern",
 			"name": "${user_2}",
 			"owner_pub": "${key}",
 			"activ_pub": "${key}"
 		}, {
-			"start_block": 43,
+			"start_block": 3,
 			"authorized_by": "${user_1}",
 			"code": "beos.gateway",
 			"action": "withdraw",
@@ -96,7 +96,7 @@
 			},
 			"expected_result": {"status":true, "message":""}
 		}, {
-			"start_block": 44,
+			"start_block": 4,
 			"authorized_by": "beos.gateway",
 			"code": "beos.gateway",
 			"action": "issue",
@@ -106,7 +106,7 @@
 			},
 			"expected_result": {"status":true, "message":""}
 		}, {
-			"start_block": 50,
+			"start_block": 10,
 			"authorized_by": "beos.gateway",
 			"code": "beos.gateway",
 			"action": "issue",
@@ -116,7 +116,7 @@
 			},
 			"expected_result": {"status":true, "message":""}
 		}, {
-			"start_block": 55,
+			"start_block": 15,
 			"authorized_by": "beos.gateway",
 			"code": "beos.gateway",
 			"action": "issue",
@@ -126,7 +126,7 @@
 			},
 			"expected_result": {"status":true, "message":""}
 		}, {
-			"start_block": 60,
+			"start_block": 20,
 			"authorized_by": "beos.gateway",
 			"code": "beos.gateway",
 			"action": "issue",
@@ -145,25 +145,25 @@
 				"ram_bytes": 15005448
 			},
 			"after_block": [{
-				"after_block": 47,
+				"after_block": 7,
 				"balance": "5.0000 PXBTS",
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448
 			}, {
-				"after_block": 52,
+				"after_block": 12,
 				"balance": "10.0000 PXBTS",
 				"net_weight": "400.0000 BEOS",
 				"cpu_weight": "400.0000 BEOS",
 				"ram_bytes": 5005448
 			}, {
-				"after_block": 57,
+				"after_block": 17,
 				"balance": "15.0000 PXBTS",
 				"net_weight": "800.0000 BEOS",
 				"cpu_weight": "800.0000 BEOS",
 				"ram_bytes": 10005448
 			}, {
-				"after_block": 62,
+				"after_block": 22,
 				"balance": "20.0000 PXBTS",
 				"net_weight": "1200.0000 BEOS",
 				"cpu_weight": "1200.0000 BEOS",
@@ -172,32 +172,32 @@
 		}]
 	}, {
 		"name": "[Test 003] Basic issue test 3.",
-		"scenario_blocks": 150,
+		"scenario_blocks": 70,
 		"params": {
 			"authorized_by": "beos.init",
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS", 140, [90, 130, 10, 8000000],
-					[90, 100, 5, 5000000],
-					[90, 130, 10, 200000]
+				"new_params": ["0.0000 PXBTS", 140, [10, 50, 10, 8000000],
+					[10, 20, 5, 5000000],
+					[10, 50, 10, 200000]
 				]
 			}
 		},
 		"actions": [{
-			"start_block": 81,
+			"start_block": 1,
 			"action": "newaccount_pattern",
 			"name": "${user_3}",
 			"owner_pub": "${key}",
 			"activ_pub": "${key}"
 		}, {
-			"start_block": 81,
+			"start_block": 1,
 			"action": "newaccount_pattern",
 			"name": "${user_4}",
 			"owner_pub": "${key}",
 			"activ_pub": "${key}"
 		}, {
-			"start_block": 83,
+			"start_block": 3,
 			"authorized_by": "${user_2}",
 			"code": "beos.gateway",
 			"action": "withdraw",
@@ -207,7 +207,7 @@
 				"quantity": "20.0000 PXBTS"
 			}
 		}, {
-			"start_block": 83,
+			"start_block": 3,
 			"authorized_by": "beos.gateway",
 			"code": "beos.gateway",
 			"action": "issue",
@@ -216,7 +216,7 @@
 				"quantity": "5.0000 PXBTS"
 			}
 		}, {
-			"start_block": 92,
+			"start_block": 12,
 			"authorized_by": "beos.gateway",
 			"code": "beos.gateway",
 			"action": "issue",
@@ -225,7 +225,7 @@
 				"quantity": "5.0000 PXBTS"
 			}
 		}, {
-			"start_block": 92,
+			"start_block": 12,
 			"authorized_by": "beos.gateway",
 			"code": "beos.gateway",
 			"action": "issue",
@@ -234,7 +234,7 @@
 				"quantity": "5.0000 PXBTS"
 			}
 		}, {
-			"start_block": 102,
+			"start_block": 22,
 			"authorized_by": "beos.gateway",
 			"code": "beos.gateway",
 			"action": "issue",
@@ -243,7 +243,7 @@
 				"quantity": "5.0000 PXBTS"
 			}
 		}, {
-			"start_block": 102,
+			"start_block": 22,
 			"authorized_by": "beos.gateway",
 			"code": "beos.gateway",
 			"action": "issue",
@@ -252,7 +252,7 @@
 				"quantity": "5.0000 PXBTS"
 			}
 		}, {
-			"start_block": 112,
+			"start_block": 32,
 			"authorized_by": "beos.gateway",
 			"code": "beos.gateway",
 			"action": "issue",
@@ -261,7 +261,7 @@
 				"quantity": "5.0000 PXBTS"
 			}
 		}, {
-			"start_block": 112,
+			"start_block": 32,
 			"authorized_by": "beos.gateway",
 			"code": "beos.gateway",
 			"action": "issue",
@@ -279,31 +279,31 @@
 				"ram_bytes": 11672114
 			},
 			"after_block": [{
-				"after_block": 91,
+				"after_block": 11,
 				"balance": "5.0000 PXBTS",
 				"net_weight": "400.0000 BEOS",
 				"cpu_weight": "400.0000 BEOS",
 				"ram_bytes": 5005448
 			}, {
-				"after_block": 100,
+				"after_block": 20,
 				"balance": "10.0000 PXBTS",
 				"net_weight": "666.6666 BEOS",
 				"cpu_weight": "666.6667 BEOS",
 				"ram_bytes": 11672114
 			}, {
-				"after_block": 110,
+				"after_block": 30,
 				"balance": "15.0000 PXBTS",
 				"net_weight": "906.6666 BEOS",
 				"cpu_weight": "906.6667 BEOS",
 				"ram_bytes": 11672114
 			}, {
-				"after_block": 120,
+				"after_block": 40,
 				"balance": "20.0000 PXBTS",
 				"net_weight": "1135.2380 BEOS",
 				"cpu_weight": "1135.2382 BEOS",
 				"ram_bytes": 11672114
 			}, {
-				"after_block": 131,
+				"after_block": 51,
 				"balance": "20.0000 PXBTS",
 				"net_weight": "1363.8094 BEOS",
 				"cpu_weight": "1363.8097 BEOS",
@@ -318,31 +318,31 @@
 				"ram_bytes": 3338782
 			},
 			"after_block": [{
-				"after_block": 91,
+				"after_block": 11,
 				"balance": "",
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448
 			}, {
-				"after_block": 101,
+				"after_block": 21,
 				"balance": "5.0000 PXBTS",
 				"net_weight": "133.3333 BEOS",
 				"cpu_weight": "133.3334 BEOS",
 				"ram_bytes": 3338782
 			}, {
-				"after_block": 111,
+				"after_block": 31,
 				"balance": "10.0000 PXBTS",
 				"net_weight": "293.3333 BEOS",
 				"cpu_weight": "293.3334 BEOS",
 				"ram_bytes": 3338782
 			}, {
-				"after_block": 121,
+				"after_block": 41,
 				"balance": "15.0000 PXBTS",
 				"net_weight": "464.7618 BEOS",
 				"cpu_weight": "464.7620 BEOS",
 				"ram_bytes": 3338782
 			}, {
-				"after_block": 131,
+				"after_block": 51,
 				"balance": "15.0000 PXBTS",
 				"net_weight": "636.1903 BEOS",
 				"cpu_weight": "636.1906 BEOS",
@@ -351,7 +351,7 @@
 		}]
 	}, {
 		"name": "[Test 004] Basic issue test 4 [issue before distr and ends before it].",
-		"scenario_blocks": 160,
+		"scenario_blocks": 10,
 		"params": {
 			"authorized_by": "beos.init",
 			"code": "beos.init",
@@ -364,19 +364,19 @@
 			}
 		},
 		"actions": [{
-			"start_block": 151,
+			"start_block": 1,
 			"action": "newaccount_pattern",
 			"name": "${user_5}",
 			"owner_pub": "${key}",
 			"activ_pub": "${key}"
 		}, {
-			"start_block": 151,
+			"start_block": 1,
 			"action": "newaccount_pattern",
 			"name": "${user_6}",
 			"owner_pub": "${key}",
 			"activ_pub": "${key}"
 		}, {
-			"start_block": 152,
+			"start_block": 2,
 			"authorized_by": "${user_3}",
 			"code": "beos.gateway",
 			"action": "withdraw",
@@ -386,7 +386,7 @@
 				"quantity": "20.0000 PXBTS"
 			}
 		}, {
-			"start_block": 152,
+			"start_block": 2,
 			"authorized_by": "${user_4}",
 			"code": "beos.gateway",
 			"action": "withdraw",
@@ -396,7 +396,7 @@
 				"quantity": "15.0000 PXBTS"
 			}
 		}, {
-			"start_block": 153,
+			"start_block": 3,
 			"authorized_by": "beos.gateway",
 			"code": "beos.gateway",
 			"action": "issue",
@@ -405,7 +405,7 @@
 				"quantity": "20.0000 PXBTS"
 			}
 		}, {
-			"start_block": 153,
+			"start_block": 3,
 			"authorized_by": "beos.gateway",
 			"code": "beos.gateway",
 			"action": "issue",
@@ -435,7 +435,7 @@
 		}]
 	}, {
 		"name": "[Test 005] Basic issue test 5 [issue after distribution period].",
-		"scenario_blocks": 170,
+		"scenario_blocks": 10,
 		"params": {
 			"authorized_by": "beos.init",
 			"code": "beos.init",
@@ -448,19 +448,19 @@
 			}
 		},
 		"actions": [{
-			"start_block": 162,
+			"start_block": 2,
 			"action": "newaccount_pattern",
 			"name": "${user_7}",
 			"owner_pub": "${key}",
 			"activ_pub": "${key}"
 		}, {
-			"start_block": 162,
+			"start_block": 2,
 			"action": "newaccount_pattern",
 			"name": "${user_8}",
 			"owner_pub": "${key}",
 			"activ_pub": "${key}"
 		}, {
-			"start_block": 163,
+			"start_block": 3,
 			"authorized_by": "${user_5}",
 			"code": "beos.gateway",
 			"action": "withdraw",
@@ -471,7 +471,7 @@
 			},
 			"expected_result": {"status":false, "message":"transaction net usage is too high"}
 		}, {
-			"start_block": 163,
+			"start_block": 3,
 			"authorized_by": "${user_6}",
 			"code": "beos.gateway",
 			"action": "withdraw",
@@ -482,7 +482,7 @@
 			},
 			"expected_result": {"status":false, "message":"transaction net usage is too high"}
 		}, {
-			"start_block": 164,
+			"start_block": 4,
 			"authorized_by": "beos.gateway",
 			"code": "beos.gateway",
 			"action": "issue",
@@ -491,7 +491,7 @@
 				"quantity": "20.0000 PXBTS"
 			}
 		}, {
-			"start_block": 164,
+			"start_block": 4,
 			"authorized_by": "beos.gateway",
 			"code": "beos.gateway",
 			"action": "issue",
@@ -521,20 +521,20 @@
 		}]
 	}, {
 		"name": "[Test 006] Withdraw of PXBTS attempt with BEOS inside distribution period.",
-		"scenario_blocks": 230,
+		"scenario_blocks": 60,
 		"params": {
 			"authorized_by": "beos.init",
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS", 180, [180, 220, 10, 8000000],
-					[180, 220, 10, 5000000],
-					[180, 220, 10, 2000000]
+				"new_params": ["0.0000 PXBTS", 10, [10, 50, 10, 8000000],
+					[10, 50, 10, 5000000],
+					[10, 50, 10, 2000000]
 				]
 			}
 		},
 		"actions": [{
-			"start_block": 185,
+			"start_block": 15,
 			"authorized_by": "${user_5}",
 			"code": "beos.gateway",
 			"action": "withdraw",
@@ -544,7 +544,7 @@
 				"quantity": "20.0000 PXBTS"
 			}
 		}, {
-			"start_block": 195,
+			"start_block": 25,
 			"authorized_by": "${user_6}",
 			"code": "beos.gateway",
 			"action": "withdraw",
@@ -554,7 +554,7 @@
 				"quantity": "20.0000 PXBTS"
 			}
 		}, {
-			"start_block": 205,
+			"start_block": 35,
 			"authorized_by": "${user_7}",
 			"code": "beos.gateway",
 			"action": "withdraw",
@@ -564,7 +564,7 @@
 				"quantity": "20.0000 PXBTS"
 			}
 		}, {
-			"start_block": 215,
+			"start_block": 45,
 			"authorized_by": "${user_8}",
 			"code": "beos.gateway",
 			"action": "withdraw",
@@ -583,25 +583,25 @@
 				"ram_bytes": 1255448
 			},
 			"after_block": [{
-				"after_block": 187,
+				"after_block": 17,
 				"balance": "",
 				"net_weight": "100.0000 BEOS",
 				"cpu_weight": "100.0000 BEOS",
 				"ram_bytes": 1255448
 			}, {
-				"after_block": 197,
+				"after_block": 27,
 				"balance": "",
 				"net_weight": "100.0000 BEOS",
 				"cpu_weight": "100.0000 BEOS",
 				"ram_bytes": 1255448
 			}, {
-				"after_block": 207,
+				"after_block": 37,
 				"balance": "",
 				"net_weight": "100.0000 BEOS",
 				"cpu_weight": "100.0000 BEOS",
 				"ram_bytes": 1255448
 			}, {
-				"after_block": 208,
+				"after_block": 48,
 				"balance": "",
 				"net_weight": "100.0000 BEOS",
 				"cpu_weight": "100.0000 BEOS",
@@ -616,25 +616,25 @@
 				"ram_bytes": 2922115
 			},
 			"after_block": [{
-				"after_block": 187,
+				"after_block": 17,
 				"balance": "20.0000 PXBTS",
 				"net_weight": "100.0000 BEOS",
 				"cpu_weight": "100.0000 BEOS",
 				"ram_bytes": 1255448
 			}, {
-				"after_block": 197,
+				"after_block": 27,
 				"balance": "",
 				"net_weight": "233.3333 BEOS",
 				"cpu_weight": "233.3334 BEOS",
 				"ram_bytes": 2922115
 			}, {
-				"after_block": 207,
+				"after_block": 37,
 				"balance": "",
 				"net_weight": "233.3333 BEOS",
 				"cpu_weight": "233.3334 BEOS",
 				"ram_bytes": 2922115
 			}, {
-				"after_block": 208,
+				"after_block": 41,
 				"balance": "",
 				"net_weight": "233.3333 BEOS",
 				"cpu_weight": "233.3334 BEOS",
@@ -649,25 +649,25 @@
 				"ram_bytes": 5422115
 			},
 			"after_block": [{
-				"after_block": 187,
+				"after_block": 17,
 				"balance": "20.0000 PXBTS",
 				"net_weight": "100.0000 BEOS",
 				"cpu_weight": "100.0000 BEOS",
 				"ram_bytes": 1255448
 			}, {
-				"after_block": 197,
+				"after_block": 28,
 				"balance": "20.0000 PXBTS",
 				"net_weight": "233.3333 BEOS",
 				"cpu_weight": "233.3334 BEOS",
 				"ram_bytes": 2922115
 			}, {
-				"after_block": 207,
+				"after_block": 37,
 				"balance": "",
 				"net_weight": "433.3333 BEOS",
 				"cpu_weight": "433.3334 BEOS",
 				"ram_bytes": 5422115
 			}, {
-				"after_block": 217,
+				"after_block": 47,
 				"balance": "",
 				"net_weight": "433.3333 BEOS",
 				"cpu_weight": "433.3334 BEOS",
@@ -682,25 +682,25 @@
 				"ram_bytes": 10422115
 			},
 			"after_block": [{
-				"after_block": 187,
+				"after_block": 17,
 				"balance": "20.0000 PXBTS",
 				"net_weight": "100.0000 BEOS",
 				"cpu_weight": "100.0000 BEOS",
 				"ram_bytes": 1255448
 			}, {
-				"after_block": 197,
+				"after_block": 27,
 				"balance": "20.0000 PXBTS",
 				"net_weight": "233.3333 BEOS",
 				"cpu_weight": "233.3334 BEOS",
 				"ram_bytes": 2922115
 			}, {
-				"after_block": 207,
+				"after_block": 37,
 				"balance": "20.0000 PXBTS",
 				"net_weight": "433.3333 BEOS",
 				"cpu_weight": "433.3334 BEOS",
 				"ram_bytes": 5422115
 			}, {
-				"after_block": 218,
+				"after_block": 48,
 				"balance": "",
 				"net_weight": "833.3333 BEOS",
 				"cpu_weight": "833.3334 BEOS",
@@ -709,20 +709,20 @@
 		}]
 	}, {
 		"name": "[Test 007] Buy and sellram before, inside and after distribution period.",
-		"scenario_blocks": 270,
+		"scenario_blocks": 40,
 		"params": {
 			"authorized_by": "beos.init",
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS", 420, [240, 260, 10, 8000000],
-					[240, 260, 10, 5000000],
-					[240, 260, 10, 2000000]
+				"new_params": ["0.0000 PXBTS", 420, [10, 30, 10, 8000000],
+					[10, 30, 10, 5000000],
+					[10, 30, 10, 2000000]
 				]
 			}
 		},
 		"actions": [{
-			"start_block": 235,
+			"start_block": 5,
 			"authorized_by": "${user_5}",
 			"code": "eosio",
 			"action": "sellram",
@@ -732,7 +732,7 @@
 			},
 			"expected_result": {"status":false,"message":"RAM shouldn't be liquid during distribution period"}
 		}, {
-			"start_block": 235,
+			"start_block": 5,
 			"authorized_by": "${user_5}",
 			"code": "eosio",
 			"action": "buyram",
@@ -743,7 +743,7 @@
 			},
 			"expected_result": {"status":false,"message":"RAM shouldn't be liquid during distribution period"}
 		}, {
-			"start_block": 250,
+			"start_block": 20,
 			"authorized_by": "${user_5}",
 			"code": "eosio",
 			"action": "sellram",
@@ -753,7 +753,7 @@
 			},
 			"expected_result": {"status":false,"message":"RAM shouldn't be liquid during distribution period"}
 		}, {
-			"start_block": 250,
+			"start_block": 20,
 			"authorized_by": "${user_5}",
 			"code": "eosio",
 			"action": "buyram",
@@ -764,7 +764,7 @@
 			},
 			"expected_result": {"status":false,"message":"RAM shouldn't be liquid during distribution period"}
 		}, {
-			"start_block": 265,
+			"start_block": 35,
 			"authorized_by": "${user_5}",
 			"code": "eosio",
 			"action": "sellram",
@@ -773,7 +773,7 @@
 				"bytes": "10000"
 			}
 		}, {
-			"start_block": 265,
+			"start_block": 35,
 			"authorized_by": "${user_5}",
 			"code": "eosio",
 			"action": "buyram",
@@ -823,32 +823,32 @@
 		}]
 	}, {
 		"name": "[Test 008] Test of issue, transfer and withdraw",
-		"scenario_blocks": 320,
+		"scenario_blocks": 90,
 		"params": {
 			"authorized_by": "beos.init",
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS", 420, [285, 290, 5, 8000000],
-					[285, 290, 5, 5000000],
-					[285, 290, 5, 2000000]
+				"new_params": ["0.0000 PXBTS", 190, [55, 60, 5, 8000000],
+					[55, 60, 5, 5000000],
+					[55, 60, 5, 2000000]
 				]
 			}
 		},
 		"actions": [{
-			"start_block": 270,
+			"start_block": 40,
 			"action": "newaccount_pattern",
 			"name": "${user_9}",
 			"owner_pub": "${key}",
 			"activ_pub": "${key}"
 		}, {
-			"start_block": 270,
+			"start_block": 40,
 			"action": "newaccount_pattern",
 			"name": "${user_10}",
 			"owner_pub": "${key}",
 			"activ_pub": "${key}"
 		},{
-			"start_block": 272,
+			"start_block": 42,
 			"authorized_by": "beos.gateway",
 			"code": "beos.gateway",
 			"action": "issue",
@@ -857,7 +857,7 @@
 				"quantity": "20.0000 PXBTS"
 			}
 		},{
-			"start_block": 272,
+			"start_block": 42,
 			"authorized_by": "beos.gateway",
 			"code": "beos.gateway",
 			"action": "issue",
@@ -866,7 +866,7 @@
 				"quantity": "20.0000 PXBTS"
 			}
 		},{
-			"start_block": 280,
+			"start_block": 50,
 			"authorized_by": "${user_9}",
 			"code": "eosio.token",
 			"action": "transfer",
@@ -878,7 +878,7 @@
 			},
 			"expected_result": {"status":false,"message":"transaction net usage is too high"}
 		},{
-			"start_block": 285,
+			"start_block": 55,
 			"authorized_by": "${user_9}",
 			"code": "eosio.token",
 			"action": "transfer",
@@ -889,7 +889,7 @@
 				"memo":" internal transfer 1"
 			}
 		},{
-			"start_block": 292,
+			"start_block": 62,
 			"authorized_by": "${user_10}",
 			"code": "eosio.token",
 			"action": "transfer",
@@ -900,7 +900,7 @@
 				"memo":" internal transfer 2"
 			}
 		},{
-			"start_block": 295,
+			"start_block": 65,
 			"authorized_by": "${user_9}",
 			"code": "beos.gateway",
 			"action": "withdraw",
@@ -910,7 +910,7 @@
 				"quantity": "20.0000 PXBTS"
 			}
 		},{
-			"start_block": 295,
+			"start_block": 65,
 			"authorized_by": "${user_10}",
 			"code": "beos.gateway",
 			"action": "withdraw",
@@ -920,7 +920,7 @@
 				"quantity": "20.0000 PXBTS"
 			}
 		},{
-			"start_block": 300,
+			"start_block": 70,
 			"authorized_by": "${user_9}",
 			"code": "eosio.token",
 			"action": "transfer",
