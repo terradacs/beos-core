@@ -9,9 +9,10 @@ import datetime
 from logger import log
 
 class EOSRPCExecutor():
-    def __init__(self, _nodeos_addres, _nodeos_port, _wallet_address, _wallet_port):
+    def __init__(self, _nodeos_addres, _nodeos_port, _wallet_address, _wallet_port, _wallet_name):
         self.nodeos_url = 'http://'+_nodeos_addres +":"+_nodeos_port
         self.wallet_url = 'http://'+_wallet_address+":"+_wallet_port
+        self.wallet_name = _wallet_name
         self.action_queue = queue.Queue()
         self.action_execution_flag = threading.Event()
         self.action_execution_flag.set()
@@ -54,6 +55,19 @@ class EOSRPCExecutor():
         except Exception as _ex:
             log.error("[ACTION][ERROR] exception  %s occures during get_account"%str(_ex))        
             
+
+    def create_key(self):
+        #curl -X POST --url http://127.0.0.1:8900/v1/wallet/create_key --data '["beos_master_wallet",""]'
+        #"EOS5pXMSt54C83tdHkv73c884xRU4TDpDpxDiWJgtDWRDa2N4XfMp"
+        try:
+            url      = self.wallet_url+"/v1/wallet/create_key"
+            data     = "[\"%s\",\"\"]"%(self.wallet_name)
+            resspone = requests.post(url, data=data)
+
+            return resspone.text[1:-1]
+        except Exception as _ex:
+            log.error("[ACTION][ERROR] exception  %s occures during get_account"%str(_ex))
+
 
     def get_currency_balance(self, _account_name, _symbol, ):
         try:
@@ -154,7 +168,9 @@ class EOSRPCExecutor():
                 last_block_id   = self.get_info()
                 last_block_info = self.get_block(last_block_id)
                 public_keys     = self.get_public_keys()
+                log.info("public keys: %s"%public_keys)
                 required_key    = self.get_required_keys(prepared_actions, binargs, last_block_info, public_keys)
+                log.info("required keys: %s"%required_key)
                 signed_trasnaction = self.sign_transaction(prepared_actions, binargs, last_block_id, last_block_info, required_key)
                 transaction_status = self.push_transaction(prepared_actions, binargs, signed_trasnaction)
                 if "transaction_id" in transaction_status:
