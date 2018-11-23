@@ -5,6 +5,14 @@
 #include <eosio/chain/database_utils.hpp>
 #include <eosio/chain/exceptions.hpp>
 
+//ABW: uncomment the following symbol to unconditionally write eosio::print calls to file (works even during unit tests)
+//#define CAVEMEN_DEBUG
+#ifdef CAVEMEN_DEBUG
+#define DBG(format, ... ) { FILE *pFile = fopen("debug.log","a"); fprintf(pFile,format "\n",__VA_ARGS__); fclose(pFile); }
+#else
+#define DBG(format, ... )
+#endif
+
 namespace eosio {
 namespace chain {
 
@@ -31,6 +39,11 @@ fc::mutable_variant_object voter_info_object::convert_to_public_voter_info() con
       ;
    }
 
+voting_manager::voting_manager(controller& c, chainbase::database& d)
+  : _controller(c), _db(d)
+  {
+  }
+
 void voting_manager::add_indices()
    {
    voting_manager_index_set::add_indices(_db);
@@ -43,6 +56,7 @@ void voting_manager::initialize_database()
 
 void voting_manager::add_to_snapshot(const snapshot_writer_ptr& snapshot) const
    {
+   DBG("voting_manager::add_to_snapshot() %s", "called");
    voting_manager_index_set::walk_indices([this, &snapshot](auto utils) {
       snapshot->write_section<typename decltype(utils)::index_t::value_type>([this](auto& section) {
          decltype(utils)::walk(_db, [this, &section](const auto &row) {
@@ -54,6 +68,7 @@ void voting_manager::add_to_snapshot(const snapshot_writer_ptr& snapshot) const
 
 void voting_manager::read_from_snapshot(const snapshot_reader_ptr& snapshot)
    {
+   DBG("voting_manager::add_to_snapshot() %s", "called");
    voting_manager_index_set::walk_indices([this, &snapshot](auto utils) {
       snapshot->read_section<typename decltype(utils)::index_t::value_type>([this](auto& section) {
          bool more = !section.empty();
@@ -64,7 +79,6 @@ void voting_manager::read_from_snapshot(const snapshot_reader_ptr& snapshot)
             }
          });
       });
-
    }
 
 void voting_manager::get_voting_stats(int64_t* total_activated_stake, uint64_t* thresh_activated_stake_time,
@@ -233,7 +247,7 @@ void voting_manager::update_votes(const account_name& voter_name, const account_
    */
    if(voter->last_vote_weight <= 0.0) {
       total_activated_stake += voter->staked;
-      if(total_activated_stake >= min_activated_stake && thresh_activated_stake_time == 0) {
+      if(total_activated_stake >= get_min_activated_stake() && thresh_activated_stake_time == 0) {
          thresh_activated_stake_time = current_time();
          }
       }
@@ -336,6 +350,25 @@ void voting_manager::process_voters(const account_name& lowerBound, const accoun
       canContinue = processor(v, hasNext);
       }
    }
+
+void voting_manager::set_min_activated_stake(int64_t min_activated_stake)
+  {
+  DBG("voting_manager::set_min_activated_stake: min_activated_stake = %lu", min_activated_stake);
+  const auto& defaultStatObject = _db.get<global_vote_stat_object>(0);
+
+  _db.modify<global_vote_stat_object>(defaultStatObject, [min_activated_stake] (global_vote_stat_object& obj)
+    {
+    obj.min_activated_stake = min_activated_stake;
+    });
+  }
+
+int64_t voting_manager::get_min_activated_stake() const
+  {
+  const auto& defaultStatObject = _db.get<global_vote_stat_object>(0);
+  int64_t min_activated_stake = defaultStatObject.min_activated_stake;
+  DBG("voting_manager::get_min_activated_stake(): min_activated_stake = %lu", min_activated_stake);
+  return min_activated_stake;
+  }
 
 inline uint64_t voting_manager::current_time() const {
    return static_cast<uint64_t>(_controller.pending_block_time().time_since_epoch().count());

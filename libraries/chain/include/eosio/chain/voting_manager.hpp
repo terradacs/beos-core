@@ -72,6 +72,7 @@ struct global_vote_stat_object : chainbase::object<global_vote_stat_object_type,
    int64_t total_activated_stake = 0;
    uint64_t thresh_activated_stake_time = 0;
    double total_producer_vote_weight = 0;
+   int64_t min_activated_stake = std::numeric_limits<int64_t>::max();
 };
 
 using global_vote_stat_index = chainbase::shared_multi_index_container<
@@ -123,15 +124,14 @@ class voting_manager final
       */
       void process_voters(const account_name& lowerBound, const account_name& upperBound, voter_processor processor) const;
 
-      void set_min_activated_stake(int64_t _min_activated_stake)
-         { min_activated_stake = _min_activated_stake; }
+      void set_min_activated_stake(int64_t min_activated_stake);
 
-      int64_t get_min_activated_stake() const { return min_activated_stake; }
+      int64_t get_min_activated_stake() const;
 
    private:
       friend struct eosio::chain::controller_impl;
       /// Can be instantiated only by controller.
-      voting_manager(controller& c, chainbase::database& d) : _controller(c), _db(d) {}
+      voting_manager(controller& c, chainbase::database& d);
 
       void add_indices();
       void initialize_database();
@@ -163,7 +163,6 @@ class voting_manager final
    private:
       controller& _controller;
       chainbase::database& _db;
-      int64_t  min_activated_stake = std::numeric_limits<int64_t>::max();
    };
 
 } }
@@ -172,7 +171,9 @@ FC_REFLECT(eosio::chain::voter_info_object, (owner)(proxy)(producers)(staked)(la
                                             (is_proxy)(reserved1)(reserved2)(reserved3)
           )
 
-FC_REFLECT(eosio::chain::global_vote_stat_object, (total_activated_stake)(thresh_activated_stake_time)(total_producer_vote_weight))
+FC_REFLECT(eosio::chain::global_vote_stat_object, (total_activated_stake)(thresh_activated_stake_time)
+                                                  (total_producer_vote_weight)(min_activated_stake)
+          )
 
 CHAINBASE_SET_INDEX_TYPE(eosio::chain::voter_info_object, eosio::chain::voter_info_index)
 CHAINBASE_SET_INDEX_TYPE(eosio::chain::global_vote_stat_object, eosio::chain::global_vote_stat_index)

@@ -15,11 +15,15 @@ namespace eosiosystem {
     _rammarket(_self,_self)
    {
       //print( "construct system\n" );
-      _gstate = _global.exists() ? _global.get() : get_default_parameters();
+      if (_global.exists() == false)
+         _gstate = get_default_parameters();
+      else
+      {
+         _gstate = _global.get();
+         _min_activated_stake = get_min_activated_stake();
+      }
 
       flush_voting_stats();
-
-      _min_activated_stake = get_min_activated_stake();
 
       auto itr = _rammarket.find(S(4,RAMCORE));
 
@@ -52,8 +56,8 @@ namespace eosiosystem {
      std::string memo("initialissue");
      INLINE_ACTION_SENDER(eosio::token, issue)( N(eosio.token), { _self, N(active) }, { _self, value, memo } );
      // min_activated_stake_percent % of quantity
-     int64_t min_activated_stake = static_cast<int64_t>( static_cast<int128_t>(quantity) * min_activated_stake_percent / 100 );
-     set_min_activated_stake( min_activated_stake );
+     _min_activated_stake = static_cast<int64_t>( static_cast<int128_t>(quantity) * min_activated_stake_percent / 100 );
+     set_min_activated_stake( _min_activated_stake );
      }
 
    eosio_global_state system_contract::get_default_parameters() {
