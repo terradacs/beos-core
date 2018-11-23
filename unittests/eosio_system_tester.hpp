@@ -75,6 +75,9 @@ public:
          token_abi_ser.set_abi(abi, abi_serializer_max_time);
       }
 
+      set_code( config::system_account_name, eosio_system_wast );
+      set_abi( config::system_account_name, eosio_system_abi );
+
       create_currency( N(eosio.token), config::system_account_name, core_from_string("10000000000.0000") );
       //issue(config::system_account_name,      core_from_string("1000000000.0000"));
       set_code( config::system_account_name, eosio_system_wast );
