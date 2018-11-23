@@ -232,7 +232,15 @@ class eosio_interchain_tester : public actions
     prepare_account( config::gateway_account_name, eosio_gateway_wast, eosio_gateway_abi, &beos_gateway_abi_ser );
     prepare_account( config::distribution_account_name, eosio_distribution_wast, eosio_distribution_abi, &beos_distrib_abi_ser );
 
-    BOOST_REQUIRE_EQUAL( success(), issue( config::system_account_name, asset::from_string("1000000000.0000 BEOS"), config::system_account_name ) );
+    //BOOST_REQUIRE_EQUAL( success(), issue( config::system_account_name, asset::from_string("1000000000.0000 BEOS"), config::system_account_name ) );
+    BOOST_REQUIRE_EQUAL( success(), push_action( config::system_account_name, N(initialissue),
+                                                 mvo()
+                                                   ( "quantity", initial_supply * 10000 )
+                                                   ( "min_activated_stake_percent", min_activated_stake_percent ),
+                                                 system_abi_ser,
+                                                 config::system_account_name
+                                               ));
+
     BOOST_REQUIRE_EQUAL( success(), initresource( config::gateway_account_name,
                                                     100'000'000,
                                                     asset::from_string("1000.0000 BEOS"),
@@ -321,6 +329,10 @@ class eosio_interchain_tester : public actions
         N(beos.init)
       );
   }
+
+protected:
+  uint64_t  initial_supply = 1'000'000'000;
+  uint8_t   min_activated_stake_percent = 15; // 15% is default in eosio
 
 };
 

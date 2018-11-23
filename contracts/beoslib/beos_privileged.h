@@ -18,14 +18,8 @@ struct block_producer_voting_info;
    /**
     *  Defined in distribution_api
     */
-   void reward_all(uint64_t, uint64_t, uint64_t, const void*, int, bool, 
-      block_producer_voting_info* , uint32_t);
+   void reward_all(uint64_t, uint64_t, uint64_t, const void*, int, bool, block_producer_voting_info* , uint32_t);
    void reward_done(const void*, int, bool);
-
-   /**
-    *  Defined in init_api
-    */
-   void set_min_activated_stake(int64_t);
 
 #ifdef __cplusplus
 }

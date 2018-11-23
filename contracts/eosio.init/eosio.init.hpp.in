@@ -167,7 +167,6 @@ namespace eosio {
        _beos_global( _self, _self )
       {
         _beos_gstate = _beos_global.exists() ? _beos_global.get() : get_beos_default_parameters();
-        set_min_activated_stake( 150'000'000'0000 ); // it should be: CORE_INITIAL_ISSUE * 15% * 10000 (precision)
       }
 
       void changeparams( beos_global_state new_params );
