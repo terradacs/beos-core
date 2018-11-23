@@ -1,56 +1,85 @@
 stages:
- - build
+  - staging-build
+  - development-build
+  - staging-deploy
 #  - plugin-test
 
 before_script:
- - pwd
+  - pwd
 
-build:
-  stage: build
+staging-build:
+  stage: staging-build
   variables:
     LC_ALL: "C"
+    CI_BEOS_CONFIG_NAME: "ci"
   script:
-   - rm -rf ./build
-   - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
-   - eval $(ssh-agent -s)
-   - ssh-add <(echo "$SSH_PRIVATE_KEY")
-   - git submodule update --init --recursive
-   - cd cd-scripts
-   - cp config-ci.py config.py
-   - ./deploy.py --build-beos
-   - cat beos_deploy_main.log
-   - echo "Stopping old keosd instance"
-   - kill -2 $(lsof -t -i:8900) || true
-   - python3 ./wait.py $(lsof -t -i:8900)
-   - echo "Stopping old nodeos instance"
-   - kill -2 $(lsof -t -i:8888) || true
-   - python3 ./wait.py $(lsof -t -i:8888)
-   - ./deploy.py --initialize-beos
-   - cat beos_deploy_main.log
-   - cd ../build/beos-autobuild/
-   - echo "Starting integration tests"
-   - make test
-   - echo "Starting unit tests"
-   - ./unittests/unit_test --log_level=test_suite
-   - echo "Started keosd instance (should be empty):"
-   - lsof -t -i:8900 || true
-   - echo "Started nodeos instance (should be empty):"
-   - lsof -t -i:8888 || true
-   - screen -list || true
-   
-  cache:
-    {}
+    - chmod +x ./gitlab-ci/build.sh
+    - ./gitlab-ci/build.sh
+    - chmod +x ./gitlab-ci/test.sh
+    - ./gitlab-ci/test.sh
+    - echo "Started keosd instance (should be empty):"
+    - lsof -t -i:8900 || true
+    - echo "Started nodeos instance (should be empty):"
+    - lsof -t -i:8888 || true
+    - screen -list || true
+
+  cache: {}
   tags:
-   - ryzen
+    - ryzen
   allow_failure: false
+  only:
+   - beos-initial-release
+
+development-build:
+  stage: development-build
+  variables:
+    LC_ALL: "C"
+    CI_BEOS_CONFIG_NAME: "ci"
+  script:
+    - chmod +x ./gitlab-ci/build.sh
+    - ./gitlab-ci/build.sh
+    - chmod +x ./gitlab-ci/test.sh
+    - ./gitlab-ci/test.sh
+    - echo "Started keosd instance (should be empty):"
+    - lsof -t -i:8900 || true
+    - echo "Started nodeos instance (should be empty):"
+    - lsof -t -i:8888 || true
+    - screen -list || true
+
+  cache: {}
+  tags:
+    - ryzen
+  allow_failure: false
+  when: manual
+  except:
+   - beos-initial-release
+
+staging-deploy:
+  stage: staging-deploy
+  variables:
+    LC_ALL: "C"
+    CI_BEOS_CONFIG_NAME: "allcpu"
+  script:
+    - chmod +x ./gitlab-ci/build.sh
+    - ./gitlab-ci/build.sh
+    - chmod +x ./gitlab-ci/run.sh
+    - ./gitlab-ci/run.sh
+
+  cache: {}
+  tags:
+    - allcpu
+  allow_failure: false
+  when: manual
+  only:
+    - beos-initial-release
   environment:
-    name: development
-    url: http://192.168.6.144:8888/v1/chain/get_info
+    name: staging
+    url: http://192.168.6.242:8888/v1/chain/get_info
 
 # currently disabled and not fully configured
 # plugin-test:
 #   stage: plugin-test
-#   script: 
+#   script:
 #   - pwd
 #   - ./deploy.py --make-beos-plugin-test
 #   when: manual
