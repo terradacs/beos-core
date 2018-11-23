@@ -326,6 +326,11 @@ class privileged_api : public context_aware_api {
             total_producer_vote_weight);
          }
 
+      void set_min_activated_stake(int64_t min_activated_stake)
+        {
+        context.control.get_mutable_voting_manager().set_min_activated_stake( min_activated_stake );
+        }
+
       int64_t get_min_activated_stake()
         {
         return context.control.get_mutable_voting_manager().get_min_activated_stake();
@@ -1841,32 +1846,6 @@ REGISTER_INTRINSICS( distribution_api,
    (reward_done, void(int, int, int)                            )
 );
 
-/*
- * This api is dedicated for using from beos.init.
- */
-class init_api : public context_aware_api {
-   public:
-      init_api( apply_context& ctx )
-      : context_aware_api( ctx )
-      {
-         name actor = ctx.trx_context.trx.first_authorizor();
-         DBG("init_api::init_api: actor = %s", actor.to_string().c_str());
-
-         EOS_ASSERT( ctx.privileged || actor == N(beos.init), unaccessible_api,
-                     "${code} does not have permission to call this API", ("code",actor) );
-      }
-
-      void set_min_activated_stake(int64_t min_activated_stake)
-      {
-         context.control.get_mutable_voting_manager().set_min_activated_stake( min_activated_stake );
-      }
-
-};
-
-REGISTER_INTRINSICS(init_api,
-   (set_min_activated_stake, void(int64_t))
-)
-
 REGISTER_INJECTED_INTRINSICS(call_depth_api,
    (call_depth_assert,  void()               )
 );
@@ -1935,6 +1914,7 @@ REGISTER_INTRINSICS(privileged_api,
    (update_votes,                     void(int64_t, int64_t, int, int, int, int, int) )
    (get_voting_stats,                 void(int, int, int)                             )
    (store_voting_stats,               void(int64_t, int64_t, double)                  )
+   (set_min_activated_stake,          void(int64_t)                                   )
    (get_min_activated_stake,          int64_t()                                       )
 );
 

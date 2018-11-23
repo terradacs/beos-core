@@ -42,6 +42,7 @@ void token::issue( account_name to, asset quantity, string memo )
     const auto& st = *existing;
 
     require_auth( st.issuer );
+    eosio_assert( sym != CORE_SYMBOL || st.supply.amount > 0 || memo == "initialissue", "eosio::initialissue not called yet" );
     eosio_assert( quantity.is_valid(), "invalid quantity" );
     eosio_assert( quantity.amount > 0, "must issue positive quantity" );
 

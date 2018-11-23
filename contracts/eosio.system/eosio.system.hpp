@@ -141,13 +141,18 @@ namespace eosiosystem {
          eosio_global_state     _gstate;
          rammarket              _rammarket;
 
-         int64_t                _min_activated_stake = 150'000'000'0000; // it should be: CORE_INITIAL_ISSUE * 15% * 10000 (precision)
+         int64_t                _min_activated_stake = std::numeric_limits<int64_t>::max();
 
       public:
          system_contract( account_name s );
          ~system_contract();
 
          // Actions:
+         /**
+          *  Create initial issue of CORE_SYMBOL and evaluate and set min_activated_stake.
+          */
+         void initialissue( uint64_t quantity, uint8_t min_activated_stake_percent );
+
          void onblock( block_timestamp timestamp, account_name producer );
                       // const block_header& header ); /// only parse first 3 fields of block header
 

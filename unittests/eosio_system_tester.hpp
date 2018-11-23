@@ -45,6 +45,9 @@ using mvo = fc::mutable_variant_object;
 namespace eosio_system {
 
 class eosio_system_tester : public TESTER {
+
+  using base_tester::push_action;
+
 public:
 
    eosio_system_tester()
@@ -73,7 +76,13 @@ public:
       }
 
       create_currency( N(eosio.token), config::system_account_name, core_from_string("10000000000.0000") );
-      issue(config::system_account_name,      core_from_string("1000000000.0000"));
+      //issue(config::system_account_name,      core_from_string("1000000000.0000"));
+      push_action( config::system_account_name, N(initialissue), config::system_account_name,
+                   mvo()
+                     ( "quantity", 1'000'000'000'0000 )
+                     ( "min_activated_stake_percent", 15 ) /* 15% is default value in eosio */
+                 );
+
       BOOST_REQUIRE_EQUAL( core_from_string("1000000000.0000"), get_balance( "eosio" ) );
 
       set_code( config::system_account_name, eosio_system_wast );
