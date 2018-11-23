@@ -349,7 +349,7 @@ namespace eosio {
       void print()const {
          int64_t p = (int64_t)symbol.precision();
          int64_t p10 = 1;
-         while( p > 0  ) {
+         while( p > 0 ) {
             p10 *= 10; --p;
          }
          p = (int64_t)symbol.precision();
@@ -357,6 +357,8 @@ namespace eosio {
          char fraction[p+1];
          fraction[p] = '\0';
          auto change = amount % p10;
+         if ( change < 0 )
+            change = -change;
 
          for( int64_t i = p -1; i >= 0; --i ) {
             fraction[i] = (change % 10) + '0';
