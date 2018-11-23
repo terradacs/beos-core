@@ -163,7 +163,7 @@ class voting_manager final
    private:
       controller& _controller;
       chainbase::database& _db;
-      int64_t  min_activated_stake = 150'000'000'0000; // it should be: CORE_INITIAL_ISSUE * 15% * 10000 (precision)
+      int64_t  min_activated_stake = std::numeric_limits<int64_t>::max();
    };
 
 } }

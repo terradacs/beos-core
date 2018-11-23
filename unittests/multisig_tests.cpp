@@ -414,7 +414,13 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_all_approve, eosio_msig_tester )
    set_abi( N(eosio.token), eosio_token_abi );
 
    create_currency( N(eosio.token), config::system_account_name, core_from_string("10000000000.0000") );
-   issue(config::system_account_name, core_from_string("1000000000.0000"));
+   //issue(config::system_account_name, core_from_string("1000000000.0000"));
+   push_action( config::system_account_name, N(initialissue),
+                mvo()
+                  ( "quantity", 1'000'000'000'0000 )
+                  ( "min_activated_stake_percent", 15 ), /* 15% is default value in eosio */
+                true
+              );
    BOOST_REQUIRE_EQUAL( core_from_string("1000000000.0000"),
                         get_balance("eosio") + get_balance("eosio.ramfee") + get_balance("eosio.stake") + get_balance("eosio.ram") );
 
@@ -528,7 +534,13 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_major_approve, eosio_msig_tester
    set_abi( N(eosio.token), eosio_token_abi );
 
    create_currency( N(eosio.token), config::system_account_name, core_from_string("10000000000.0000") );
-   issue(config::system_account_name, core_from_string("1000000000.0000"));
+   //issue(config::system_account_name, core_from_string("1000000000.0000"));
+   push_action( config::system_account_name, N(initialissue),
+                mvo()
+                  ( "quantity", 1'000'000'000'0000 )
+                  ( "min_activated_stake_percent", 15 ), /* 15% is default value in eosio */
+                true
+              );
    BOOST_REQUIRE_EQUAL( core_from_string("1000000000.0000"), get_balance( "eosio" ) );
 
    set_code( config::system_account_name, eosio_system_wast );

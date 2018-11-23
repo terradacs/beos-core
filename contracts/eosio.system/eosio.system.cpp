@@ -40,6 +40,22 @@ namespace eosiosystem {
       }
    }
 
+   void system_contract::initialissue( uint64_t quantity, uint8_t min_activated_stake_percent )
+     {
+     require_auth( _self );
+
+     asset balance = eosio::token(N(eosio.token)).check_balance( _self, CORE_SYMBOL );
+     eosio_assert( balance.amount == 0, "call after any issue or second call is prohibited" );
+     eosio_assert( quantity != 0, "quantity is non-positive value" );
+     eosio_assert( 0 <= min_activated_stake_percent && min_activated_stake_percent <= 100, "min_activated_stake_percent must be in range [0:100]" );
+     asset value( quantity, CORE_SYMBOL );
+     std::string memo("initialissue");
+     INLINE_ACTION_SENDER(eosio::token, issue)( N(eosio.token), { _self, N(active) }, { _self, value, memo } );
+     // min_activated_stake_percent % of quantity
+     int64_t min_activated_stake = static_cast<int64_t>( static_cast<int128_t>(quantity) * min_activated_stake_percent / 100 );
+     set_min_activated_stake( min_activated_stake );
+     }
+
    eosio_global_state system_contract::get_default_parameters() {
       eosio_global_state dp;
       get_blockchain_parameters(dp);
@@ -213,7 +229,7 @@ EOSIO_ABI( eosiosystem::system_contract,
      // native.hpp (newaccount definition is actually in eosio.system.cpp)
      (initresource)(reward)(newaccount)(updateauth)(deleteauth)(linkauth)(unlinkauth)(canceldelay)(onerror)
      // eosio.system.cpp
-     (setram)(setparams)(setpriv)(rmvproducer)(bidname)
+     (initialissue)(setram)(setparams)(setpriv)(rmvproducer)(bidname)
      // delegate_bandwidth.cpp
      (buyrambytes)(buyram)(sellram)(delegatebw)(undelegatebw)(refund)
      // voting.cpp

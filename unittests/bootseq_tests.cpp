@@ -213,14 +213,20 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
         auto max_supply = core_from_string("10000000000.0000"); /// 1x larger than 1B initial tokens
         auto initial_supply = core_from_string("1000000000.0000"); /// 1x larger than 1B initial tokens
         create_currency(N(eosio.token), config::system_account_name, max_supply);
-        // Issue the genesis supply of 1 billion SYS tokens to eosio.system
-        issue(N(eosio.token), config::system_account_name, config::system_account_name, initial_supply);
-
-        auto actual = get_balance(config::system_account_name);
-        BOOST_REQUIRE_EQUAL(initial_supply, actual);
 
         // Set eosio.system to eosio
         set_code_abi(config::system_account_name, eosio_system_wast, eosio_system_abi);
+
+        // Issue the genesis supply of 1 billion SYS tokens to eosio.system
+        //issue(N(eosio.token), config::system_account_name, config::system_account_name, initial_supply);
+        push_action( config::system_account_name, N(initialissue), config::system_account_name,
+                     mvo()
+                       ( "quantity", initial_supply.get_amount() )
+                       ( "min_activated_stake_percent", 15 ) /* 15% is default value in eosio */
+                   );
+
+        auto actual = get_balance(config::system_account_name);
+        BOOST_REQUIRE_EQUAL(initial_supply, actual);
 
         initial_settings(eosio_init_wast, eosio_init_abi, eosio_gateway_wast, eosio_gateway_abi, eosio_distribution_wast, eosio_distribution_abi);
 
