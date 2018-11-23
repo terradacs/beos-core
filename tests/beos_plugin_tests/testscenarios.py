@@ -8,7 +8,7 @@ from logger import log
 from eosrpcexecutor import EOSRPCExecutor
 
 class TestScenarios(object):
-    def __init__(self, _nodeos_addres, _nodeos_port, _wallet_address, _wallet_port, _scenarios_file_name, _append_start_block):
+    def __init__(self, _nodeos_addres, _nodeos_port, _wallet_address, _wallet_port, _scenarios_file_name, _append_start_block, _master_wallet_name):
         self.append_block_numbers = _append_start_block
         self.summary_file = "Scenarios_summary_"+str(datetime.datetime.now())[:-7]
         self.scenarios_file = _scenarios_file_name
@@ -20,7 +20,8 @@ class TestScenarios(object):
         self.join_block_number = 0
         self.after_block_result    = {}
         self.called_actions_result = {}
-        self.eos_rpc      = EOSRPCExecutor(_nodeos_addres, _nodeos_port, _wallet_address, _wallet_port)
+        self.eos_rpc      = EOSRPCExecutor(_nodeos_addres, _nodeos_port, _wallet_address, _wallet_port, _master_wallet_name)
+        self.load_scenarios()
 
         self.load_scenarios()
         self.blockGetter = threading.Thread(target=self.block_id_getter)

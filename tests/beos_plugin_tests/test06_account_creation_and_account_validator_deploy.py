@@ -18,7 +18,8 @@ def random_user_name():
    return ''.join(random.choice(string.ascii_lowercase) for _ in range(12))
 
 def createUserAccounts(_account_name):
-    eosrpc = EOSRPCExecutor(args.nodeos_ip, args.nodeos_port, args.keosd_ip, args.keosd_port)
+    eosrpc = EOSRPCExecutor(args.nodeos_ip, args.nodeos_port, args.keosd_ip, args.keosd_port, args.master_wallet_name)
+    key = eosrpc.create_key()
     cmd = [{
     "code":"eosio",
     "action":"newaccount",
@@ -30,7 +31,7 @@ def createUserAccounts(_account_name):
             "owner": {
             "threshold": 1,
             "keys": [{
-                "key": args.public_key,
+                "key": key,
                 "weight": 1
                 }
             ],
@@ -40,7 +41,7 @@ def createUserAccounts(_account_name):
             "active": {
             "threshold": 1,
             "keys": [{
-                "key": args.public_key,
+                "key": key,
                 "weight": 1
                 }
             ],
@@ -91,11 +92,10 @@ def kill_nodeos_and_keosd():
 parser = argparse.ArgumentParser()
 parser.add_argument('--nodeos-ip', metavar='', help="Ip address of nodeos ", default='127.0.0.1', dest="nodeos_ip")
 parser.add_argument('--keosd-ip', metavar='', help="Ip address of keosd", default='127.0.0.1', dest="keosd_ip")
-parser.add_argument('--public-key', metavar='', help="EOSIO Public Key", default='EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV', dest="public_key")
-parser.add_argument('--private-Key', metavar='', help="EOSIO Private Key", default='5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3', dest="private_key")
 parser.add_argument('--nodeos-port', metavar='', help="Port", default='8888')
 parser.add_argument('--keosd-port', metavar='', help="Port", default='8900')
 parser.add_argument('--deploy-script-pwd', metavar='', help="Path to deploy.py" )
+parser.add_argument('--master-wallet-name', metavar='', help="Name of main wallet.", default="beos_master_wallet" )
 
 if __name__ == "__main__":
   test_passed = False
