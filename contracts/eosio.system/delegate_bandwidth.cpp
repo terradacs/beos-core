@@ -97,9 +97,38 @@ namespace eosiosystem {
 
       auto itr = _rammarket.find(S(4,RAMCORE));
       auto tmp = *itr;
-      auto eosout = tmp.convert( asset(bytes,S(0,RAM)), CORE_SYMBOL );
+      auto ram_cost = - tmp.convert( -asset(bytes,S(0,RAM)), CORE_SYMBOL );
+      ram_cost.amount = (200 * ram_cost.amount + 199) / 199;
 
-      buyram( payer, receiver, eosout );
+      /*
+      auto eosout = tmp.convert( asset(bytes,S(0,RAM)), CORE_SYMBOL );
+      ABW: the original formula above is incorrect:
+       - it does not take fee into account
+       - it wrongfully assumes that if we could sell 'bytes' of RAM at current market for 'eosout' we could also
+         buy the same amount for that price; the difference grows the bigger chunk of current market we want to buy
+      Corrected formula still underestimates the cost due to internal truncations, but is much closer regardless
+      of market parameters.
+      
+      auto tmp2 = *itr;
+      auto wrong_ram_cost = tmp2.convert( asset(bytes,S(0,RAM)), CORE_SYMBOL );
+      auto wrong_fee = wrong_ram_cost;
+      wrong_fee.amount = ( wrong_fee.amount + 199 ) / 200;
+      wrong_ram_cost.amount -= wrong_fee.amount;
+      auto tmp3 = *itr;
+      int64_t wrong_bytes_out = tmp3.convert( wrong_ram_cost, S(0,RAM) ).amount;
+      auto fee = ram_cost;
+      fee.amount = ( fee.amount + 199 ) / 200;
+      auto good_ram_cost = ram_cost;
+      good_ram_cost.amount -= fee.amount;
+      auto tmp4 = *itr;
+      int64_t bytes_out = tmp4.convert( good_ram_cost, S(0,RAM) ).amount;
+      eosio::print( "\nasked for RAM: ", bytes );
+      eosio::print( "\nwrong RAM cost: ", wrong_ram_cost, " + ", wrong_fee, "; gives RAM: ", wrong_bytes_out );
+      eosio::print( "\nbetter RAM cost: ", good_ram_cost, " + ", fee, "; gives RAM: ", bytes_out );
+      eosio::print( "\nwrong is short by ", bytes-wrong_bytes_out, "\nbetter is short by ", bytes-bytes_out, "\n" );
+      */
+
+      buyram( payer, receiver, ram_cost );
    }
 
 
@@ -160,19 +189,23 @@ namespace eosiosystem {
          eosio_assert( _ram_bytes < 0 && _net_weight < 0 && _cpu_weight < 0, "can only be called for unlimited account" );
       }
     
-      // replicate buyrambytes but without a fee
+      // replicate buyrambytes but without a fee (but buy a bit more to cover for truncations - it is better to buy more
+      // and claim we bought less, so ram market is never short, than to do the opposite)
       if ( bytes > 0 ) {
          auto itr = _rammarket.find(S(4,RAMCORE));
          eosio_assert( itr != _rammarket.end(), "ram market does not exist");
          auto tmp = *itr;
-         auto ram_cost = tmp.convert( asset(bytes,S(0,RAM)), CORE_SYMBOL );
+         auto ram_cost = - tmp.convert( -asset(bytes+16,S(0,RAM)), CORE_SYMBOL );
 
          INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {_self,N(active)},
             { _self, N(eosio.ram), ram_cost, std::string("buy ram") } );
 
+         int64_t bytes_out;
          _rammarket.modify( *itr, 0, [&]( auto& es ) {
-            es.convert( ram_cost, S(0,RAM) );
+            bytes_out = es.convert( ram_cost, S(0,RAM) ).amount;
          });
+         eosio_assert( bytes_out - bytes >= 0, "failed ram cost estimation formula" );
+         eosio_assert( (bytes - bytes_out)*1000 / bytes == 0, "failed ram cost estimation formula" );
 
          _gstate.total_ram_bytes_reserved += uint64_t(bytes);
          _gstate.total_ram_stake          += ram_cost.amount;

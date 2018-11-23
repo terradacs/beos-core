@@ -37,7 +37,6 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
    const auto increment_contract_bytes = 10000;
    const auto table_allocation_bytes = 12000;
    BOOST_REQUIRE_MESSAGE(table_allocation_bytes > increment_contract_bytes, "increment_contract_bytes must be less than table_allocation_bytes for this test setup to work");
-   buyrambytes(config::system_account_name, config::system_account_name, 70000);
    produce_blocks(10);
    create_account_with_resources(N(testram11111),config::system_account_name, init_request_bytes + 40);
    create_account_with_resources(N(testram22222),config::system_account_name, init_request_bytes + 1190);
@@ -51,8 +50,8 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
          break;
       } catch (const ram_usage_exceeded&) {
          init_request_bytes += increment_contract_bytes;
-         buyrambytes(config::system_account_name, N(testram11111), increment_contract_bytes);
-         buyrambytes(config::system_account_name, N(testram22222), increment_contract_bytes);
+         check_buyrambytes(config::system_account_name, N(testram11111), increment_contract_bytes);
+         check_buyrambytes(config::system_account_name, N(testram22222), increment_contract_bytes);
       }
    }
    produce_blocks(10);
@@ -63,8 +62,8 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
          break;
       } catch (const ram_usage_exceeded&) {
          init_request_bytes += increment_contract_bytes;
-         buyrambytes(config::system_account_name, N(testram11111), increment_contract_bytes);
-         buyrambytes(config::system_account_name, N(testram22222), increment_contract_bytes);
+         check_buyrambytes(config::system_account_name, N(testram11111), increment_contract_bytes);
+         check_buyrambytes(config::system_account_name, N(testram22222), increment_contract_bytes);
       }
    }
    produce_blocks(10);
@@ -79,11 +78,13 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
    auto initial_ram_usage = rlm.get_account_ram_usage(N(testram11111));
 
    // calculate how many more bytes we need to have table_allocation_bytes for database stores
-   auto more_ram = table_allocation_bytes + init_bytes - init_request_bytes;
+   // ABW: the original calculation made no sense, also buyrambytes worked incorrectly allocating noticably less than requested,
+   // on top of that 1155 sized records consume 12882, not 12000 of table_allocation_bytes; either way all numbers had to be corrected
+   auto more_ram = table_allocation_bytes + initial_ram_usage - init_bytes;
    BOOST_REQUIRE_MESSAGE(more_ram >= 0, "Underlying understanding changed, need to reduce size of init_request_bytes");
    wdump((init_bytes)(initial_ram_usage)(init_request_bytes)(more_ram) );
-   buyrambytes(config::system_account_name, N(testram11111), more_ram);
-   buyrambytes(config::system_account_name, N(testram22222), more_ram);
+   check_buyrambytes(config::system_account_name, N(testram11111), more_ram);
+   check_buyrambytes(config::system_account_name, N(testram22222), more_ram);
 
    TESTER* tester = this;
    // allocate just under the allocated bytes
@@ -91,13 +92,13 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                         ("payer", "testram11111")
                         ("from", 1)
                         ("to", 10)
-                        ("size", 1155 /*1780*/ /*1910*/));//1780 -> 1155 because of changes in multi_index
+                        ("size", 1065));//1780 -> 1155 because of changes in multi_index
    produce_blocks(1);
    auto ram_usage = rlm.get_account_ram_usage(N(testram11111));
 
    total = get_total_stake( N(testram11111) );
    const auto ram_bytes =  total["ram_bytes"].as_uint64();
-   wdump((ram_bytes)(ram_usage)(initial_ram_usage)(init_bytes)(ram_usage - initial_ram_usage)(init_bytes - ram_usage) );
+   wdump((ram_bytes)(ram_usage)(initial_ram_usage)(init_bytes)(ram_usage - initial_ram_usage)(ram_usage - init_bytes) );
 
    wlog("ram_tests 1    %%%%%%");
    // allocate just beyond the allocated bytes
@@ -106,7 +107,7 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                            ("payer", "testram11111")
                            ("from", 1)
                            ("to", 10)
-                           ("size", 1790 /*1920*/)),
+                           ("size", 1067)),
                            ram_usage_exceeded,
                            fc_exception_message_starts_with("account testram11111 has insufficient ram"));
    wlog("ram_tests 2    %%%%%%");
@@ -118,7 +119,8 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                         ("payer", "testram11111")
                         ("from", 1)
                         ("to", 10)
-                        ("size", 1155 /*1680*/ /*1810*/));//1680 -> 1155 because of changes in multi_index
+                        ("size", 1065));//1680 -> 1155 because of changes in multi_index
+   wlog("ram_tests 3    %%%%%%");
    produce_blocks(1);
    BOOST_REQUIRE_EQUAL(ram_usage, rlm.get_account_ram_usage(N(testram11111)));
 
@@ -128,9 +130,10 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                            ("payer", "testram11111")
                            ("from", 1)
                            ("to", 11)
-                           ("size", 1680/*1810*/)),
+                           ("size", 1065)),
                            ram_usage_exceeded,
                            fc_exception_message_starts_with("account testram11111 has insufficient ram"));
+   wlog("ram_tests 4    %%%%%%");
    produce_blocks(1);
    BOOST_REQUIRE_EQUAL(ram_usage, rlm.get_account_ram_usage(N(testram11111)));
 
@@ -143,6 +146,7 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                            ("size", 1760)),
                            ram_usage_exceeded,
                            fc_exception_message_starts_with("account testram11111 has insufficient ram"));
+   wlog("ram_tests 5    %%%%%%");
    produce_blocks(1);
    BOOST_REQUIRE_EQUAL(ram_usage, rlm.get_account_ram_usage(N(testram11111)));
 
@@ -151,12 +155,14 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                         ("payer", "testram11111")
                         ("from", 1)
                         ("to", 11)
-                        ("size", 1039/*1600*/ /*1720*/));//1600 -> 1039 because of changes in multi_index
+                        ("size", 958));//1600 -> 1039 because of changes in multi_index
+   wlog("ram_tests 6    %%%%%%");
    produce_blocks(1);
 
    tester->push_action( N(testram11111), N(rmentry), N(testram11111), mvo()
                         ("from", 3)
                         ("to", 3));
+   wlog("ram_tests 7    %%%%%%");
    produce_blocks(1);
    
    // verify that the new entry will exceed the allocation bytes limit
@@ -168,6 +174,7 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                            ("size", 1780)),
                            ram_usage_exceeded,
                            fc_exception_message_starts_with("account testram11111 has insufficient ram"));
+   wlog("ram_tests 8    %%%%%%");
    produce_blocks(1);
 
    // verify that the new entry is under the allocation bytes limit
@@ -175,7 +182,8 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                         ("payer", "testram11111")
                         ("from", 12)
                         ("to", 12)
-                        ("size", 1040/*1620*/ /*1720*/));//1620 -> 1040 because of changes in multi_index
+                        ("size", 959));//1620 -> 1040 because of changes in multi_index
+   wlog("ram_tests 9    %%%%%%");
    produce_blocks(1);
 
    // verify that anoth new entry will exceed the allocation bytes limit, to setup testing of new payer
@@ -187,6 +195,7 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                            ("size", 1660)),
                            ram_usage_exceeded,
                            fc_exception_message_starts_with("account testram11111 has insufficient ram"));
+   wlog("ram_tests 10   %%%%%%");
    produce_blocks(1);
 
    // verify that the new entry is under the allocation bytes limit
@@ -195,6 +204,7 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                         ("from", 12)
                         ("to", 12)
                         ("size", 1720));
+   wlog("ram_tests 11   %%%%%%");
    produce_blocks(1);
 
    // verify that another new entry that is too big will exceed the allocation bytes limit, to setup testing of new payer
@@ -206,15 +216,16 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                            ("size", 1900)),
                            ram_usage_exceeded,
                            fc_exception_message_starts_with("account testram11111 has insufficient ram"));
+   wlog("ram_tests 12   %%%%%%");
    produce_blocks(1);
 
-   wlog("ram_tests 18    %%%%%%");
    // verify that the new entry is under the allocation bytes limit, because entry 12 is now charged to testram22222
    tester->push_action( N(testram11111), N(setentry), N(testram11111), mvo()
                         ("payer", "testram11111")
                         ("from", 13)
                         ("to", 13)
-                        ("size", 1040 /*1720*/));//1720 -> 1040 because of changes in multi_index
+                        ("size", 959 ));//1720 -> 1040 because of changes in multi_index
+   wlog("ram_tests 13    %%%%%%");
    produce_blocks(1);
 
    // verify that new entries for testram22222 exceed the allocation bytes limit
@@ -226,6 +237,7 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                            ("size", 1930)),
                            ram_usage_exceeded,
                            fc_exception_message_starts_with("account testram22222 has insufficient ram"));
+   wlog("ram_tests 14    %%%%%%");
    produce_blocks(1);
 
    // verify that new entries for testram22222 are under the allocation bytes limit
@@ -233,7 +245,8 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                         ("payer", "testram22222")
                         ("from", 12)
                         ("to", 21)
-                        ("size", 1210 /*1910*/ ));//1910 -> 1210 because of changes in multi_index
+                        ("size", 1190 ));//1910 -> 1210 because of changes in multi_index
+   wlog("ram_tests 15    %%%%%%");
    produce_blocks(1);
 
    // verify that new entry for testram22222 exceed the allocation bytes limit
@@ -242,14 +255,16 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                            ("payer", "testram22222")
                            ("from", 22)
                            ("to", 22)
-                           ("size", 1910)),
+                           ("size", 1210)),
                            ram_usage_exceeded,
                            fc_exception_message_starts_with("account testram22222 has insufficient ram"));
+   wlog("ram_tests 16    %%%%%%");
    produce_blocks(1);
 
    tester->push_action( N(testram11111), N(rmentry), N(testram11111), mvo()
                         ("from", 20)
                         ("to", 20));
+   wlog("ram_tests 17    %%%%%%");
    produce_blocks(1);
 
    // verify that new entry for testram22222 are under the allocation bytes limit
@@ -257,7 +272,8 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                         ("payer", "testram22222")
                         ("from", 22)
                         ("to", 22)
-                        ("size", 1910));
+                        ("size", 1210));
+   wlog("ram_tests 18    %%%%%%");
    produce_blocks(1);
 
 } FC_LOG_AND_RETHROW() }

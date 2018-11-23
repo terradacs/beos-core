@@ -234,6 +234,18 @@ public:
       return push_action( payer, N(buyrambytes), mvo()( "payer",payer)("receiver",receiver)("bytes",numbytes) );
    }
 
+   void check_buyrambytes( const account_name& payer, account_name receiver, uint32_t numbytes ) {
+      auto rlm = control->get_resource_limits_manager();
+      int64_t old_ram, old_net, old_cpu, new_ram, new_net, new_cpu;
+      rlm.get_account_limits(receiver, old_ram, old_net, old_cpu);
+      BOOST_REQUIRE_EQUAL( success(), buyrambytes(payer, receiver, numbytes));
+      rlm.get_account_limits(receiver, new_ram, new_net, new_cpu);
+      wdump((new_ram - old_ram)(numbytes));
+      BOOST_REQUIRE_EQUAL( (old_ram + numbytes - new_ram)*1000 / numbytes, 0 );
+      BOOST_REQUIRE_EQUAL(new_net, old_net);
+      BOOST_REQUIRE_EQUAL(new_cpu, old_cpu);
+   }
+   
    action_result sellram( const account_name& account, uint64_t numbytes ) {
       return push_action( account, N(sellram), mvo()( "account", account)("bytes",numbytes) );
    }
