@@ -1,7 +1,11 @@
 #!/bin/bash
 cd ~/ci/build/$CI_COMMIT_REF_NAME
 echo "Starting keosd and nodeos"
-python3 ./run.py
+if ! python3 ./run.py
+  printf "Unable to start BEOS instance"
+  exit 1
+fi
+
 echo "Started keosd instance:"
 echo "Started keosd instance (should be empty):"
 lsof -t -i:8900 || true
