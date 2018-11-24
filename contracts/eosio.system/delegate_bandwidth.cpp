@@ -195,7 +195,8 @@ namespace eosiosystem {
          auto itr = _rammarket.find(S(4,RAMCORE));
          eosio_assert( itr != _rammarket.end(), "ram market does not exist");
          auto tmp = *itr;
-         auto ram_cost = - tmp.convert( -asset(bytes+16,S(0,RAM)), CORE_SYMBOL );
+         auto bytes_extra = bytes * 100001 / 100000;
+         auto ram_cost = - tmp.convert( -asset(bytes_extra,S(0,RAM)), CORE_SYMBOL );
 
          INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {_self,N(active)},
             { _self, N(eosio.ram), ram_cost, std::string("buy ram") } );
@@ -204,7 +205,7 @@ namespace eosiosystem {
          _rammarket.modify( *itr, 0, [&]( auto& es ) {
             bytes_out = es.convert( ram_cost, S(0,RAM) ).amount;
          });
-         eosio_assert( bytes_out - bytes >= 0, "failed ram cost estimation formula" );
+         eosio_assert( bytes_out >= bytes, "failed ram cost estimation formula" );
          eosio_assert( (bytes - bytes_out)*1000 / bytes == 0, "failed ram cost estimation formula" );
 
          _gstate.total_ram_bytes_reserved += uint64_t(bytes);
