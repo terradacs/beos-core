@@ -2,6 +2,7 @@
 cd ~/ci/build/$CI_COMMIT_REF_NAME
 echo "Starting keosd and nodeos"
 if ! python3 ./run.py
+then
   printf "Unable to start BEOS instance"
   exit 1
 fi

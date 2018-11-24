@@ -25,6 +25,7 @@ kill -2 $(lsof -t -i:8888) || true
 python3 ./wait.py $(lsof -t -i:8888)
 
 if ! ./deploy.py --initialize-beos
+then
   cat beos_deploy_main.log
   printf "Unable to initialize beos blockchain"
   exit 2
