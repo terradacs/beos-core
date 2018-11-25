@@ -97,7 +97,7 @@ namespace eosiosystem {
 
       auto itr = _rammarket.find(S(4,RAMCORE));
       auto tmp = *itr;
-      auto ram_cost = - tmp.convert( -asset(bytes,S(0,RAM)), CORE_SYMBOL );
+      auto ram_cost = - tmp.convert( -asset(bytes,S(0,RAM)), CORE_SYMBOL, true );
       ram_cost.amount = (200 * ram_cost.amount + 199) / 199;
 
       /*
@@ -106,8 +106,8 @@ namespace eosiosystem {
        - it does not take fee into account
        - it wrongfully assumes that if we could sell 'bytes' of RAM at current market for 'eosout' we could also
          buy the same amount for that price; the difference grows the bigger chunk of current market we want to buy
-      Corrected formula still underestimates the cost due to internal truncations, but is much closer regardless
-      of market parameters.
+      Corrected formula is much closer regardless of market parameters and actually overestimates slightly (it is
+      not possible to get exact value due to limits in CORE_SYMBOL precision).
       
       auto tmp2 = *itr;
       auto wrong_ram_cost = tmp2.convert( asset(bytes,S(0,RAM)), CORE_SYMBOL );
@@ -125,8 +125,8 @@ namespace eosiosystem {
       eosio::print( "\nasked for RAM: ", bytes );
       eosio::print( "\nwrong RAM cost: ", wrong_ram_cost, " + ", wrong_fee, "; gives RAM: ", wrong_bytes_out );
       eosio::print( "\nbetter RAM cost: ", good_ram_cost, " + ", fee, "; gives RAM: ", bytes_out );
-      eosio::print( "\nwrong is short by ", bytes-wrong_bytes_out, "\nbetter is short by ", bytes-bytes_out, "\n" );
-      */
+      eosio::print( "\nwrong is short by ", bytes-wrong_bytes_out, "\nbetter is over by ", bytes_out-bytes, "\n" );
+      //*/
 
       buyram( payer, receiver, ram_cost );
    }
@@ -189,14 +189,12 @@ namespace eosiosystem {
          eosio_assert( _ram_bytes < 0 && _net_weight < 0 && _cpu_weight < 0, "can only be called for unlimited account" );
       }
     
-      // replicate buyrambytes but without a fee (but buy a bit more to cover for truncations - it is better to buy more
-      // and claim we bought less, so ram market is never short, than to do the opposite)
+      // replicate buyrambytes but without a fee
       if ( bytes > 0 ) {
          auto itr = _rammarket.find(S(4,RAMCORE));
          eosio_assert( itr != _rammarket.end(), "ram market does not exist");
          auto tmp = *itr;
-         auto bytes_extra = bytes * 100001 / 100000;
-         auto ram_cost = - tmp.convert( -asset(bytes_extra,S(0,RAM)), CORE_SYMBOL );
+         auto ram_cost = - tmp.convert( -asset(bytes,S(0,RAM)), CORE_SYMBOL, true );
 
          INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {_self,N(active)},
             { _self, N(eosio.ram), ram_cost, std::string("buy ram") } );

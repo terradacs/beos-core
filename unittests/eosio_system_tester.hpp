@@ -241,9 +241,10 @@ public:
       BOOST_REQUIRE_EQUAL( success(), buyrambytes(payer, receiver, numbytes));
       rlm.get_account_limits(receiver, new_ram, new_net, new_cpu);
       wdump((new_ram - old_ram)(numbytes));
-      BOOST_REQUIRE_EQUAL( (old_ram + numbytes - new_ram)*1000 / numbytes, 0 );
-      BOOST_REQUIRE_EQUAL(new_net, old_net);
-      BOOST_REQUIRE_EQUAL(new_cpu, old_cpu);
+      BOOST_REQUIRE_GE( new_ram, old_ram + numbytes );
+      BOOST_REQUIRE_EQUAL( (new_ram - old_ram - numbytes)*1000 / numbytes, 0 );
+      BOOST_REQUIRE_EQUAL( new_net, old_net );
+      BOOST_REQUIRE_EQUAL( new_cpu, old_cpu );
    }
    
    action_result sellram( const account_name& account, uint64_t numbytes ) {

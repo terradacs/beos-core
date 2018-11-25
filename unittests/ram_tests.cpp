@@ -107,7 +107,7 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, eosio_system::eosio_system_tester) { try {
                            ("payer", "testram11111")
                            ("from", 1)
                            ("to", 10)
-                           ("size", 1067)),
+                           ("size", 1068)),
                            ram_usage_exceeded,
                            fc_exception_message_starts_with("account testram11111 has insufficient ram"));
    wlog("ram_tests 2    %%%%%%");
