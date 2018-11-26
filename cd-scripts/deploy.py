@@ -379,7 +379,7 @@ def initialize_beos():
         eosio.set_contract("producerjson", config.CONTRACTS_DIR + "producerjson", "producerjson")
         eosio.set_contract("proxyinfo", config.CONTRACTS_DIR + "proxyinfo", "proxyinfo")
 
-        eosio.push_action("eosio.token", "issue", '[ "eosio", "{0} {1}", "initial token creation" ]'.format(config.CORE_INITIAL_SUPPLY, config.CORE_SYMBOL_NAME), "eosio")
+        eosio.push_action("eosio", "initialissue", '[ "{0}", "{1}" ]'.format(config.CORE_INITIAL_SUPPLY, config.MIN_ACTIVATED_STAKE_PERCENT), "eosio")
         eosio.push_action("eosio", "initresource", '[ "beos.gateway", "{0}", "{1} {2}", "{3} {4}"]'.format(config.GATEWAY_INIT_RAM, config.GATEWAY_INIT_NET, config.CORE_SYMBOL_NAME, config.GATEWAY_INIT_CPU, config.CORE_SYMBOL_NAME), "eosio")
         eosio.push_action("eosio", "initresource", '[ "beos.distrib", "{0}", "{1} {2}", "{3} {4}"]'.format(config.DISTRIB_INIT_RAM, config.DISTRIB_INIT_NET, config.CORE_SYMBOL_NAME, config.DISTRIB_INIT_CPU, config.CORE_SYMBOL_NAME), "eosio")
 

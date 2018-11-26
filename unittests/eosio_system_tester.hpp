@@ -75,10 +75,20 @@ public:
          token_abi_ser.set_abi(abi, abi_serializer_max_time);
       }
 
+      create_currency( N(eosio.token), config::system_account_name, core_from_string("10000000000.0000") );
+
+      initial_settings(eosio_init_wast, eosio_init_abi, eosio_gateway_wast, eosio_gateway_abi, eosio_distribution_wast, eosio_distribution_abi);
+
       set_code( config::system_account_name, eosio_system_wast );
       set_abi( config::system_account_name, eosio_system_abi );
 
-      create_currency( N(eosio.token), config::system_account_name, core_from_string("10000000000.0000") );
+      {
+         const auto& accnt = control->db().get<account_object,by_name>( config::system_account_name );
+         abi_def abi;
+         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
+         abi_ser.set_abi(abi, abi_serializer_max_time);
+      }
+
       //issue(config::system_account_name,      core_from_string("1000000000.0000"));
       set_code( config::system_account_name, eosio_system_wast );
       set_abi( config::system_account_name, eosio_system_abi );
@@ -89,15 +99,6 @@ public:
                  );
 
       BOOST_REQUIRE_EQUAL( core_from_string("1000000000.0000"), get_balance( "eosio" ) );
-
-      initial_settings(eosio_init_wast, eosio_init_abi, eosio_gateway_wast, eosio_gateway_abi, eosio_distribution_wast, eosio_distribution_abi);
-
-      {
-         const auto& accnt = control->db().get<account_object,by_name>( config::system_account_name );
-         abi_def abi;
-         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
-         abi_ser.set_abi(abi, abi_serializer_max_time);
-      }
 
       produce_blocks();
 

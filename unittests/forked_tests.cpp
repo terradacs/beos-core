@@ -6,6 +6,9 @@
 #include <eosio.token/eosio.token.wast.hpp>
 #include <eosio.token/eosio.token.abi.hpp>
 
+#include <eosio.system/eosio.system.wast.hpp>
+#include <eosio.system/eosio.system.abi.hpp>
+
 #include <Runtime/Runtime.h>
 
 #include <fc/variant_object.hpp>
@@ -145,7 +148,7 @@ BOOST_AUTO_TEST_CASE( forking ) try {
    tester c;
    c.produce_block();
    c.produce_block();
-   auto r = c.create_accounts( {N(dan),N(sam),N(pam)} );
+   auto r = c.create_accounts( {N(dan),N(sam),N(pam),N(cam)} );
    wdump((fc::json::to_pretty_string(r)));
    c.produce_block();
    auto res = c.set_producers( {N(dan),N(sam),N(pam)} );
@@ -162,13 +165,21 @@ BOOST_AUTO_TEST_CASE( forking ) try {
    c.set_abi( N(eosio.token), eosio_token_abi );
    c.produce_blocks(10);
 
-
    auto cr = c.push_action( N(eosio.token), N(create), N(eosio.token), mutable_variant_object()
               ("issuer",       "eosio" )
               ("maximum_supply", core_from_string("10000000.0000"))
       );
 
    wdump((fc::json::to_pretty_string(cr)));
+
+   c.set_code( config::system_account_name, eosio_system_wast );
+   c.set_abi( config::system_account_name, eosio_system_abi );
+
+   cr = c.push_action( config::system_account_name, N(initialissue), config::system_account_name,
+                  mutable_variant_object()
+                    ( "quantity", 1'000'000'0000 )
+                    ( "min_activated_stake_percent", 15 ) /* 15% is default value in eosio */
+                );
 
    cr = c.push_action( N(eosio.token), N(issue), config::system_account_name, mutable_variant_object()
               ("to",       "dan" )
@@ -195,7 +206,6 @@ BOOST_AUTO_TEST_CASE( forking ) try {
    expected_producer = N(sam);
    BOOST_REQUIRE_EQUAL( b->producer.to_string(), expected_producer.to_string() );
    c.produce_blocks(10);
-   c.create_accounts( {N(cam)} );
    c.set_producers( {N(dan),N(sam),N(pam),N(cam)} );
    wlog("set producer schedule to [dan,sam,pam,cam]");
    c.produce_block();
