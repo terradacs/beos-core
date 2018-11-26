@@ -189,12 +189,14 @@ namespace eosiosystem {
          eosio_assert( _ram_bytes < 0 && _net_weight < 0 && _cpu_weight < 0, "can only be called for unlimited account" );
       }
     
-      // replicate buyrambytes but without a fee
+      // replicate buyrambytes but without a fee (but buy a bit more - it is better to buy more and claim we bought less, so ram
+      // market is never short, than to do the opposite, especially that ram market itself claims to have funds it doesn't have)
       if ( bytes > 0 ) {
          auto itr = _rammarket.find(S(4,RAMCORE));
          eosio_assert( itr != _rammarket.end(), "ram market does not exist");
          auto tmp = *itr;
-         auto ram_cost = - tmp.convert( -asset(bytes,S(0,RAM)), CORE_SYMBOL, true );
+         auto bytes_extra = bytes * 100001 / 100000;
+         auto ram_cost = - tmp.convert( -asset(bytes_extra,S(0,RAM)), CORE_SYMBOL, true );
 
          INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {_self,N(active)},
             { _self, N(eosio.ram), ram_cost, std::string("buy ram") } );
