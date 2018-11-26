@@ -44,11 +44,11 @@ namespace eosiosystem {
      {
      require_auth( _self );
 
-     asset balance = eosio::token(N(eosio.token)).check_balance( _self, CORE_SYMBOL );
-     eosio_assert( balance.amount == 0, "call after any issue or second call is prohibited" );
+     asset balance = eosio::token(N(eosio.token)).check_balance( _self, system_token_symbol );
+     eosio_assert( balance.amount == 0, "second call is prohibited" );
      eosio_assert( quantity != 0, "quantity is non-positive value" );
      eosio_assert( 0 <= min_activated_stake_percent && min_activated_stake_percent <= 100, "min_activated_stake_percent must be in range [0:100]" );
-     asset value( quantity, CORE_SYMBOL );
+     asset value( quantity, system_token_symbol );
      std::string memo("initialissue");
      INLINE_ACTION_SENDER(eosio::token, issue)( N(eosio.token), { _self, N(active) }, { _self, value, memo } );
      // min_activated_stake_percent % of quantity

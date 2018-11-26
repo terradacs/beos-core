@@ -131,12 +131,13 @@ namespace eosio { namespace testing {
 
          vector<transaction_trace_ptr>  create_accounts( vector<account_name> names,
                                                          bool multisig = false,
-                                                         bool include_code = true
+                                                         bool include_code = true,
+                                                         int32_t buy_ram = 0
                                                        )
          {
             vector<transaction_trace_ptr> traces;
             traces.reserve(names.size());
-            for( auto n : names ) traces.emplace_back( create_account( n, config::system_account_name, multisig, include_code ) );
+            for( auto n : names ) traces.emplace_back( create_account( n, config::system_account_name, multisig, include_code, buy_ram ) );
             return traces;
          }
 
