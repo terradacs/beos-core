@@ -28,9 +28,9 @@ namespace eosiosystem {
 
       uint64_t primary_key()const { return supply.symbol; }
 
-      asset convert_to_exchange( connector& c, asset in ); 
-      asset convert_from_exchange( connector& c, asset in );
-      asset convert( asset from, symbol_type to );
+      asset convert_to_exchange( connector& c, asset in, bool cost_estimation = false ); 
+      asset convert_from_exchange( connector& c, asset in, bool cost_estimation = false );
+      asset convert( asset from, symbol_type to, bool cost_estimation = false );
 
       EOSLIB_SERIALIZE( exchange_state, (supply)(base)(quote) )
    };

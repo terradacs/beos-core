@@ -1,7 +1,7 @@
 #include <eosio.system/exchange_state.hpp>
 
 namespace eosiosystem {
-   asset exchange_state::convert_to_exchange( connector& c, asset in ) {
+   asset exchange_state::convert_to_exchange( connector& c, asset in, bool cost_estimation ) {
 
       real_type R(supply.amount);
       real_type C(c.balance.amount+in.amount);
@@ -11,7 +11,7 @@ namespace eosiosystem {
 
       real_type E = -R * (ONE - std::pow( ONE + T / C, F) );
       //print( "E: ", E, "\n");
-      int64_t issued = int64_t(E);
+      int64_t issued = cost_estimation ? (E < 0 ? int64_t(std::floor(E)) : int64_t(std::ceil(E))) : int64_t(E);
 
       supply.amount += issued;
       c.balance.amount += in.amount;
@@ -19,7 +19,7 @@ namespace eosiosystem {
       return asset( issued, supply.symbol );
    }
 
-   asset exchange_state::convert_from_exchange( connector& c, asset in ) {
+   asset exchange_state::convert_from_exchange( connector& c, asset in, bool cost_estimation ) {
       eosio_assert( in.symbol== supply.symbol, "unexpected asset symbol input" );
 
       real_type R(supply.amount - in.amount);
@@ -37,7 +37,7 @@ namespace eosiosystem {
       
       real_type T = C * (std::pow( ONE + E/R, F) - ONE);
       //print( "T: ", T, "\n");
-      int64_t out = int64_t(T);
+      int64_t out = cost_estimation ? (T < 0 ? int64_t(std::floor(T)) : int64_t(std::ceil(T))) : int64_t(T);
 
       supply.amount -= in.amount;
       c.balance.amount -= out;
@@ -45,7 +45,7 @@ namespace eosiosystem {
       return asset( out, c.balance.symbol );
    }
 
-   asset exchange_state::convert( asset from, symbol_type to ) {
+   asset exchange_state::convert( asset from, symbol_type to, bool cost_estimation ) {
       auto sell_symbol  = from.symbol;
       auto ex_symbol    = supply.symbol;
       auto base_symbol  = base.balance.symbol;
@@ -58,24 +58,24 @@ namespace eosiosystem {
 
       if( sell_symbol != ex_symbol ) {
          if( sell_symbol == base_symbol ) {
-            from = convert_to_exchange( base, from );
+            from = convert_to_exchange( base, from, cost_estimation );
          } else if( sell_symbol == quote_symbol ) {
-            from = convert_to_exchange( quote, from );
+            from = convert_to_exchange( quote, from, cost_estimation );
          } else { 
             eosio_assert( false, "invalid sell" );
          }
       } else {
          if( to == base_symbol ) {
-            from = convert_from_exchange( base, from ); 
+            from = convert_from_exchange( base, from, cost_estimation );
          } else if( to == quote_symbol ) {
-            from = convert_from_exchange( quote, from ); 
+            from = convert_from_exchange( quote, from, cost_estimation );
          } else {
             eosio_assert( false, "invalid conversion" );
          }
       }
 
       if( to != from.symbol )
-         return convert( from, to );
+         return convert( from, to, cost_estimation );
 
       return from;
    }
