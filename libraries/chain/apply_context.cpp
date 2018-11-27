@@ -39,7 +39,8 @@ static inline void print_debug(account_name receiver, const action_trace& ar) {
    }
 }
 
-inline void apply_context::change_resource_limits( const account_name& acc, int64_t ram, int64_t net, int64_t cpu )const {
+inline void apply_context::change_any_resource_limits_impl( const account_name& acc, int64_t ram, int64_t net, int64_t cpu, bool is_distribution )const
+{
    auto& resource_limit_mgr = control.get_mutable_resource_limits_manager();
    int64_t ram_bytes = 0;
    int64_t net_weight = 0;
@@ -50,8 +51,24 @@ inline void apply_context::change_resource_limits( const account_name& acc, int6
    net_weight += net;
    cpu_weight += cpu;
 
-   if (resource_limit_mgr.set_account_limits( acc, ram_bytes, net_weight, cpu_weight ))
-      trx_context.validate_ram_usage.insert( acc );
+   if( is_distribution )
+   {
+    if (resource_limit_mgr.set_distribution_account_limits( acc, ram_bytes, net_weight, cpu_weight ))
+        trx_context.validate_ram_usage.insert( acc );
+   }
+   else
+   {
+    if (resource_limit_mgr.set_account_limits( acc, ram_bytes, net_weight, cpu_weight ))
+        trx_context.validate_ram_usage.insert( acc );
+   }
+}
+
+inline void apply_context::change_distribution_resource_limits( const account_name& acc, int64_t ram, int64_t net, int64_t cpu )const {
+  change_any_resource_limits_impl( acc, ram, net, cpu, true/*is_distribution*/ );
+}
+
+inline void apply_context::change_resource_limits( const account_name& acc, int64_t ram, int64_t net, int64_t cpu )const {
+  change_any_resource_limits_impl( acc, ram, net, cpu, false/*is_distribution*/ );
 }
 
 void apply_context::exec_one( action_trace& trace )
@@ -146,14 +163,14 @@ void apply_context::reward_stake( const account_name& account, int64_t val, cons
    int64_t stake_net = val / 2;
    int64_t stake_cpu = val - stake_net;
 
-   change_resource_limits( account, 0, stake_net, stake_cpu );
+   change_distribution_resource_limits( account, 0, stake_net, stake_cpu );
    
    control.get_mutable_voting_manager().update_voting_power(account, val, _producers);
 }
 
 void apply_context::reward_ram( const account_name& account, int64_t val )
 {
-   change_resource_limits( account, val, 0, 0 );
+   change_distribution_resource_limits( account, val, 0, 0 );
 }
 
 void apply_context::reward_all( uint64_t amount_of_reward, uint64_t amount_of_reward_for_trustee, uint64_t gathered_amount,

@@ -146,6 +146,29 @@ namespace eosio { namespace chain { namespace resource_limits {
       int64_t cpu_weight = -1;
       int64_t ram_bytes = -1;
 
+      //These values are set only during distribution period. See 'apply_context::reward_all' method.
+      int64_t distribution_net_weight = 0;
+      int64_t distribution_cpu_weight = 0;
+      int64_t distribution_ram_bytes = 0;
+
+      void set_resource_limits( int64_t _ram_bytes, int64_t _net_weight, int64_t _cpu_weight, bool is_distribution )
+      {
+        ram_bytes = _ram_bytes;
+        net_weight = _net_weight;
+        cpu_weight = _cpu_weight;
+
+        if( is_distribution )
+        {
+            if( _ram_bytes > distribution_ram_bytes )
+              distribution_ram_bytes = _ram_bytes;
+
+            if( _net_weight > distribution_net_weight )
+              distribution_net_weight = _net_weight;
+
+            if( _cpu_weight > distribution_cpu_weight )
+              distribution_cpu_weight = _cpu_weight;
+        }
+      }
    };
 
    struct by_owner;

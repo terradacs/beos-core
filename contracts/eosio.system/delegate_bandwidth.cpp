@@ -283,11 +283,24 @@ namespace eosiosystem {
          del_bandwidth_table     del_tbl( _self, from);
          auto itr = del_tbl.find( receiver );
          if( itr == del_tbl.end() ) {
+
+            auto _stake_net_delta = stake_net_delta;
+            auto _stake_cpu_delta = stake_cpu_delta;
+
+            if( from == receiver )
+            {
+              int64_t _ram_bytes, _net_weight, _cpu_weight;
+              get_distribution_resource_rewards( from, &_ram_bytes, &_net_weight, &_cpu_weight );
+
+              _stake_net_delta.amount += _net_weight;
+              _stake_cpu_delta.amount += _cpu_weight;
+            }
+
             itr = del_tbl.emplace( from, [&]( auto& dbo ){
                   dbo.from          = from;
                   dbo.to            = receiver;
-                  dbo.net_weight    = stake_net_delta;
-                  dbo.cpu_weight    = stake_cpu_delta;
+                  dbo.net_weight    = _stake_net_delta;
+                  dbo.cpu_weight    = _stake_cpu_delta;
                });
          }
          else {
