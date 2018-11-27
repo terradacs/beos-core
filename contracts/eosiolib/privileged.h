@@ -21,6 +21,16 @@ extern "C" {
     */
 
   /**
+    * @brief Get the resource rewards of an account gathered during a distribution period
+    * Get the resource rewards of an account
+    * @param account - name of the account whose resource limit to get
+    * @param ram_bytes - pointer to `int64_t` to hold ram rewards in absolute bytes
+    * @param net_weight - pointer to `int64_t` to hold net rewards
+    * @param cpu_weight - pointer to `int64_t` to hold cpu rewards
+    */
+   void get_distribution_resource_rewards( account_name account, int64_t* ram_bytes, int64_t* net_weight, int64_t* cpu_weight );
+
+  /**
     * @brief Get the resource limits of an account
     * Get the resource limits of an account
     * @param account - name of the account whose resource limit to get

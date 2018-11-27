@@ -285,7 +285,9 @@ fc::mutable_variant_object resource_limits_manager::convert_to_public( const res
     ( "ram_bytes",  object.ram_bytes );
   }
 
-bool resource_limits_manager::set_account_limits( const account_name& account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight) {
+bool resource_limits_manager::set_any_account_limits_impl( const account_name& account,
+                                                       int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight,
+                                                       bool is_distribution ) {
    //const auto& usage = _db.get<resource_usage_object,by_owner>( account );
    /*
     * Since we need to delay these until the next resource limiting boundary, these are created in a "pending"
@@ -298,9 +300,15 @@ bool resource_limits_manager::set_account_limits( const account_name& account, i
          const auto& limits = _db.get<resource_limits_object, by_owner>( boost::make_tuple(false, account));
          return _db.create<resource_limits_object>([&](resource_limits_object& pending_limits){
             pending_limits.owner = limits.owner;
+
             pending_limits.ram_bytes = limits.ram_bytes;
             pending_limits.net_weight = limits.net_weight;
             pending_limits.cpu_weight = limits.cpu_weight;
+
+            pending_limits.distribution_ram_bytes = limits.distribution_ram_bytes;
+            pending_limits.distribution_net_weight = limits.distribution_net_weight;
+            pending_limits.distribution_cpu_weight = limits.distribution_cpu_weight;
+
             pending_limits.pending = true;
          });
       } else {
@@ -327,26 +335,59 @@ bool resource_limits_manager::set_account_limits( const account_name& account, i
    }
 
    _db.modify( limits, [&]( resource_limits_object& pending_limits ){
-      pending_limits.ram_bytes = ram_bytes;
-      pending_limits.net_weight = net_weight;
-      pending_limits.cpu_weight = cpu_weight;
+      pending_limits.set_resource_limits( ram_bytes, net_weight, cpu_weight, is_distribution );
    });
 
    return decreased_limit;
 }
 
-void resource_limits_manager::get_account_limits( const account_name& account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight ) const {
+bool resource_limits_manager::set_distribution_account_limits( const account_name& account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight) {
+  return set_any_account_limits_impl( account, ram_bytes, net_weight, cpu_weight, true/*is_distribution*/ );
+}
+
+bool resource_limits_manager::set_account_limits( const account_name& account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight) {
+  return set_any_account_limits_impl( account, ram_bytes, net_weight, cpu_weight, false/*is_distribution*/ );
+}
+
+void resource_limits_manager::get_any_account_data( const account_name& account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight, bool is_distribution ) const
+{
    const auto* pending_buo = _db.find<resource_limits_object,by_owner>( boost::make_tuple(true, account) );
    if (pending_buo) {
-      ram_bytes  = pending_buo->ram_bytes;
-      net_weight = pending_buo->net_weight;
-      cpu_weight = pending_buo->cpu_weight;
+      if( is_distribution )
+      {
+        ram_bytes  = pending_buo->distribution_ram_bytes;
+        net_weight = pending_buo->distribution_net_weight;
+        cpu_weight = pending_buo->distribution_cpu_weight;
+      }
+      else
+      {
+        ram_bytes  = pending_buo->ram_bytes;
+        net_weight = pending_buo->net_weight;
+        cpu_weight = pending_buo->cpu_weight;
+      }
    } else {
       const auto& buo = _db.get<resource_limits_object,by_owner>( boost::make_tuple( false, account ) );
-      ram_bytes  = buo.ram_bytes;
-      net_weight = buo.net_weight;
-      cpu_weight = buo.cpu_weight;
+      if( is_distribution )
+      {
+        ram_bytes  = buo.distribution_ram_bytes;
+        net_weight = buo.distribution_net_weight;
+        cpu_weight = buo.distribution_cpu_weight;
+      }
+      else
+      {
+        ram_bytes  = buo.ram_bytes;
+        net_weight = buo.net_weight;
+        cpu_weight = buo.cpu_weight;
+      }
    }
+}
+
+void resource_limits_manager::get_distribution_resource_rewards( const account_name& account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight ) const {
+  get_any_account_data( account, ram_bytes, net_weight, cpu_weight, true/*is_distribution*/ );
+}
+
+void resource_limits_manager::get_account_limits( const account_name& account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight ) const {
+  get_any_account_data( account, ram_bytes, net_weight, cpu_weight, false/*is_distribution*/ );
 }
 
 
@@ -382,6 +423,9 @@ void resource_limits_manager::process_account_limit_updates() {
             update_state_and_value(rso.total_ram_bytes,  rlo.ram_bytes,  itr->ram_bytes, "ram_bytes");
             update_state_and_value(rso.total_cpu_weight, rlo.cpu_weight, itr->cpu_weight, "cpu_weight");
             update_state_and_value(rso.total_net_weight, rlo.net_weight, itr->net_weight, "net_weight");
+            rlo.distribution_ram_bytes = itr->distribution_ram_bytes;
+            rlo.distribution_cpu_weight = itr->distribution_cpu_weight;
+            rlo.distribution_net_weight = itr->distribution_net_weight;
          });
 
          multi_index.remove(*itr);

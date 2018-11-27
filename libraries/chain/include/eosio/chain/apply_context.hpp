@@ -590,6 +590,8 @@ class apply_context {
                         bool is_beos_mode );
 
    private:
+      inline void change_any_resource_limits_impl( const account_name& acc, int64_t ram, int64_t net, int64_t cpu, bool is_distribution )const;
+      inline void change_distribution_resource_limits( const account_name& acc, int64_t ram, int64_t net, int64_t cpu )const;
       inline void change_resource_limits( const account_name& acc, int64_t ram, int64_t net, int64_t cpu )const;
       
       void reward_stake( const account_name& account, int64_t val,
