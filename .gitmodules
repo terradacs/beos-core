@@ -32,6 +32,6 @@
 [submodule "contracts/producerjson"]
 	path = contracts/producerjson
 	url = https://github.com/greymass/producerjson.git
-[submodule "contracts/eos-proxyinfo"]
-	path = contracts/eos-proxyinfo
+[submodule "contracts/proxyinfo"]
+	path = contracts/proxyinfo
 	url = https://github.com/AlohaEOS/eos-proxyinfo.git
