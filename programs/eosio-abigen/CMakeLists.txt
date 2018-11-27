@@ -26,3 +26,8 @@ install( TARGETS
    LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
    ARCHIVE DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
 )
+
+add_custom_command(TARGET eosio-abigen
+    POST_BUILD
+    COMMAND ${CMAKE_BINARY_DIR}/tools/eosiocpp -g ${CMAKE_BINARY_DIR}/contracts/proxyinfo/proxyinfo.abi ${CMAKE_SOURCE_DIR}/contracts/proxyinfo/proxyinfo.cpp
+)

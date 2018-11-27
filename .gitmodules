@@ -17,7 +17,6 @@
 [submodule "externals/binaryen"]
 	path = externals/binaryen
 	url = https://github.com/EOSIO/binaryen
-
 [submodule "libraries/softfloat"]
 	path = libraries/softfloat
 	url = https://github.com/eosio/berkeley-softfloat-3
@@ -30,3 +29,9 @@
 [submodule "libraries/wabt"]
 	path = libraries/wabt
 	url = http://github.com/EOSIO/wabt
+[submodule "contracts/producerjson"]
+	path = contracts/producerjson
+	url = https://github.com/greymass/producerjson.git
+[submodule "contracts/proxyinfo"]
+	path = contracts/proxyinfo
+	url = https://github.com/AlohaEOS/eos-proxyinfo.git

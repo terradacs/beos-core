@@ -38,6 +38,10 @@ add_subdirectory(integration_test)
 add_subdirectory(eosio.init)
 add_subdirectory(eosio.gateway)
 add_subdirectory(eosio.distribution)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists-proxyinfo.txt ${CMAKE_CURRENT_SOURCE_DIR}/proxyinfo/CMakeLists.txt COPYONLY)
+add_subdirectory(proxyinfo)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists-producerjson.txt ${CMAKE_CURRENT_SOURCE_DIR}/producerjson/CMakeLists.txt COPYONLY)
+add_subdirectory(producerjson)
 
 
 file(GLOB SKELETONS RELATIVE ${CMAKE_SOURCE_DIR}/contracts "skeleton/*")
