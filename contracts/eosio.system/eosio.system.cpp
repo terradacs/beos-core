@@ -15,11 +15,15 @@ namespace eosiosystem {
     _rammarket(_self,_self)
    {
       //print( "construct system\n" );
-      _gstate = _global.exists() ? _global.get() : get_default_parameters();
+      if (_global.exists() == false)
+         _gstate = get_default_parameters();
+      else
+      {
+         _gstate = _global.get();
+         _min_activated_stake = get_min_activated_stake();
+      }
 
       flush_voting_stats();
-
-      _min_activated_stake = get_min_activated_stake();
 
       auto itr = _rammarket.find(S(4,RAMCORE));
 
@@ -39,6 +43,22 @@ namespace eosiosystem {
          //print( "ram market already created" );
       }
    }
+
+   void system_contract::initialissue( uint64_t quantity, uint8_t min_activated_stake_percent )
+     {
+     require_auth( _self );
+
+     asset balance = eosio::token(N(eosio.token)).check_balance( _self, system_token_symbol );
+     eosio_assert( balance.amount == 0, "second call is prohibited" );
+     eosio_assert( quantity != 0, "quantity is non-positive value" );
+     eosio_assert( 0 <= min_activated_stake_percent && min_activated_stake_percent <= 100, "min_activated_stake_percent must be in range [0:100]" );
+     asset value( quantity, system_token_symbol );
+     std::string memo("initialissue");
+     INLINE_ACTION_SENDER(eosio::token, issue)( N(eosio.token), { _self, N(active) }, { _self, value, memo } );
+     // min_activated_stake_percent % of quantity
+     _min_activated_stake = static_cast<int64_t>( static_cast<int128_t>(quantity) * min_activated_stake_percent / 100 );
+     set_min_activated_stake( _min_activated_stake );
+     }
 
    eosio_global_state system_contract::get_default_parameters() {
       eosio_global_state dp;
@@ -213,7 +233,7 @@ EOSIO_ABI( eosiosystem::system_contract,
      // native.hpp (newaccount definition is actually in eosio.system.cpp)
      (initresource)(reward)(newaccount)(updateauth)(deleteauth)(linkauth)(unlinkauth)(canceldelay)(onerror)
      // eosio.system.cpp
-     (setram)(setparams)(setpriv)(rmvproducer)(bidname)
+     (initialissue)(setram)(setparams)(setpriv)(rmvproducer)(bidname)
      // delegate_bandwidth.cpp
      (buyrambytes)(buyram)(sellram)(delegatebw)(undelegatebw)(refund)
      // voting.cpp

@@ -133,6 +133,8 @@ extern "C" {
    void store_voting_stats(int64_t total_activated_stake, uint64_t thresh_activated_stake_time,
       double total_producer_vote_weight);
 
+   void set_min_activated_stake(int64_t);
+
    int64_t get_min_activated_stake();
 
    /** @brief Registers given account as a proxy (if is_proxy is true)

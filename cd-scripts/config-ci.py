@@ -202,7 +202,8 @@ DISTRIB_INIT_CPU = "1758000.0000" # as above
 
 # sum of BEOS needed to cover gateway and distrib initial resources; note that the more we issue the more expensive ram will be, which means
 # we must issue even more; we are trying to buy half of all available ram after all
-CORE_INITIAL_SUPPLY = "8000000.0000"
+CORE_INITIAL_SUPPLY = 3674470000 * (10 ** CORE_SYMBOL_PRECISION)
+MIN_ACTIVATED_STAKE_PERCENT = 15
 
 ### init loggers
 global log_main
