@@ -1,5 +1,5 @@
 #!/bin/bash
-cd ~/ci/build/$CI_COMMIT_REF_NAME
+cd ~/ci/beos-core/$CI_COMMIT_REF_NAME/build
 echo "Starting keosd and nodeos"
 if ! python3 ./run.py
 then

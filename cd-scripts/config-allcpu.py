@@ -5,9 +5,9 @@ from logging import INFO, DEBUG, ERROR, WARNING, CRITICAL
 LOG_LEVEL = INFO
 
 # directory where all sources will be downloaded
-SOURCES_DOWNLOAD_DIR = os.environ["HOME"] + "/ci/sources"
+SOURCES_DOWNLOAD_DIR = os.environ["HOME"] + "/ci/beos-core" + os.environ["CI_COMMIT_REF_NAME"] + "/sources"
 # beos main directory
-BEOS_DIR = os.environ["CI_PROJECT_DIR"]
+BEOS_DIR = os.environ["HOME"] + "/ci/beos-core/" + os.environ["CI_COMMIT_REF_NAME"]
 # path to beos sources repository
 #BEOS_REPOSITORY_PATH = "git@gitlab.syncad.com:blocktrades/beos-core.git"
 BEOS_REPOSITORY_PATH = "https://gitlab.syncad.com/blocktrades/beos-core.git" 
@@ -15,7 +15,7 @@ BEOS_REPOSITORY_PATH = "https://gitlab.syncad.com/blocktrades/beos-core.git"
 BEOS_REPOSITORY_BRANCH = 'beos-initial-release'
 #
 # eosio build directory - here will land final build
-BEOS_BUILD_DIR = os.environ["HOME"] + "/ci/build/" + os.environ["CI_COMMIT_REF_NAME"]
+BEOS_BUILD_DIR = os.environ["HOME"] + "/ci/beos-core/" + os.environ["CI_COMMIT_REF_NAME"] + "/build"
 
 MAIN_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
 ERROR_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
