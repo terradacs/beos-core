@@ -3,7 +3,6 @@ rm -rf ~/ci/build/$CI_COMMIT_REF_NAME
 which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
 eval $(ssh-agent -s)
 ssh-add <(echo "$SSH_PRIVATE_KEY")
-git submodule update --init --recursive
 cd cd-scripts
 cp config-$CI_BEOS_CONFIG_NAME.py config.py
 if ! ./deploy.py --build-beos
