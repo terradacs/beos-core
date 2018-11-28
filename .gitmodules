@@ -31,7 +31,7 @@
 	url = http://github.com/EOSIO/wabt
 [submodule "contracts/producerjson"]
 	path = contracts/producerjson
-	url = https://github.com/greymass/producerjson.git
+	url = ../../blocktrades/producerjson.git
 [submodule "contracts/proxyinfo"]
 	path = contracts/proxyinfo
-	url = https://github.com/AlohaEOS/eos-proxyinfo.git
+	url = ../../blocktrades/eos-proxyinfo.git

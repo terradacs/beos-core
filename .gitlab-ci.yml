@@ -4,14 +4,13 @@ stages:
   - staging-deploy
 #  - plugin-test
 
-before_script:
-  - pwd
-
 staging-build:
   stage: staging-build
   variables:
     LC_ALL: "C"
     CI_BEOS_CONFIG_NAME: "ci"
+    GIT_SUBMODULE_STRATEGY: recursive
+    
   script:
     - chmod +x ./gitlab-ci/build.sh
     - ./gitlab-ci/build.sh
@@ -35,6 +34,8 @@ development-build:
   variables:
     LC_ALL: "C"
     CI_BEOS_CONFIG_NAME: "ci"
+    GIT_SUBMODULE_STRATEGY: recursive
+    
   script:
     - chmod +x ./gitlab-ci/build.sh
     - ./gitlab-ci/build.sh
@@ -59,6 +60,8 @@ staging-deploy:
   variables:
     LC_ALL: "C"
     CI_BEOS_CONFIG_NAME: "allcpu"
+    GIT_SUBMODULE_STRATEGY: recursive
+    
   script:
     - chmod +x ./gitlab-ci/build.sh
     - ./gitlab-ci/build.sh
