@@ -63,6 +63,7 @@ namespace eosio { namespace chain { namespace resource_limits {
          /// set_account_limits returns true if new ram_bytes limit is more restrictive than the previously set one
          bool set_distribution_account_limits( const account_name& account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight);
          bool set_account_limits( const account_name& account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight);
+         void enable_unstake_mode_distribution_resource_rewards( account_name account );
          void get_distribution_resource_rewards( const account_name& account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight) const;
          void get_account_limits( const account_name& account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight) const;
 

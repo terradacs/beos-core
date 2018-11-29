@@ -310,6 +310,7 @@ bool resource_limits_manager::set_any_account_limits_impl( const account_name& a
             pending_limits.distribution_cpu_weight = limits.distribution_cpu_weight;
 
             pending_limits.pending = true;
+            pending_limits.unstaked_mode = limits.unstaked_mode;
          });
       } else {
          return *pending_limits;
@@ -355,9 +356,18 @@ void resource_limits_manager::get_any_account_data( const account_name& account,
    if (pending_buo) {
       if( is_distribution )
       {
-        ram_bytes  = pending_buo->distribution_ram_bytes;
-        net_weight = pending_buo->distribution_net_weight;
-        cpu_weight = pending_buo->distribution_cpu_weight;
+        if( pending_buo->unstaked_mode )
+        {
+          ram_bytes  = 0;
+          net_weight = 0;
+          cpu_weight = 0;
+        }
+        else
+        {
+          ram_bytes  = pending_buo->distribution_ram_bytes;
+          net_weight = pending_buo->distribution_net_weight;
+          cpu_weight = pending_buo->distribution_cpu_weight;
+        }
       }
       else
       {
@@ -369,9 +379,18 @@ void resource_limits_manager::get_any_account_data( const account_name& account,
       const auto& buo = _db.get<resource_limits_object,by_owner>( boost::make_tuple( false, account ) );
       if( is_distribution )
       {
-        ram_bytes  = buo.distribution_ram_bytes;
-        net_weight = buo.distribution_net_weight;
-        cpu_weight = buo.distribution_cpu_weight;
+        if( buo.unstaked_mode )
+        {
+          ram_bytes  = 0;
+          net_weight = 0;
+          cpu_weight = 0;
+        }
+        else
+        {
+          ram_bytes  = buo.distribution_ram_bytes;
+          net_weight = buo.distribution_net_weight;
+          cpu_weight = buo.distribution_cpu_weight;
+        }
       }
       else
       {
@@ -379,6 +398,27 @@ void resource_limits_manager::get_any_account_data( const account_name& account,
         net_weight = buo.net_weight;
         cpu_weight = buo.cpu_weight;
       }
+   }
+}
+
+void resource_limits_manager::enable_unstake_mode_distribution_resource_rewards( account_name account )
+{
+   const auto* pending_buo = _db.find<resource_limits_object,by_owner>( boost::make_tuple(true, account) );
+   if (pending_buo) {
+
+     if( !pending_buo->unstaked_mode )
+      _db.modify( *pending_buo, [&]( resource_limits_object& rlo ){
+        rlo.unstaked_mode = true;
+      });
+
+   } else {
+      const auto& buo = _db.get<resource_limits_object,by_owner>( boost::make_tuple( false, account ) );
+
+      if( !buo.unstaked_mode )
+        _db.modify( buo, [&]( resource_limits_object& rlo ){
+          rlo.unstaked_mode = true;
+        });
+
    }
 }
 
@@ -426,6 +466,7 @@ void resource_limits_manager::process_account_limit_updates() {
             rlo.distribution_ram_bytes = itr->distribution_ram_bytes;
             rlo.distribution_cpu_weight = itr->distribution_cpu_weight;
             rlo.distribution_net_weight = itr->distribution_net_weight;
+            rlo.unstaked_mode = itr->unstaked_mode;
          });
 
          multi_index.remove(*itr);

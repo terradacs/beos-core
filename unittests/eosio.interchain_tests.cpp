@@ -375,10 +375,10 @@ class eosio_init_tester: public eosio_interchain_tester
       );
   }
 
-  action_result stake( const account_name& sender, const account_name& receiver, const asset& net, const asset& cpu, bool transfer )
+  action_result stake( const account_name& from, const account_name& receiver, const asset& net, const asset& cpu, bool transfer )
   {
-    return push_action( sender, N(delegatebw), mvo()
-        ("from",     sender)
+    return push_action( from, N(delegatebw), mvo()
+        ("from",     from)
         ("receiver", receiver)
         ("stake_net_quantity", net)
         ("stake_cpu_quantity", cpu)
@@ -911,6 +911,9 @@ BOOST_FIXTURE_TEST_CASE( undelegate_block_test, eosio_init_tester ) try {
 
 BOOST_FIXTURE_TEST_CASE( delegate_block_test, eosio_init_tester ) try {
 
+  asset _5 = asset::from_string("5.0000 BEOS");
+  asset _10 = asset::from_string("10.0000 BEOS");
+
   test_global_state tgs;
   tgs.beos.amount_of_reward = asset::from_string("51000000.0000 BEOS").get_amount();
 
@@ -919,10 +922,7 @@ BOOST_FIXTURE_TEST_CASE( delegate_block_test, eosio_init_tester ) try {
   produce_blocks( 235 - control->head_block_num() );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 235u );
 
-  asset test_asset_half = asset::from_string("5.0000 BEOS");
-  asset test_asset = asset::from_string("10.0000 BEOS");
-
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg("no balance object found"), stake( N(alice), N(bob), test_asset, test_asset, true/*transfer*/ ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("no balance object found"), stake( N(alice), N(bob), _10, _10, true/*transfer*/ ) );
 
   BOOST_REQUIRE_EQUAL( success(), issue( N(alice), asset::from_string("000.0010 PROXY") ) );
   BOOST_REQUIRE_EQUAL( success(), issue( N(bob), asset::from_string("000.0001 PROXY") ) );
@@ -930,36 +930,45 @@ BOOST_FIXTURE_TEST_CASE( delegate_block_test, eosio_init_tester ) try {
   produce_blocks( 242 - control->head_block_num() );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 242u );
 
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg("no balance object found"), stake( N(alice), N(bob), test_asset, test_asset, true/*transfer*/ ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("no balance object found"), stake( N(alice), N(bob), _10, _10, true/*transfer*/ ) );
 
   produce_blocks( 248 - control->head_block_num() );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 248u );
 
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg("no balance object found"), stake( N(alice), N(bob), test_asset, test_asset, true/*transfer*/ ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("no balance object found"), stake( N(alice), N(bob), _10, _10, true/*transfer*/ ) );
 
   produce_blocks( 270 - control->head_block_num() );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 270u );
   CHECK_STATS(alice, "0.0010 PROXY", "185454545.4544 BEOS", "13636365");
   CHECK_STATS(bob, "0.0001 PROXY", "18545454.5456 BEOS", "1363635");
 
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg("no balance object found"), stake( N(alice), N(bob), test_asset, test_asset, true/*transfer*/ ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("no balance object found"), stake( N(alice), N(bob), _10, _10, true/*transfer*/ ) );
 
   BOOST_REQUIRE_EQUAL( success(), create_producer( N(bob) ) );
   BOOST_REQUIRE_EQUAL( success(), vote_producer( N(alice), { N(bob) } ) );
 
-  BOOST_REQUIRE_EQUAL( success(), unstake( N(alice), N(alice), test_asset_half, test_asset_half ) );
+  BOOST_REQUIRE_EQUAL( success(), unstake( N(alice), N(alice), _5, _5 ) );
 
   produce_block( fc::hours(3*24) );
   produce_blocks(1);
 
   asset balance = get_balance( N(alice) );
-  BOOST_REQUIRE_EQUAL( test_asset, balance );  
+  BOOST_REQUIRE_EQUAL( _10, balance );  
 
-  BOOST_REQUIRE_EQUAL( success(), stake( N(alice), N(bob), test_asset_half, test_asset_half, true/*transfer*/ ) );
+  BOOST_REQUIRE_EQUAL( success(), stake( N(alice), N(bob), _5, _5, true/*transfer*/ ) );
 
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( delegate_block_test2, eosio_init_tester ) try {
+
+  asset _0 = asset::from_string("0.0000 BEOS");
+  asset _5 = asset::from_string("5.0000 BEOS");
+  asset _10 = asset::from_string("10.0000 BEOS");
+
+  std::string message_15_percent = "cannot undelegate bandwidth until the chain is activated (at least 15% of all tokens participate in voting)";
+  std::string message_not_enough_net = "insufficient staked net bandwidth";
+  std::string message_no_balance = "no balance object found";
+  std::string message_overdrawn_balance = "overdrawn balance";
 
   test_global_state tgs;
 
@@ -991,56 +1000,113 @@ BOOST_FIXTURE_TEST_CASE( delegate_block_test2, eosio_init_tester ) try {
   CHECK_STATS(carol, "1.0000 PROXY", "50000000.0000 BEOS", "5555000");
   CHECK_STATS(dan, "1.0000 PROXY", "50000000.0000 BEOS", "5555000");
 
-  asset test_asset_zero = asset::from_string("0.0000 BEOS");
-  asset test_asset_half = asset::from_string("5.0000 BEOS");
-  asset test_asset = asset::from_string("10.0000 BEOS");
-
-  std::string message_15_percent = "cannot undelegate bandwidth until the chain is activated (at least 15% of all tokens participate in voting)";
-  std::string message_not_enough_net = "insufficient staked net bandwidth";
-  std::string message_no_balance = "no balance object found";
-  std::string message_overdrawn_balance = "overdrawn balance";
-
   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "producer is not registered" ), vote_producer( N(alice), { N(bob) } ) );
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_15_percent ), unstake( N(alice), N(alice), test_asset_half, test_asset_half ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_15_percent ), unstake( N(alice), N(alice), _5, _5 ) );
 
   BOOST_REQUIRE_EQUAL( success(), create_producer( N(bob) ) );
 
   BOOST_REQUIRE_EQUAL( success(), vote_producer( N(alice), { N(bob) } ) );
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_15_percent ), unstake( N(alice), N(alice), test_asset_half, test_asset_half ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_15_percent ), unstake( N(alice), N(alice), _5, _5 ) );
 
   BOOST_REQUIRE_EQUAL( success(), vote_producer( N(carol), { N(bob) } ) );
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_15_percent ), unstake( N(alice), N(alice), test_asset_half, test_asset_half ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_15_percent ), unstake( N(alice), N(alice), _5, _5 ) );
 
   BOOST_REQUIRE_EQUAL( success(), vote_producer( N(dan), { N(bob) } ) );
-  BOOST_REQUIRE_EQUAL( success(), unstake( N(alice), N(alice), test_asset_half, test_asset_half ) );
+  BOOST_REQUIRE_EQUAL( success(), unstake( N(alice), N(alice), _5, _5 ) );
 
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_not_enough_net ), unstake( N(alice), N(alice), asset::from_string("50000000.0000 BEOS"), test_asset_zero ) );
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_not_enough_net ), unstake( N(bob), N(alice), asset::from_string("5.0000 BEOS"), test_asset_zero ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_not_enough_net ), unstake( N(alice), N(alice), asset::from_string("50000000.0000 BEOS"), _0 ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_not_enough_net ), unstake( N(bob), N(alice), asset::from_string("5.0000 BEOS"), _0 ) );
 
-  BOOST_REQUIRE_EQUAL( success(), unstake( N(bob), N(bob), test_asset_half, test_asset_half ) );
-  BOOST_REQUIRE_EQUAL( success(), unstake( N(carol), N(carol), test_asset_half, test_asset_half ) );
+  BOOST_REQUIRE_EQUAL( success(), unstake( N(bob), N(bob), _5, _5 ) );
+  BOOST_REQUIRE_EQUAL( success(), unstake( N(carol), N(carol), _5, _5 ) );
 
   produce_block( fc::hours(3*24) );
   produce_blocks(1);
 
   asset balance = get_balance( N(alice) );
-  BOOST_REQUIRE_EQUAL( test_asset, balance );  
+  BOOST_REQUIRE_EQUAL( _10, balance );  
 
   balance = get_balance( N(bob) );
-  BOOST_REQUIRE_EQUAL( test_asset, balance );  
+  BOOST_REQUIRE_EQUAL( _10, balance );  
 
   balance = get_balance( N(carol) );
-  BOOST_REQUIRE_EQUAL( test_asset, balance );  
+  BOOST_REQUIRE_EQUAL( _10, balance );  
 
   balance = get_balance( N(dan) );
-  BOOST_REQUIRE_EQUAL( test_asset_zero, balance );  
+  BOOST_REQUIRE_EQUAL( _0, balance );  
 
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_no_balance ), stake( N(dan), N(bob), asset::from_string("11.0000 BEOS"), test_asset_zero, false/*transfer*/ ) );
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_no_balance ), stake( N(dan), N(bob), asset::from_string("11.0000 BEOS"), test_asset_zero, true/*transfer*/ ) );
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_overdrawn_balance ), stake( N(alice), N(bob), asset::from_string("11.0000 BEOS"), test_asset_zero, false/*transfer*/ ) );
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_overdrawn_balance ), stake( N(alice), N(bob), asset::from_string("11.0000 BEOS"), test_asset_zero, true/*transfer*/ ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_no_balance ), stake( N(dan), N(bob), asset::from_string("11.0000 BEOS"), _0, false/*transfer*/ ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_no_balance ), stake( N(dan), N(bob), asset::from_string("11.0000 BEOS"), _0, true/*transfer*/ ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_overdrawn_balance ), stake( N(alice), N(bob), asset::from_string("11.0000 BEOS"), _0, false/*transfer*/ ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_overdrawn_balance ), stake( N(alice), N(bob), asset::from_string("11.0000 BEOS"), _0, true/*transfer*/ ) );
 
-  BOOST_REQUIRE_EQUAL( success(), stake( N(alice), N(carol), asset::from_string("1.0000 BEOS"), test_asset_zero, false/*transfer*/ ) );
+  BOOST_REQUIRE_EQUAL( success(), stake( N(alice), N(carol), asset::from_string("1.0000 BEOS"), _0, false/*transfer*/ ) );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( delegate_block_test3, eosio_init_tester ) try {
+
+  asset _0 = asset::from_string("0.0000 BEOS");
+  asset _5 = asset::from_string("5.0000 BEOS");
+  asset _10 = asset::from_string("10.0000 BEOS");
+  asset _20 = asset::from_string("20.0000 BEOS");
+
+  asset _reward_quarter = asset::from_string("37500000.0000 BEOS");
+  asset _reward_half = asset::from_string("75000000.0000 BEOS");
+  asset _reward = asset::from_string("150000000.0000 BEOS");
+
+  test_global_state tgs;
+
+  tgs.starting_block_for_initial_witness_election = 1;
+
+  tgs.ram.starting_block_for_distribution = 200;
+  tgs.ram.distribution_payment_block_interval_for_distribution = 10;
+  tgs.ram.ending_block_for_distribution = 205;
+  tgs.ram.amount_of_reward = 500'0000;
+
+  tgs.beos.starting_block_for_distribution = 200;
+  tgs.beos.distribution_payment_block_interval_for_distribution = 10;
+  tgs.beos.ending_block_for_distribution = 206;
+  tgs.beos.amount_of_reward = _reward.get_amount();
+
+  BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
+
+  BOOST_REQUIRE_EQUAL( success(), issue( N(alice), asset::from_string("1.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( success(), issue( N(bob), asset::from_string("1.0000 PROXY") ) );
+
+  produce_blocks( 206 - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 206u );
+
+  CHECK_STATS(alice, "1.0000 PROXY", _reward_half.to_string().c_str(), "");
+  CHECK_STATS(bob, "1.0000 PROXY", _reward_half.to_string().c_str(), "");
+
+  BOOST_REQUIRE_EQUAL( success(), create_producer( N(bob) ) );
+  BOOST_REQUIRE_EQUAL( success(), create_producer( N(alice) ) );
+  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(alice), { N(bob) } ) );
+  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(bob), { N(alice) } ) );
+  BOOST_REQUIRE_EQUAL( success(), unstake( N(bob), N(bob), _10, _10 ) );
+
+  produce_block( fc::hours(3*24) );
+  produce_blocks(1);
+
+  BOOST_REQUIRE_EQUAL( _20, get_balance( N(bob) ) );  
+
+  BOOST_REQUIRE_EQUAL( success(), stake( N(bob), N(alice), _10, _10, false/*transfer*/ ) );
+  BOOST_REQUIRE_EQUAL( _0, get_balance( N(bob) ) );  
+
+  BOOST_REQUIRE_EQUAL( success(), unstake( N(alice), N(alice), _reward_quarter, _reward_quarter ) );
+
+  produce_block( fc::hours(3*24) );
+  produce_blocks(1);
+
+  BOOST_REQUIRE_EQUAL( _reward_half, get_balance( N(alice) ) );  
+
+  /*
+    There is impossible, that 'alice' has any staked BEOSes.
+    Checking records in `user_reward_info_table` rejects retrieving rewards many times.
+  */
+  std::string message_not_enough_net = "insufficient staked net bandwidth";
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_not_enough_net ), unstake( N(alice), N(alice), _5, _0 ) );
 
 } FC_LOG_AND_RETHROW()
 

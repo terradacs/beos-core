@@ -21,6 +21,11 @@ extern "C" {
     */
 
   /**
+    * @brief Setting rewards ( gathered during a distribution period ) in unstaked-mode
+    */
+   void enable_unstake_mode_distribution_resource_rewards( account_name account );
+
+  /**
     * @brief Get the resource rewards of an account gathered during a distribution period
     * Get the resource rewards of an account
     * @param account - name of the account whose resource limit to get
