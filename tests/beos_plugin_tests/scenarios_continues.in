@@ -3721,7 +3721,7 @@
                             "balance": "",
                             "net_weight": "200.0000 BEOS",
                             "cpu_weight": "200.0000 BEOS",
-                            "ram_bytes" : 1005498
+                            "ram_bytes" : 1005499
                         }
                     }, {
                         "user":"${user_45}",
@@ -3869,7 +3869,7 @@
 							"balance": "",
 							"net_weight": "100.0000 BEOS",
 							"cpu_weight": "100.0000 BEOS",
-							"ram_bytes" : 2005448
+							"ram_bytes" : 2005447
 						}
 					}
 				]
