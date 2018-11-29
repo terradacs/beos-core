@@ -190,6 +190,26 @@ struct actions: public tester
       );
   }
 
+  fc::variant get_stats( const string& symbolname ) {
+    auto symb = eosio::chain::symbol::from_string(symbolname);
+    auto symbol_code = symb.to_symbol_code().value;
+    vector<char> data = get_row_by_account( N(eosio.token), symbol_code, N(stat), symbol_code );
+    return data.empty() ? fc::variant() : token_abi_ser.binary_to_variant( "currency_stats", data, abi_serializer_max_time );
+  }
+
+  asset get_token_supply() {
+    return get_stats("4," CORE_SYMBOL_NAME)["supply"].as<asset>();
+  }
+
+  action_result claimrewards( account_name owner )
+  {
+    return push_action( owner, N(claimrewards), mvo()
+        ( "owner", owner ),
+        system_abi_ser,
+        config::system_account_name
+      );
+  }
+
 };
 
 class eosio_interchain_tester : public actions
@@ -1041,6 +1061,98 @@ BOOST_FIXTURE_TEST_CASE( delegate_block_test2, eosio_init_tester ) try {
   BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_overdrawn_balance ), stake( N(alice), N(bob), asset::from_string("11.0000 BEOS"), test_asset_zero, true/*transfer*/ ) );
 
   BOOST_REQUIRE_EQUAL( success(), stake( N(alice), N(carol), asset::from_string("1.0000 BEOS"), test_asset_zero, false/*transfer*/ ) );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( claimrewards_test, eosio_init_tester ) try {
+
+  asset _0 = asset::from_string("0.0000 BEOS");
+
+  std::string message_no_found_key = "unable to find key";
+  std::string message_15_percent = "cannot claim rewards until the chain is activated (at least 15% of all tokens participate in voting)";
+  std::string message_once_per_day = "already claimed rewards within past day";
+
+  test_global_state tgs;
+
+  tgs.starting_block_for_initial_witness_election = 1;
+
+  tgs.ram.starting_block_for_distribution = 200;
+  tgs.ram.distribution_payment_block_interval_for_distribution = 10;
+  tgs.ram.ending_block_for_distribution = 205;
+  tgs.ram.amount_of_reward = 2222'0000;
+
+  tgs.beos.starting_block_for_distribution = 200;
+  tgs.beos.distribution_payment_block_interval_for_distribution = 2;
+  tgs.beos.ending_block_for_distribution = 206;
+  tgs.beos.amount_of_reward = asset::from_string("50000000.0000 BEOS").get_amount();
+
+  BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
+
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_no_found_key ), claimrewards( N(alice) ) );
+
+  BOOST_REQUIRE_EQUAL( success(), issue( N(alice), asset::from_string("1.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( success(), issue( N(bob), asset::from_string("1.0000 PROXY") ) );
+
+  produce_blocks( 200 - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 200u );
+
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_no_found_key ), claimrewards( N(alice) ) );
+  BOOST_REQUIRE_EQUAL( success(), create_producer( N(alice) ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_15_percent ), claimrewards( N(alice) ) );
+
+  produce_blocks( 210 - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 210u );
+
+  produce_blocks(200);
+  BOOST_REQUIRE_EQUAL( success(), create_producer( N(bob) ) );
+  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(alice), { N(bob) } ) );
+  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(bob), { N(alice) } ) );
+  produce_blocks(200);
+
+  CHECK_STATS( alice, "1.0000 PROXY", "100000000.0000 BEOS", "11110000");
+  CHECK_STATS( bob, "1.0000 PROXY", "100000000.0000 BEOS", "11110000");
+
+  BOOST_REQUIRE_EQUAL( _0, get_balance( N(eosio.saving) ) );
+  BOOST_REQUIRE_EQUAL( _0, get_balance( N(eosio.bpay) ) );
+  BOOST_REQUIRE_EQUAL( _0, get_balance( N(eosio.vpay) ) );
+
+  asset supply01 = get_token_supply();
+
+  BOOST_REQUIRE_EQUAL( success(), claimrewards( N(alice) ) );
+  produce_blocks(1);
+  BOOST_REQUIRE_EQUAL( asset::from_string("124.1097 BEOS"), get_balance( N(eosio.saving) ) );
+  BOOST_REQUIRE_EQUAL( asset::from_string("3.8194 BEOS"), get_balance( N(eosio.bpay) ) );
+  BOOST_REQUIRE_EQUAL( asset::from_string("23.2706 BEOS"), get_balance( N(eosio.vpay) ) );
+  CHECK_STATS( alice, "1.0000 PROXY", "100000003.9374 BEOS", "11110000");
+
+  asset supply02 = get_token_supply();
+  asset sum = supply01 + get_balance( N(eosio.saving) ) + get_balance( N(eosio.bpay) ) + get_balance( N(eosio.vpay) );
+  sum+= asset::from_string("3.9374 BEOS");
+  BOOST_REQUIRE_EQUAL( supply02, sum );
+
+  BOOST_REQUIRE_EQUAL( success(), claimrewards( N(bob) ) );
+  produce_blocks(1);
+  BOOST_REQUIRE_EQUAL( asset::from_string("125.3508 BEOS"), get_balance( N(eosio.saving) ) );
+  BOOST_REQUIRE_EQUAL( asset::from_string("0.0000 BEOS"), get_balance( N(eosio.bpay) ) );
+  BOOST_REQUIRE_EQUAL( asset::from_string("23.5033 BEOS"), get_balance( N(eosio.vpay) ) );
+  CHECK_STATS( bob, "1.0000 PROXY", "100000003.8969 BEOS", "11110000");
+
+  asset supply03 = get_token_supply();
+  sum = supply01 + get_balance( N(eosio.saving) ) + get_balance( N(eosio.bpay) ) + get_balance( N(eosio.vpay) );
+  sum+= asset::from_string("3.9374 BEOS");
+  sum+= asset::from_string("3.8969 BEOS");
+  BOOST_REQUIRE_EQUAL( supply03, sum );
+
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg( message_once_per_day ), claimrewards( N(alice) ) );
+
+  produce_block( fc::hours(24) );
+  produce_blocks(1);
+
+  BOOST_REQUIRE_EQUAL( success(), claimrewards( N(bob) ) );
+  CHECK_STATS( bob, "1.0000 PROXY", "100016770.7497 BEOS", "11110000");
+
+  BOOST_REQUIRE_EQUAL( success(), claimrewards( N(alice) ) );
+  CHECK_STATS( alice, "1.0000 PROXY", "100005036.8236 BEOS", "11110000");
 
 } FC_LOG_AND_RETHROW()
 
