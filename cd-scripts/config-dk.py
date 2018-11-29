@@ -5,9 +5,9 @@ from logging import INFO, DEBUG, ERROR, WARNING, CRITICAL
 LOG_LEVEL = INFO
 
 # directory where all sources will be downloaded
-SOURCES_DOWNLOAD_DIR = os.environ["HOME"] + "/ci/sources"
+SOURCES_DOWNLOAD_DIR = os.environ["HOME"] + "/Sources"
 # beos main directory
-BEOS_DIR = os.environ["CI_PROJECT_DIR"]
+BEOS_DIR = SOURCES_DOWNLOAD_DIR + "/beos-core"
 # path to beos sources repository
 #BEOS_REPOSITORY_PATH = "git@gitlab.syncad.com:blocktrades/beos-core.git"
 BEOS_REPOSITORY_PATH = "https://gitlab.syncad.com/blocktrades/beos-core.git" 
@@ -15,7 +15,7 @@ BEOS_REPOSITORY_PATH = "https://gitlab.syncad.com/blocktrades/beos-core.git"
 BEOS_REPOSITORY_BRANCH = 'beos-initial-release'
 #
 # eosio build directory - here will land final build
-BEOS_BUILD_DIR = os.environ["HOME"] + "/ci/build/" + os.environ["CI_COMMIT_REF_NAME"]
+BEOS_BUILD_DIR = os.environ["HOME"] + "/Builds/build/"
 
 MAIN_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
 ERROR_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
@@ -118,7 +118,7 @@ REGPROXYINFO_ACTIVE_PRIVATE_KEY = "5KeanX7RooeHb8goe1ghirt74R1GGqYZtsyKfqszEUGrD
 # path to keosd executable
 KEOSD_EXECUTABLE = BEOS_BUILD_DIR + "/programs/keosd/keosd"
 # keosd ip address
-KEOSD_IP_ADDRESS = "192.168.6.242"
+KEOSD_IP_ADDRESS = "127.0.0.1"
 # keosd port
 KEOSD_PORT = 8900
 # keosd certificate chain file - mandatory for https
@@ -131,7 +131,7 @@ CLEOS_EXECUTABLE = BEOS_BUILD_DIR + "/programs/cleos/cleos"
 # path to nodeos executable
 NODEOS_EXECUTABLE = BEOS_BUILD_DIR + "/programs/nodeos/nodeos"
 # nodeos ip address
-NODEOS_IP_ADDRESS = "192.168.6.242"
+NODEOS_IP_ADDRESS = "127.0.0.1"
 # nodeos port
 NODEOS_PORT = 8888
 # nodeos certificate chain file - mandatory for https
@@ -139,7 +139,7 @@ NODEOS_CERTIFICATE_CHAIN_FILE = None
 # nodeos private key file path - mandatory for https
 NODEOS_PRIVATE_KEY_FILE = None
 # direcotry with nodes data
-NODEOS_WORKING_DIR = os.environ["HOME"] + "/tmp/"
+NODEOS_WORKING_DIR = os.environ["HOME"] + "/beos-data/"
 # directory in which wallet files are held
 DEFAULT_WALLET_DIR = os.environ["HOME"] + "/eosio-wallet"
 # name of the master wallet
@@ -161,8 +161,7 @@ SYSTEM_ACCOUNT_KEYS = [
     TRUSTEE_ACTIVE_PRIVATE_KEY,
     PRODUCERJSON_OWNER_PRIVATE_KEY,
     PRODUCERJSON_ACTIVE_PRIVATE_KEY,
-    REGPROXYINFO_OWNER_PRIVATE_KEY,
-    REGPROXYINFO_ACTIVE_PRIVATE_KEY
+    REGPROXYINFO_OWNER_PRIVATE_KEY
 ]
 # source file for beos config
 BEOS_CONFIG_FILE_SRC = BEOS_BUILD_DIR + "/resources/config.ini"
@@ -206,7 +205,6 @@ AMOUNT_OF_REWARD_BEOS = 800 * CORE_SYMBOL_PRECISION # 800 * asset().symbol.preci
 STARTING_BLOCK_FOR_RAM_DISTRIBUTION = 7 * 24 * 3600 * 2 # days(7).to_seconds() * 2
 ENDING_BLOCK_FOR_RAM_DISTRIBUTION = 280 * 24 * 3600 * 2 # days(280).to_seconds() * 2
 DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION = 1 * 3600 * 2 # hours(1).to_seconds() * 2
-
 AMOUNT_OF_REWARD_RAM = 5000000 # 5000000 is a number not asset
 STARTING_BLOCK_FOR_TRUSTEE_DISTRIBUTION = 7 * 24 * 3600 * 2 # days(7).to_seconds() * 2 [UNUSED]
 ENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION = 98 * 24 * 3600 * 2 # days(98).to_seconds() * 2 [UNUSED]

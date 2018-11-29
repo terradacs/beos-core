@@ -364,8 +364,8 @@ def initialize_beos():
         eosio.create_account("eosio", "beos.init", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY)
         eosio.create_account("eosio", "beos.trustee", config.TRUSTEE_OWNER_PUBLIC_KEY, config.TRUSTEE_ACTIVE_PUBLIC_KEY)
 
-        eosio.create_account("eosio", "producerjson", config.TRUSTEE_OWNER_PUBLIC_KEY, config.TRUSTEE_ACTIVE_PUBLIC_KEY)
-        eosio.create_account("eosio", "proxyinfo", config.TRUSTEE_OWNER_PUBLIC_KEY, config.TRUSTEE_ACTIVE_PUBLIC_KEY)
+        eosio.create_account("eosio", "producerjson", config.PRODUCERJSON_OWNER_PUBLIC_KEY, config.PRODUCERJSON_ACTIVE_PUBLIC_KEY)
+        eosio.create_account("eosio", "regproxyinfo", config.REGPROXYINFO_OWNER_PUBLIC_KEY, config.REGPROXYINFO_ACTIVE_PUBLIC_KEY)
 
         eosio.set_contract("eosio.token", config.CONTRACTS_DIR + "/eosio.token", "eosio.token")
 
@@ -377,7 +377,7 @@ def initialize_beos():
         eosio.set_contract("beos.gateway", config.CONTRACTS_DIR + "eosio.gateway", "beos.gateway")
         eosio.set_contract("beos.distrib", config.CONTRACTS_DIR + "eosio.distribution", "beos.distrib")
         eosio.set_contract("producerjson", config.CONTRACTS_DIR + "producerjson", "producerjson")
-        eosio.set_contract("proxyinfo", config.CONTRACTS_DIR + "proxyinfo", "proxyinfo")
+        eosio.set_contract("regproxyinfo", config.CONTRACTS_DIR + "proxyinfo", "regproxyinfo")
 
         eosio.push_action("eosio", "initialissue", '[ "{0}", "{1}" ]'.format(config.CORE_INITIAL_SUPPLY, config.MIN_ACTIVATED_STAKE_PERCENT), "eosio")
         eosio.push_action("eosio", "initresource", '[ "beos.gateway", "{0}", "{1} {2}", "{3} {4}"]'.format(config.GATEWAY_INIT_RAM, config.GATEWAY_INIT_NET, config.CORE_SYMBOL_NAME, config.GATEWAY_INIT_CPU, config.CORE_SYMBOL_NAME), "eosio")
