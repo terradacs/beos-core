@@ -136,6 +136,9 @@ namespace eosio { namespace chain { namespace resource_limits {
       account_name owner;
       bool pending = false;
 
+      // If is 'true', it means that an information about rewards was transferred to 'del_bandwidth_table' table.
+      bool unstaked_mode = false;
+
       //ABW: it looks dangerous that all accounts start with unlimited resources, however they need
       //them for two reasons:
       // - before system contract is set all accounts are special, even if they are not native;

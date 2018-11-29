@@ -45,7 +45,6 @@ namespace eosiosystem {
       EOSLIB_SERIALIZE( user_resources, (owner)(net_weight)(cpu_weight)(ram_bytes) )
    };
 
-
    /**
     *  Every user 'from' has a scope/table that uses every receipient 'to' as the primary key.
     */
@@ -291,6 +290,8 @@ namespace eosiosystem {
             {
               int64_t _ram_bytes, _net_weight, _cpu_weight;
               get_distribution_resource_rewards( from, &_ram_bytes, &_net_weight, &_cpu_weight );
+              if( _ram_bytes > 0 || _net_weight > 0 || _cpu_weight > 0 )
+                enable_unstake_mode_distribution_resource_rewards( from );
 
               _stake_net_delta.amount += _net_weight;
               _stake_cpu_delta.amount += _cpu_weight;

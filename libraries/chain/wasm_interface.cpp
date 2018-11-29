@@ -192,6 +192,10 @@ class privileged_api : public context_aware_api {
          set_resource_limits_impl( account, ram_bytes, net_weight, cpu_weight );
       }
 
+      void enable_unstake_mode_distribution_resource_rewards( account_name account ) {
+         context.control.get_mutable_resource_limits_manager().enable_unstake_mode_distribution_resource_rewards( account );
+      }
+
       void get_distribution_resource_rewards( account_name account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight ) {
          context.control.get_resource_limits_manager().get_distribution_resource_rewards( account, ram_bytes, net_weight, cpu_weight);
       }
@@ -1899,6 +1903,7 @@ REGISTER_INTRINSICS(compiler_builtins,
 REGISTER_INTRINSICS(privileged_api,
    (is_feature_active,                int(int64_t)                                    )
    (activate_feature,                 void(int64_t)                                   )
+   (enable_unstake_mode_distribution_resource_rewards,void(int64_t)                   )
    (get_distribution_resource_rewards,void(int64_t,int,int,int)                       )
    (get_resource_limits,              void(int64_t,int,int,int)                       )
    (set_resource_limits,              void(int64_t,int64_t,int64_t,int64_t)           )
