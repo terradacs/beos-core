@@ -156,11 +156,6 @@ namespace eosiosystem {
       }
    }
 
-  void system_contract::reward( account_name receiver, int64_t ram_bytes, asset net_weight, asset cpu_weight )
-  {
-     change_resource_limits( receiver, ram_bytes, net_weight.amount, cpu_weight.amount );
-  }
-
    /**
     *  Called after a new account is created. This code enforces resource-limits rules
     *  for new accounts as well as new account naming conventions.
@@ -231,7 +226,7 @@ namespace eosiosystem {
 
 EOSIO_ABI( eosiosystem::system_contract,
      // native.hpp (newaccount definition is actually in eosio.system.cpp)
-     (initresource)(reward)(newaccount)(updateauth)(deleteauth)(linkauth)(unlinkauth)(canceldelay)(onerror)
+     (initresource)(newaccount)(updateauth)(deleteauth)(linkauth)(unlinkauth)(canceldelay)(onerror)
      // eosio.system.cpp
      (initialissue)(setram)(setparams)(setpriv)(rmvproducer)(bidname)
      // delegate_bandwidth.cpp
