@@ -51,6 +51,7 @@ class EOSRPCExecutor():
             url = self.nodeos_url+"/v1/chain/get_account"
             command = {"account_name":_account_name}
             response = requests.post(url, json=command)
+            log.info("Get account %s"%response.json())
             return response.json()
         except Exception as _ex:
             log.error("[ACTION][ERROR] exception  %s occures during get_account"%str(_ex))        
@@ -81,6 +82,7 @@ class EOSRPCExecutor():
             else:
                 whole = ""
             response_json ={"balance":whole}
+            log.info("Get currency balance %s"%response_json)
             return response_json
         except Exception as _ex:
             log.error("[ACTION][ERROR] exception  %s occures during get_currency_balance"%str(_ex))            

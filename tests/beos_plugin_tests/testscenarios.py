@@ -20,10 +20,10 @@ class TestScenarios(object):
         self.join_block_number = 0
         self.after_block_result    = {}
         self.called_actions_result = {}
+        self.scenarios_status_summary = {}
         self.eos_rpc      = EOSRPCExecutor(_nodeos_addres, _nodeos_port, _wallet_address, _wallet_port, _master_wallet_name)
         self.load_scenarios()
 
-        self.load_scenarios()
         self.blockGetter = threading.Thread(target=self.block_id_getter)
         self.blockGetter.setDaemon(daemonic=True)
         self.user_status_getter = threading.Thread(target=self.check_user_status_after_block)
@@ -88,9 +88,6 @@ class TestScenarios(object):
         if "message" in _expected_result:
             if expected_status == False:
                 same_status = True
-            else:
-                if expected_status == True:
-                    same_status = True
         else:
             if expected_status == True:
                 same_status = True
@@ -121,14 +118,17 @@ class TestScenarios(object):
                     same_status, same_message, message = self.comare_expected_messages(expected, status)
                     if same_status:
                         if same_message:
-                            _file.writelines("[OK] action `%s` status call and message are as expected."%(act))
+                            _file.writelines("[OK] action `%s` status call `%d` and message `%s` are as expected."%(act, expected["status"], message))
                         else:
                             _file.writelines("[ERROR] action `%s` status call is as expected `%d` but message `%s` is not."%(act, expected["status"], message))
+                            error = True
                     else:
                         if same_message:
-                            _file.writelines("[ERROR] action `%s` status call is not as expected `%d` but message is."%(act, expected["status"]))
+                            _file.writelines("[ERROR] action `%s` status call `%d` is not as expected `%d` but message `%s` is."%(act, not expected["status"],expected["status"], message))
+                            error = True
                         else:
-                            _file.writelines("[ERROR] action `%s` status call is not as expected `%d` as well as message `%s`."%(act, expected["status"], message))
+                            _file.writelines("[ERROR] action `%s` status call `%d` is not as expected `%d` as well as `%s`."%(act,not expected["status"],  expected["status"], message))
+                            error = True
                 else:
                     if expected["status"] == status:
                         _file.writelines("[OK] action `%s` status call is as expected `%d`."%(act, expected["status"]))
@@ -148,33 +148,43 @@ class TestScenarios(object):
     def get_at_end_summary(self, _file, _symbol):
         try:
             expected_result_for_user = self.scenarios[self.scenariosNr]["expected_results"]
+            error = False
             for expected in expected_result_for_user:
                 user = expected["user"]
                 balance = self.eos_rpc.get_currency_balance(user, _symbol)
                 result = self.eos_rpc.get_account(user)
+                voter_info      = result["voter_info"] if "voter_info" in result else None
                 total_resources = result["total_resources"] if "total_resources" in result else None
+                total_resources["core_liquid_balance"] = result["core_liquid_balance"] if "core_liquid_balance" in result else ""
                 total_resources["balance"]=balance["balance"]
                 at_end = expected["at_end"] if "at_end" in expected else None
-                error = False
                 if total_resources and at_end:
                     _file.writelines("[INFO] CHECKING `AT END` VALUES FOR ACCOUNT %s\n"%(user))
-                    for key, value in at_end.items():
-                        if at_end[key] == total_resources[key]:
-                            _file.writelines("[OK] VALUE FOR %s IS AS EXPECTED \n"%(key))
+                    for key, value in at_end["resources"].items():
+                        if at_end["resources"][key] == total_resources[key]:
+                            _file.writelines("[OK] VALUE FOR `%s` IS AS EXPECTED %s\n"%(key, value))
                         else:
-                            _file.writelines("[ERROR] VALUE %s FOR %s DOES NOT MATCH EXPECTED ONE %s\n"%( total_resources[key], key, at_end[key]))
+                            _file.writelines("[ERROR] VALUE `%s` FOR `%s` DOES NOT MATCH EXPECTED ONE `%s`\n"%( total_resources[key], key, at_end["resources"][key]))
                             error = True
+                    if voter_info and "voter_info" in at_end:
+                        for key, value in at_end["voter_info"].items():
+                            if at_end["voter_info"][key] == voter_info[key]:
+                                _file.writelines("[OK] VALUE FOR `%s` IS AS EXPECTED `%s`\n"%(key, value))
+                            else:
+                                _file.writelines("[ERROR] VALUE `%s` FOR `%s` DOES NOT MATCH EXPECTED ONE `%s`\n"%( voter_info[key], key, at_end["voter_info"][key]))
+                                error = True
                 else:
                     if not total_resources and not at_end:
-                        _file.writelines("[OK] BOTH `AT_END` AND `TOTAL_RESOURCES` ARE NOT AVAILABLE FOR %s \n"%(user))
+                        _file.writelines("[OK] BOTH `AT_END` AND `TOTAL_RESOURCES` ARE NOT AVAILABLE FOR `%s` \n"%(user))
                     if total_resources:
                         error = True
-                        _file.writelines("[ERROR] `AT_END` IS NOT DEFINED FOR USER %s WHILE `TOTAL_RESOURCES` IS AVAILABLE\n"%(user))
+                        _file.writelines("[ERROR] `AT_END` IS NOT DEFINED FOR USER `%s` WHILE `TOTAL_RESOURCES` IS AVAILABLE\n"%(user))
                     if at_end:
                         error = True
-                        _file.writelines("[ERROR] `TOTAL_RESOURCES` IS NOT DEFINED FOR USER %s WHILE `AT_END` IS AVAILABLE\n"%(user))
+                        _file.writelines("[ERROR] `TOTAL_RESOURCES` IS NOT DEFINED FOR USER `%s` WHILE `AT_END` IS AVAILABLE\n"%(user))
+
                 if not error:
-                    _file.writelines("[OK] ALL VALUES FOR %s ARE OK\n"%(user))
+                    _file.writelines("[OK] ALL VALUES FOR `%s` ARE OK\n"%(user))
             _file.writelines("###################################\n")
             return error
         except Exception as _ex:
@@ -192,19 +202,29 @@ class TestScenarios(object):
                 if "after_block" in expected:
                     _file.writelines("[INFO] CHECKING `AFTER BLOCKS` VALUES FOR ACCOUNT %s\n"%(user))
                     for expected_after_block in expected["after_block"]:
+                        _file.writelines("###################################\n")
+                        _file.writelines("[INFO] CHECKING VALUES FOR `AFTER BLOCK` %d (%d)\n"%(expected_after_block["after_block"],expected_after_block["after_block"]+self.join_block_number))
+                        _file.writelines("###################################\n")
                         for actual_after_block in self.after_block_result[user]:
                             if expected_after_block["after_block"] == actual_after_block["after_block"]:
-                                for key, value in expected_after_block.items():
-                                    if key == "after_block":
-                                        _file.writelines("[INFO] CHECKING VALUES FOR `AFTER BLOCK` %d\n"%(value+self.join_block_number))
-                                        _file.writelines("###################################\n")
-                                        continue
-                                    if actual_after_block[key] == expected_after_block[key]:
-                                        _file.writelines("[OK] VALUE FOR %s IS AS EXPECTED \n"%(key))
+                                log.info("expected_after_block %s"%expected_after_block)
+                                log.info("actual_after_block %s"%actual_after_block)
+                                for key, value in expected_after_block["resources"].items():
+                                    if actual_after_block["resources"][key] == expected_after_block["resources"][key]:
+                                        _file.writelines("[OK] VALUE FOR `%s` IS AS EXPECTED `%s`\n"%(key,value))
                                     else:
-                                        _file.writelines("[ERROR] VALUE %s FOR %s DOES NOT MATCH EXPECTED ONE %s\n"%( actual_after_block[key], key, expected_after_block[key]))
+                                        _file.writelines("[ERROR] VALUE `%s` FOR `%s` DOES NOT MATCH EXPECTED ONE `%s`\n"%( actual_after_block["resources"][key], key, expected_after_block["resources"][key]))
                                         error = True
+                                if "voter_info" in expected_after_block and "voter_info" in actual_after_block:
+                                    for key, value in expected_after_block["voter_info"].items():
+                                        if actual_after_block["voter_info"][key] == expected_after_block["voter_info"][key]:
+                                            _file.writelines("[OK] VALUE FOR `%s` IS AS EXPECTED `%s`\n"%(key,value))
+                                        else:
+                                            _file.writelines("[ERROR] VALUE `%s` FOR `%s` DOES NOT MATCH EXPECTED ONE `%s`\n"%( actual_after_block["voter_info"][key], key, expected_after_block["voter_info"][key]))
+                                            error = True
+
             _file.writelines("###################################\n")
+            self.after_block.clear()
             self.after_block_result.clear()
             return error
         except Exception as _ex:
@@ -217,17 +237,36 @@ class TestScenarios(object):
         try:
             self.askForBlockNumber.clear()
             with open(self.summary_file,"a+") as sf:
-                sf.writelines("[SCENARIO] :%s\n"%(self.scenarios[self.scenariosNr]["name"]))
+                scenario_name = self.scenarios[self.scenariosNr]["name"]
+                sf.writelines("[SCENARIO] :%s\n"%(scenario_name))
                 sf.writelines("############# SUMMARY #############\n")
                 actions_error     = self.get_action_calls_summary(sf)
                 after_block_error = self.get_after_block_summary(sf)
                 at_end_error      = self.get_at_end_summary(sf, _symbol)
                 if actions_error or after_block_error or at_end_error:
+                    self.scenarios_status_summary[scenario_name] = False
                     return True
                 else :
+                    self.scenarios_status_summary[scenario_name] = True
                     return False
         except Exception as _ex:
             log.error("Exception `%s` while getting scenarios summary"%str(_ex))
+            self.stop_scenarios()
+            exit(1)
+
+
+    def add_scenario_status_to_summary_file(self):
+        try:
+            with open(self.summary_file,"a+") as sf:
+                temp_len_scen = len(" Scenario name ") 
+                max_scenario_name = max(len(name) for name in self.scenarios_status_summary )
+                sf.writelines(" Scenario name " + (max_scenario_name-temp_len_scen)*' ' + "| status \n")
+                sf.writelines( max_scenario_name*'-' + '|' + len("+ status ")*'-' +'\n')
+                for scenario, status in self.scenarios_status_summary.items():
+                    log_status = "| {0}".format("OK" if status else "ERROR")
+                    sf.writelines(scenario + (max_scenario_name-len(scenario))*' ' + log_status + '\n')
+        except Exception as _ex:
+            log.error("Exception `%s` while adding scenarios status to summary file."%str(_ex))
             self.stop_scenarios()
             exit(1)
 
@@ -295,10 +334,14 @@ class TestScenarios(object):
                                     return
                                 balance = self.eos_rpc.get_currency_balance(user, _symbol)
                                 account_after_block = self.eos_rpc.get_account(user)
-                                result = account_after_block["total_resources"] if "total_resources" in account_after_block else {}
-                                if result and "owner" in result:
-                                    result.pop("owner")
-                                result["balance"]=balance["balance"]
+                                result = {}
+                                result["resources"] = account_after_block["total_resources"] if "total_resources" in account_after_block else {}
+                                result["resources"]["core_liquid_balance"] = account_after_block["core_liquid_balance"] if "core_liquid_balance" in account_after_block else ""
+                                voter_info = account_after_block["voter_info"] if "voter_info" in account_after_block else {}
+                                if result and "owner" in result["resources"]:
+                                    result["resources"].pop("owner")
+                                result["resources"]["balance"]=balance["balance"]
+                                result["voter_info"] = voter_info
                                 result["after_block"] = (after_block  )
                                 if user in self.after_block_result:
                                     self.after_block_result[user].append(result)
@@ -371,14 +414,19 @@ class TestScenarios(object):
     def prepare_after_block(self):
         try:
             after_block = self.scenarios[self.scenariosNr]["expected_results"]
-            for after in after_block:
-                if after["user"] in self.after_block:
-                    for a in after["after_block"]:
-                        self.after_block[after["user"]].append(a)    
-                else:
-                    self.after_block[after["user"]]=after["after_block"]
-            for key, value in self.after_block.items():
-                self.after_block[key] = sorted(value, key=lambda k:k['after_block'])
+            log.info("after block %s"%after_block)
+            if after_block:
+                for after in after_block:
+                    if after["user"] in self.after_block:
+                        if "after_block" in after:
+                            for a in after["after_block"]:
+                                self.after_block[after["user"]].append(a)    
+                    else:
+                        if "after_block" in after:
+                            self.after_block[after["user"]]=after["after_block"]
+                if self.after_block:
+                    for key, value in self.after_block.items():
+                        self.after_block[key] = sorted(value, key=lambda k:k['after_block'])
         except Exception as _ex:
             log.error("Exception `%s` while preparing after blocks."%str(_ex))
             self.stop_scenarios()
