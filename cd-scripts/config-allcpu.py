@@ -192,11 +192,15 @@ PROXY_TOTAL_SUPPLY = "10000000000.0000" # as string to preserve zeros (they esta
 CORE_SYMBOL_PRECISION = 4 # 10^4
 # maximum amount that will ever be allowed to be issued (includes "perpetual" inflation)
 CORE_TOTAL_SUPPLY = "10000000000.0000" # as string to preserve zeros (they establish precision)
+CORE_INITIAL_SUPPLY = 3674470000 * (10 ** CORE_SYMBOL_PRECISION) # equals total supply of BTS
+MIN_ACTIVATED_STAKE_PERCENT = 15
 
 # 2724*2 (doubled minimal amount) * 30000 (number of accounts to create before ram has to be refilled) + gateway own needs, all rounded up
-GATEWAY_INIT_RAM = "164000000"
-GATEWAY_INIT_NET = "10000.0000" # just for gateway needs
-GATEWAY_INIT_CPU = "10000.0000" # just for gateway needs
+GATEWAY_INIT_RAM = 164000000
+GATEWAY_INIT_NET = 10000 * (10**CORE_SYMBOL_PRECISION) # just for gateway needs
+GATEWAY_INIT_CPU = 10000 * (10**CORE_SYMBOL_PRECISION) # just for gateway needs
+# beos.distrib needs enough to cover all rewards, plus some for its own needs; net/cpu are calculated from other params
+DISTRIB_INIT_RAM = 32000300000
 
 STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION = 100
 STARTING_BLOCK_FOR_BEOS_DISTRIBUTION = 7 * 24 * 3600 * 2 # days(7).to_seconds() * 2
@@ -206,23 +210,11 @@ AMOUNT_OF_REWARD_BEOS = 800 * CORE_SYMBOL_PRECISION # 800 * asset().symbol.preci
 STARTING_BLOCK_FOR_RAM_DISTRIBUTION = 7 * 24 * 3600 * 2 # days(7).to_seconds() * 2
 ENDING_BLOCK_FOR_RAM_DISTRIBUTION = 280 * 24 * 3600 * 2 # days(280).to_seconds() * 2
 DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION = 1 * 3600 * 2 # hours(1).to_seconds() * 2
-
 AMOUNT_OF_REWARD_RAM = 5000000 # 5000000 is a number not asset
 STARTING_BLOCK_FOR_TRUSTEE_DISTRIBUTION = 7 * 24 * 3600 * 2 # days(7).to_seconds() * 2 [UNUSED]
 ENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION = 98 * 24 * 3600 * 2 # days(98).to_seconds() * 2 [UNUSED]
 DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_TRUSTEE_DISTRIBUTION = 1 * 3600 * 2 # hours(1).to_seconds() * 2 [UNUSED]
 AMOUNT_OF_REWARD_TRUSTEE = 800 * CORE_SYMBOL_PRECISION # 800 * asset().symbol.precision()
-
-# reward_pool = ((end-start)/interval + 1) * reward_per_interval
-# beos.distrib needs enough to cover all rewards, plus some for its own needs
-DISTRIB_INIT_RAM = "32765010000" # (280-7)*24 + 1 intervals * 5000000 per interval plus some 10000 for itself
-DISTRIB_INIT_NET = "1758000.0000" # (98-7)*24 + 1 intervals * (800/2 (users) + 800/2 (trustee)) per interval plus some 10000 for itself
-DISTRIB_INIT_CPU = "1758000.0000" # as above
-
-# sum of BEOS needed to cover gateway and distrib initial resources; note that the more we issue the more expensive ram will be, which means
-# we must issue even more; we are trying to buy half of all available ram after all
-CORE_INITIAL_SUPPLY = 3674470000 * (10 ** CORE_SYMBOL_PRECISION)
-MIN_ACTIVATED_STAKE_PERCENT = 15
 
 ### init loggers
 global log_main

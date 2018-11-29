@@ -42,7 +42,7 @@ extern "C" {
 
    /**
     * @brief Set the resource limits of an account
-    * Set the resource limits of an account - cannot be used to turn limited resource into unlimited
+    * Set the resource limits of an account
     * @param account - name of the account whose resource limit to be set
     * @param ram_bytes - ram limit in absolute bytes
     * @param net_weight - fractionally proportionate net limit of available resources based on (weight / total_weight_of_all_accounts)

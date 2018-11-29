@@ -230,8 +230,12 @@ namespace eosiosystem {
 
          void bidname( account_name bidder, account_name newname, asset bid );
 
-         void initresource( account_name receiver, int64_t bytes, asset stake_net_quantity, asset stake_cpu_quantity );
-         void reward( account_name receiver, int64_t ram_bytes, asset net_weight, asset cpu_weight );
+         /**
+          *  Turns unlimited account resource(s) into concrete limit(s) by buying ram / staking.
+          *  Pass -1 to leave particular limit unchanged (-1 will not change limited resource back into unlimited!).
+          *  eosio is payer, so it has to have enough liquid tokens for the operation.
+          */
+         void initresource( account_name receiver, int64_t bytes, int64_t stake_net_quantity, int64_t stake_cpu_quantity );
 
          bool is_allowed_vote_operation() const;
          bool is_allowed_ram_operation() const;
