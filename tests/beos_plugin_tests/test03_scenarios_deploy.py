@@ -152,6 +152,7 @@ if __name__ == "__main__":
     error = True
   finally:
     scenarios.stop_scenarios()
+    scenarios.add_scenario_status_to_summary_file()
     if args.restore_node_params :
       scenario.restore_node_params(
                 args.starting_block_for_initial_witness_election,
