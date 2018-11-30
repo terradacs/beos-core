@@ -1045,7 +1045,7 @@
 			"after_block": []
 		}]
 	}, {
-		"name": "Basic operations test [2.1]",
+		"name": "[2.1] Basic operations test",
 		"scenario_blocks": 100,
 		"params": {
 			"authorized_by": "beos.init",
@@ -1370,7 +1370,7 @@
 			}
 		}]
 	}, {
-		"name": "Basic operations test [2.2]",
+		"name": "[2.2] Basic operations test",
 		"scenario_blocks": 50,
 		"params": {
 			"authorized_by": "beos.init",
@@ -1490,7 +1490,7 @@
 			}
 		}]
 	}, {
-		"name": "Basic operations test [2.3]",
+		"name": "[2.3] Basic operations test",
 		"scenario_blocks": 100,
 		"params": {
 			"authorized_by": "beos.init",
@@ -1668,7 +1668,7 @@
 			}
 		}]
 	}, {
-		"name": "Basic operation test [2.4]",
+		"name": "[2.4] Basic operation test",
 		"scenario_blocks": 60,
 		"params": {
 			"authorized_by": "beos.init",
@@ -1832,7 +1832,7 @@
 			}
 		}]
 	}, {
-		"name": "Vote test [2.5]",
+		"name": "[2.5] Vote test",
 		"scenario_blocks": 50,
 		"params": {
 			"authorized_by": "beos.init",
@@ -1944,7 +1944,7 @@
 			}
 		}]
 	}, {
-		"name": "Vote test [2.5]",
+		"name": "[2.10] Vote test",
 		"scenario_blocks": 70,
 		"params": {
 			"authorized_by": "beos.init",
@@ -2170,7 +2170,7 @@
 			}
 		}]
 	}, {
-		"name": "Basic operations test [1.1]",
+		"name": "[1.1] Basic operations test",
 		"scenario_blocks": 100,
 		"params": {
 			"authorized_by": "beos.init",
@@ -2434,7 +2434,7 @@
 			}
 		}]
 	}, {
-		"name": "Basic operations test [1.2]",
+		"name": "[1.2] Basic operations test",
 		"scenario_blocks": 50,
 		"params": {
 			"authorized_by": "beos.init",
@@ -2516,7 +2516,7 @@
 			}
 		}]
 	}, {
-		"name": "Basic operations test [1.3]",
+		"name": "[1.3] Basic operations test",
 		"scenario_blocks": 50,
 		"params": {
 			"authorized_by": "beos.init",
@@ -2672,7 +2672,7 @@
 			}
 		}]
 	}, {
-		"name": "Basic operations test [1.4]",
+		"name": "[1.4] Basic operations test",
 		"scenario_blocks": 40,
 		"params": {
 			"authorized_by": "beos.init",
@@ -2840,7 +2840,7 @@
 			}
 		}]
 	}, {
-		"name": "Basic operations test [1.5]",
+		"name": "[1.5] Basic operations test",
 		"scenario_blocks": 40,
 		"params": {
 			"authorized_by": "beos.init",
@@ -2973,7 +2973,7 @@
 			}
 		}]
 	}, {
-		"name": "Vote test [1.6]",
+		"name": "[1.6] Vote test",
 		"scenario_blocks": 50,
 		"params": {
 			"authorized_by": "beos.init",
@@ -3265,7 +3265,7 @@
 			}
 		}]
 	}, {
-		"name": "Vote test [3.1]",
+		"name": "[3.1] Vote test",
 		"scenario_blocks": 30,
 		"params": {
 			"authorized_by": "beos.init",
@@ -3458,7 +3458,7 @@
 			}
 		}]
 	}, {
-		"name": "Issues done by other normal user [1.7]",
+		"name": "[1.7] Issues done by other normal user",
 		"scenario_blocks": 110,
 		"params": {
 			"authorized_by": "beos.init",
@@ -3837,7 +3837,7 @@
 			}
 		}]
 	}, {
-		"name": "Withdraw done by other normal user [1.8]",
+		"name": "[1.8] Withdraw done by other normal user",
 		"scenario_blocks": 110,
 		"params": {
 			"authorized_by": "beos.init",
@@ -4193,7 +4193,7 @@
 			}
 		}]
 	}, {
-		"name": "Buy and sell ram tests [2.6]",
+		"name": "[2.6] Buy and sell ram tests",
 		"scenario_blocks": 35,
 		"params": {
 			"authorized_by": "beos.init",
@@ -4361,7 +4361,7 @@
 			}
 		}]
 	}, {
-		"name": "Buy and sell ram tests [2.7]",
+		"name": "[2.7] Buy and sell ram tests",
 		"scenario_blocks": 55,
 		"params": {
 			"authorized_by": "beos.init",
@@ -4527,7 +4527,7 @@
 			}
 		}]
 	}, {
-		"name": "Undelegatebw - after distribution period - to self, without voting. [6.1]",
+		"name": "[6.1] Undelegatebw - after distribution period - to self, without voting.",
 		"scenario_blocks": 40,
 		"params": {
 			"authorized_by": "beos.init",
@@ -4597,7 +4597,7 @@
 			"after_block": []
 		}]
 	}, {
-		"name": "Undelegatebw - after distribution period - to self, with voting. [6.2]",
+		"name": "[6.2] Undelegatebw - after distribution period - to self, with voting.",
 		"scenario_blocks": 40,
 		"params": {
 			"authorized_by": "beos.init",
@@ -4696,7 +4696,7 @@
 			"after_block": []
 		}]
 	}, {
-		"name": "Undelegatebw - after distribution period - to other, without voting. [6.3]",
+		"name": "[6.3] Undelegatebw - after distribution period - to other, without voting.",
 		"scenario_blocks": 40,
 		"params": {
 			"authorized_by": "beos.init",
@@ -4805,7 +4805,7 @@
 			"after_block": []
 		}]
 	}, {
-		"name": "Undelegatebw - after distribution period - to other, with voting. [6.4]",
+		"name": "[6.4] Undelegatebw - after distribution period - to other, with voting.",
 		"scenario_blocks": 40,
 		"params": {
 			"authorized_by": "beos.init",
@@ -4956,5 +4956,2032 @@
 			},
 			"after_block": []
 		}]
-	}]
+	},{
+		"name": "[2.9] Great all-in-one test",
+		"scenario_blocks": 160,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS", 80, [20, 140, 40, 40000000], [20, 140, 40, 20000000], [10, 30, 10, 2000000]]
+			}
+		},
+		"actions": [{
+			"start_block": 1,
+			"action":"newaccount_pattern",
+			"name":"${user_j1}",
+			"owner_pub":"${key}",
+			"activ_pub":"${key}",
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 1,
+			"action":"newaccount_pattern",
+			"name":"${user_j2}",
+			"owner_pub":"${key}",
+			"activ_pub":"${key}",
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 1,
+			"action":"newaccount_pattern",
+			"name":"${user_j3}",
+			"owner_pub":"${key}",
+			"activ_pub":"${key}",
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 1,
+			"action":"newaccount_pattern",
+			"name":"${user_j4}",
+			"owner_pub":"${key}",
+			"activ_pub":"${key}",
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 1,
+			"action":"newaccount_pattern",
+			"name":"${user_j5}",
+			"owner_pub":"${key}",
+			"activ_pub":"${key}",
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 1,
+			"action":"newaccount_pattern",
+			"name":"${user_j6}",
+			"owner_pub":"${key}",
+			"activ_pub":"${key}",
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 1,
+			"action":"newaccount_pattern",
+			"name":"${user_j7}",
+			"owner_pub":"${key}",
+			"activ_pub":"${key}",
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 1,
+			"action":"newaccount_pattern",
+			"name":"${user_j8}",
+			"owner_pub":"${key}",
+			"activ_pub":"${key}",
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 1,
+			"action":"newaccount_pattern",
+			"name":"${user_j9}",
+			"owner_pub":"${key}",
+			"activ_pub":"${key}",
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 1,
+			"action":"newaccount_pattern",
+			"name":"${user_j10}",
+			"owner_pub":"${key}",
+			"activ_pub":"${key}",
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 5,
+			"authorized_by":"beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"from": "beos.gateway",
+				"to": "${user_j1}",
+				"quantity": "30.0000 PXBTS"
+			},
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 5,
+			"authorized_by":"beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"from": "beos.gateway",
+				"to": "${user_j2}",
+				"quantity": "15.0000 PXBTS"
+			},
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 5,
+			"authorized_by":"beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"from": "beos.gateway",
+				"to": "${user_j3}",
+				"quantity": "10.0000 PXBTS"
+			},
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 5,
+			"authorized_by":"beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"from": "beos.gateway",
+				"to": "${user_j4}",
+				"quantity": "10.0000 PXBTS"
+			},
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 5,
+			"authorized_by":"beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"from": "beos.gateway",
+				"to": "${user_j5}",
+				"quantity": "5.0000 PXBTS"
+			},
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 5,
+			"authorized_by":"beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"from": "beos.gateway",
+				"to": "${user_j6}",
+				"quantity": "5.0000 PXBTS"
+			},
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 5,
+			"authorized_by":"beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"from": "beos.gateway",
+				"to": "${user_j7}",
+				"quantity": "5.0000 PXBTS"
+			},
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 5,
+			"authorized_by":"beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"from": "beos.gateway",
+				"to": "${user_j8}",
+				"quantity": "5.0000 PXBTS"
+			},
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 10,
+			"authorized_by":"${user_j2}",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+					"producer": "${user_j2}",
+					"producer_key": "${key}",
+					"url": "test.html",
+					"location": "0"
+			},
+			"expected_result": {"status": false, "message": "transaction net usage is too high: 152 > 0"}
+	},{
+		"start_block": 15,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "${user_j2}",
+			"quantity": "5.0000 PXBTS"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 15,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "${user_j5}",
+			"quantity": "5.0000 PXBTS"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 15,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "${user_j9}",
+			"quantity": "5.0000 PXBTS"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 15,
+		"authorized_by": "${user_j3}",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "${user_j3}",
+			"to": "${user_j10}",
+			"quantity": "5.0000 PXBTS",
+			"memo":"Free muunies"
+		},
+		"expected_result": {"status":false,"message":"transaction net usage is too high: 144 > 0"}
+	},{
+		"start_block": 15,
+		"authorized_by": "${user_j7}",
+		"code": "eosio",
+		"action": "sellram",
+		"args": {
+			"account": "${user_j7}",
+			"bytes": "2000"
+		},
+		"expected_result": {"status":false,"message":"RAM shouldn't be liquid during distribution period"}
+	},{
+		"start_block": 15,
+		"authorized_by": "${user_j6}",
+		"code": "eosio",
+		"action": "delegatebw",
+		"args": 
+		{
+			"from": "${user_j6}",
+			"receiver": "${user_j6}",
+			"stake_net_quantity": "5.0000 BEOS",
+			"stake_cpu_quantity": "5.0000 BEOS",
+			"transfer": false
+		},
+		"expected_result": {"status": false, "message": "no balance object found"}
+	},{
+		"start_block": 25,
+		"action":"newaccount_pattern",
+		"name":"${user_j11}",
+		"owner_pub":"${key}",
+		"activ_pub":"${key}",
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 25,
+		"action":"newaccount_pattern",
+		"name":"${user_j12}",
+		"owner_pub":"${key}",
+		"activ_pub":"${key}",
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 25,
+		"action":"newaccount_pattern",
+		"name":"${user_j13}",
+		"owner_pub":"${key}",
+		"activ_pub":"${key}",
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 30,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "${user_j1}",
+			"quantity": "30.0000 PXBTS"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 30,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "${user_j3}",
+			"quantity": "10.0000 PXBTS"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 30,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "${user_j7}",
+			"quantity": "15.0000 PXBTS"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 30,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "${user_j10}",
+			"quantity": "5.0000 PXBTS"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 30,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "${user_j11}",
+			"quantity": "40.0000 PXBTS"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 35,
+		"authorized_by": "${user_j4}",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "${user_j4}",
+			"to": "${user_j6}",
+			"quantity": "10.0000 PXBTS",
+			"memo":"From 4 to 6"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 40,
+		"authorized_by": "${user_j7}",
+		"code": "eosio",
+		"action": "undelegatebw",
+		"args": 
+		{
+			"from": "${user_j7}",
+			"receiver": "${user_j7}",
+			"unstake_net_quantity": "50.0000 BEOS",
+			"unstake_cpu_quantity": "50.0000 BEOS"
+		},
+		"expected_result": {"status": false, "message": ""}
+	},{
+		"start_block": 40,
+		"authorized_by":"${user_j1}",
+		"code": "eosio",
+		"action": "regproducer",
+		"args": {
+				"producer": "${user_j1}",
+				"producer_key": "${key}",
+				"url": "test.html",
+				"location": "0"
+		},
+		"expected_result": {"status": true, "message": ""}
+	},{
+		"start_block": 45,
+		"authorized_by": "${user_j5}",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "${user_j5}",
+			"to": "${user_j11}",
+			"quantity": "30.0000 PXBTS",
+			"memo":"From 5 to 11"
+		},
+		"expected_result": {"status":false, "message":"overdrawn balance"}
+	},{
+		"start_block": 45,
+		"authorized_by": "${user_j2}",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "${user_j2}",
+			"to": "${user_j3}",
+			"quantity": "5.0000 PXBTS",
+			"memo":"From 2 to 3"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 50,
+		"authorized_by": "${user_j3}",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "${user_j3}",
+			"to": "${user_j2}",
+			"quantity": "5.0000 PXBTS",
+			"memo":"From 3 to 2"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 50,
+		"authorized_by": "${user_j9}",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "${user_j9}",
+			"to": "${user_j8}",
+			"quantity": "5.0000 PXBTS",
+			"memo":"From 9 to 8"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 65,
+		"action":"newaccount_pattern",
+		"name":"${user_j14}",
+		"owner_pub":"${key}",
+		"activ_pub":"${key}",
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 65,
+		"action":"newaccount_pattern",
+		"name":"${user_j15}",
+		"owner_pub":"${key}",
+		"activ_pub":"${key}",
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 65,
+		"action":"newaccount_pattern",
+		"name":"${user_j16}",
+		"owner_pub":"${key}",
+		"activ_pub":"${key}",
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 65,
+		"action":"newaccount_pattern",
+		"name":"${user_j17}",
+		"owner_pub":"${key}",
+		"activ_pub":"${key}",
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 65,
+		"action":"newaccount_pattern",
+		"name":"${user_j18}",
+		"owner_pub":"${key}",
+		"activ_pub":"${key}",
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 65,
+		"action":"newaccount_pattern",
+		"name":"${user_j19}",
+		"owner_pub":"${key}",
+		"activ_pub":"${key}",
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 65,
+		"action":"newaccount_pattern",
+		"name":"${user_j20}",
+		"owner_pub":"${key}",
+		"activ_pub":"${key}",
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by": "${user_j6}",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "${user_j6}",
+			"bts_to": "any_account",
+			"quantity": "15.0000 PXBTS",
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "${user_j10}",
+			"quantity": "45.0000 PXBTS"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "${user_j1}",
+			"quantity": "40.0000 PXBTS"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "${user_j2}",
+			"quantity": "10.0000 PXBTS"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "${user_j11}",
+			"quantity": "40.0000 PXBTS"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "${user_j12}",
+			"quantity": "10.0000 PXBTS"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "${user_j14}",
+			"quantity": "20.0000 PXBTS"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "${user_j15}",
+			"quantity": "10.0000 PXBTS"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "${user_j16}",
+			"quantity": "10.0000 PXBTS"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "${user_j17}",
+			"quantity": "10.0000 PXBTS"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "${user_j18}",
+			"quantity": "10.0000 PXBTS"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "${user_j19}",
+			"quantity": "10.0000 PXBTS"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 75,
+		"authorized_by": "${user_j5}",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "${user_j5}",
+			"to": "${user_j19}",
+			"quantity": "10.0000 PXBTS",
+			"memo":"From 5 to 19"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 75,
+		"authorized_by": "${user_j3}",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "${user_j3}",
+			"to": "${user_j11}",
+			"quantity": "10.0000 PXBTS",
+			"memo":"From 5 to 11"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 75,
+		"authorized_by": "${user_j7}",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "${user_j7}",
+			"to": "${user_j11}",
+			"quantity": "10.0000 PXBTS",
+			"memo":"From 7 to 11"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 80,
+		"authorized_by": "${user_j2}",
+		"code": "eosio",
+		"action": "regproducer",
+		"args": {
+			"producer": "${user_j2}",
+			"producer_key": "${key}",
+			"url": "test.html",
+			"location": 0
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	},{
+		"start_block": 80,
+		"authorized_by": "${user_j9}",
+		"code": "eosio",
+		"action": "regproducer",
+		"args": {
+			"producer": "${user_j9}",
+			"producer_key": "${key}",
+			"url": "test.html",
+			"location": 0
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	},{
+		"start_block": 80,
+		"authorized_by": "${user_j4}",
+		"code": "eosio",
+		"action": "regproducer",
+		"args": {
+			"producer": "${user_j4}",
+			"producer_key": "${key}",
+			"url": "test.html",
+			"location": 0
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	}, {
+		"start_block": 85,
+		"authorized_by": "${user_j10}",
+		"code": "eosio",
+		"action": "voteproducer",
+		"args": {
+			"voter": "${user_j10}",
+			"proxy": "",
+			"producers": ["${user_j1}"]
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	}, {
+		"start_block": 85,
+		"authorized_by": "${user_j1}",
+		"code": "eosio",
+		"action": "voteproducer",
+		"args": {
+			"voter": "${user_j1}",
+			"proxy": "",
+			"producers": ["${user_j1}"]
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	}, {
+		"start_block": 85,
+		"authorized_by": "${user_j11}",
+		"code": "eosio",
+		"action": "voteproducer",
+		"args": {
+			"voter": "${user_j11}",
+			"proxy": "",
+			"producers": ["${user_j4}"]
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	}, {
+		"start_block": 85,
+		"authorized_by": "${user_j3}",
+		"code": "eosio",
+		"action": "voteproducer",
+		"args": {
+			"voter": "${user_j3}",
+			"proxy": "",
+			"producers": ["${user_j2}"]
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	}, {
+		"start_block": 85,
+		"authorized_by": "${user_j5}",
+		"code": "eosio",
+		"action": "voteproducer",
+		"args": {
+			"voter": "${user_j5}",
+			"proxy": "",
+			"producers": ["${user_j9}"]
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	}, {
+		"start_block": 85,
+		"authorized_by": "${user_j6}",
+		"code": "eosio",
+		"action": "voteproducer",
+		"args": {
+			"voter": "${user_j6}",
+			"proxy": "",
+			"producers": ["${user_j9}"]
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	},{
+		"start_block": 105,
+		"authorized_by": "${user_j2}",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "${user_j2}",
+			"bts_to": "any_account",
+			"quantity": "30.0000 PXBTS",
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 105,
+		"authorized_by": "${user_j3}",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "${user_j3}",
+			"bts_to": "any_account",
+			"quantity": "10.0000 PXBTS",
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 105,
+		"authorized_by": "${user_j7}",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "${user_j7}",
+			"bts_to": "any_account",
+			"quantity": "10.0000 PXBTS",
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 105,
+		"authorized_by": "${user_j8}",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "${user_j8}",
+			"bts_to": "any_account",
+			"quantity": "10.0000 PXBTS",
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 105,
+		"authorized_by": "${user_j10}",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "${user_j10}",
+			"bts_to": "any_account",
+			"quantity": "30.0000 PXBTS",
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 105,
+		"authorized_by": "${user_j11}",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "${user_j11}",
+			"bts_to": "any_account",
+			"quantity": "100.0000 PXBTS",
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 105,
+		"authorized_by": "${user_j14}",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "${user_j14}",
+			"bts_to": "any_account",
+			"quantity": "10.0000 PXBTS",
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 110,
+		"authorized_by":"${user_j19}",
+		"code": "eosio",
+		"action": "regproducer",
+		"args": {
+				"producer": "${user_j19}",
+				"producer_key": "${key}",
+				"url": "test.html",
+				"location": "0"
+		},
+		"expected_result": {"status": true, "message": ""}
+	}, {
+		"start_block": 115,
+		"authorized_by": "${user_j15}",
+		"code": "eosio",
+		"action": "voteproducer",
+		"args": {
+			"voter": "${user_j15}",
+			"proxy": "",
+			"producers": ["${user_j19}"]
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	}, {
+		"start_block": 115,
+		"authorized_by": "${user_j16}",
+		"code": "eosio",
+		"action": "voteproducer",
+		"args": {
+			"voter": "${user_j16}",
+			"proxy": "",
+			"producers": ["${user_j19}"]
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	}, {
+		"start_block": 115,
+		"authorized_by": "${user_j17}",
+		"code": "eosio",
+		"action": "voteproducer",
+		"args": {
+			"voter": "${user_j17}",
+			"proxy": "",
+			"producers": ["${user_j19}"]
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	}, {
+		"start_block": 115,
+		"authorized_by": "${user_j18}",
+		"code": "eosio",
+		"action": "voteproducer",
+		"args": {
+			"voter": "${user_j18}",
+			"proxy": "",
+			"producers": ["${user_j19}"]
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	},{
+		"start_block": 120,
+		"authorized_by": "${user_j19}",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "${user_j19}",
+			"to": "${user_j12}",
+			"quantity": "20.0000 PXBTS",
+			"memo":"From 19 to 12"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 120,
+		"authorized_by": "${user_j10}",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "${user_j10}",
+			"to": "${user_j1}",
+			"quantity": "10.0000 PXBTS",
+			"memo":"From 10 to 1"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 145,
+		"authorized_by": "${user_j1}",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "${user_j1}",
+			"bts_to": "any_account",
+			"quantity": "110.0000 PXBTS",
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 145,
+		"authorized_by": "${user_j10}",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "${user_j10}",
+			"bts_to": "any_account",
+			"quantity": "10.0000 PXBTS",
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 145,
+		"authorized_by": "${user_j12}",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "${user_j12}",
+			"bts_to": "any_account",
+			"quantity": "30.0000 PXBTS",
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 145,
+		"authorized_by": "${user_j14}",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "${user_j14}",
+			"bts_to": "any_account",
+			"quantity": "10.0000 PXBTS",
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 145,
+		"authorized_by": "${user_j15}",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "${user_j15}",
+			"bts_to": "any_account",
+			"quantity": "10.0000 PXBTS",
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 145,
+		"authorized_by": "${user_j16}",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "${user_j16}",
+			"bts_to": "any_account",
+			"quantity": "10.0000 PXBTS",
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 145,
+		"authorized_by": "${user_j17}",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "${user_j17}",
+			"bts_to": "any_account",
+			"quantity": "10.0000 PXBTS",
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 145,
+		"authorized_by": "${user_j18}",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "${user_j18}",
+			"bts_to": "any_account",
+			"quantity": "10.0000 PXBTS",
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	}],
+		"expected_results": [
+			{
+				"user":"${user_j1}",
+				"after_block":[{
+					"after_block":23,
+					"resources": {
+						"balance": "30.0000 PXBTS",
+						"net_weight": "600.0000 BEOS",
+						"cpu_weight": "600.0000 BEOS",
+						"ram_bytes" : 6005448
+					}
+				},{
+					"after_block":55,
+					"resources": {
+						"balance": "60.0000 PXBTS",
+						"net_weight": "600.0000 BEOS",
+						"cpu_weight": "600.0000 BEOS",
+						"ram_bytes" : 6005448
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "100.0000 PXBTS",
+						"net_weight": "1200.0000 BEOS",
+						"cpu_weight": "1200.0000 BEOS",
+						"ram_bytes" : 12005448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "110.0000 PXBTS",
+						"net_weight": "1700.0000 BEOS",
+						"cpu_weight": "1700.0000 BEOS",
+						"ram_bytes" : 17005448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "2800.0000 BEOS",
+						"cpu_weight": "2800.0000 BEOS",
+						"ram_bytes" : 28005448
+					}
+				}
+			},{
+				"user":"${user_j2}",
+				"after_block":[{
+					"after_block":23,
+					"resources": {
+						"balance": "20.0000 PXBTS",
+						"net_weight": "400.0000 BEOS",
+						"cpu_weight": "400.0000 BEOS",
+						"ram_bytes" : 4005448
+					}
+				},{
+					"after_block":55,
+					"resources": {
+						"balance": "20.0000 PXBTS",
+						"net_weight": "400.0000 BEOS",
+						"cpu_weight": "400.0000 BEOS",
+						"ram_bytes" : 4005448	
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "30.0000 PXBTS",
+						"net_weight": "600.0000 BEOS",
+						"cpu_weight": "600.0000 BEOS",
+						"ram_bytes" : 6005448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "750.0000 BEOS",
+						"cpu_weight": "750.0000 BEOS",
+						"ram_bytes" : 7505448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "750.0000 BEOS",
+						"cpu_weight": "750.0000 BEOS",
+						"ram_bytes" : 7505448
+					}
+				}
+			},{
+				"user":"${user_j3}",
+				"after_block":[{
+					"after_block":23,
+					"resources": {
+						"balance": "10.0000 PXBTS",
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448
+					}
+				},{
+					"after_block":55,
+					"resources": {
+						"balance": "20.0000 PXBTS",
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "10.0000 PXBTS",
+						"net_weight": "400.0000 BEOS",
+						"cpu_weight": "400.0000 BEOS",
+						"ram_bytes" : 4005448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "450.0000 BEOS",
+						"cpu_weight": "450.0000 BEOS",
+						"ram_bytes" : 4505448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "450.0000 BEOS",
+						"cpu_weight": "450.0000 BEOS",
+						"ram_bytes" : 4505448
+					}
+				}
+			},{
+				"user":"${user_j4}",
+				"after_block":[{
+					"after_block":23,
+					"resources": {
+						"balance": "10.0000 PXBTS",
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448
+					}
+				},{
+					"after_block":55,
+					"resources": {
+						"balance": "",
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "",
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448	
+					}
+				}
+			},{
+				"user":"${user_j5}",
+				"after_block":[{
+					"after_block":23,
+					"resources": {
+						"balance": "10.0000 PXBTS",
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448
+					}
+				},{
+					"after_block":55,
+					"resources": {
+						"balance": "10.0000 PXBTS",
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "",
+						"net_weight": "300.0000 BEOS",
+						"cpu_weight": "300.0000 BEOS",
+						"ram_bytes" : 3005448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "300.0000 BEOS",
+						"cpu_weight": "300.0000 BEOS",
+						"ram_bytes" : 3005448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "300.0000 BEOS",
+						"cpu_weight": "300.0000 BEOS",
+						"ram_bytes" : 3005448
+					}
+				}
+			},{
+				"user":"${user_j6}",
+				"after_block":[{
+					"after_block":23,
+					"resources": {
+						"balance": "5.0000 PXBTS",
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448	
+					}
+				},{
+					"after_block":55,
+					"resources": {
+						"balance": "15.0000 PXBTS",
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448	
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "",
+						"net_weight": "250.0000 BEOS",
+						"cpu_weight": "250.0000 BEOS",
+						"ram_bytes" : 2505448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "250.0000 BEOS",
+						"cpu_weight": "250.0000 BEOS",
+						"ram_bytes" : 2505448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "250.0000 BEOS",
+						"cpu_weight": "250.0000 BEOS",
+						"ram_bytes" : 2505448
+					}
+				}
+			},{
+				"user":"${user_j7}",
+				"after_block":[{
+					"after_block":23,
+					"resources": {
+						"balance": "5.0000 PXBTS",
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				},{
+					"after_block":55,
+					"resources": {
+						"balance": "20.0000 PXBTS",
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "10.0000 PXBTS",
+						"net_weight": "300.0000 BEOS",
+						"cpu_weight": "300.0000 BEOS",
+						"ram_bytes" : 3005448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "350.0000 BEOS",
+						"cpu_weight": "350.0000 BEOS",
+						"ram_bytes" : 3505448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "350.0000 BEOS",
+						"cpu_weight": "350.0000 BEOS",
+						"ram_bytes" : 3505448
+					}
+				}
+			},{
+				"user":"${user_j8}",
+				"after_block":[{
+					"after_block":23,
+					"resources": {
+						"balance": "5.0000 PXBTS",
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				},{
+					"after_block":55,
+					"resources": {
+						"balance": "10.0000 PXBTS",
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448							
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "10.0000 PXBTS",
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "250.0000 BEOS",
+						"cpu_weight": "250.0000 BEOS",
+						"ram_bytes" : 2505448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "250.0000 BEOS",
+						"cpu_weight": "250.0000 BEOS",
+						"ram_bytes" : 2505448
+					}
+				}
+			},{
+				"user":"${user_j9}",
+				"after_block":[{
+					"after_block":23,
+					"resources": {
+						"balance": "5.0000 PXBTS",
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				},{
+					"after_block":55,
+					"resources": {
+						"balance": "",
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "",
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				}
+			},{
+				"user":"${user_j10}",
+				"after_block":[{
+					"after_block":23,
+					"resources": {
+						"balance": "",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":55,
+					"resources": {
+						"balance": "5.0000 PXBTS",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448	
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "50.0000 PXBTS",
+						"net_weight": "50.0000 BEOS",
+						"cpu_weight": "50.0000 BEOS",
+						"ram_bytes" : 505448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "10.0000 PXBTS",
+						"net_weight": "300.0000 BEOS",
+						"cpu_weight": "300.0000 BEOS",
+						"ram_bytes" : 3005448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "400.0000 BEOS",
+						"cpu_weight": "400.0000 BEOS",
+						"ram_bytes" : 4005448
+					}
+				}
+			},{
+				"user":"${user_j11}",
+				"after_block":[{
+					"after_block":55,
+					"resources": {
+						"balance": "40.0000 PXBTS",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "100.0000 PXBTS",
+						"net_weight": "400.0000 BEOS",
+						"cpu_weight": "400.0000 BEOS",
+						"ram_bytes" : 4005448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "900.0000 BEOS",
+						"cpu_weight": "900.0000 BEOS",
+						"ram_bytes" : 9005448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "900.0000 BEOS",
+						"cpu_weight": "900.0000 BEOS",
+						"ram_bytes" : 9005448
+					}
+				}
+			},{
+				"user":"${user_j12}",
+				"after_block":[{
+					"after_block":55,
+					"resources": {
+						"balance": "",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "10.0000 PXBTS",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "30.0000 PXBTS",
+						"net_weight": "50.0000 BEOS",
+						"cpu_weight": "50.0000 BEOS",
+						"ram_bytes" : 505448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "350.0000 BEOS",
+						"cpu_weight": "350.0000 BEOS",
+						"ram_bytes" : 3505448
+					}
+				}
+			},{
+				"user":"${user_j13}",
+				"after_block":[{
+					"after_block":55,
+					"resources": {
+						"balance": "",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				}
+			},{
+				"user":"${user_j14}",
+				"after_block":[{
+					"after_block":90,
+					"resources": {
+						"balance": "20.0000 PXBTS",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "10.0000 PXBTS",
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448
+					}
+				}
+			},{
+				"user":"${user_j15}",
+				"after_block":[{
+					"after_block":90,
+					"resources": {
+						"balance": "10.0000 PXBTS",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "10.0000 PXBTS",
+						"net_weight": "50.0000 BEOS",
+						"cpu_weight": "50.0000 BEOS",
+						"ram_bytes" : 505448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "150.0000 BEOS",
+						"cpu_weight": "150.0000 BEOS",
+						"ram_bytes" : 1505448
+					}
+				}
+			},{
+				"user":"${user_j16}",
+				"after_block":[{
+					"after_block":90,
+					"resources": {
+						"balance": "10.0000 PXBTS",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "10.0000 PXBTS",
+						"net_weight": "50.0000 BEOS",
+						"cpu_weight": "50.0000 BEOS",
+						"ram_bytes" : 505448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "150.0000 BEOS",
+						"cpu_weight": "150.0000 BEOS",
+						"ram_bytes" : 1505448
+					}
+				}
+			},{
+				"user":"${user_j17}",
+				"after_block":[{
+					"after_block":90,
+					"resources": {
+						"balance": "10.0000 PXBTS",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "10.0000 PXBTS",
+						"net_weight": "50.0000 BEOS",
+						"cpu_weight": "50.0000 BEOS",
+						"ram_bytes" : 505448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "150.0000 BEOS",
+						"cpu_weight": "150.0000 BEOS",
+						"ram_bytes" : 1505448
+					}
+				}
+			},{
+				"user":"${user_j18}",
+				"after_block":[{
+					"after_block":90,
+					"resources": {
+						"balance": "10.0000 PXBTS",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "10.0000 PXBTS",
+						"net_weight": "50.0000 BEOS",
+						"cpu_weight": "50.0000 BEOS",
+						"ram_bytes" : 505448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "150.0000 BEOS",
+						"cpu_weight": "150.0000 BEOS",
+						"ram_bytes" : 1505448
+					}
+				}
+			},{
+				"user":"${user_j19}",
+				"after_block":[{
+					"after_block":90,
+					"resources": {
+						"balance": "20.0000 PXBTS",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				}
+			},{
+				"user":"${user_j20}",
+				"after_block":[{
+					"after_block":90,
+					"resources": {
+						"balance": "",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				}
+			}
+		]
+	},{
+		"name": "[1.9] Vote after voting time",
+		"scenario_blocks": 60,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS", 20, [10, 20, 10, 8000000],[10, 20, 10, 5000000],[250, 290, 10, 200000]]
+			}
+		},
+		"actions": [{
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "${user_53}",
+			"owner_pub": "${key}",
+			"activ_pub": "${key}"
+		}, {
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "${user_54}",
+			"owner_pub": "${key}",
+			"activ_pub": "${key}"
+		}, {
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "${user_55}",
+			"owner_pub": "${key}",
+			"activ_pub": "${key}"
+		}, {
+			"start_block": 3,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"to": "${user_53}",
+				"quantity": "5.0000 PXBTS"
+			},
+			"expected_result": {"status": true,	"message": ""}
+		}, {
+			"start_block": 3,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"to": "${user_55}",
+				"quantity": "5.0000 PXBTS"
+			},
+			"expected_result": {"status": true,	"message": ""}
+		}, {
+			"start_block": 6,
+			"authorized_by": "${user_55}",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+				"producer": "${user_55}",
+				"producer_key": "${key}",
+				"url": "test.html",
+				"location": 0
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 8,
+			"authorized_by": "${user_53}",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+				"producer": "${user_55}",
+				"producer_key": "${key}",
+				"url": "test.html",
+				"location": 0
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 25,
+			"authorized_by": "${user_53}",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+				"producer": "${user_55}",
+				"producer_key": "${key}",
+				"url": "test.html",
+				"location": 0
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 28,
+			"authorized_by": "${user_55}",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+				"producer": "${user_55}",
+				"producer_key": "${key}",
+				"url": "test.html",
+				"location": 0
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 32,
+			"authorized_by": "${user_54}",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "${user_54}",
+				"proxy": "",
+				"producers": ["${user_55}"]
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 36,
+			"authorized_by": "${user_53}",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "${user_53}",
+				"proxy": "",
+				"producers": ["${user_55}"]
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 40,
+			"authorized_by": "${user_55}",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "${user_55}",
+				"proxy": "",
+				"producers": ["${user_55}"]
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 40,
+			"authorized_by": "${user_55}",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "${user_55}",
+				"proxy": "",
+				"producers": ["${user_53}"]
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 45,
+			"authorized_by": "${user_55}",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "${user_55}",
+				"proxy": "",
+				"producers": ["${user_54}"]
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 45,
+			"authorized_by": "${user_54}",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "${user_54}",
+				"proxy": "",
+				"producers": ["${user_54}"]
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 45,
+			"authorized_by": "${user_53}",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "${user_53}",
+				"proxy": "",
+				"producers": ["${user_53}"]
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 50,
+			"authorized_by": "${user_53}",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "${user_53}",
+				"bts_to": "any_account",
+				"quantity": "5.0000 PXBTS"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 50,
+			"authorized_by": "${user_55}",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "${user_55}",
+				"bts_to": "any_account",
+				"quantity": "5.0000 PXBTS"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "${user_53}",
+			"after_block": [],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}
+		},{
+			"user": "${user_54}",
+			"after_block": [],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}
+		},{
+			"user": "${user_55}",
+			"after_block": [],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}
+		}]
+	}
+]
 }
