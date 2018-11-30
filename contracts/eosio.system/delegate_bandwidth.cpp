@@ -179,18 +179,21 @@ namespace eosiosystem {
       change_resource_limits( receiver, bytes_out, 0, 0 );
    }
 
-   void system_contract::initresource( account_name receiver, int64_t bytes, asset stake_net_quantity, asset stake_cpu_quantity )
+   void system_contract::initresource( account_name receiver, int64_t bytes, int64_t stake_net_quantity, int64_t stake_cpu_quantity )
    {
       require_auth( _self );
-      {
-         int64_t _ram_bytes, _net_weight, _cpu_weight;
-         get_resource_limits( receiver, &_ram_bytes, &_net_weight, &_cpu_weight );
-         eosio_assert( _ram_bytes < 0 && _net_weight < 0 && _cpu_weight < 0, "can only be called for unlimited account" );
-      }
+      int64_t _ram_bytes, _net_weight, _cpu_weight;
+      get_resource_limits( receiver, &_ram_bytes, &_net_weight, &_cpu_weight );
+      eosio_assert( (bytes < 0 || _ram_bytes < 0) &&
+                    (stake_net_quantity < 0 || _net_weight < 0) &&
+                    (stake_cpu_quantity < 0 || _cpu_weight < 0),
+                    "can only be called to replace lack of limit with concrete resource value" );
     
       // replicate buyrambytes but without a fee (but buy a bit more - it is better to buy more and claim we bought less, so ram
       // market is never short, than to do the opposite, especially that ram market itself claims to have funds it doesn't have)
-      if ( bytes > 0 ) {
+      if ( bytes == 0 ) {
+         _ram_bytes = bytes;
+      } else if ( bytes > 0 ) {
          auto itr = _rammarket.find(S(4,RAMCORE));
          eosio_assert( itr != _rammarket.end(), "ram market does not exist");
          auto tmp = *itr;
@@ -209,16 +212,25 @@ namespace eosiosystem {
 
          _gstate.total_ram_bytes_reserved += uint64_t(bytes);
          _gstate.total_ram_stake          += ram_cost.amount;
+         _ram_bytes = bytes;
       }
 
       // replicate delegatebw but without votes and record for undelegate
-      auto transfer_amount = stake_net_quantity + stake_cpu_quantity;
-      if ( asset(0) < transfer_amount ) {
+      int64_t transfer_amount = 0;
+      if ( stake_net_quantity >= 0 ) {
+         _net_weight = stake_net_quantity;
+         transfer_amount += stake_net_quantity;
+      }
+      if ( stake_cpu_quantity >= 0 ) {
+         _cpu_weight = stake_cpu_quantity;
+         transfer_amount += stake_cpu_quantity;
+      }
+      if ( transfer_amount > 0 ) {
          INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {_self, N(active)},
             { _self, N(eosio.stake), asset(transfer_amount), std::string("stake bandwidth") } );
       }
 
-      set_resource_limits( receiver, bytes, stake_net_quantity.amount, stake_cpu_quantity.amount );
+      set_resource_limits( receiver, _ram_bytes, _net_weight, _cpu_weight );
    }
 
    /**

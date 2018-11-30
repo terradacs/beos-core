@@ -171,8 +171,8 @@ struct actions: public tester
     return push_action( config::system_account_name, N(initresource), mvo()
         ( "receiver", receiver )
         ( "bytes", bytes )
-        ( "stake_net_quantity", stake_net_quantity )
-        ( "stake_cpu_quantity", stake_cpu_quantity ),
+        ( "stake_net_quantity", stake_net_quantity.get_amount() )
+        ( "stake_cpu_quantity", stake_cpu_quantity.get_amount() ),
         system_abi_ser,
         config::system_account_name
       );

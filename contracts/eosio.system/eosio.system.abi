@@ -29,9 +29,9 @@
       "base": "",
       "fields": [
          {"name":"receiver",            "type":"account_name"},
-         {"name":"bytes",               "type":"uint64"},
-         {"name":"stake_net_quantity",  "type":"asset"},
-         {"name":"stake_cpu_quantity",  "type":"asset"}
+         {"name":"bytes",               "type":"int64"},
+         {"name":"stake_net_quantity",  "type":"int64"},
+         {"name":"stake_cpu_quantity",  "type":"int64"}
       ]
     },{
       "name": "permission_level",

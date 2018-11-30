@@ -5,6 +5,7 @@ import logging
 import os
 import time
 import sys
+import json
 
 try:
     import config
@@ -42,6 +43,18 @@ def run_command(parameters):
         logger.error("Executed with ret: {0}".format(ret))
         logger.error("Initialization failed on last command")
         raise EOSIOException("Initialization failed on last command")
+
+def run_command_and_return_output(parameters):
+    ret = subprocess.run(parameters, stdout=subprocess.PIPE)
+    print(ret)
+    retcode = ret.returncode
+    if retcode == 0:
+        logger.debug("Executed with ret: {0}".format(ret))
+    else:
+        logger.error("Executed with ret: {0}".format(ret))
+        logger.error("Initialization failed on last command")
+        raise EOSIOException("Initialization failed on last command")
+    return ret.stdout
 
 def run_service(service_name, parameters, unblock_trigger, raise_on_error = False):
     proc = subprocess.Popen(parameters, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -282,6 +295,22 @@ def push_action(account, action, data, permission, schema = "http"):
         "push", "action", account, action, data, "-p", permission]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
     run_command(parameters)
+
+def get_balance(_account_name, _currency, schema = "http"):
+    parameters = [config.CLEOS_EXECUTABLE, 
+        "--url", "{0}://{1}:{2}".format(schema, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT),
+        "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
+        "get", "currency", "balance", "eosio.token", _account_name, _currency]
+    logger.info("Executing command: {0}".format(" ".join(parameters)))
+    return float(run_command_and_return_output(parameters).decode('utf-8').split()[0])
+
+def get_account(_account_name, schema = "http"):
+    parameters = [config.CLEOS_EXECUTABLE, 
+        "--url", "{0}://{1}:{2}".format(schema, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT),
+        "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
+        "get", "account", "-j", _account_name]
+    logger.info("Executing command: {0}".format(" ".join(parameters)))
+    logger.info(json.dumps(json.loads(run_command_and_return_output(parameters)),indent=2,separators=(',', ': ')))
 
 def terminate_running_tasks(nodeos, keosd):
     from signal import SIGINT
