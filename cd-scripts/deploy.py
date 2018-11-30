@@ -344,8 +344,9 @@ def initialize_beos():
     keosd = None
     nodeos = None
     try:
+        wallet_url = "http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)
         keosd = eosio.run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR, False, True)
-        eosio.create_wallet("http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT), False)
+        eosio.create_wallet(wallet_url, False)
         nodeos = eosio.run_nodeos(config.START_NODE_INDEX, config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY)
 
         eosio.create_account("eosio", "eosio.msig", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
@@ -367,10 +368,27 @@ def initialize_beos():
         eosio.create_account("eosio", "producerjson", config.PRODUCERJSON_OWNER_PUBLIC_KEY, config.PRODUCERJSON_ACTIVE_PUBLIC_KEY)
         eosio.create_account("eosio", "regproxyinfo", config.REGPROXYINFO_OWNER_PUBLIC_KEY, config.REGPROXYINFO_ACTIVE_PUBLIC_KEY)
 
+        # create producer accounts
+        for producer, data in config.PRODUCERS_ARRAY.items():
+            logger.info("Creating producer account for: {0}".format(producer))
+            eosio.import_key(config.MASTER_WALLET_NAME, data["prv_owner"], wallet_url)
+            eosio.import_key(config.MASTER_WALLET_NAME, data["prv_active"], wallet_url)
+            eosio.create_account("eosio", producer, data["pub_owner"], data["pub_active"])
+
         eosio.set_contract("eosio.token", config.CONTRACTS_DIR + "/eosio.token", "eosio.token")
 
         eosio.push_action("eosio.token", "create", '[ "eosio", "{0} {1}"]'.format(config.CORE_TOTAL_SUPPLY, config.CORE_SYMBOL_NAME), "eosio.token")
         eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PROXY_TOTAL_SUPPLY, config.PROXY_ASSET_NAME), "eosio.token")
+
+        # set initial producers
+        if config.PRODUCERS_ARRAY:
+            eosio.set_contract("eosio", config.CONTRACTS_DIR + "eosio.bios", "eosio")
+            producers = []
+            for producer, data in config.PRODUCERS_ARRAY.items():
+                producers.append({"producer_name": producer, "block_signing_key": data["pub_active"]})
+            import json
+            args = {"schedule" : producers}
+            eosio.push_action("eosio", "setprods", '{0}'.format(json.dumps(args)), "eosio")
 
         eosio.set_contract("eosio", config.CONTRACTS_DIR + "eosio.system", "eosio")
         eosio.set_contract("beos.init", config.CONTRACTS_DIR + "eosio.init", "beos.init")

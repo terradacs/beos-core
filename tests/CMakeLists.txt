@@ -44,6 +44,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeos_voting_test.py ${CMAKE_CURRENT
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/consensus-validation-malicious-producers.py ${CMAKE_CURRENT_BINARY_DIR}/consensus-validation-malicious-producers.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/validate-dirty-db.py ${CMAKE_CURRENT_BINARY_DIR}/validate-dirty-db.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/launcher_test.py ${CMAKE_CURRENT_BINARY_DIR}/launcher_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/eos_voter_rpc_tests.py  ${CMAKE_CURRENT_BINARY_DIR}/eos_voter_rpc_tests.py  COPYONLY)
 
 # copy beos test dirs to binary dir
 execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/beos_plugin_tests ${CMAKE_CURRENT_BINARY_DIR}/beos_plugin_tests)
@@ -177,6 +178,11 @@ endif()
 
 add_test(NAME start_nodeos_keosd_via_run_py COMMAND run.py WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_property(TEST start_nodeos_keosd_via_run_py PROPERTY LABELS beos_tests)
+add_test(NAME eos_voter_rpc_tests COMMAND python3 eos_voter_rpc_tests.py 
+  --nodeos-ip ${NODEOS_IP_ADDRESS} 
+  --nodeos-port ${NODEOS_PORT}
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+set_property(TEST eos_voter_rpc_tests PROPERTY LABELS beos_tests)
 add_test(NAME test03_scenarios_deploy COMMAND test03_scenarios_deploy.py --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} 
 --add-block-number
 --restore-node-params
