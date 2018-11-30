@@ -106,6 +106,9 @@ namespace eosio { namespace chain { namespace resource_limits {
 
          void get_any_account_data( const account_name& account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight, bool is_distribution ) const;
          bool set_any_account_limits_impl( const account_name& account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight, bool is_distribution );
+
+         template <typename TObjectConverter, typename TProcessor>
+         void process_userres(const account_name& lowerBound, const account_name& upperBound, TProcessor processor) const;
    };
 } } } /// eosio::chain
 
