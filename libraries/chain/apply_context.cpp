@@ -13,7 +13,6 @@
 #include <boost/container/flat_set.hpp>
 #include <boost/scope_exit.hpp>
 
-//ABW: uncomment the following symbol to unconditionally write eosio::print calls to file (works even during unit tests)
 //#define CAVEMEN_DEBUG
 #ifdef CAVEMEN_DEBUG
 #define DBG(format, ... ) { FILE *pFile = fopen("debug.log","a"); fprintf(pFile,format "\n",__VA_ARGS__); fclose(pFile); }
@@ -173,32 +172,27 @@ void apply_context::reward_ram( const account_name& account, int64_t val )
    change_distribution_resource_limits( account, val, 0, 0 );
 }
 
-void apply_context::reward_all( uint64_t amount_of_reward, uint64_t amount_of_reward_for_trustee, uint64_t gathered_amount,
-   asset sym, bool is_beos_mode,
-   const voting_manager::producer_info_index& _producers)
-{
+void apply_context::reward_all( uint64_t beos_to_distribute, uint64_t beos_to_distribute_trustee, uint64_t ram_to_distribute,
+      uint64_t ram_to_distribute_trustee, asset pxbts, const voting_manager::producer_info_index& _producers ) {
    const auto& accounts_index = db.template get_index<account_index, by_id>();
 
-   // trustee is always rewarded with the same value
-   if (amount_of_reward_for_trustee)
-     reward_stake( N(beos.trustee), amount_of_reward_for_trustee, _producers );
+   // trustee is always rewarded with full given value
+   if ( beos_to_distribute_trustee > 0 )
+      reward_stake( N(beos.trustee), beos_to_distribute_trustee, _producers );
+   if ( ram_to_distribute_trustee > 0 )
+      reward_ram( N(beos.trustee), ram_to_distribute_trustee );
 
-   uint64_t actual_reward_sum = amount_of_reward_for_trustee;
-   BOOST_SCOPE_EXIT(this_,&actual_reward_sum,is_beos_mode) {
-      auto& resource_limit_mgr = this_->control.get_mutable_resource_limits_manager();
-      if (is_beos_mode) {
-         auto half = actual_reward_sum / 2; //resources are interchangable so it doesn't matter much which one we transfer
-         this_->change_resource_limits(config::distribution_account_name, 0, -half, half - actual_reward_sum );
-      } else {
-         this_->change_resource_limits(config::distribution_account_name, -actual_reward_sum, 0, 0);
-      }
+   uint64_t actual_beos_reward_sum = beos_to_distribute_trustee;
+   uint64_t actual_ram_reward_sum = ram_to_distribute_trustee;
+   BOOST_SCOPE_EXIT(this_,&actual_beos_reward_sum,&actual_ram_reward_sum) {
+      // resources are interchangable so it doesn't matter that we are taking all from net (where beos.distrib stores resources to distribute)
+      this_->change_resource_limits(config::distribution_account_name, -actual_ram_reward_sum, -actual_beos_reward_sum, 0 );
    } BOOST_SCOPE_EXIT_END;
 
-   if (gathered_amount == 0)
+   if (pxbts.get_amount() == 0)
      return; // nothing more to do here
 
-   auto get_currency_balance = [this]( const account_name& name, const symbol& asset_symbol ) -> asset
-   {
+   auto get_currency_balance = [this]( const account_name& name, const symbol& asset_symbol ) -> asset {
       const auto* tbl = db.template find<table_id_object, by_code_scope_table>(std::make_tuple(N(eosio.token), name, N(accounts)));
       share_type result = 0;
 
@@ -214,30 +208,44 @@ void apply_context::reward_all( uint64_t amount_of_reward, uint64_t amount_of_re
       return asset(result, asset_symbol);
    };
 
-   for (auto& account : accounts_index)
-   {
+   for (auto& account : accounts_index) {
       auto& name = account.name;
-      asset balance( get_currency_balance(name, sym.get_symbol()) );
-      //Calculation ratio for given account.
-      int128_t block_amount = static_cast<int128_t>(balance.get_amount()) * amount_of_reward;
-      long double dreward = static_cast<long double>(block_amount) / gathered_amount;
-      //int64_t reward = static_cast<int64_t>(dreward);
-      int64_t reward = llround(dreward); // [MK]: round is for compatibility with the same code on contract side
+      if (name == config::gateway_account_name || name == config::distribution_account_name)
+        continue; //neither beos.gateway (issuer of proxy) nor beos.distrib (source of rewards) can be rewarded
+      auto& resource_limit_mgr = control.get_mutable_resource_limits_manager();
+      int64_t current_ram_bytes = 0;
+      int64_t current_net_weight = 0;
+      int64_t current_cpu_weight = 0;
+      resource_limit_mgr.get_account_limits( name, current_ram_bytes, current_net_weight, current_cpu_weight );
 
-      if (reward <= 0)
-         continue;
+      asset balance( get_currency_balance(name, pxbts.get_symbol()) );
 
-      actual_reward_sum += reward;
-
-      if (is_beos_mode)
-        reward_stake( name, reward, _producers);
-      else
-        reward_ram( name, reward );
+      if ( beos_to_distribute > 0 && current_net_weight >= 0 && current_cpu_weight >= 0 ) {
+         //account that has unlimited bandwidth cannot be rewarded with bandwidth
+         int128_t block_amount = static_cast<int128_t>(balance.get_amount()) * beos_to_distribute;
+         long double dreward = static_cast<long double>(block_amount) / pxbts.get_amount();
+         int64_t beos_reward = static_cast<int64_t>(dreward);
+         if ( beos_reward > 0 ) {
+            actual_beos_reward_sum += beos_reward;
+            reward_stake( name, beos_reward, _producers );
+         }
+      }
+      if ( ram_to_distribute > 0 && current_ram_bytes >= 0 ) {
+         //account that has unlimited ram cannot be rewarded with ram
+         int128_t block_amount = static_cast<int128_t>(balance.get_amount()) * ram_to_distribute;
+         long double dreward = static_cast<long double>(block_amount) / pxbts.get_amount();
+         int64_t ram_reward = static_cast<int64_t>(dreward);
+         if ( ram_reward > 0 ) {
+            actual_ram_reward_sum += ram_reward;
+            reward_ram( name, ram_reward );
+         }
+      }
    }
 }
 
-void apply_context::reward_done( asset symbol, bool is_beos_mode )
+void apply_context::reward_done()
 {
+   //TODO: stop producing distrib::onblock actions
 }
 
 void apply_context::exec( action_trace& trace )

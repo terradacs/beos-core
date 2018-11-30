@@ -282,18 +282,37 @@ class TestScenarios(object):
 
     def set_scenario_params(self):
         try:
-            params = self.scenarios[self.scenariosNr]["params"]
-            if self.join_block_number:
-                new_params   = params["args"]["new_params"]
-                distribution = new_params[2]
-                distribution[0] = distribution[0]+self.join_block_number
-                distribution[1] = distribution[1]+self.join_block_number
-                ram          = new_params[3]
-                ram[0] = ram[0]+self.join_block_number
-                ram[1] = ram[1]+self.join_block_number
-                trustee      = new_params[4]
-                trustee[0] = trustee[0]+self.join_block_number
-                trustee[1] = trustee[1]+self.join_block_number
+            scenario_params = self.scenarios[self.scenariosNr]["params"]
+            nr = self.join_block_number if self.join_block_number != None else 0
+            params=list()
+            params.append({
+                    "authorized_by":"beos.init",
+                    "code":"beos.init",
+                    "action":"changeparams",
+                    "args":{
+                        "new_params":["0.0000 PXBTS", scenario_params["starting_block_for_initial_witness_election"]+nr]
+                    }
+                })
+            params.append({
+                    "authorized_by":"beos.distrib",
+                    "code":"beos.distrib",
+                    "action":"changeparams",
+                    "args":{
+                        "new_params":[
+                            [ scenario_params["starting_block_for_beos_distribution"]+nr,
+                              0,
+                              scenario_params["ending_block_for_beos_distribution"]+nr,
+                              scenario_params["distribution_payment_block_interval_for_beos_distribution"],
+                              scenario_params["trustee_reward_beos"] ],
+                            [ scenario_params["starting_block_for_ram_distribution"]+nr,
+                              0,
+                              scenario_params["ending_block_for_ram_distribution"]+nr,
+                              scenario_params["distribution_payment_block_interval_for_ram_distribution"],
+                              scenario_params["trustee_reward_ram"] ],
+                            scenario_params["distrib_ram_leftover"]
+                        ]
+                    }
+                })
             self.eos_rpc.prepare_and_push_transaction(params)
         except Exception as _ex:
             log.error("Exception `%s` while setting scenarios params"%str(_ex))
@@ -450,37 +469,42 @@ class TestScenarios(object):
                 _starting_block_for_beos_distribution,
                 _ending_block_for_beos_distribution,
                 _distribution_payment_block_interval_for_beos_distribution,
-                _amount_of_reward_beos,
+                _trustee_reward_beos,
                 _starting_block_for_ram_distribution,
                 _ending_block_for_ram_distribution,
                 _distribution_payment_block_interval_for_ram_distribution,
-                _amount_of_reward_ram,
-                _starting_block_for_trustee_distribution,
-                _ending_block_for_trustee_distribution,
-                _distribution_payment_block_interval_for_trustee_distribution,
-                _amount_of_reward_trustee):
+                _trustee_reward_ram,
+                _distrib_ram_leftover):
         try:
-            params={
+            params=list()
+            params.append({
                     "authorized_by":"beos.init",
                     "code":"beos.init",
                     "action":"changeparams",
                     "args":{
-                        "new_params":["0.0000 PXBTS", _starting_block_for_initial_witness_election,
-                                                        [ _starting_block_for_beos_distribution,
-                                                        _ending_block_for_beos_distribution,
-                                                        _distribution_payment_block_interval_for_beos_distribution,
-                                                        _amount_of_reward_beos ]
-                                                        ,[ _starting_block_for_ram_distribution,
-                                                        _ending_block_for_ram_distribution,
-                                                        _distribution_payment_block_interval_for_ram_distribution,
-                                                        _amount_of_reward_ram ],
-                                                        [ _starting_block_for_trustee_distribution,
-                                                        _ending_block_for_trustee_distribution,
-                                                        _distribution_payment_block_interval_for_trustee_distribution,
-                                                        _amount_of_reward_trustee ]
-                                                        ]
+                        "new_params":["0.0000 PXBTS", _starting_block_for_initial_witness_election]
                     }
-                }
+                })
+            params.append({
+                    "authorized_by":"beos.distrib",
+                    "code":"beos.distrib",
+                    "action":"changeparams",
+                    "args":{
+                        "new_params":[
+                            [ _starting_block_for_beos_distribution,
+                              _starting_block_for_beos_distribution,
+                              _ending_block_for_beos_distribution,
+                              _distribution_payment_block_interval_for_beos_distribution,
+                              _trustee_reward_beos ],
+                            [ _starting_block_for_ram_distribution,
+                              _starting_block_for_ram_distribution,
+                              _ending_block_for_ram_distribution,
+                              _distribution_payment_block_interval_for_ram_distribution,
+                              _trustee_reward_ram ],
+                            _distrib_ram_leftover
+                        ]
+                    }
+                })
 
             self.eos_rpc.prepare_and_push_transaction(params)
         except Exception as _ex:

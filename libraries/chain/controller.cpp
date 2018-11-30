@@ -1566,7 +1566,7 @@ struct controller_impl {
       action on_block_distribution_act;
       on_block_distribution_act.account = config::distribution_account_name;
       on_block_distribution_act.name = N(onblock);
-      on_block_distribution_act.authorization = vector<permission_level>{ { config::distribution_account_name, config::active_name } };
+      on_block_distribution_act.authorization = vector<permission_level>{{config::system_account_name, config::active_name}};
       on_block_distribution_act.data = fc::raw::pack(block_num);
 
       signed_transaction trx;

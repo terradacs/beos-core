@@ -3,15 +3,16 @@
 		"name": "[5.1] Basic issue test.",
 		"scenario_blocks": 40,
 		"params": {
-			"authorized_by": "beos.init",
-			"code": "beos.init",
-			"action": "changeparams",
-			"args": {
-				"new_params": ["0.0000 PXBTS",  10, [10, 30, 5, 8000000],
-					[10, 18, 4, 5000000],
-					[10, 40, 10, 200000]
-				]
-			}
+			"starting_block_for_initial_witness_election": 10,
+			"starting_block_for_beos_distribution": 10,
+			"ending_block_for_beos_distribution": 30,
+			"distribution_payment_block_interval_for_beos_distribution": 5,
+			"trustee_reward_beos": 1000000,
+			"starting_block_for_ram_distribution": 10,
+			"ending_block_for_ram_distribution": 18,
+			"distribution_payment_block_interval_for_ram_distribution": 4,
+			"trustee_reward_ram": 0,
+			"distrib_ram_leftover": 300000
 		},
 		"actions": [{
 			"start_block": 1,
@@ -73,6 +74,7 @@
 		"name": "[5.2] Basic issue test.",
 		"scenario_blocks": 40,
 		"params": {
+<<<<<<< HEAD
 			"authorized_by": "beos.init",
 			"code": "beos.init",
 			"action": "changeparams",
@@ -82,6 +84,18 @@
 					[10, 30, 10, 200000]
 				]
 			}
+=======
+      "starting_block_for_initial_witness_election": 120,
+			"starting_block_for_beos_distribution": 10,
+			"ending_block_for_beos_distribution": 30,
+			"distribution_payment_block_interval_for_beos_distribution": 5,
+			"trustee_reward_beos": 1000000,
+			"starting_block_for_ram_distribution": 10,
+			"ending_block_for_ram_distribution": 20,
+			"distribution_payment_block_interval_for_ram_distribution": 5,
+			"trustee_reward_ram": 0,
+			"distrib_ram_leftover": 300000
+>>>>>>> 84e431f6a... [ABW]: first steps to correct scenarios
 		},
 		"actions": [{
 			"start_block": 2,

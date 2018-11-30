@@ -173,8 +173,8 @@ class EOSRPCExecutor():
                 log.info("public keys: %s"%public_keys)
                 required_key    = self.get_required_keys(prepared_actions, binargs, last_block_info, public_keys)
                 log.info("required keys: %s"%required_key)
-                signed_trasnaction = self.sign_transaction(prepared_actions, binargs, last_block_id, last_block_info, required_key)
-                transaction_status = self.push_transaction(prepared_actions, binargs, signed_trasnaction)
+                signed_transaction = self.sign_transaction(prepared_actions, binargs, last_block_id, last_block_info, required_key)
+                transaction_status = self.push_transaction(prepared_actions, binargs, signed_transaction)
                 if "transaction_id" in transaction_status:
                     log.info("[ACTION][OK] %s pushed to block %d"%(actions, transaction_status["processed"]["block_num"]))
                     self.actions_call_summary.append([actions, expected_result, True])
@@ -285,10 +285,8 @@ class EOSRPCExecutor():
                     "actions" : _action,
                     "transaction_extensions": []
                 },
-                "signatures": [
-                        _signed_transaction["signatures"][0]
-                ]
-                }
+                "signatures": _signed_transaction["signatures"]
+            }
             response = requests.post(self.nodeos_url+'/v1/chain/push_transaction', data=json.dumps(data))
             return response.json()
         except Exception as _ex:

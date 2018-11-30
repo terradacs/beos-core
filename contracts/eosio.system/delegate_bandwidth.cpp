@@ -14,7 +14,7 @@
 
 #include <eosio.token/eosio.token.hpp>
 
-#include <eosio.init/eosio.init.hpp>
+#include <eosio.distribution/eosio.distribution.hpp>
 #include <beoslib/beos_privileged.hpp>
 
 #include <cmath>
@@ -82,9 +82,7 @@ namespace eosiosystem {
 
    bool system_contract::is_allowed_ram_operation() const {
       //RAM shouldn't be liquid during distribution period.
-      uint64_t block_nr = static_cast< uint64_t >( get_blockchain_block_number() );
-      eosio::beos_global_state b_state = eosio::init( N(beos.init) ).get_beos_global_state();
-      return block_nr > b_state.ram.ending_block_for_distribution;
+      return eosio::distribution( N(beos.distrib) ).is_past_ram_distribution_period();
    }
 
    /**
@@ -434,7 +432,7 @@ namespace eosiosystem {
    void system_contract::undelegatebw( account_name from, account_name receiver,
                                        asset unstake_net_quantity, asset unstake_cpu_quantity )
    {
-      eosio_assert( eosio::init( N(beos.init) ).is_past_distribution_period(), "cannot unstake during distribution period" );
+      eosio_assert( eosio::distribution( N(beos.distrib) ).is_past_beos_distribution_period(), "cannot unstake during distribution period" );
       eosio_assert( asset() <= unstake_cpu_quantity, "must unstake a positive amount" );
       eosio_assert( asset() <= unstake_net_quantity, "must unstake a positive amount" );
       eosio_assert( asset() < unstake_cpu_quantity + unstake_net_quantity, "must unstake a positive amount" );

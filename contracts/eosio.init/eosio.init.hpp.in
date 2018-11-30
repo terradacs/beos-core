@@ -13,37 +13,15 @@
 
 namespace eosio {
 
-    struct beos_global_state_element
-    {
-      uint32_t starting_block_for_distribution;
-      uint32_t ending_block_for_distribution;
-      uint32_t distribution_payment_block_interval_for_distribution;
-      uint64_t amount_of_reward;
-
-      EOSLIB_SERIALIZE( beos_global_state_element,
-
-      (starting_block_for_distribution)
-      (ending_block_for_distribution)
-      (distribution_payment_block_interval_for_distribution)
-      (amount_of_reward) )
-    };
-
     struct beos_global_state
     {
       asset proxy_asset;
       uint32_t starting_block_for_initial_witness_election;
 
-      beos_global_state_element beos;
-      beos_global_state_element ram;
-      beos_global_state_element trustee; ///< For trustee only 'amount_of_reward' is valid now
-
       EOSLIB_SERIALIZE( beos_global_state,
 
       (proxy_asset)
-      (starting_block_for_initial_witness_election)
-      (beos)
-      (ram)
-      (trustee) )
+      (starting_block_for_initial_witness_election) )
     };
 
     typedef eosio::singleton<N(beosglobal), beos_global_state> beos_global_state_singleton;
@@ -56,22 +34,9 @@ namespace eosio {
       beos_global_state            _beos_gstate;
       beos_global_state_singleton  _beos_global;
 
-      void checker( const beos_global_state_element& state )
-      {
-        eosio_assert( state.starting_block_for_distribution > 0, "STARTING_BLOCK_FOR_DISTRIBUTION > 0" );
-        eosio_assert( state.ending_block_for_distribution > state.starting_block_for_distribution, "ENDING_BLOCK_FOR_DISTRIBUTION > STARTING_BLOCK_FOR_DISTRIBUTION" );
-        eosio_assert( state.distribution_payment_block_interval_for_distribution > 0, "DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_DISTRIBUTION > 0" );
-        eosio_assert( state.amount_of_reward > 0, "AMOUNT_OF_REWARD > 0" );
-      }
-
-      //Checking basic dependencies between BEOS parameters.
       void checker( const beos_global_state& state )
       {
         eosio_assert( state.starting_block_for_initial_witness_election > 0, "STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION > 0" );
-
-        checker( state.beos );
-        checker( state.ram );
-        checker( state.trustee );
       }
 
       beos_global_state get_beos_default_parameters()
@@ -88,72 +53,6 @@ namespace eosio {
           Set this to 14 days worth of blocks
         */
         dp.starting_block_for_initial_witness_election = ${STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION};
-
-        /*
-          STARTING_BLOCK_FOR_BEOS_DISTRIBUTION
-          This is the block where the blockchain begins awarding staked BEOS to accounts holding proxyBTS.
-          Set this to 7 days/1 week worth of blocks.
-        */
-        dp.beos.starting_block_for_distribution = ${STARTING_BLOCK_FOR_BEOS_DISTRIBUTION};
-
-        /*
-          ENDING_BLOCK_FOR_BEOS_DISTRIBUTION
-          ending_block_for_beos_distribution
-          This is the block where the blockchain stops awarding staked BEOS to accounts holding proxyBTS.
-          Set this to STARTING_BLOCK_FOR_DISTRIBUTION  + 98 days worth of blocks
-          (in other words, distribution will last for 98 days/14 weeks).
-          
-          IMPORTANT NOTE: Staked BEOS will only be “unstakeable” after this period is over.
-        */
-        dp.beos.ending_block_for_distribution = ${ENDING_BLOCK_FOR_BEOS_DISTRIBUTION};
-
-        /*
-          distribution_payment_block_interval_for_beos_distribution
-        */
-        dp.beos.distribution_payment_block_interval_for_distribution = ${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION};
-
-        /*
-          AMOUNT_OF_REWARD_BEOS
-          This is the total amount of staked BEOS to be awarded over the BEOS distribution period.
-          TODO: This value needs to be set by Terradacs.
-        */
-        dp.beos.amount_of_reward = ${AMOUNT_OF_REWARD_BEOS};
-
-        /*
-          STARTING_BLOCK_FOR_RAM_DISTRIBUTION
-          This is the block where the blockchain begins awarding RAM to accounts holding proxyBTS.
-          Set this to 7 days worth of blocks.
-        */
-        dp.ram.starting_block_for_distribution = ${STARTING_BLOCK_FOR_RAM_DISTRIBUTION};
-
-        /*
-          ENDING_BLOCK_FOR_RAM_DISTRIBUTION
-          This is the block where the blockchain stops awarding sRAM to accounts holding proxyBTS.
-          Set this to STARTING_BLOCK_FOR_RAM_DISTRIBUTION  + 280 days worth of blocks
-          (in other words, distribution will last for 280 days/40 weeks).
-
-          IMPORTANT NOTE: Don’t allow RAM to be transferred until after distribution period is over,
-          but it can be spent on fees for actions. This prevents a market from forming for RAM until the end of the distribution period.
-          This means that anyone needing RAM during distribution period must lock up BTS to get it.
-        */
-        dp.ram.ending_block_for_distribution = ${ENDING_BLOCK_FOR_RAM_DISTRIBUTION};
-
-        /*
-          get_distribution_payment_block_interval_for_ram_distribution
-        */
-        dp.ram.distribution_payment_block_interval_for_distribution = ${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION};
-
-        /*
-          AMOUNT_OF_REWARD_RAM
-          This is the total amount of RAM to be awarded over the RAM distribution period.
-          TODO: Some analysis is needed to determine a reasonable value for this amount based on RAM resources.
-        */
-        dp.ram.amount_of_reward = ${AMOUNT_OF_REWARD_RAM};
-
-        dp.trustee.starting_block_for_distribution = ${STARTING_BLOCK_FOR_TRUSTEE_DISTRIBUTION}; //unused
-        dp.trustee.ending_block_for_distribution = ${ENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION}; //unused
-        dp.trustee.distribution_payment_block_interval_for_distribution = ${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_TRUSTEE_DISTRIBUTION}; //unused
-        dp.trustee.amount_of_reward = ${AMOUNT_OF_REWARD_TRUSTEE};
 
         checker( dp );
 
@@ -172,32 +71,11 @@ namespace eosio {
       void changeparams( beos_global_state new_params );
 
       inline beos_global_state get_beos_global_state() const;
-      /*
-        current block is inside [ starting_block_for_distribution : ending_block_for_distribution )
-      */
-      inline bool is_active_distribution_period() const;
-      /*
-        current block is at or above ending_block_for_distribution
-      */
-      inline bool is_past_distribution_period() const;
   };
 
   inline beos_global_state init::get_beos_global_state() const
   {
     return _beos_gstate;
-  }
-
-  inline bool init::is_active_distribution_period() const
-  {
-    auto block_no = get_blockchain_block_number();
-    return _beos_gstate.beos.starting_block_for_distribution <= block_no &&
-      block_no < _beos_gstate.beos.ending_block_for_distribution;
-  }
-
-  inline bool init::is_past_distribution_period() const
-  {
-    auto block_no = get_blockchain_block_number();
-    return _beos_gstate.beos.ending_block_for_distribution <= block_no;
   }
 
 } /// namespace eosio
