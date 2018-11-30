@@ -177,6 +177,10 @@ START_NODE_INDEX = 0
 
 PRODUCER_NAME = "eosio"
 
+##############           Producers accounts configuration         ###############
+#################################################################################
+PRODUCERS_ARRAY = {}
+
 ##############              Cmake tests configuration             ###############
 #################################################################################
 DISABLE_FAILING_TESTS = "true"

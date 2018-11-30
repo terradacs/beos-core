@@ -161,7 +161,8 @@ SYSTEM_ACCOUNT_KEYS = [
     TRUSTEE_ACTIVE_PRIVATE_KEY,
     PRODUCERJSON_OWNER_PRIVATE_KEY,
     PRODUCERJSON_ACTIVE_PRIVATE_KEY,
-    REGPROXYINFO_OWNER_PRIVATE_KEY
+    REGPROXYINFO_OWNER_PRIVATE_KEY,
+    REGPROXYINFO_ACTIVE_PRIVATE_KEY
 ]
 # source file for beos config
 BEOS_CONFIG_FILE_SRC = BEOS_BUILD_DIR + "/resources/config.ini"
@@ -175,6 +176,10 @@ GENESIS_JSON_FILE = "genesis.json"
 START_NODE_INDEX = 0
 
 PRODUCER_NAME = "eosio"
+
+##############           Producers accounts configuration         ###############
+#################################################################################
+PRODUCERS_ARRAY = {}
 
 ##############              Cmake tests configuration             ###############
 #################################################################################
