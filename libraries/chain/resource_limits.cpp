@@ -7,6 +7,14 @@
 #include <eosio/chain/database_utils.hpp>
 #include <algorithm>
 
+//ABW: uncomment the following symbol to unconditionally write eosio::print calls to file (works even during unit tests)
+#define CAVEMEN_DEBUG
+#ifdef CAVEMEN_DEBUG
+#define DBG(format, ... ) { FILE *pFile = fopen("debug.log","a"); fprintf(pFile,format "\n",__VA_ARGS__); fclose(pFile); }
+#else
+#define DBG(format, ... )
+#endif
+
 namespace eosio { namespace chain { namespace resource_limits {
 
 using resource_index_set = index_set<
@@ -218,40 +226,49 @@ int64_t resource_limits_manager::get_account_ram_usage( const account_name& name
    return _db.get<resource_usage_object,by_owner>( name ).ram_usage;
 }
 
+template <typename TObjectConverter, typename TProcessor>
 void resource_limits_manager::process_userres(const account_name& lowerBound, const account_name& upperBound,
-  userres_processor processor) const
+  TProcessor processor) const
   {
   const auto& idx = _db.template get_index<resource_limits_index, by_owner>();
 
-  auto begin = lowerBound.empty() ? idx.begin() : idx.lower_bound(lowerBound);
-  auto end = upperBound.empty() ? idx.end() : idx.lower_bound(upperBound);
+  // process range of non-pending limits:
+  auto range = idx.equal_range(false);
+  auto begin = lowerBound.empty() ? range.first : idx.lower_bound(boost::make_tuple(false, lowerBound));
+  auto end = upperBound.empty() ? range.second : idx.lower_bound(boost::make_tuple(false, upperBound));
 
   bool canContinue = (begin != end);
 
   while (canContinue)
     {
-    const resource_limits_object& obj = *begin;
+    // to be compatible with eosio::userres, pending limits have priority
+    auto found = idx.lower_bound(boost::make_tuple(true, begin->owner));
+    const resource_limits_object& obj = (found != idx.end() ? *found : *begin);
     bool hasNext = (++begin != end);
-    canContinue = processor(obj, hasNext) && hasNext;
+    canContinue = processor(TObjectConverter()(obj), hasNext) && hasNext;
     }
+  }
+
+void resource_limits_manager::process_userres(const account_name& lowerBound, const account_name& upperBound,
+  userres_processor processor) const
+  {
+  struct TDefaultConverter
+    {
+    const resource_limits_object& operator () (const resource_limits_object& obj) const { return obj; }
+    };
+
+  process_userres<TDefaultConverter>(lowerBound, upperBound, std::move(processor));
   }
 
 void resource_limits_manager::process_public_userres(const account_name& lowerBound, const account_name& upperBound,
   userres_public_processor processor) const
   {
-  const auto& idx = _db.template get_index<resource_limits_index, by_owner>();
-
-  auto begin = lowerBound.empty() ? idx.begin() : idx.lower_bound(lowerBound);
-  auto end = upperBound.empty() ? idx.end() : idx.lower_bound(upperBound);
-
-  bool canContinue = (begin != end);
-
-  while (canContinue)
+  struct TPublicConverter
     {
-    const resource_limits_object& obj = *begin;
-    bool hasNext = (++begin != end);
-    canContinue = processor(convert_to_public(obj), hasNext) && hasNext;
-    }
+    fc::mutable_variant_object operator () (const resource_limits_object& obj) const { return convert_to_public(obj); }
+    };
+
+  process_userres<TPublicConverter>(lowerBound, upperBound, std::move(processor));
   }
 
 fc::mutable_variant_object resource_limits_manager::convert_to_public(
