@@ -1533,6 +1533,11 @@ class context_free_transaction_api : public context_aware_api {
       int get_action( uint32_t type, uint32_t index, array_ptr<char> buffer, size_t buffer_size )const {
          return context.get_action( type, index, buffer, buffer_size );
       }
+
+      uint32_t get_blockchain_block_number() const
+         {
+         return context.control.head_block_num();
+         }
 };
 
 class compiler_builtins : public context_aware_api {
@@ -2044,6 +2049,7 @@ REGISTER_INTRINSICS(context_free_transaction_api,
    (tapos_block_prefix,     int()                    )
    (tapos_block_num,        int()                    )
    (get_action,             int (int, int, int, int) )
+   (get_blockchain_block_number, int32_t()           )
 );
 
 REGISTER_INTRINSICS(transaction_api,

@@ -1,19 +1,16 @@
 #pragma once
 #include <eosiolib/types.h>
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 struct block_producer_voting_info;
 
-   /**
-    * @brief Get the number of actual block in blockchain
-    */
-   int tapos_block_num();
-
-   ///@ } privilegedcapi
+   /** Allows to retrieve blockchain head block number.
+       @return head block number
+   */
+   uint32_t get_blockchain_block_number();
 
    /**
     *  Defined in distribution_api
