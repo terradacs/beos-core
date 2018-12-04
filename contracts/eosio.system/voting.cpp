@@ -155,6 +155,7 @@ namespace eosiosystem {
     *  If voting for a proxy, the producer votes will not change until the proxy updates their own vote.
     */
    void system_contract::voteproducer( const account_name voter_name, const account_name proxy, const std::vector<account_name>& producers ) {
+      eosio_assert( is_allowed_vote_operation(), "initial witness election is disabled" );
       require_auth( voter_name );
       update_votes( voter_name, proxy, producers, true);
    }
@@ -196,9 +197,6 @@ namespace eosiosystem {
     */
    void system_contract::regproxy( const account_name proxy, bool isproxy ) {
       require_auth( proxy );
-
-      if( !is_allowed_vote_operation() )
-        return;
 
       auto producer_infos = prepare_producer_infos(_producers);
 

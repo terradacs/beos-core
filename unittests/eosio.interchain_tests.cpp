@@ -807,7 +807,7 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test, eosio_init_tester ) try {
   produce_blocks( 60 - control->head_block_num() );
 
   BOOST_REQUIRE_EQUAL( success(), create_producer( N(bob) ) );
-  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("initial witness election is disabled"), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
 
   CHECK_STATS(xxxxxxxmario, "5.0000 PROXY", "800.0000 BEOS", "0");
   CHECK_STATS(bob, "5.0000 PROXY", "800.0000 BEOS", "0");
@@ -817,7 +817,7 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test, eosio_init_tester ) try {
 
   produce_blocks( 100 - control->head_block_num() );
 
-  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("initial witness election is disabled"), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
   prod = get_producer_info( N(bob) );
   BOOST_REQUIRE_EQUAL( 0, prod["total_votes"].as_double() );
 
@@ -856,11 +856,11 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test2, eosio_init_tester ) try {
   BOOST_REQUIRE_EQUAL( success(), create_producer( N(bob) ) );
   BOOST_REQUIRE_EQUAL( success(), create_producer( N(carol) ) );
 
-  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
-  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxxmario), { N(carol) } ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("initial witness election is disabled"), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("initial witness election is disabled"), vote_producer( N(xxxxxxxmario), { N(carol) } ) );
 
-  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxmario2), { N(bob) } ) );
-  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxmario2), { N(carol) } ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("initial witness election is disabled"), vote_producer( N(xxxxxxmario2), { N(bob) } ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("initial witness election is disabled"), vote_producer( N(xxxxxxmario2), { N(carol) } ) );
 
   auto prod = get_producer_info( N(bob) );
   BOOST_REQUIRE_EQUAL( 0, prod["total_votes"].as_double() );
@@ -871,9 +871,10 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test2, eosio_init_tester ) try {
   produce_blocks( 100 - control->head_block_num() - 2 );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 98u );
 
-  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
-  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxmario2), { N(carol) } ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("initial witness election is disabled"), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("initial witness election is disabled"), vote_producer( N(xxxxxxmario2), { N(carol) } ) );
 
+  produce_blocks( 2 );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 100u );
 
   prod = get_producer_info( N(bob) );

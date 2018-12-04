@@ -415,11 +415,8 @@ namespace eosiosystem {
       }
 
       // update voting power
-      if( is_allowed_vote_operation() )
-      {
-         asset total_update = stake_net_delta + stake_cpu_delta;
-         update_voting_power(from, total_update.amount);
-      }
+      asset total_update = stake_net_delta + stake_cpu_delta;
+      update_voting_power(from, total_update.amount);
    }
 
    void system_contract::delegatebw( account_name from, account_name receiver,
