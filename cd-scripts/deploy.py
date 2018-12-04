@@ -380,8 +380,9 @@ def initialize_beos():
         eosio.push_action("eosio.token", "create", '[ "eosio", "{0} {1}"]'.format(config.CORE_TOTAL_SUPPLY, config.CORE_SYMBOL_NAME), "eosio.token")
         eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PROXY_TOTAL_SUPPLY, config.PROXY_ASSET_NAME), "eosio.token")
 
-        # set initial producers
+        # set initial producers, setprods is in eosio.bios contract so we need to load it first
         if config.PRODUCERS_ARRAY:
+            logger.info("Setting initial producers via setprods")
             eosio.set_contract("eosio", config.CONTRACTS_DIR + "eosio.bios", "eosio")
             producers = []
             for producer, data in config.PRODUCERS_ARRAY.items():
@@ -390,7 +391,12 @@ def initialize_beos():
             args = {"schedule" : producers}
             eosio.push_action("eosio", "setprods", '{0}'.format(json.dumps(args)), "eosio")
 
+        # registering initial producers, regproducer is in eosio.system contract so it need to be loaded first
         eosio.set_contract("eosio", config.CONTRACTS_DIR + "eosio.system", "eosio")
+        for producer, data in config.PRODUCERS_ARRAY.items():
+            logger.info("Registering producer account for: {0}".format(producer))
+            eosio.push_action("eosio", "regproducer", '["{0}", "{1}", "{2}", 0]'.format(producer, data["pub_active"], data["url"]), producer)
+
         eosio.set_contract("beos.init", config.CONTRACTS_DIR + "eosio.init", "beos.init")
         eosio.set_contract("beos.gateway", config.CONTRACTS_DIR + "eosio.gateway", "beos.gateway")
         eosio.set_contract("beos.distrib", config.CONTRACTS_DIR + "eosio.distribution", "beos.distrib")
