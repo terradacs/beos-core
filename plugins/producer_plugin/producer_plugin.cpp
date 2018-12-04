@@ -158,6 +158,8 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
       fc::optional<scoped_connection>                          _accepted_block_connection;
       fc::optional<scoped_connection>                          _irreversible_block_connection;
 
+      mutable bool                                             _acceleration_enabled = false;
+      mutable int64_t                                          _acceleration = 0;
       /*
        * HACK ALERT
        * Boost timers can be in a state where a handler has not yet executed but is not abortable.
@@ -453,6 +455,7 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
 
       start_block_result start_block(bool &last_block);
 
+      void accelerate_blocks( const fc::microseconds& value );
       fc::time_point calculate_pending_block_time() const;
       void schedule_delayed_production_loop(const std::weak_ptr<producer_plugin_impl>& weak_this, const block_timestamp_type& current_block_time);
 };
@@ -919,6 +922,11 @@ producer_plugin::snapshot_information producer_plugin::create_snapshot() const {
    return {head_id, snapshot_path};
 }
 
+void producer_plugin::accelerate_blocks( const fc::microseconds& value )
+{
+  my->accelerate_blocks( value );
+}
+
 optional<fc::time_point> producer_plugin_impl::calculate_next_block_time(const account_name& producer_name, const block_timestamp_type& current_block_time) const {
    chain::controller& chain = app().get_plugin<chain_plugin>().chain();
    const auto& hbs = chain.head_block_state();
@@ -975,9 +983,26 @@ optional<fc::time_point> producer_plugin_impl::calculate_next_block_time(const a
    }
 }
 
+void producer_plugin_impl::accelerate_blocks( const fc::microseconds& value )
+{
+  if( value.count() > config::block_interval_us )
+  {
+    _acceleration_enabled = true;
+    _acceleration += value.count();
+  }
+}
+
 fc::time_point producer_plugin_impl::calculate_pending_block_time() const {
+
+   fc::time_point now = fc::time_point::now();
+
+   if( _acceleration_enabled )
+   {
+     _acceleration_enabled = false;
+     now += microseconds( _acceleration );
+   }
+
    const chain::controller& chain = app().get_plugin<chain_plugin>().chain();
-   const fc::time_point now = fc::time_point::now();
    const fc::time_point base = std::max<fc::time_point>(now, chain.head_block_time());
    const int64_t min_time_to_next_block = (config::block_interval_us) - (base.time_since_epoch().count() % (config::block_interval_us) );
    fc::time_point block_time = base + fc::microseconds(min_time_to_next_block);
@@ -1354,6 +1379,7 @@ void producer_plugin_impl::schedule_production_loop() {
          // ship this block off no later than its deadline
          EOS_ASSERT( chain.pending_block_state(), missing_pending_block_state, "producing without pending_block_state, start_block succeeded" );
          auto deadline = chain.pending_block_time().time_since_epoch().count() + (last_block ? _last_block_time_offset_us : _produce_time_offset_us);
+         deadline -= _acceleration;
          _timer.expires_at( epoch + boost::posix_time::microseconds( deadline ));
          fc_dlog(_log, "Scheduling Block Production on Normal Block #${num} for ${time}", ("num", chain.pending_block_state()->block_num)("time",deadline));
       } else {
