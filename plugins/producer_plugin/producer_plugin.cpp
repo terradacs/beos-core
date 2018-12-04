@@ -159,7 +159,7 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
       fc::optional<scoped_connection>                          _irreversible_block_connection;
 
       mutable bool                                             _acceleration_enabled = false;
-      mutable int64_t                                          _acceleration = 0;
+      mutable uint64_t                                         _acceleration = 0;
       /*
        * HACK ALERT
        * Boost timers can be in a state where a handler has not yet executed but is not abortable.
