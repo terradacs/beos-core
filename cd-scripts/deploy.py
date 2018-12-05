@@ -381,10 +381,10 @@ def initialize_beos():
         eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PROXY_TOTAL_SUPPLY, config.PROXY_ASSET_NAME), "eosio.token")
 
         # set initial producers, setprods is in eosio.bios contract so we need to load it first
+        logger.info("Setting initial producers via setprods")
+        eosio.set_contract("eosio", config.CONTRACTS_DIR + "eosio.bios", "eosio")
+        producers = [{"producer_name": config.PRODUCER_NAME, "block_signing_key": config.EOSIO_PUBLIC_KEY}]
         if config.PRODUCERS_ARRAY:
-            logger.info("Setting initial producers via setprods")
-            eosio.set_contract("eosio", config.CONTRACTS_DIR + "eosio.bios", "eosio")
-            producers = []
             for producer, data in config.PRODUCERS_ARRAY.items():
                 producers.append({"producer_name": producer, "block_signing_key": data["pub_active"]})
             import json
@@ -393,6 +393,8 @@ def initialize_beos():
 
         # registering initial producers, regproducer is in eosio.system contract so it need to be loaded first
         eosio.set_contract("eosio", config.CONTRACTS_DIR + "eosio.system", "eosio")
+        # special case, register eosio as producer
+        eosio.push_action("eosio", "regproducer", '["{0}", "{1}", "{2}", 0]'.format(config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY, "http://dummy.net"), config.PRODUCER_NAME)
         for producer, data in config.PRODUCERS_ARRAY.items():
             logger.info("Registering producer account for: {0}".format(producer))
             eosio.push_action("eosio", "regproducer", '["{0}", "{1}", "{2}", 0]'.format(producer, data["pub_active"], data["url"]), producer)
