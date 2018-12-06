@@ -66,8 +66,22 @@ namespace beos_apis
       } else {
         return address_validator_results( false );
       }
-    } catch(...){
-
+    } catch (const fc::exception& e) {
+        throw e;
+    } catch( const std::exception& e ) {
+      auto fce = fc::exception(
+          FC_LOG_MESSAGE( info, "Caught std::exception: ${what}", ("what",e.what())),
+          fc::std_exception_code,
+          BOOST_CORE_TYPEID(e).name(),
+          e.what()
+      );
+      throw fce;
+    } catch( ... ) {
+      auto fce = fc::unhandled_exception(
+          FC_LOG_MESSAGE( info, "Caught unknown exception"),
+          std::current_exception()
+      );
+      throw fce;
     }
     return address_validator_results( false );
   }
