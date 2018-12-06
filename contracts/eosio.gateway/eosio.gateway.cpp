@@ -11,7 +11,7 @@
 
 namespace eosio {
 
-void gateway::issue( account_name to, asset quantity )
+void gateway::issue( account_name to, asset quantity, std::string memo)
 {
   auto from = N(beos.gateway);
 
@@ -36,26 +36,29 @@ void gateway::issue( account_name to, asset quantity )
   */
   auto gateway_balance = eosio::token( N(eosio.token) ).check_balance( from, quantity.symbol );
 
+  name sName;
+  sName.value = quantity.symbol.name();
+
   if( gateway_balance.amount == 0 )//a
   {
     //Sending PXBTS to the user `to` during every lock.
     INLINE_ACTION_SENDER(eosio::token, issue)( N(eosio.token), {{from,N(active)}},
-                                            { to, quantity, std::string("issue - distribution period")} );
+                                            { to, quantity, memo} );
   }
   else if( gateway_balance >= quantity )//b
   {
     INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {from,N(active)},
-                                               { from, to, quantity, std::string("transfer - distribution period") } );
+                                               { from, to, quantity, memo } );
   }
   else//c
   {
     INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {from,N(active)},
-                                               { from, to, gateway_balance, std::string("transfer - distribution period") } );
+                                               { from, to, gateway_balance, memo } );
 
     quantity -= gateway_balance;
     eosio_assert( quantity.amount > 0, "must issue positive quantity" );
     INLINE_ACTION_SENDER(eosio::token, issue)( N(eosio.token), {{from,N(active)}},
-                                            { to, quantity, std::string("issue - distribution period")} );
+                                            { to, quantity, memo } );
   }
 }
 

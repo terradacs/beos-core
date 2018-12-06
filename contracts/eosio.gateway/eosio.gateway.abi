@@ -5,14 +5,20 @@
   "structs": [{
       "name": "issue",
       "base": "",
-      "fields": [{
-          "name": "to",
-          "type": "name"
-        },{
-          "name": "quantity",
-          "type": "asset"
-        }
-      ]
+    "fields": [
+      {
+        "name": "to",
+        "type": "name"
+      },
+      {
+        "name": "quantity",
+        "type": "asset"
+      },
+      {
+        "name": "memo",
+        "type": "string" 
+      }
+    ]
     },{
       "name": "withdraw",
       "base": "",

@@ -136,7 +136,8 @@ struct actions: public tester
 
     create_action( act, N(issue), mvo()
       ( "to", to )
-      ( "quantity", quantity ),
+      ( "quantity", quantity )
+      ( "memo", ""),
       beos_gateway_abi_ser,
       N(beos.gateway)
       );
