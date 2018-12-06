@@ -35,6 +35,8 @@ void distribution::execute( uint32_t block_nr, asset proxy_asset,
         reward_all( amount_of_reward, amount_of_reward_for_trustee, gathered_amount, &proxy_asset, sizeof(asset), is_beos_mode,
            vud.producer_infos.data(), vud.producer_infos.size());
 
+         INLINE_ACTION_SENDER(eosiosystem::system_contract, updateprods)( N(eosio), {N(eosio),N(active)},{ vud } );
+
         //Total end of distribution period. Transferring from staked BEOS/RAM to liquid BEOS/RAM.
         //It depends on `is_beos_mode` variable.
         if(

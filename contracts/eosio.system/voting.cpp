@@ -52,7 +52,7 @@ namespace eosiosystem {
    bool system_contract::is_allowed_vote_operation() const
    {
       //Creating votes for producers has delay.
-      uint64_t block_nr = static_cast< uint64_t >( get_blockchain_block_number() );
+      uint32_t block_nr = get_blockchain_block_number();
       eosio::beos_global_state b_state = eosio::init( N(beos.init) ).get_beos_global_state();
       return block_nr > b_state.starting_block_for_initial_witness_election;
    }
@@ -155,15 +155,20 @@ namespace eosiosystem {
     *  If voting for a proxy, the producer votes will not change until the proxy updates their own vote.
     */
    void system_contract::voteproducer( const account_name voter_name, const account_name proxy, const std::vector<account_name>& producers ) {
-      eosio_assert( is_allowed_vote_operation(), "initial witness election is disabled" );
       require_auth( voter_name );
       update_votes( voter_name, proxy, producers, true);
    }
 
-   void system_contract::update_votes( const account_name voter_name, const account_name proxy, const std::vector<account_name>& producers, bool voting ) {
+   void system_contract::updateprods( const eosio_voting_data& voting_data )
+   {
+      require_auth( _self );
 
-     if( !is_allowed_vote_operation() )
-      return;
+      update_producers_table( voting_data.producer_infos, _producers );
+
+      flush_voting_stats();
+   }
+
+   void system_contract::update_votes( const account_name voter_name, const account_name proxy, const std::vector<account_name>& producers, bool voting ) {
 
       //validate input
       if ( proxy ) {
