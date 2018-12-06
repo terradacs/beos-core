@@ -29,7 +29,7 @@ namespace eosio {
       * `to`        - given account
       * `quantity`  - number of PXBTS-es.
       */
-      void issue(account_name to, asset quantity );
+      void issue(account_name to, asset quantity, std::string memo = "");
 
       /**
       * Executed by any user at any time. If the user wants to decrease balance
