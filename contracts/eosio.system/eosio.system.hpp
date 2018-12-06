@@ -68,9 +68,11 @@ namespace eosiosystem {
 
    /// Helper structure to retrieve data next to be passed to `update_voting_power` method (priviledged_api)
    struct eosio_voting_data
-      {
+    {
       std::vector<block_producer_voting_info> producer_infos;
-      };
+
+      EOSLIB_SERIALIZE( eosio_voting_data, (producer_infos) )
+    };
 
    struct producer_info {
       account_name          owner;
@@ -216,6 +218,8 @@ namespace eosiosystem {
          void setram( uint64_t max_ram_size );
 
          void voteproducer( const account_name voter, const account_name proxy, const std::vector<account_name>& producers );
+
+         void updateprods( const eosio_voting_data& voting_data );
 
          void regproxy( const account_name proxy, bool isproxy );
 

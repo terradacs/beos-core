@@ -794,7 +794,6 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test, eosio_init_tester ) try {
 
   test_global_state tgs;
 
-  tgs.beos.starting_block_for_distribution = 50;
   tgs.beos.distribution_payment_block_interval_for_distribution = 5;
   tgs.beos.starting_block_for_distribution = 55;
   BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
@@ -807,25 +806,34 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test, eosio_init_tester ) try {
   produce_blocks( 60 - control->head_block_num() );
 
   BOOST_REQUIRE_EQUAL( success(), create_producer( N(bob) ) );
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg("initial witness election is disabled"), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
+  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
 
   CHECK_STATS(xxxxxxxmario, "5.0000 PROXY", "800.0000 BEOS", "0");
   CHECK_STATS(bob, "5.0000 PROXY", "800.0000 BEOS", "0");
 
-  auto prod = get_producer_info( N(bob) );
-  BOOST_REQUIRE_EQUAL( 0, prod["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( 8730859820578.5469, get_producer_info( N(bob) )["total_votes"].as_double() );
 
   produce_blocks( 100 - control->head_block_num() );
 
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg("initial witness election is disabled"), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
-  prod = get_producer_info( N(bob) );
-  BOOST_REQUIRE_EQUAL( 0, prod["total_votes"].as_double() );
+  CHECK_STATS(xxxxxxxmario, "5.0000 PROXY", "4000.0000 BEOS", "0");
+  CHECK_STATS(bob, "5.0000 PROXY", "4000.0000 BEOS", "0");
+
+  BOOST_REQUIRE_EQUAL( 43654299102892.734, get_producer_info( N(bob) )["total_votes"].as_double() );
+
+  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
+
+  BOOST_REQUIRE_EQUAL( 43654299102892.734, get_producer_info( N(bob) )["total_votes"].as_double() );
 
   produce_blocks( 1 );
 
+  CHECK_STATS(xxxxxxxmario, "5.0000 PROXY", "4000.0000 BEOS", "0");
+  CHECK_STATS(bob, "5.0000 PROXY", "4000.0000 BEOS", "0");
+
+  BOOST_REQUIRE_EQUAL( 43654299102892.734, get_producer_info( N(bob) )["total_votes"].as_double() );
+
   BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
-  prod = get_producer_info( N(bob) );
-  BOOST_REQUIRE_EQUAL( 43654299102892.734, prod["total_votes"].as_double() );
+
+  BOOST_REQUIRE_EQUAL( 43654299102892.734, get_producer_info( N(bob) )["total_votes"].as_double() );
 
 } FC_LOG_AND_RETHROW()
 
@@ -856,32 +864,25 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test2, eosio_init_tester ) try {
   BOOST_REQUIRE_EQUAL( success(), create_producer( N(bob) ) );
   BOOST_REQUIRE_EQUAL( success(), create_producer( N(carol) ) );
 
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg("initial witness election is disabled"), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg("initial witness election is disabled"), vote_producer( N(xxxxxxxmario), { N(carol) } ) );
+  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
+  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxxmario), { N(carol) } ) );
 
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg("initial witness election is disabled"), vote_producer( N(xxxxxxmario2), { N(bob) } ) );
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg("initial witness election is disabled"), vote_producer( N(xxxxxxmario2), { N(carol) } ) );
+  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxmario2), { N(bob) } ) );
+  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxmario2), { N(carol) } ) );
 
-  auto prod = get_producer_info( N(bob) );
-  BOOST_REQUIRE_EQUAL( 0, prod["total_votes"].as_double() );
-
-  prod = get_producer_info( N(carol) );
-  BOOST_REQUIRE_EQUAL( 0, prod["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( 0, get_producer_info( N(bob) )["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( 13096289730867.82, get_producer_info( N(carol) )["total_votes"].as_double() );
 
   produce_blocks( 100 - control->head_block_num() - 2 );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 98u );
 
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg("initial witness election is disabled"), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg("initial witness election is disabled"), vote_producer( N(xxxxxxmario2), { N(carol) } ) );
+  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
+  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxmario2), { N(carol) } ) );
 
-  produce_blocks( 2 );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 100u );
 
-  prod = get_producer_info( N(bob) );
-  BOOST_REQUIRE_EQUAL( 0, prod["total_votes"].as_double() );
-
-  prod = get_producer_info( N(carol) );
-  BOOST_REQUIRE_EQUAL( 0, prod["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( 21827149551446.367, get_producer_info( N(bob) )["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( 21827149551446.375, get_producer_info( N(carol) )["total_votes"].as_double() );
 
   produce_blocks( 1 );
 
@@ -889,21 +890,21 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test2, eosio_init_tester ) try {
 
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 102u );
 
-  prod = get_producer_info( N(bob) );
-  BOOST_REQUIRE_EQUAL( 21827149551446.367, prod["total_votes"].as_double() );
-
-  prod = get_producer_info( N(carol) );
-  BOOST_REQUIRE_EQUAL( 0, prod["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( 21827149551446.367, get_producer_info( N(bob) )["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( 21827149551446.375, get_producer_info( N(carol) )["total_votes"].as_double() );
 
   BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxmario2), { N(carol) } ) );
 
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 103u );
 
-  prod = get_producer_info( N(bob) );
-  BOOST_REQUIRE_EQUAL( 21827149551446.367, prod["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( 21827149551446.367, get_producer_info( N(bob) )["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( 21827149551446.375, get_producer_info( N(carol) )["total_votes"].as_double() );
 
-  prod = get_producer_info( N(carol) );
-  BOOST_REQUIRE_EQUAL( 21827149551446.367, prod["total_votes"].as_double() );
+  produce_blocks( 110 - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 110u );
+
+  BOOST_REQUIRE_EQUAL( 26192579461735.641, get_producer_info( N(bob) )["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( 26192579461735.648, get_producer_info( N(carol) )["total_votes"].as_double() );
 
 } FC_LOG_AND_RETHROW()
 

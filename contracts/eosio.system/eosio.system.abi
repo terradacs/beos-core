@@ -25,6 +25,20 @@
          {"name":"min_activated_stake_percent", "type":"uint8"}
       ]
     },{
+       "name": "block_producer_voting_info",
+       "base": "",
+       "fields": [
+          {"name":"owner_account_name", "type":"account_name"},
+          {"name":"total_votes", "type":"float64"},
+          {"name":"is_active", "type":"bool"}
+       ]
+    },{
+       "name": "eosio_voting_data",
+       "base": "",
+       "fields": [
+          {"name":"producer_infos", "type":"block_producer_voting_info[]"}
+       ]
+    },{
       "name": "initresource",
       "base": "",
       "fields": [
@@ -327,6 +341,12 @@
         {"name":"producers", "type":"account_name[]"}
       ]
     },{
+      "name": "updateprods",
+      "base": "",
+      "fields": [
+        {"name":"voting_data",     "type":"eosio_voting_data"}
+      ]
+    },{
       "name": "voter_info",
       "base": "",
       "fields": [
@@ -514,6 +534,10 @@
    },{
       "name": "voteproducer",
       "type": "voteproducer",
+      "ricardian_contract": ""
+   },{
+      "name": "updateprods",
+      "type": "updateprods",
       "ricardian_contract": ""
    },{
       "name": "claimrewards",

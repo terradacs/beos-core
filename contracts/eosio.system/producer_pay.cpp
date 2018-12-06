@@ -24,40 +24,47 @@ namespace eosiosystem {
       if( _gstate.total_activated_stake < _min_activated_stake )
          return;
 
-      if( _gstate.last_pervote_bucket_fill == 0 )  /// start the presses
-         _gstate.last_pervote_bucket_fill = current_time();
+      /// only update block producers & name-bid once every minute, block_timestamp is in half seconds
+      bool doUpdate = timestamp.slot - _gstate.last_producer_schedule_update.slot > 120;
 
+      if(is_allowed_vote_operation())
+         {
+         if( _gstate.last_pervote_bucket_fill == 0 )  /// start the presses
+            _gstate.last_pervote_bucket_fill = current_time();
+
+         /// only update block producers once every minute, block_timestamp is in half seconds
+         if(doUpdate)
+            update_elected_producers( timestamp );
+         } /// is_allowed_vote_operation()
 
       /**
-       * At startup the initial producer may not be one that is registered / elected
-       * and therefore there may be no producer object for them.
-       */
+      * At startup the initial producer may not be one that is registered / elected
+      * and therefore there may be no producer object for them.
+      */
       auto prod = _producers.find(producer);
-      if ( prod != _producers.end() ) {
+      if(prod != _producers.end())
+         {
          _gstate.total_unpaid_blocks++;
-         _producers.modify( prod, 0, [&](auto& p ) {
-               p.unpaid_blocks++;
-         });
-      }
-
-      /// only update block producers once every minute, block_timestamp is in half seconds
-      if( timestamp.slot - _gstate.last_producer_schedule_update.slot > 120 ) {
-         update_elected_producers( timestamp );
-
-         if( (timestamp.slot - _gstate.last_name_close.slot) > blocks_per_day ) {
-            name_bid_table bids(_self,_self);
-            auto idx = bids.get_index<N(highbid)>();
-            auto highest = idx.begin();
-            if( highest != idx.end() &&
-                highest->high_bid > 0 &&
-                highest->last_bid_time < (current_time() - useconds_per_day) &&
-                _gstate.thresh_activated_stake_time > 0 &&
-                (current_time() - _gstate.thresh_activated_stake_time) > 14 * useconds_per_day ) {
-                   _gstate.last_name_close = timestamp;
-                   idx.modify( highest, 0, [&]( auto& b ){
-                         b.high_bid = -b.high_bid;
-               });
+         _producers.modify(prod, 0, [&](auto& p)
+            {
+            p.unpaid_blocks++;
             }
+            );
+         }
+
+      if(doUpdate && ((timestamp.slot - _gstate.last_name_close.slot) > blocks_per_day) ) {
+         name_bid_table bids(_self,_self);
+         auto idx = bids.get_index<N(highbid)>();
+         auto highest = idx.begin();
+         if( highest != idx.end() &&
+               highest->high_bid > 0 &&
+               highest->last_bid_time < (current_time() - useconds_per_day) &&
+               _gstate.thresh_activated_stake_time > 0 &&
+               (current_time() - _gstate.thresh_activated_stake_time) > 14 * useconds_per_day ) {
+                  _gstate.last_name_close = timestamp;
+                  idx.modify( highest, 0, [&]( auto& b ){
+                        b.high_bid = -b.high_bid;
+            });
          }
       }
    }
@@ -71,6 +78,7 @@ namespace eosiosystem {
 
       eosio_assert( _gstate.total_activated_stake >= _min_activated_stake,
                     "cannot claim rewards until the chain is activated (at least 15% of all tokens participate in voting)" );
+      eosio_assert(is_allowed_vote_operation(), "cannot claim rewards until intial witness election phase will complete");
 
       auto ct = current_time();
 
