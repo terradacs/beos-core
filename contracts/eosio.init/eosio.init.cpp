@@ -18,6 +18,14 @@ namespace eosio {
     _beos_global.set( _beos_gstate, _self );
   }
 
+  void init::storeparams()
+  {
+    require_auth( _self );
+
+    auto tmp = _beos_global.exists() ? _beos_global.get() : get_beos_default_parameters();
+    _beos_global.set( tmp, _self );
+  }
+
 } /// namespace eosio
 
-EOSIO_ABI( eosio::init, (changeparams) )
+EOSIO_ABI( eosio::init, (changeparams)(storeparams) )

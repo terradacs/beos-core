@@ -105,6 +105,14 @@ void distribution::changeparams( distrib_global_state new_params ) {
    _global.set( _gstate, _self );
 }
 
+void distribution::storeparams()
+{
+  require_auth( _self );
+
+  auto tmp = _global.exists() ? _global.get() : get_default_parameters();
+  _global.set( tmp, _self );
+}
+
 } /// namespace eosio
 
-EOSIO_ABI( eosio::distribution, (onblock)(changeparams) )
+EOSIO_ABI( eosio::distribution, (onblock)(changeparams)(storeparams) )

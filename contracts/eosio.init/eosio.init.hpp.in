@@ -69,6 +69,7 @@ namespace eosio {
       }
 
       void changeparams( beos_global_state new_params );
+      void storeparams();
 
       inline beos_global_state get_beos_global_state() const;
   };

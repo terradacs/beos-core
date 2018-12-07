@@ -416,6 +416,9 @@ def initialize_beos():
         # eosio.get_account("eosio")
         # eosio.get_account("beos.distrib")
 
+        eosio.push_action("beos.init", "storeparams", '[]', "beos.init")
+        eosio.push_action("beos.distrib", "storeparams", '[]', "beos.distrib")
+
         eosio.terminate_running_tasks(nodeos, keosd)
         eosio.show_keosd_postconf(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
         eosio.show_wallet_unlock_postconf()
