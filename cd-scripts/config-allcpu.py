@@ -210,14 +210,14 @@ DISTRIB_RAM_LEFTOVER = 0
 # beos.distrib stores all rewards as net, whatever value is on cpu (declared here) will also be subtracted from net pool of rewards
 DISTRIB_NETCPU_LEFTOVER = 10000
 
-STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION = 100
-STARTING_BLOCK_FOR_BEOS_DISTRIBUTION = 7 * 24 * 3600 * 2 # days(7).to_seconds() * 2
-ENDING_BLOCK_FOR_BEOS_DISTRIBUTION = 98 * 24 * 3600 * 2 # days(98).to_seconds() * 2
-DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION = 1 * 3600 * 2 # hours(1).to_seconds() * 2
+STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION = 1800 * 2 
+STARTING_BLOCK_FOR_BEOS_DISTRIBUTION = 100 # days(7).to_seconds() * 2
+ENDING_BLOCK_FOR_BEOS_DISTRIBUTION =  24 * 3600 * 2 # days(98).to_seconds() * 2
+DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION = 1 * 600  # hours(1).to_seconds() * 2
 TRUSTEE_REWARD_BEOS = CORE_INITIAL_SUPPLY * 2 // 7 # 2/7 of initial supply
-STARTING_BLOCK_FOR_RAM_DISTRIBUTION = 7 * 24 * 3600 * 2 # days(7).to_seconds() * 2
-ENDING_BLOCK_FOR_RAM_DISTRIBUTION = 280 * 24 * 3600 * 2 # days(280).to_seconds() * 2
-DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION = 1 * 3600 * 2 # hours(1).to_seconds() * 2
+STARTING_BLOCK_FOR_RAM_DISTRIBUTION = 100  # days(7).to_seconds() * 2
+ENDING_BLOCK_FOR_RAM_DISTRIBUTION = 24 * 3600 * 2 # days(280).to_seconds() * 2
+DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION = 1 * 600  # hours(1).to_seconds() * 2
 TRUSTEE_REWARD_RAM = 0 # no ram for trustee as reward
 
 ### init loggers
