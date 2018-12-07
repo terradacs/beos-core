@@ -881,9 +881,10 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test, eosio_init_tester ) try {
 
   test_global_state tgs;
 
-  tgs.beos.distribution_payment_block_interval_for_distribution = 5;
-  tgs.beos.starting_block_for_distribution = 55;
-  BOOST_REQUIRE_EQUAL( success(), change_params( tgs ) );
+  tgs.beos.starting_block = 50;
+  tgs.beos.block_interval = 5;
+  tgs.beos.ending_block = 55;
+  check_change_params( tgs );
 
   create_account_with_resources( config::gateway_account_name, N(xxxxxxxmario) );
 
@@ -898,29 +899,29 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test, eosio_init_tester ) try {
   CHECK_STATS(xxxxxxxmario, "5.0000 PROXY", "100000000.0000 BEOS", "0");
   CHECK_STATS(bob, "5.0000 PROXY", "100000000.0000 BEOS", "0");
 
-  BOOST_REQUIRE_EQUAL( 8730859820578.5469, get_producer_info( N(bob) )["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( atof( "1.0913574775723183e+18" ), get_producer_info( N(bob) )["total_votes"].as_double() );
 
   produce_blocks( 100 - control->head_block_num() );
 
-  CHECK_STATS(xxxxxxxmario, "5.0000 PROXY", "4000.0000 BEOS", "0");
-  CHECK_STATS(bob, "5.0000 PROXY", "4000.0000 BEOS", "0");
+  CHECK_STATS(xxxxxxxmario, "5.0000 PROXY", "100000000.0000 BEOS", "0");
+  CHECK_STATS(bob, "5.0000 PROXY", "100000000.0000 BEOS", "0");
 
-  BOOST_REQUIRE_EQUAL( 43654299102892.734, get_producer_info( N(bob) )["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( atof( "1.0913574775723183e+18" ), get_producer_info( N(bob) )["total_votes"].as_double() );
 
   BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
 
-  BOOST_REQUIRE_EQUAL( 43654299102892.734, get_producer_info( N(bob) )["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( atof( "1.0913574775723183e+18" ), get_producer_info( N(bob) )["total_votes"].as_double() );
 
   produce_blocks( 1 );
 
-  CHECK_STATS(xxxxxxxmario, "5.0000 PROXY", "4000.0000 BEOS", "0");
-  CHECK_STATS(bob, "5.0000 PROXY", "4000.0000 BEOS", "0");
+  CHECK_STATS(xxxxxxxmario, "5.0000 PROXY", "100000000.0000 BEOS", "0");
+  CHECK_STATS(bob, "5.0000 PROXY", "100000000.0000 BEOS", "0");
 
-  BOOST_REQUIRE_EQUAL( 43654299102892.734, get_producer_info( N(bob) )["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( atof( "1.0913574775723183e+18" ), get_producer_info( N(bob) )["total_votes"].as_double() );
 
   BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxxmario), { N(bob) } ) );
 
-  BOOST_REQUIRE_EQUAL( 43654299102892.734, get_producer_info( N(bob) )["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( atof( "1.0913574775723183e+18" ), get_producer_info( N(bob) )["total_votes"].as_double() );
 
 } FC_LOG_AND_RETHROW()
 
@@ -930,7 +931,7 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test2, eosio_init_tester ) try {
 
   tgs.beos.starting_block = 50;
   tgs.beos.block_interval = 5;
-  tgs.beos.ending_block = 55;
+  tgs.beos.ending_block = 145;
   check_change_params( tgs );
 
   create_account_with_resources( config::gateway_account_name, N(xxxxxxxmario) );
@@ -943,10 +944,10 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test2, eosio_init_tester ) try {
 
   produce_blocks( 60 - control->head_block_num() );
 
-  CHECK_STATS(xxxxxxxmario, "5.0000 PROXY", "50000000.0000 BEOS", "0");
-  CHECK_STATS(xxxxxxxmario, "5.0000 PROXY", "50000000.0000 BEOS", "0");
-  CHECK_STATS(bob, "5.0000 PROXY", "50000000.0000 BEOS", "0");
-  CHECK_STATS(carol, "5.0000 PROXY", "50000000.0000 BEOS", "0");
+  CHECK_STATS(xxxxxxxmario, "5.0000 PROXY", "7500000.0000 BEOS", "0");
+  CHECK_STATS(xxxxxxxmario, "5.0000 PROXY", "7500000.0000 BEOS", "0");
+  CHECK_STATS(bob, "5.0000 PROXY", "7500000.0000 BEOS", "0");
+  CHECK_STATS(carol, "5.0000 PROXY", "7500000.0000 BEOS", "0");
 
   BOOST_REQUIRE_EQUAL( success(), create_producer( N(bob) ) );
   BOOST_REQUIRE_EQUAL( success(), create_producer( N(carol) ) );
@@ -958,7 +959,7 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test2, eosio_init_tester ) try {
   BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxmario2), { N(carol) } ) );
 
   BOOST_REQUIRE_EQUAL( 0, get_producer_info( N(bob) )["total_votes"].as_double() );
-  BOOST_REQUIRE_EQUAL( 13096289730867.82, get_producer_info( N(carol) )["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( atof( "2.1827149551446368e+17" ), get_producer_info( N(carol) )["total_votes"].as_double() );
 
   produce_blocks( 100 - control->head_block_num() - 2 );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 98u );
@@ -968,8 +969,8 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test2, eosio_init_tester ) try {
 
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 100u );
 
-  BOOST_REQUIRE_EQUAL( 21827149551446.367, get_producer_info( N(bob) )["total_votes"].as_double() );
-  BOOST_REQUIRE_EQUAL( 21827149551446.375, get_producer_info( N(carol) )["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( atof( "3.0012330633238758e+17" ), get_producer_info( N(bob) )["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( atof( "3.0012330633238765e+17" ), get_producer_info( N(carol) )["total_votes"].as_double() );
 
   produce_blocks( 1 );
 
@@ -977,21 +978,21 @@ BOOST_FIXTURE_TEST_CASE( basic_vote_test2, eosio_init_tester ) try {
 
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 102u );
 
-  BOOST_REQUIRE_EQUAL( 21827149551446.367, get_producer_info( N(bob) )["total_votes"].as_double() );
-  BOOST_REQUIRE_EQUAL( 21827149551446.375, get_producer_info( N(carol) )["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( atof( "3.0012330633238758e+17" ), get_producer_info( N(bob) )["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( atof( "3.0012330633238765e+17" ), get_producer_info( N(carol) )["total_votes"].as_double() );
 
   BOOST_REQUIRE_EQUAL( success(), vote_producer( N(xxxxxxmario2), { N(carol) } ) );
 
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 103u );
 
-  BOOST_REQUIRE_EQUAL( 21827149551446.367, get_producer_info( N(bob) )["total_votes"].as_double() );
-  BOOST_REQUIRE_EQUAL( 21827149551446.375, get_producer_info( N(carol) )["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( atof( "3.0012330633238758e+17" ), get_producer_info( N(bob) )["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( atof( "3.0012330633238765e+17" ), get_producer_info( N(carol) )["total_votes"].as_double() );
 
   produce_blocks( 110 - control->head_block_num() );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 110u );
 
-  BOOST_REQUIRE_EQUAL( 26192579461735.641, get_producer_info( N(bob) )["total_votes"].as_double() );
-  BOOST_REQUIRE_EQUAL( 26192579461735.648, get_producer_info( N(carol) )["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( atof( "3.5469118021100346e+17" ), get_producer_info( N(bob) )["total_votes"].as_double() );
+  BOOST_REQUIRE_EQUAL( atof( "3.5469118021100352e+17" ), get_producer_info( N(carol) )["total_votes"].as_double() );
 
 } FC_LOG_AND_RETHROW()
 
