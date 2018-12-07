@@ -15,13 +15,29 @@
       "fields": [
         {"name":"new_params",   "type":"beos_global_state"}
       ]
+    },{
+      "name": "storeparams",
+      "base": "",
+      "fields": [
+      ]
     }],
   "actions": [{
       "name": "changeparams",
       "type": "changeparams",
       "ricardian_contract": ""
+    },{
+      "name": "storeparams",
+      "type": "storeparams",
+      "ricardian_contract": ""
     }],
-  "tables": [],
+  "tables": [
+    {
+      "name": "beosglobal",
+      "type": "beos_global_state",
+      "index_type": "i64",
+      "key_names": [],
+      "key_types": []
+    }],
   "ricardian_clauses": [],
   "error_messages": [],
   "abi_extensions": []

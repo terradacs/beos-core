@@ -367,6 +367,40 @@ class eosio_interchain_tester : public actions
      BOOST_REQUIRE_EQUAL( success(), change_distrib_params( tgs ) );
   }
 
+  fc::variant get_init_param()
+  {
+    vector<char> data = get_row_by_account( N(beos.init), N(beos.init), N(beosglobal), N(beosglobal) );
+    if( data.empty() )
+      return fc::variant();
+    else
+      return beos_init_abi_ser.binary_to_variant( "beos_global_state", data, abi_serializer_max_time );
+  }
+
+  fc::variant get_distrib_param()
+  {
+    vector<char> data = get_row_by_account( N(beos.distrib), N(beos.distrib), N(distribstate), N(distribstate) );
+    if( data.empty() )
+      return fc::variant();
+    else
+      return beos_distrib_abi_ser.binary_to_variant( "distrib_global_state", data, abi_serializer_max_time );
+  }
+
+  action_result store_params_init()
+  {
+    return push_action( N(beos.init), N(storeparams), mvo(),
+        beos_init_abi_ser,
+        N(beos.init)
+      );
+  }
+
+  action_result store_params_distrib()
+  {
+    return push_action( N(beos.distrib), N(storeparams), mvo(),
+        beos_distrib_abi_ser,
+        N(beos.distrib)
+      );
+  }
+
 protected:
   uint64_t  initial_supply = 1'000'000'000;
   uint8_t   min_activated_stake_percent = 15; // 15% is default in eosio
@@ -671,6 +705,37 @@ inline uint64_t check_asset_value(uint64_t value)
 #define ASSET_STRING(INTEGER, SYMBOL) std::string(std::to_string(check_asset_value(INTEGER)) + ".0000 " + #SYMBOL).c_str()
 
 BOOST_AUTO_TEST_SUITE(eosio_init_tests)
+
+BOOST_FIXTURE_TEST_CASE( store_params_test, eosio_init_tester ) try {
+
+  auto var_tgs = get_distrib_param();
+  BOOST_REQUIRE_EQUAL( true, var_tgs.is_null() );
+
+  BOOST_REQUIRE_EQUAL( success(), store_params_distrib() );
+
+  var_tgs = get_distrib_param();
+  BOOST_REQUIRE_EQUAL( false, var_tgs.is_null() );
+  BOOST_REQUIRE_EQUAL( true, var_tgs["beos"].is_object() );
+
+  auto var_tgs_beos = var_tgs["beos"].get_object();
+  BOOST_REQUIRE_EQUAL( true, var_tgs_beos["starting_block"].is_uint64() );
+
+  BOOST_REQUIRE_EQUAL( var_tgs_beos["starting_block"].as_uint64(), 7 * 24 * 3600 * 2 /* days(7).to_seconds() * 2 */ );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( store_params_test2, eosio_init_tester ) try {
+
+  auto var_tgs = get_init_param();
+  BOOST_REQUIRE_EQUAL( true, var_tgs.is_null() );
+
+  BOOST_REQUIRE_EQUAL( success(), store_params_init() );
+
+  var_tgs = get_init_param();
+  BOOST_REQUIRE_EQUAL( false, var_tgs.is_null() );
+  BOOST_REQUIRE_EQUAL( asset::from_string("0.0000 PXBTS"), var_tgs["proxy_asset"].as< asset >() );
+
+} FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( basic_param_test, eosio_init_tester ) try {
 
