@@ -1534,10 +1534,9 @@ class context_free_transaction_api : public context_aware_api {
          return context.get_action( type, index, buffer, buffer_size );
       }
 
-      uint32_t get_blockchain_block_number() const
-         {
+      uint32_t get_blockchain_block_number() const {
          return context.control.head_block_num();
-         }
+      }
 };
 
 class compiler_builtins : public context_aware_api {
@@ -1824,35 +1823,27 @@ class distribution_api : public context_aware_api {
                      "${code} does not have permission to call this API", ("code",actor) );
       }
 
-      void reward_all( uint64_t amount_of_reward, uint64_t amount_of_reward_for_trustee, uint64_t gathered_amount,
-                       array_ptr<char> symbol, size_t symbol_len, //asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/,
-                       bool is_beos_mode,
-                       array_ptr<block_producer_voting_info> producerInfos, size_t producerInfoSize)
-      {
-         datastream<const char*> ds( symbol, symbol_len );
-         asset _symbol;
-         fc::raw::unpack(ds, _symbol);
+      void reward_all( uint64_t beos_to_distribute, uint64_t beos_to_distribute_trustee, uint64_t ram_to_distribute,
+            uint64_t ram_to_distribute_trustee, array_ptr<char> pxbtsAsset, size_t assetLen,
+            array_ptr<block_producer_voting_info> producerInfos, size_t producerInfoSize ) {
+         datastream<const char*> ds( pxbtsAsset, assetLen );
+         asset pxbts;
+         fc::raw::unpack(ds, pxbts);
 
          voting_manager::producer_info_index _producers = prepare_producers(producerInfos, producerInfoSize);
 
-         context.reward_all( amount_of_reward, amount_of_reward_for_trustee, gathered_amount, _symbol, is_beos_mode,
-            _producers);
+         context.reward_all( beos_to_distribute, beos_to_distribute_trustee, ram_to_distribute, ram_to_distribute_trustee, pxbts, _producers);
       }
 
-      void reward_done( array_ptr<char> symbol, size_t symbol_len, //asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/,
-                        bool is_beos_mode )
+      void reward_done()
       {
-         datastream<const char*> ds( symbol, symbol_len );
-         asset _symbol;
-         fc::raw::unpack(ds, _symbol);
-
-         context.reward_done( _symbol, is_beos_mode );
+         context.reward_done();
       }
 };
 
 REGISTER_INTRINSICS( distribution_api,
-   (reward_all,  void(int64_t, int64_t, int64_t, int, int, int, int, int) )
-   (reward_done, void(int, int, int)                            )
+   (reward_all,  void(int64_t, int64_t, int64_t, int64_t, int, int, int, int) )
+   (reward_done, void() )
 );
 
 REGISTER_INJECTED_INTRINSICS(call_depth_api,

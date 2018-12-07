@@ -1,81 +1,110 @@
 
 #include "eosio.distribution.hpp"
+#include <eosio.init/eosio.init.hpp>
 #include <eosio.token/eosio.token.hpp>
 #include <eosio.system/eosio.system.hpp>
-#include <eosio.gateway/eosio.gateway.hpp>
 
 namespace eosio {
 
-distribution::distribution( account_name self )
-          : contract( self )
-{
-}
-
-distribution::~distribution()
-{
-}
-
-void distribution::execute( uint32_t block_nr, asset proxy_asset,
-  uint32_t starting_block_for_any_distribution, uint32_t ending_block_for_any_distribution,
-  uint32_t distribution_payment_block_interval_for_any_distribution, uint64_t amount_of_reward,
-  uint64_t amount_of_reward_for_trustee, bool is_beos_mode )
-{
-  //Only during a distribution period, an action can be called.
-  if( block_nr >= starting_block_for_any_distribution && block_nr <= ending_block_for_any_distribution )
-    {
-      //Maintenance period.
-      if( ( ( block_nr - starting_block_for_any_distribution ) % distribution_payment_block_interval_for_any_distribution ) == 0 )
-      {
-        //Rewarding all accounts.
-        uint64_t gathered_amount = get_sum();
-
-        eosiosystem::immutable_system_contract sc(N(eosio));
-        eosiosystem::eosio_voting_data vud = sc.prepare_data_for_voting_update();
-
-        reward_all( amount_of_reward, amount_of_reward_for_trustee, gathered_amount, &proxy_asset, sizeof(asset), is_beos_mode,
-           vud.producer_infos.data(), vud.producer_infos.size());
-
-         INLINE_ACTION_SENDER(eosiosystem::system_contract, updateprods)( N(eosio), {N(eosio),N(active)},{ vud } );
-
-        //Total end of distribution period. Transferring from staked BEOS/RAM to liquid BEOS/RAM.
-        //It depends on `is_beos_mode` variable.
-        if(
-            ( block_nr == ending_block_for_any_distribution ) ||
-            ( block_nr + distribution_payment_block_interval_for_any_distribution > ending_block_for_any_distribution )
-          )
-        {
-          reward_done( &proxy_asset, sizeof(asset), is_beos_mode );
-        }
-      }
-    }
-}
-
 //This method is triggered every block.
-void distribution::onblock( uint32_t block_nr )
-{
-  eosio::beos_global_state b_state = eosio::init( N(beos.init) ).get_beos_global_state();
+void distribution::onblock( uint32_t block_nr ) {
+   bool distribute_beos = block_nr == _gstate.beos.next_block;
+   bool distribute_ram = block_nr == _gstate.ram.next_block;
+   if ( !(distribute_beos|distribute_ram) )
+      return;
 
-  //Rewarding staked BEOSes, issuing BEOSes.
-  execute( block_nr, b_state.proxy_asset, b_state.beos.starting_block_for_distribution, b_state.beos.ending_block_for_distribution,
-    b_state.beos.distribution_payment_block_interval_for_distribution, b_state.beos.amount_of_reward, b_state.trustee.amount_of_reward,
-    true/*is_beos_mode*/ );
+   int64_t distrib_ram_bytes, distrib_net_weight, distrib_cpu_weight;
+   get_resource_limits( _self, &distrib_ram_bytes, &distrib_net_weight, &distrib_cpu_weight );
+   eosio_assert(distrib_ram_bytes > 0 && distrib_net_weight >= 0 && distrib_cpu_weight >= 0,
+      "initresource not called properly on beos.distrib");
 
-  //Rewarding staked RAM, buying RAM.
-  execute( block_nr, b_state.proxy_asset, b_state.ram.starting_block_for_distribution, b_state.ram.ending_block_for_distribution,
-    b_state.ram.distribution_payment_block_interval_for_distribution, b_state.ram.amount_of_reward, 0, false/*is_beos_mode*/ );
+   uint64_t beos_to_distribute = 0;
+   uint64_t beos_to_distribute_trustee = 0;
+   uint64_t ram_to_distribute = 0;
+   uint64_t ram_to_distribute_trustee = 0;
+
+   if ( distribute_beos ) {
+      // set next beos distribution block (leave on current if this one is last)
+      _gstate.beos.next_block += _gstate.beos.block_interval;
+      if ( !is_within_beos_distribution_period(_gstate.beos.next_block) )
+         _gstate.beos.next_block = block_nr;
+      // calculate value of user/trustee beos rewards for current distribution
+      beos_to_distribute = static_cast<uint64_t>(distrib_net_weight); //beos.distrib holds all rewards on net weight
+        //ABW: for perfect safety we should actually subtract all resources beos.distrib might currently have
+        //as borrowed, however since no account can call delegatebw until end of distribution, we can assume
+        //there is no borrowed bandwidth
+      beos_to_distribute -= static_cast<uint64_t>(distrib_cpu_weight); //make sure beos.distrib has leftover
+        //resources (otherwise it won't be even possible to call changeparams); leftover size is defined by stake in cpu
+      calculate_current_reward( &beos_to_distribute, &beos_to_distribute_trustee, block_nr, _gstate.beos );
+   }
+   if ( distribute_ram ) {
+      // set next ram distribution block (leave on current if this one is last)
+      _gstate.ram.next_block += _gstate.ram.block_interval;
+      if ( !is_within_ram_distribution_period(_gstate.ram.next_block) )
+         _gstate.ram.next_block = block_nr;
+      // calculate value of user/trustee ram rewards for current distribution
+      uint64_t used_ram = static_cast<uint64_t>(get_account_ram_usage(_self));
+      if (used_ram < _gstate.ram_leftover)
+         used_ram = _gstate.ram_leftover;
+      ram_to_distribute = static_cast<uint64_t>(distrib_ram_bytes) - used_ram;
+      calculate_current_reward( &ram_to_distribute, &ram_to_distribute_trustee, block_nr, _gstate.ram );
+   }
+
+   // execute actual distribution
+   asset pxbts = get_active_PXBTS();
+   eosiosystem::immutable_system_contract sc(N(eosio));
+   eosiosystem::eosio_voting_data vud = sc.prepare_data_for_voting_update();
+   eosio::print("Distributing @block ", block_nr, " bandwidth ", beos_to_distribute, " (", beos_to_distribute_trustee,
+      "), ram ", ram_to_distribute, " (", ram_to_distribute_trustee, ")\n");
+   reward_all( beos_to_distribute, beos_to_distribute_trustee, ram_to_distribute, ram_to_distribute_trustee,
+      &pxbts, sizeof(asset), vud.producer_infos.data(), vud.producer_infos.size() );
+
+   INLINE_ACTION_SENDER(eosiosystem::system_contract, updateprods)( N(eosio), {N(eosio),N(active)},{ vud } );
+
+   // reduce total trustee reward by values rewarded above
+   _gstate.beos.trustee_reward -= beos_to_distribute_trustee;
+   _gstate.ram.trustee_reward -= ram_to_distribute_trustee;
+
+   // save corrected variables in permanent state
+   _global.set( _gstate, _self );
+
+   // finish distribution if this was last block
+   if ( _gstate.beos.next_block <= block_nr && _gstate.ram.next_block <= block_nr )
+      reward_done();
 }
 
-uint64_t distribution::get_sum()
-{
-  eosio::beos_global_state b_state = eosio::init( N(beos.init) ).get_beos_global_state();
-  auto issued = eosio::token( N(eosio.token) ).get_supply( b_state.proxy_asset.symbol.name() ).amount;
-  auto withdrawn = eosio::token( N(eosio.token) ).check_balance( N(beos.gateway), b_state.proxy_asset.symbol ).amount;
+asset distribution::get_active_PXBTS() {
+   eosio::beos_global_state b_state = eosio::init( N(beos.init) ).get_beos_global_state();
+   auto issued = eosio::token( N(eosio.token) ).get_supply( b_state.proxy_asset.symbol.name() );
+   auto withdrawn = eosio::token( N(eosio.token) ).check_balance( N(beos.gateway), b_state.proxy_asset.symbol );
   
-  eosio_assert( issued >= withdrawn, "issued PXBTS >= withdrawn PXBTS" );
+   eosio_assert( issued >= withdrawn, "issued PXBTS >= withdrawn PXBTS" );
 
-  return issued - withdrawn;
+   return issued - withdrawn;
+}
+
+void distribution::calculate_current_reward( uint64_t* to_distribute, uint64_t* to_distribute_trustee,
+      uint32_t block_nr, const distribution_parameters& params ) {
+   *to_distribute_trustee = params.trustee_reward;
+   if ( *to_distribute_trustee > *to_distribute )
+      *to_distribute_trustee = *to_distribute;
+   *to_distribute -= *to_distribute_trustee;
+   uint32_t remaining_distribution_steps = (params.ending_block - block_nr) / params.block_interval + 1;
+   *to_distribute /= remaining_distribution_steps;
+   *to_distribute_trustee /= remaining_distribution_steps;
+}
+
+void distribution::changeparams( distrib_global_state new_params ) {
+   require_auth( _self );
+   new_params.beos.next_block = new_params.beos.starting_block;
+   new_params.ram.next_block = new_params.ram.starting_block;
+
+   check( new_params );
+
+   _gstate = new_params;
+   _global.set( _gstate, _self );
 }
 
 } /// namespace eosio
 
-EOSIO_ABI( eosio::distribution, (onblock) )
+EOSIO_ABI( eosio::distribution, (onblock)(changeparams) )

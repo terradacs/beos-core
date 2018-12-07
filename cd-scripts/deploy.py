@@ -294,15 +294,12 @@ def build_eosio(c_compiler, cxx_compiler):
         "-DSTARTING_BLOCK_FOR_BEOS_DISTRIBUTION={0}".format(config.STARTING_BLOCK_FOR_BEOS_DISTRIBUTION),
         "-DENDING_BLOCK_FOR_BEOS_DISTRIBUTION={0}".format(config.ENDING_BLOCK_FOR_BEOS_DISTRIBUTION),
         "-DDISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION={0}".format(config.DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION),
-        "-DAMOUNT_OF_REWARD_BEOS={0}".format(config.AMOUNT_OF_REWARD_BEOS),
+        "-DTRUSTEE_REWARD_BEOS={0}".format(config.TRUSTEE_REWARD_BEOS),
         "-DSTARTING_BLOCK_FOR_RAM_DISTRIBUTION={0}".format(config.STARTING_BLOCK_FOR_RAM_DISTRIBUTION),
         "-DENDING_BLOCK_FOR_RAM_DISTRIBUTION={0}".format(config.ENDING_BLOCK_FOR_RAM_DISTRIBUTION),
         "-DDISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION={0}".format(config.DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION),
-        "-DAMOUNT_OF_REWARD_RAM={0}".format(config.AMOUNT_OF_REWARD_RAM),
-        "-DSTARTING_BLOCK_FOR_TRUSTEE_DISTRIBUTION={0}".format(config.STARTING_BLOCK_FOR_TRUSTEE_DISTRIBUTION),
-        "-DENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION={0}".format(config.ENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION),
-        "-DDISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_TRUSTEE_DISTRIBUTION={0}".format(config.DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_TRUSTEE_DISTRIBUTION),
-        "-DAMOUNT_OF_REWARD_TRUSTEE={0}".format(config.AMOUNT_OF_REWARD_TRUSTEE),
+        "-DTRUSTEE_REWARD_RAM={0}".format(config.TRUSTEE_REWARD_RAM),
+        "-DDISTRIB_RAM_LEFTOVER={0}".format(config.DISTRIB_RAM_LEFTOVER),
         "-DNODEOS_HTTP_SERVER_PORT={0}".format("{0}:{1}".format(config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)),
         "-DSIGNATURE_PROVIDER={0}".format("{0}=KEOSD:http://{1}:{2}/v1/wallet/sign_digest".format(config.EOSIO_PUBLIC_KEY, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)),
         "-DDISABLE_FAILING_TESTS={0}".format(config.DISABLE_FAILING_TESTS),
@@ -413,8 +410,9 @@ def initialize_beos():
         # eosio.get_account("eosio")
         # eosio.get_account("beos.distrib")
         balance = eosio.get_balance("eosio", config.CORE_SYMBOL_NAME)
-        balance_int = int(balance * (10 ** config.CORE_SYMBOL_PRECISION))
-        eosio.push_action("eosio", "initresource", '[ "beos.distrib", "-1", "{0}", "{1}"]'.format(balance_int//2, balance_int-balance_int//2), "eosio")
+        balance_int = int(balance * (10 ** config.CORE_SYMBOL_PRECISION) - config.DISTRIB_NETCPU_LEFTOVER)
+        # all bandwidth resources to distribute must be stored as net! leftover value in cpu will also be subtracted from net reward pool
+        eosio.push_action("eosio", "initresource", '[ "beos.distrib", "-1", "{0}", "{1}"]'.format(balance_int, config.DISTRIB_NETCPU_LEFTOVER), "eosio")
         # eosio.get_account("eosio")
         # eosio.get_account("beos.distrib")
 

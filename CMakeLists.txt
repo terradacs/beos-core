@@ -309,8 +309,8 @@ if ("${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION}" STREQUAL "")
     set(DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION "hours(1).to_seconds() * 2")
 endif()
 
-if ("${AMOUNT_OF_REWARD_BEOS}" STREQUAL "")
-    set(AMOUNT_OF_REWARD_BEOS "asset().symbol.precision()")
+if ("${TRUSTEE_REWARD_BEOS}" STREQUAL "")
+    set(TRUSTEE_REWARD_BEOS "0")
 endif()
 
 if ("${STARTING_BLOCK_FOR_RAM_DISTRIBUTION}" STREQUAL "")
@@ -325,27 +325,16 @@ if ("${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION}" STREQUAL "")
     set(DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION "hours(1).to_seconds() * 2")
 endif()
 
-if ("${AMOUNT_OF_REWARD_RAM}" STREQUAL "")
-    set(AMOUNT_OF_REWARD_RAM "5000000")
+if ("${TRUSTEE_REWARD_RAM}" STREQUAL "")
+    set(TRUSTEE_REWARD_RAM "0")
 endif()
 
-if ("${STARTING_BLOCK_FOR_TRUSTEE_DISTRIBUTION}" STREQUAL "")
-    set(STARTING_BLOCK_FOR_TRUSTEE_DISTRIBUTION "days(7).to_seconds() * 2")
-endif()
-
-if ("${ENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION}" STREQUAL "")
-    set(ENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION "days(98).to_seconds() * 2")
-endif()
-
-if ("${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_TRUSTEE_DISTRIBUTION}" STREQUAL "")
-    set(DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_TRUSTEE_DISTRIBUTION "hours(1).to_seconds() * 2")
-endif()
-
-if ("${AMOUNT_OF_REWARD_TRUSTEE}" STREQUAL "")
-    set(AMOUNT_OF_REWARD_TRUSTEE "asset().symbol.precision()")
+if ("${DISTRIB_RAM_LEFTOVER}" STREQUAL "")
+    set(DISTRIB_RAM_LEFTOVER "0")
 endif()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/contracts/eosio.init/eosio.init.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/contracts/eosio.init/eosio.init.hpp)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/contracts/eosio.distribution/eosio.distribution.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/contracts/eosio.distribution/eosio.distribution.hpp)
 
 if ("${SIGNATURE_PROVIDER}" STREQUAL "")
     set(SIGNATURE_PROVIDER "${EOSIO_ROOT_KEY}=KEOSD:http://127.0.0.1:8900/v1/wallet/sign_digest")

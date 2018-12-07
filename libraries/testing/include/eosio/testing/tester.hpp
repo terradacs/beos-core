@@ -521,16 +521,18 @@ namespace eosio { namespace testing {
 
   struct test_global_state_element
      {
-     uint32_t starting_block_for_distribution;
-     uint32_t ending_block_for_distribution;
-     uint32_t distribution_payment_block_interval_for_distribution;
-     uint64_t amount_of_reward;
+     uint32_t starting_block;
+     uint32_t next_block;
+     uint32_t ending_block;
+     uint32_t block_interval;
+     uint64_t trustee_reward;
 
      test_global_state_element(uint32_t s, uint32_t e, uint32_t d, uint64_t a)
-        : starting_block_for_distribution(s),
-        ending_block_for_distribution(e),
-        distribution_payment_block_interval_for_distribution(d),
-        amount_of_reward(a)
+        : starting_block(s),
+        next_block(s),
+        ending_block(e),
+        block_interval(d),
+        trustee_reward(a)
         {}
 
      };
@@ -541,19 +543,19 @@ namespace eosio { namespace testing {
      uint32_t starting_block_for_initial_witness_election;
      test_global_state_element beos;
      test_global_state_element ram;
-     test_global_state_element trustee;
+     uint64_t ram_leftover;
 
      test_global_state()
         : proxy_asset(0, symbol(SY(4, PROXY))),
         starting_block_for_initial_witness_election(100),
-        beos(240, 270, 10, 8000000),
-        ram(240, 248, 4, 5000000),
-        trustee(240, 300, 15, 200000)
+        beos(240, 270, 10, 1'000'0000),
+        ram(240, 248, 4, 0),
+        ram_leftover(300000)
         {}
      };
 
 } } /// eosio::testing
 
-FC_REFLECT(eosio::testing::test_global_state_element, (starting_block_for_distribution)(ending_block_for_distribution)(distribution_payment_block_interval_for_distribution)(amount_of_reward))
-FC_REFLECT(eosio::testing::test_global_state, (proxy_asset)(starting_block_for_initial_witness_election)(beos)(ram)(trustee))
+FC_REFLECT(eosio::testing::test_global_state_element, (starting_block)(next_block)(ending_block)(block_interval)(trustee_reward))
+FC_REFLECT(eosio::testing::test_global_state, (proxy_asset)(starting_block_for_initial_witness_election)(beos)(ram)(ram_leftover))
 

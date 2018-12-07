@@ -7,8 +7,7 @@
 #include <eosio/chain/database_utils.hpp>
 #include <algorithm>
 
-//ABW: uncomment the following symbol to unconditionally write eosio::print calls to file (works even during unit tests)
-#define CAVEMEN_DEBUG
+//#define CAVEMEN_DEBUG
 #ifdef CAVEMEN_DEBUG
 #define DBG(format, ... ) { FILE *pFile = fopen("debug.log","a"); fprintf(pFile,format "\n",__VA_ARGS__); fclose(pFile); }
 #else

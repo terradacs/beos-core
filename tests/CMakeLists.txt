@@ -183,25 +183,22 @@ add_test(NAME eos_voter_rpc_tests COMMAND python3 eos_voter_rpc_tests.py
   --nodeos-port ${NODEOS_PORT}
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
 set_property(TEST eos_voter_rpc_tests PROPERTY LABELS beos_tests)
-add_test(NAME test03_scenarios_deploy COMMAND test03_scenarios_deploy.py --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} 
---add-block-number
---restore-node-params
---master-wallet-name ${MASTER_WALLET_NAME}
---starting-block-for-initial-witness_election ${STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION}
---starting-block-for-beos_distribution ${STARTING_BLOCK_FOR_BEOS_DISTRIBUTION}
---ending-block-for-beos-distribution ${ENDING_BLOCK_FOR_BEOS_DISTRIBUTION}
---distribution-payment-block-interval-for-beos-distribution ${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION}
---amount-of-reward-beos ${AMOUNT_OF_REWARD_BEOS}
---starting-block-for-ram-distribution ${STARTING_BLOCK_FOR_RAM_DISTRIBUTION}
---ending-block-for-ram-distribution ${ENDING_BLOCK_FOR_RAM_DISTRIBUTION}
---distribution-payment-block-interval-for-ram-distribution ${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION}
---amount-of-reward-ram ${AMOUNT_OF_REWARD_RAM}
---starting-block-for-trustee-distribution ${STARTING_BLOCK_FOR_TRUSTEE_DISTRIBUTION}
---ending-block-for-trustee-distribution ${ENDING_BLOCK_FOR_TRUSTEE_DISTRIBUTION}
---distribution-payment-block-interval-for-trustee-distribution ${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_TRUSTEE_DISTRIBUTION}
---amount-of-reward-trustee ${AMOUNT_OF_REWARD_TRUSTEE}
- WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests/beos_plugin_tests/)
-set_property(TEST test03_scenarios_deploy PROPERTY LABELS nonparallelizable_tests)
+# add_test(NAME test03_scenarios_deploy COMMAND test03_scenarios_deploy.py --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} 
+# --add-block-number
+# --restore-node-params
+# --master-wallet-name ${MASTER_WALLET_NAME}
+# --starting-block-for-initial-witness-election ${STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION}
+# --starting-block-for-beos-distribution ${STARTING_BLOCK_FOR_BEOS_DISTRIBUTION}
+# --ending-block-for-beos-distribution ${ENDING_BLOCK_FOR_BEOS_DISTRIBUTION}
+# --distribution-payment-block-interval-for-beos-distribution ${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION}
+# --trustee-reward-beos ${TRUSTEE_REWARD_BEOS}
+# --starting-block-for-ram-distribution ${STARTING_BLOCK_FOR_RAM_DISTRIBUTION}
+# --ending-block-for-ram-distribution ${ENDING_BLOCK_FOR_RAM_DISTRIBUTION}
+# --distribution-payment-block-interval-for-ram-distribution ${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION}
+# --trustee-reward-ram ${TRUSTEE_REWARD_RAM}
+# --distrib-ram-leftover ${DISTRIB_RAM_LEFTOVER}
+#  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests/beos_plugin_tests/)
+# set_property(TEST test03_scenarios_deploy PROPERTY LABELS nonparallelizable_tests)
 add_test(NAME test04_account_creation_and_get_account_deploy COMMAND tests/beos_plugin_tests/test04_account_creation_and_get_account_deploy.py  --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --master-wallet-name ${MASTER_WALLET_NAME}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_property(TEST test04_account_creation_and_get_account_deploy PROPERTY LABELS nonparallelizable_tests)
 add_test(NAME test05_account_creation_with_delegate_ram COMMAND tests/beos_plugin_tests/test05_account_creation_with_delegate_ram.py  --main-dir ${CMAKE_BINARY_DIR} --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})

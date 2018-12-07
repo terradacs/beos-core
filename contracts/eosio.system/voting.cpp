@@ -52,7 +52,7 @@ namespace eosiosystem {
    bool system_contract::is_allowed_vote_operation() const
    {
       //Creating votes for producers has delay.
-      uint32_t block_nr = get_blockchain_block_number();
+      auto block_nr = get_blockchain_block_number();
       eosio::beos_global_state b_state = eosio::init( N(beos.init) ).get_beos_global_state();
       return block_nr > b_state.starting_block_for_initial_witness_election;
    }

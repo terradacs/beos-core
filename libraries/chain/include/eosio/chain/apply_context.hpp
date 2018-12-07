@@ -581,13 +581,9 @@ class apply_context {
    /// Distribution methods:
    public:
 
-      void reward_all( uint64_t amount_of_reward, uint64_t amount_of_reward_for_trustee, uint64_t gathered_amount,
-                       asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/,
-                       bool is_beos_mode,
-                       const voting_manager::producer_info_index& _producers);
-
-      void reward_done( asset symbol/*correct symbol of BEOS coin, for example: `0.0000 BEOS`*/,
-                        bool is_beos_mode );
+      void reward_all( uint64_t beos_to_distribute, uint64_t beos_to_distribute_trustee, uint64_t ram_to_distribute,
+         uint64_t ram_to_distribute_trustee, asset pxbts, const voting_manager::producer_info_index& _producers );
+      void reward_done();
 
    private:
       inline void change_any_resource_limits_impl( const account_name& acc, int64_t ram, int64_t net, int64_t cpu, bool is_distribution )const;
