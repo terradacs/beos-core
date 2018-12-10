@@ -2,13 +2,30 @@ stages:
   - staging-build
   - development-build
   - staging-deploy
-#  - plugin-test
+
+before_script:
+  - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
+  - eval $(ssh-agent -s)
+  - ssh-add <(echo "$SSH_PRIVATE_KEY")
+  - echo "Working for branch" $CI_COMMIT_REF_NAME
+  - rm -rf ~/ci/beos-core/$CI_COMMIT_REF_NAME
+  - git clone git@gitlab.syncad.com:blocktrades/beos-core.git ~/ci/beos-core/$CI_COMMIT_REF_NAME
+  - cd ~/ci/beos-core/$CI_COMMIT_REF_NAME
+  - git checkout $CI_COMMIT_REF_NAME
+  - git status
+  - git submodule sync --recursive
+  - git submodule update --init --recursive
+
+after_script:
+ - echo "Repository for this pipeline located on" ~/ci/beos-core/$CI_COMMIT_REF_NAME
+ - echo "Build for this pipeline located on" ~/ci/beos-core/$CI_COMMIT_REF_NAME/build
 
 staging-build:
   stage: staging-build
   variables:
     LC_ALL: "C"
     CI_BEOS_CONFIG_NAME: "ci"
+    GIT_STRATEGY: none
     GIT_SUBMODULE_STRATEGY: recursive
     
   script:
@@ -34,8 +51,9 @@ development-build:
   variables:
     LC_ALL: "C"
     CI_BEOS_CONFIG_NAME: "ci"
+    GIT_STRATEGY: none
     GIT_SUBMODULE_STRATEGY: recursive
-    
+
   script:
     - chmod +x ./gitlab-ci/build.sh
     - ./gitlab-ci/build.sh
@@ -60,6 +78,7 @@ staging-deploy:
   variables:
     LC_ALL: "C"
     CI_BEOS_CONFIG_NAME: "allcpu"
+    GIT_STRATEGY: none
     GIT_SUBMODULE_STRATEGY: recursive
     
   script:
@@ -78,15 +97,3 @@ staging-deploy:
   environment:
     name: staging
     url: http://192.168.6.242:8888/v1/chain/get_info
-
-# currently disabled and not fully configured
-# plugin-test:
-#   stage: plugin-test
-#   script:
-#   - pwd
-#   - ./deploy.py --make-beos-plugin-test
-#   when: manual
-#   cache: {}
-#   tags:
-#   - ryzen
-#   allow_failure: true
