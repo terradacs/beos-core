@@ -231,7 +231,15 @@ class eosio_interchain_tester : public actions
 
   public:
 
-  eosio_interchain_tester(uint64_t state_size = 1024*1024*8)
+  eosio_interchain_tester(uint64_t state_size = 1024*1024*8,
+                          uint64_t initial_supply = 1'000'000'000'0000,
+                          uint8_t min_activated_stake_percent = 15, // 15% is default in eosio
+                          uint64_t gateway_init_ram = 100'000'000,
+                          uint64_t gateway_init_net = 1000'0000,
+                          uint64_t gateway_init_cpu = 1000'0000,
+                          uint64_t distrib_init_ram = 30'000'300'000, //30'000'000'000 + 300'000 default leftover + 0 default ram trustee reward
+                          uint64_t distrib_init_net = 200'001'001'0000, //200'000'000.0000 + 1.0000 leftover + 1000.0000 default beos trustee reward (set == 0 for auto calculation)
+                          uint64_t distrib_init_cpu = 1'0000) //this is leftover from distribution - that amount will be left on distrib on both net and cpu
     : actions(state_size)
   {
     produce_blocks( 2 );
@@ -256,33 +264,35 @@ class eosio_interchain_tester : public actions
     //BOOST_REQUIRE_EQUAL( success(), issue( config::system_account_name, asset::from_string("1000000000.0000 BEOS"), config::system_account_name ) );
     BOOST_REQUIRE_EQUAL( success(), push_action( config::system_account_name, N(initialissue),
                                                  mvo()
-                                                   ( "quantity", initial_supply * 10000 )
+                                                   ( "quantity", initial_supply )
                                                    ( "min_activated_stake_percent", min_activated_stake_percent ),
                                                  system_abi_ser,
                                                  config::system_account_name
-                                               ));
+                                               )
+                       );
 
     BOOST_REQUIRE_EQUAL( success(), initresource( config::gateway_account_name,
-                                                    100'000'000,
-                                                    asset::from_string("1000.0000 BEOS"),
-                                                    asset::from_string("1000.0000 BEOS")
-                                                   )
-                        );
+                                                    gateway_init_ram,
+                                                    asset(gateway_init_net, symbol(4,"BEOS")),
+                                                    asset(gateway_init_cpu, symbol(4,"BEOS"))
+                                                )
+                       );
     BOOST_REQUIRE_EQUAL( success(), initresource( config::distribution_account_name,
-                                                    //30'000'000'000 + 300'000 default leftover + 0 default ram trustee reward
-                                                    30'000'300'000,
+                                                    distrib_init_ram,
                                                     asset::from_string("-0.0001 BEOS"),
                                                     asset::from_string("-0.0001 BEOS")
-                                                   )
-                        );
+                                                )
+                       );
     //beos.distrib only distributes resources stored as net weight (minus value on cpu)
+    if (distrib_init_net == 0) {
+       distrib_init_net = get_balance(config::system_account_name).get_amount() - distrib_init_cpu;
+    }
     BOOST_REQUIRE_EQUAL( success(), initresource( config::distribution_account_name,
                                                     -1,
-                                                    //200'000'000.0000 + 1.0000 leftover + 1000.0000 default beos trustee reward
-                                                    asset::from_string("200001001.0000 BEOS"),
-                                                    asset::from_string("1.0000 BEOS")
-                                                   )
-                        );
+                                                    asset(distrib_init_net, symbol(4,"BEOS")),
+                                                    asset(distrib_init_cpu, symbol(4,"BEOS"))
+                                                )
+                       );
     //ABW: we need to have enough resources to cover all tests regardless of distribution parameters (we leave plenty of liquid BEOS on eosio
     //because if it was calculated as in case of normal initialization phase test results for distribution would be more unstable)
 
@@ -400,19 +410,23 @@ class eosio_interchain_tester : public actions
         N(beos.distrib)
       );
   }
-
-protected:
-  uint64_t  initial_supply = 1'000'000'000;
-  uint8_t   min_activated_stake_percent = 15; // 15% is default in eosio
-
 };
 
 class eosio_init_tester: public eosio_interchain_tester
 {
   public:
  
-  eosio_init_tester(uint64_t state_size = 1024*1024*8)
-    : eosio_interchain_tester(state_size) {}
+  eosio_init_tester(uint64_t state_size = 1024*1024*8,
+                    uint64_t initial_supply = 1'000'000'000'0000,
+                    uint8_t min_activated_stake_percent = 15,
+                    uint64_t gateway_init_ram = 100'000'000,
+                    uint64_t gateway_init_net = 1000'0000,
+                    uint64_t gateway_init_cpu = 1000'0000,
+                    uint64_t distrib_init_ram = 30'000'300'000,
+                    uint64_t distrib_init_net = 200'001'001'0000,
+                    uint64_t distrib_init_cpu = 1'0000)
+    : eosio_interchain_tester(state_size, initial_supply, min_activated_stake_percent, gateway_init_ram, gateway_init_net, gateway_init_cpu,
+                              distrib_init_ram, distrib_init_net, distrib_init_cpu) {}
 
   fc::variant get_producer_info( const account_name& act )
   {
@@ -454,6 +468,28 @@ class eosio_init_tester: public eosio_interchain_tester
         ("stake_net_quantity", net)
         ("stake_cpu_quantity", cpu)
         ("transfer", transfer ),
+        system_abi_ser,
+        config::system_account_name
+      );
+  }
+  
+  action_result buyram( const account_name& payer, const account_name& receiver, asset ram_cost )
+  {
+    return push_action( payer, N(buyram), mvo()
+        ("payer", payer)
+        ("receiver", receiver)
+        ("quant", ram_cost),
+        system_abi_ser,
+        config::system_account_name
+      );
+  }
+
+  action_result buyrambytes( const account_name& payer, const account_name& receiver, uint64_t numbytes )
+  {
+    return push_action( payer, N(buyrambytes), mvo()
+        ("payer", payer)
+        ("receiver", receiver)
+        ("bytes",numbytes),
         system_abi_ser,
         config::system_account_name
       );
@@ -669,6 +705,19 @@ protected:
   static uint64_t       state_size; //< could be changed before run particular test case
   static size_t         no_of_accounts; //< could be changed before run particular test case
   static const size_t   actions_per_trx;
+};
+
+/**
+ * This tester initializes chain with parameters like in BEOS mainnet so we can test various effects
+ * as they will be on regular BEOS (suitable f.e. to observe actual cost of RAM)
+ */
+class beos_mainnet_tester : public eosio_init_tester
+{
+public:
+
+beos_mainnet_tester(uint64_t state_size = 1024*1024*8)
+   : eosio_init_tester(state_size, 3'674'470'000'0000, 15, 164'000'000, 10'000'0000, 10'000'0000,
+                       32'000'300'000, 0, 1'0000) {}
 };
 
 uint64_t eosio_init_bigstate_tester::state_size = 1 * 1024 * 1024 * 1024ll;
@@ -1072,7 +1121,7 @@ BOOST_FIXTURE_TEST_CASE( undelegate_block_test, eosio_init_tester ) try {
 
   check_change_params( tgs );
 
-  BOOST_REQUIRE_EQUAL( wasm_assert_msg("cannot unstake during distribution period"), unstake( N(beos.distrib), N(alice), asset::from_string("10.0000 BEOS"), asset::from_string("10.0000 BEOS") ) );
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("cannot unstake during distribution period"), unstake( N(alice), N(alice), asset::from_string("10.0000 BEOS"), asset::from_string("10.0000 BEOS") ) );
 
   produce_blocks( 105 - control->head_block_num() );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 105u );
@@ -2617,6 +2666,220 @@ BOOST_FIXTURE_TEST_CASE( creating_short_names, eosio_interchain_tester ) try {
   create_account_with_resources( config::gateway_account_name, N(mario.mar) );
   create_account_with_resources( config::gateway_account_name, N(12345123451) );
   create_account_with_resources( config::gateway_account_name, N(1234.x) );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(beos_mainnet_tests)
+
+BOOST_FIXTURE_TEST_CASE( buying_ram, beos_mainnet_tester ) try {
+  BOOST_TEST_MESSAGE( "Buying ram with big 100mln BEOS chunks");
+
+  test_global_state tgs;
+
+  tgs.beos.starting_block = 30;
+  tgs.beos.ending_block = 30;
+  tgs.beos.block_interval = 1;
+  tgs.beos.trustee_reward = 0;
+  tgs.ram.starting_block = 30;
+  tgs.ram.ending_block = 30;
+  tgs.ram.block_interval = 1;
+  tgs.ram.trustee_reward = 0;
+
+  check_change_params( tgs );
+
+  issue( N(alice), asset::from_string("1.0000 PROXY") );
+
+  produce_blocks( 30 - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 30u );
+  //all rewards are on 'alice'
+  CHECK_STATS(alice, "1.0000 PROXY", "", "32000000000");
+  CHECK_STATS(bob, "0.0000 PROXY", "", "0");
+
+  BOOST_REQUIRE_EQUAL( success(), create_producer( N(alice) ) );
+  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(alice), { N(alice) } ) );
+
+  BOOST_REQUIRE_EQUAL( success(), unstake( N(alice), N(alice), asset::from_string("1800000000.0000 BEOS"), asset::from_string("1800000000.0000 BEOS") ) );
+
+  produce_block( fc::hours(3*24) );
+  produce_blocks(1);
+  
+  asset liquid_beos = get_balance(N(alice));
+  BOOST_REQUIRE_EQUAL( liquid_beos, asset::from_string("3600000000.0000 BEOS") );
+
+  int64_t bob_ram = DEFAULT_RAM;
+  for (int i = 0; i < 36; ++i) {
+     buyram(N(alice), N(bob), asset::from_string("100000000.0000 BEOS"));
+     int64_t new_bob_ram = check_data(N(bob))["staked_ram"].as_int64();
+     int64_t bought_ram = new_bob_ram - bob_ram;
+     bob_ram = new_bob_ram;
+     BOOST_WARN_MESSAGE(false, std::string("100mln BEOS == ")+std::to_string(bought_ram)+" bytes");
+  }
+  bob_ram -= DEFAULT_RAM;
+  BOOST_WARN_MESSAGE(false, std::string("Bob now has ")+std::to_string(bob_ram)+" bytes above default");
+  //as expected spending almost all money gives almost all RAM
+  BOOST_REQUIRE_GE(bob_ram, 36484490000);
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( buying_ram2, beos_mainnet_tester ) try {
+  BOOST_TEST_MESSAGE( "Buying ram with smaller 100*1mln BEOS chunks");
+
+  test_global_state tgs;
+
+  tgs.beos.starting_block = 30;
+  tgs.beos.ending_block = 30;
+  tgs.beos.block_interval = 1;
+  tgs.beos.trustee_reward = 0;
+  tgs.ram.starting_block = 30;
+  tgs.ram.ending_block = 30;
+  tgs.ram.block_interval = 1;
+  tgs.ram.trustee_reward = 0;
+
+  check_change_params( tgs );
+
+  issue( N(alice), asset::from_string("1.0000 PROXY") );
+
+  produce_blocks( 30 - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 30u );
+  //all rewards are on 'alice'
+  CHECK_STATS(alice, "1.0000 PROXY", "", "32000000000");
+  CHECK_STATS(bob, "0.0000 PROXY", "", "0");
+
+  BOOST_REQUIRE_EQUAL( success(), create_producer( N(alice) ) );
+  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(alice), { N(alice) } ) );
+
+  BOOST_REQUIRE_EQUAL( success(), unstake( N(alice), N(alice), asset::from_string("1800000000.0000 BEOS"), asset::from_string("1800000000.0000 BEOS") ) );
+
+  produce_block( fc::hours(3*24) );
+  produce_blocks(1);
+  
+  asset liquid_beos = get_balance(N(alice));
+  BOOST_REQUIRE_EQUAL( liquid_beos, asset::from_string("3600000000.0000 BEOS") );
+
+  int64_t bob_ram = DEFAULT_RAM;
+  for (int i = 0; i < 36; ++i) {
+     for (int j = 0; j < 100; ++j) {
+        buyram(N(alice), N(bob), asset::from_string("1000000.0000 BEOS"));
+     }
+     int64_t new_bob_ram = check_data(N(bob))["staked_ram"].as_int64();
+     int64_t bought_ram = new_bob_ram - bob_ram;
+     bob_ram = new_bob_ram;
+     BOOST_WARN_MESSAGE(false, std::string("100*1mln BEOS == ")+std::to_string(bought_ram)+" bytes");
+  }
+  bob_ram -= DEFAULT_RAM;
+  BOOST_WARN_MESSAGE(false, std::string("Bob now has ")+std::to_string(bob_ram)+" bytes above default");
+  //compared with previous test buying with many smaller chunks gives marginally less RAM due to many more truncations
+  BOOST_REQUIRE_GE(bob_ram, 36484490000);
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( buying_rambytes, beos_mainnet_tester ) try {
+  BOOST_TEST_MESSAGE( "Buying ram with 100*10mln byte chunks"); //trying to buy in 1bln chunks fails on calculations in exchange due to too large intermediate numbers
+
+  test_global_state tgs;
+
+  tgs.beos.starting_block = 30;
+  tgs.beos.ending_block = 30;
+  tgs.beos.block_interval = 1;
+  tgs.beos.trustee_reward = 0;
+  tgs.ram.starting_block = 30;
+  tgs.ram.ending_block = 30;
+  tgs.ram.block_interval = 1;
+  tgs.ram.trustee_reward = 0;
+
+  check_change_params( tgs );
+
+  issue( N(alice), asset::from_string("1.0000 PROXY") );
+
+  produce_blocks( 30 - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 30u );
+  //all rewards are on 'alice'
+  CHECK_STATS(alice, "1.0000 PROXY", "", "32000000000");
+  CHECK_STATS(bob, "0.0000 PROXY", "", "0");
+
+  BOOST_REQUIRE_EQUAL( success(), create_producer( N(alice) ) );
+  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(alice), { N(alice) } ) );
+
+  BOOST_REQUIRE_EQUAL( success(), unstake( N(alice), N(alice), asset::from_string("1800000000.0000 BEOS"), asset::from_string("1800000000.0000 BEOS") ) );
+
+  produce_block( fc::hours(3*24) );
+  produce_blocks(1);
+  
+  asset liquid_beos = get_balance(N(alice));
+  BOOST_REQUIRE_EQUAL( liquid_beos, asset::from_string("3600000000.0000 BEOS") );
+
+  int64_t bob_ram = DEFAULT_RAM;
+  for (int i = 0; i < 36; ++i) {
+     for (int j = 0; j < 100; ++j)
+        buyrambytes(N(alice), N(bob), 10000000);
+     int64_t new_bob_ram = check_data(N(bob))["staked_ram"].as_int64();
+     int64_t bought_ram = new_bob_ram - bob_ram;
+     bob_ram = new_bob_ram;
+     asset new_liquid_beos = get_balance(N(alice));
+     asset spent_beos = liquid_beos - new_liquid_beos;
+     liquid_beos = new_liquid_beos;
+     BOOST_WARN_MESSAGE(false, spent_beos.to_string()+" == "+std::to_string(bought_ram)+" bytes");
+  }
+  bob_ram -= DEFAULT_RAM;
+  BOOST_WARN_MESSAGE(false, std::string("Bob now has ")+std::to_string(bob_ram)+" bytes above default");
+  BOOST_REQUIRE_EQUAL((bob_ram - 36000000000) * 1000000 / bob_ram, 0);
+  BOOST_WARN_MESSAGE(false, std::string("Alice spent ")+(asset::from_string("3600000000.0000 BEOS")-liquid_beos).to_string());
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( selling_ram, beos_mainnet_tester ) try {
+  BOOST_TEST_MESSAGE( "Selling ram with big 1bln byte chunks");
+
+  test_global_state tgs;
+
+  tgs.beos.starting_block = 30;
+  tgs.beos.ending_block = 30;
+  tgs.beos.block_interval = 1;
+  tgs.beos.trustee_reward = 0;
+  tgs.ram.starting_block = 30;
+  tgs.ram.ending_block = 30;
+  tgs.ram.block_interval = 1;
+  tgs.ram.trustee_reward = 0;
+
+  check_change_params( tgs );
+
+  issue( N(alice), asset::from_string("1.0000 PROXY") );
+
+  produce_blocks( 30 - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 30u );
+  //all rewards are on 'alice'
+  CHECK_STATS(alice, "1.0000 PROXY", "", "32000000000");
+  CHECK_STATS(bob, "0.0000 PROXY", "", "0");
+
+  BOOST_REQUIRE_EQUAL( success(), create_producer( N(alice) ) );
+  BOOST_REQUIRE_EQUAL( success(), vote_producer( N(alice), { N(alice) } ) );
+
+  BOOST_REQUIRE_EQUAL( success(), unstake( N(alice), N(alice), asset::from_string("1800000000.0000 BEOS"), asset::from_string("1800000000.0000 BEOS") ) );
+
+  produce_block( fc::hours(3*24) );
+  produce_blocks(1);
+  
+  asset liquid_beos = get_balance(N(alice));
+  BOOST_REQUIRE_EQUAL( liquid_beos, asset::from_string("3600000000.0000 BEOS") );
+
+  buyram(N(alice), N(alice), asset::from_string("3600000000.0000 BEOS"));
+  int64_t alice_ram = check_data(N(alice))["staked_ram"].as_int64() - DEFAULT_RAM;
+  BOOST_WARN_MESSAGE(false, std::string("Alice now has ")+std::to_string(alice_ram)+" bytes above default");
+  BOOST_REQUIRE_GE(alice_ram, 68484490000);
+  liquid_beos = get_balance(N(alice));
+  BOOST_REQUIRE_EQUAL( liquid_beos, asset::from_string("0.0000 BEOS") );
+
+  for (int i = 0; i < 68; ++i) {
+     sellram(N(alice), 1000000000);
+     asset new_liquid_beos = get_balance(N(alice));
+     asset acquired_beos = new_liquid_beos - liquid_beos;
+     liquid_beos = new_liquid_beos;
+     BOOST_WARN_MESSAGE(false, std::string("Alice sold 1bln bytes for ")+acquired_beos.to_string());
+  }
+  BOOST_WARN_MESSAGE(false, std::string("Alice now has ")+liquid_beos.to_string());
+  BOOST_REQUIRE_GE(liquid_beos, asset::from_string("3567000000.0000 BEOS"));
 
 } FC_LOG_AND_RETHROW()
 
