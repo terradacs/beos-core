@@ -94,6 +94,44 @@ staging-deploy:
   when: manual
   only:
     - beos-initial-release
-  environment:
+  environment:  
     name: staging
     url: http://192.168.6.242:8888/v1/chain/get_info
+
+staging-deploy-docker:
+  stage: staging-deploy
+  variables:
+    GIT_STRATEGY: none
+    LC_ALL: "C"
+    CI_BEOS_CONFIG_NAME: "docker-deploy"
+    GIT_SUBMODULE_STRATEGY: recursive
+    BEOS_TESTNET_DOCKER_REPOSITORY: registry.gitlab.syncad.com/blocktrades/docker/beos-testnet
+    BEOS_DOCKER_LATEST: "yes"
+    P2P_PEER_ADDRESS: 188.165.220.61:9876
+  script:
+    - echo $CI_DOCKER_PW | docker login --username $CI_DOCKER_LOGIN --password-stdin $CI_DOCKER_REGISTRY
+    - source ./gitlab-ci/deploy-docker.sh
+  after_script:
+    - echo ""
+  cache: {}
+  tags:
+    - devel-wallets-2
+  allow_failure: false
+  when: manual
+  only:
+    - beos-initial-release
+  environment:
+    name: docker-container-registry
+    url: https://gitlab.syncad.com/blocktrades/docker/container_registry
+
+# currently disabled and not fully configured
+# plugin-test:
+#   stage: plugin-test
+#   script:
+#   - pwd
+#   - ./deploy.py --make-beos-plugin-test
+#   when: manual
+#   cache: {}
+#   tags:
+#   - ryzen
+#   allow_failure: true
