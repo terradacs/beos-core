@@ -329,31 +329,11 @@ def build_beos(c_compiler, cxx_compiler):
 
 def initialize_wallet():
     import eosio
-    keosd = None
-    logger.info("Starting initialize_wallet")
     try:
         wallet_url = "http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)
-        keosd = eosio.run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR, False, True)
+        eosio.run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR, False, True)
         eosio.create_wallet(wallet_url, False)
-        # import producer keys
-        for producer, data in config.PRODUCERS_ARRAY.items():
-            logger.info("Importing keys for producer: {0}".format(producer))
-            eosio.import_key(config.MASTER_WALLET_NAME, data["prv_owner"], wallet_url)
-            eosio.import_key(config.MASTER_WALLET_NAME, data["prv_active"], wallet_url)
-
-        return keosd
-    except Exception as ex:
-        eosio.terminate_running_tasks(None, keosd)
-        logger.error("Exception during initialize_wallet: {0}".format(ex))
-        raise
-
-def initialize_beos():
-    import eosio
-    keosd = None
-    nodeos = None
-    try:
-        keosd = initialize_wallet()
-        nodeos = eosio.run_nodeos(config.START_NODE_INDEX, config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY)
+        eosio.run_nodeos(config.START_NODE_INDEX, config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY)
 
         eosio.create_account("eosio", "eosio.msig", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
         eosio.create_account("eosio", "eosio.names", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
@@ -432,12 +412,15 @@ def initialize_beos():
 
         eosio.create_account("beos.gateway", "beos.trustee", config.TRUSTEE_OWNER_PUBLIC_KEY, config.TRUSTEE_ACTIVE_PUBLIC_KEY, True)
 
-        eosio.terminate_running_tasks(nodeos, keosd)
+        #Just to produce few blocks and accept lately scheduled transaction(s)
+        # we will wait for approx 10 blocks to be produced
+        eosio.wait_for_blocks_produced(10, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
+        eosio.terminate_running_tasks()
         eosio.show_keosd_postconf(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
         eosio.show_wallet_unlock_postconf()
         eosio.show_nodeos_postconf(config.START_NODE_INDEX, config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY)
     except Exception as ex:
-        eosio.terminate_running_tasks(nodeos, keosd)
+        eosio.terminate_running_tasks()
         logger.error("Exception during initialize: {0}".format(ex))
         raise
         #sys.exit(1)
@@ -486,7 +469,6 @@ if __name__ == '__main__':
     parser = OptionParser(usage = "Usage: %prog options")
 
     generalGroup = OptionGroup(parser, "General actions")
-    generalGroup.add_option("--download-sources", action="store_true", dest="download_sources", help="Delete source tree and clone sources from git repository.")
     generalGroup.add_option("--c-compiler", action="store", type="string", default=config.DEFAULT_C_COMPILER, dest="c_compiler", help="Set C compiler")
     generalGroup.add_option("--cxx-compiler", action="store", type="string", default=config.DEFAULT_CXX_COMPILER, dest="cxx_compiler", help="Set CXX compiler")
 
@@ -529,17 +511,6 @@ if __name__ == '__main__':
     if len(argv) == 1:
         parser.print_help()
         exit(0)
-
-    if options.download_sources:
-        logger.info("Cloning sources from repository {0} to {1}".format(config.BEOS_REPOSITORY_PATH, config.BEOS_DIR))
-        beos_repo = None
-        if os.path.exists(config.BEOS_DIR):
-            beos_repo = Repo(config.BEOS_DIR)
-            beos_repo.remotes.origin.pull()
-            beos_repo.git.submodule('update', '--init', '--recursive')
-        else:
-            beos_repo = Repo.clone_from(config.BEOS_REPOSITORY_PATH, config.BEOS_DIR, branch = config.BEOS_REPOSITORY_BRANCH)
-            beos_repo.git.submodule('update', '--init', '--recursive')
 
     c_compiler = options.c_compiler
     cxx_compiler = options.cxx_compiler
