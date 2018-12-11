@@ -330,8 +330,6 @@ def build_beos(c_compiler, cxx_compiler):
 
 def initialize_wallet():
     import eosio
-    keosd = None
-    logger.info("Starting initialize_wallet")
     try:
         wallet_url = "http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)
         eosio.run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR, False, True)
