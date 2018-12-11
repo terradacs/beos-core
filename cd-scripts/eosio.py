@@ -6,6 +6,7 @@ import os
 import time
 import sys
 import json
+import datetime
 
 try:
     import config
@@ -34,6 +35,127 @@ class EOSIOException(Exception):
     def __str__(self):
         return self.message
 
+def raiseEOSIOException(msg):
+    logger.error(msg)
+    raise EOSIOException(msg)
+
+def save_screen_cfg(cfg_file_name, log_file_path):
+    with open(cfg_file_name, "w") as cfg:
+        cfg.write("logfile {0}\n".format(log_file_path))
+        cfg.write("deflog on\n")
+        cfg.write("logfile flush 1\n")
+
+def save_pid_file(pid_file_name, exec_name):
+    with open(pid_file_name, "w") as pid_file:
+            pid_file.write("{0}-{1}\n".format(exec_name, datetime.datetime.now().strftime("%Y-%m-%d")))
+
+def wait_for_string_in_file(log_file_name, string, timeout):
+    step = 0.5
+    to_timeout = 0.
+    while True:
+        time.sleep(step)
+        to_timeout = to_timeout + step
+        if to_timeout > timeout:
+            msg = "Timeout during wait for string {0}".format(string)
+            print(msg)
+            raise EOSIOException(msg)
+        if not os.path.exists(log_file_name):
+            continue
+        with open(log_file_name, "r") as log_file:
+            leave = False
+            for line in log_file.readlines():
+                if string in line:
+                    leave = True
+                    break
+            if leave:
+                break
+
+def get_last_line_of_file(file_name):
+    last_line = ""
+    with open(file_name, "r") as f:
+        f.seek(-2, os.SEEK_END)
+        while f.read(1) != b'\n':
+            f.seek(-2, os.SEEK_CUR) 
+        last_line = f.readline().decode()
+    return last_line
+
+def get_last_block_number_from_log_file(nodeos_log_file_name, timeout = 60.):
+    import re
+    last_block_number = -1
+    step = 0.5
+    timeout_cnt = 0.
+    while True:
+        line = get_last_line_of_file(nodeos_log_file_name)
+        if "] Produced block" in line:
+            ret = re.search('\#[0-9] @', line)
+            ret = ret.group(0)
+            last_block_number = int(ret[1:-1])
+            break
+        time.sleep(step)
+        timeout_cnt += step
+        if timeout_cnt >= timeout:
+            raiseEOSIOException("Timeout during get_last_block_number_from_log_file")
+    return last_block_number
+
+def wait_for_blocks_produced_from_log_file(block_count, nodeos_log_file_name, timeout = 60.):
+    logger.info("Waiting for {0} blocks to be produces...".format(block_count))
+    last_block_number = get_last_block_number_from_log_file(nodeos_log_file_name, timeout)
+    while True:
+        curr_block_number = get_last_block_number_from_log_file(nodeos_log_file_name, timeout)
+        if curr_block_number - last_block_number > block_count:
+            return
+
+def get_last_block_number(nodeos_ip, nodeos_port, timeout = 60., use_https = False):
+    import requests
+    prefix = "http://"
+    if use_https:
+        prefix = "https://"
+    step = 0.5
+    timeout_cnt = 0.
+    url = prefix + "{0}:{1}/v1/chain/get_info".format(nodeos_ip, nodeos_port)
+    while True:
+        try:
+            response = requests.get(url)
+            if  response.status_code == 200:
+                response_json = response.json()
+                return int(response_json['head_block_num'])
+        except:
+            pass
+        time.sleep(step)
+        timeout_cnt += step
+        if timeout_cnt >= timeout:
+            raiseEOSIOException("Timeout during get_last_block_number_rpc")
+
+def wait_for_blocks_produced(block_count, nodeos_ip, nodeos_port, timeout = 60., use_https = False):
+    logger.info("Waiting for {0} blocks to be produced...".format(block_count))
+    last_block_number = get_last_block_number(nodeos_ip, nodeos_port, timeout, use_https)
+    while True:
+        curr_block_number = get_last_block_number(nodeos_ip, nodeos_port, timeout, use_https)
+        if curr_block_number - last_block_number > block_count:
+            return
+
+def kill_process(pid_file_name, proc_name, ip_address, port):
+    pids = []
+    pid_name = None
+    try:
+        with open(pid_file_name, "r") as pid_file:
+            pid_name = pid_file.readline()
+            pid_name = pid_name.strip()
+        if pid_name is not None:
+            for line in os.popen("ps ax | grep " + proc_name + " | grep -v grep"):
+                if pid_name in line:
+                    line = line.strip().split()
+                    pids.append(line[0])
+            for pid in pids:
+                for line in os.popen("ps --no-header --ppid {0}".format(pid)):
+                    line = line.strip().split()
+                    os.kill(int(line[0]), 2)
+                os.kill(int(pid), 2)
+            if os.path.exists(pid_file_name):
+                os.remove(pid_file_name)
+    except Exception as ex:
+        logger.warning("Process {0} cannot be killed. Reason: {1}".format(proc_name, ex))
+
 def run_command(parameters):
     ret = subprocess.run(parameters, stdout=config.log_main, stderr=config.log_main)
     retcode = ret.returncode
@@ -41,36 +163,17 @@ def run_command(parameters):
         logger.debug("Executed with ret: {0}".format(ret))
     else:
         logger.error("Executed with ret: {0}".format(ret))
-        logger.error("Initialization failed on last command")
-        raise EOSIOException("Initialization failed on last command")
+        raiseEOSIOException("Initialization failed on last command")
 
 def run_command_and_return_output(parameters):
     ret = subprocess.run(parameters, stdout=subprocess.PIPE)
-    print(ret)
     retcode = ret.returncode
     if retcode == 0:
         logger.debug("Executed with ret: {0}".format(ret))
     else:
         logger.error("Executed with ret: {0}".format(ret))
-        logger.error("Initialization failed on last command")
-        raise EOSIOException("Initialization failed on last command")
+        raiseEOSIOException("Initialization failed on last command")
     return ret.stdout
-
-def run_service(service_name, parameters, unblock_trigger, raise_on_error = False):
-    proc = subprocess.Popen(parameters, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    while True:
-        line = proc.stdout.readline()
-        line = line.decode('utf-8').strip()
-        if line.startswith("error"):
-            logger.error(line)
-            if raise_on_error:
-                raise EOSIOException("Error during {0} run".format(service_name))
-        else:
-            logger.info(line)
-            if unblock_trigger in line:
-                logger.info("{0} is up and running".format(service_name))
-                break
-    return proc
 
 def show_wallet_unlock_postconf():
     wallet_password = None
@@ -123,16 +226,20 @@ def detect_process_by_name(proc_name, ip_address, port):
             line = line.strip().split()
             pids.append(line[0])
     if pids:
-        msg = "{0} process is running on {1}:{2}. Please terminate that process and try again.".format(proc_name, ip_address, port)
-        logger.error(msg)
-        raise EOSIOException(msg)
+        raiseEOSIOException("{0} process is running on {1}:{2}. Please terminate that process and try again.".format(proc_name, ip_address, port))
+
+def get_log_file_name(executable, date = datetime.datetime.now().strftime("%Y-%m-%d")):
+    return "./{0}-{1}.log".format(executable, date)
+
+def get_screen_name(executable, date = datetime.datetime.now().strftime("%Y-%m-%d")):
+    return "{0}-{1}".format(executable, date)
 
 def run_keosd(ip_address, port, wallet_dir, use_https = False, forceWalletCleanup = False):
     from sys import exit
     logger.info("*** Running KLEOSD at {0}:{1} in {2}".format(ip_address, port, wallet_dir))
     detect_process_by_name("keosd", ip_address, port)
     
-    from shutil import rmtree
+    from shutil import rmtree, move
     if os.path.exists(config.DEFAULT_WALLET_DIR):
         if forceWalletCleanup:
             rmtree(config.DEFAULT_WALLET_DIR)
@@ -150,23 +257,50 @@ def run_keosd(ip_address, port, wallet_dir, use_https = False, forceWalletCleanu
     os.makedirs(config.DEFAULT_WALLET_DIR)
     os.makedirs(config.WALLET_PASSWORD_DIR)
 
+    log_file_name = get_log_file_name("keosd")
+    if os.path.exists(log_file_name):
+        move(log_file_name, log_file_name + ".old")
+
     parameters = None
     if use_https:
         # run kleosd in https mode
-        parameters = [config.KEOSD_EXECUTABLE, 
-            "--https-server-address","{0}:{1}".format(ip_address, port), 
-            "--https-certificate-chain-file", config.KEOSD_CERTIFICATE_CHAIN_FILE, 
-            "--https-private-key-file", config.KEOSD_PRIVATE_KEY_FILE, 
+        parameters = [
+            config.KEOSD_EXECUTABLE,
+            "--https-server-address","{0}:{1}".format(ip_address, port),
+            "--https-certificate-chain-file", config.KEOSD_CERTIFICATE_CHAIN_FILE,
+            "--https-private-key-file", config.KEOSD_PRIVATE_KEY_FILE,
             "--wallet-dir", wallet_dir,
         ]
     else:
         # run kleosd in http mode
-        parameters = [config.KEOSD_EXECUTABLE, 
+        parameters = [
+            config.KEOSD_EXECUTABLE,
             "--http-server-address","{0}:{1}".format(ip_address, port) ,
             "--wallet-dir", wallet_dir,
         ]
-    logger.info("Executing command: {0}".format(" ".join(parameters)))
-    return run_service("KEOSD", parameters, "add api url: /v1/wallet/unlock", False)
+    
+    save_screen_cfg("./keosd_screen.cfg", log_file_name)
+    screen_params = [
+        "screen",
+        "-m",
+        "-d",
+        "-L",
+        "-c",
+        "./keosd_screen.cfg",
+        "-S",
+        get_screen_name("keosd")
+    ]
+
+    parameters = screen_params + parameters
+    logger.info("Running keosd with command: {0}".format(" ".join(parameters)))
+    try:
+        subprocess.Popen(parameters)
+        save_pid_file("./run_keosd.pid", "keosd")
+        wait_for_string_in_file(log_file_name, "add api url: /v1/wallet/unlock", 10.)
+    except Exception as ex:
+        logger.error("Exception during keosd run: {0}".format(ex))
+        kill_process("./run_keosd.pid", "keosd", ip_address, port)
+        sys.exit(1)
 
 def unlock_wallet(wallet_name, wallet_password):
     parameters = [config.CLEOS_EXECUTABLE, 
@@ -195,8 +329,7 @@ def import_key(wallet_name, key, wallet_url = None):
         logger.info("Executing command: {0}".format(" ".join(parameters)))
         run_command(parameters)
     else:
-        logger.error("Importing empty key!")
-        raise EOSIOException("Importing empty key!")
+        raiseEOSIOException("Importing empty key!")
 
 def create_wallet(wallet_url = None, unlock = False):
     logger.info("*** Create wallet, wallet url {0}".format(wallet_url))
@@ -233,7 +366,7 @@ def run_nodeos(node_index, name, public_key, use_https = False):
     if not public_key:
         logger.error("Public key is empty, aborting")
         raise EOSIOException("Public key is empty, aborting")
-    from shutil import rmtree, copy
+    from shutil import rmtree, copy, move
     working_dir = "{0}{1}-{2}/".format(config.NODEOS_WORKING_DIR, node_index, name)
 
     logger.info("*** START NODE in {0}".format(working_dir))
@@ -245,17 +378,17 @@ def run_nodeos(node_index, name, public_key, use_https = False):
     if os.path.exists(config.GENESIS_JSON_FILE_SRC):
         copy(config.GENESIS_JSON_FILE_SRC, working_dir + config.GENESIS_JSON_FILE)
     else:
-        msg = "File {0} does not exists.".format(config.GENESIS_JSON_FILE_SRC)
-        logger.error(msg)
-        raise EOSIOException(msg)
-
+        raiseEOSIOException("File {0} does not exists.".format(config.GENESIS_JSON_FILE_SRC))
+        
     logger.info("Copying config file from {0} to {1}".format(config.BEOS_CONFIG_FILE_SRC, working_dir + config.BEOS_CONFIG_FILE))
     if os.path.exists(config.BEOS_CONFIG_FILE_SRC):
         copy(config.BEOS_CONFIG_FILE_SRC, working_dir + config.BEOS_CONFIG_FILE)
     else:
-        msg = "File {0} does not exists.".format(config.BEOS_CONFIG_FILE_SRC)
-        logger.error(msg)
-        raise EOSIOException(msg)
+        raiseEOSIOException("File {0} does not exists.".format(config.BEOS_CONFIG_FILE_SRC))
+
+    log_file_name = get_log_file_name("nodeos")
+    if os.path.exists(log_file_name):
+        move(log_file_name, log_file_name + ".old")
 
     parameters = [
         config.NODEOS_EXECUTABLE,
@@ -264,10 +397,30 @@ def run_nodeos(node_index, name, public_key, use_https = False):
         "--blocks-dir", os.path.abspath(working_dir) + '/blocks',
         "--config-dir", os.path.abspath(working_dir),
         "--data-dir", os.path.abspath(working_dir),
-    ] 
-    
-    logger.info("Executing command: {0}".format(" ".join(parameters)))
-    return run_service("NODEOS", parameters, "] Produced block", False)
+    ]
+
+    save_screen_cfg("./nodeos_screen.cfg", log_file_name)
+    screen_params = [
+        "screen",
+        "-m",
+        "-d",
+        "-L",
+        "-c",
+        "./nodeos_screen.cfg",
+        "-S",
+        "{0}-{1}".format("nodeos", datetime.datetime.now().strftime("%Y-%m-%d"))
+    ]
+
+    parameters = screen_params + parameters
+    logger.info("Running nodeos with command: {0}".format(" ".join(parameters)))
+    try:
+        subprocess.Popen(parameters)
+        save_pid_file("./run_nodeos.pid", "nodeos")
+        wait_for_blocks_produced(2, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
+    except Exception as ex:
+        logger.error("Exception during nodeos run: {0}".format(ex))
+        kill_process("./run_nodeos.pid", "nodeos", config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
+        sys.exit(1)
 
 def create_account(creator, name, owner_key, active_key, schema = "http"):
     if not owner_key and not active_key:
@@ -312,17 +465,7 @@ def get_account(_account_name, schema = "http"):
     logger.info("Executing command: {0}".format(" ".join(parameters)))
     logger.info(json.dumps(json.loads(run_command_and_return_output(parameters)),indent=2,separators=(',', ': ')))
 
-def terminate_running_tasks(nodeos, keosd):
-    from signal import SIGINT
-    #Just to produce few blocks and accept lately scheduled transaction(s)
-    time.sleep(2)
+def terminate_running_tasks():
+    kill_process("./run_nodeos.pid", "nodeos", config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
+    kill_process("./run_keosd.pid", "keosd", config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)
 
-    if nodeos is not None:
-        logger.info("Terminating NODEOS")
-        nodeos.send_signal(SIGINT)
-        nodeos.wait()
-
-    if keosd is not None:
-        logger.info("Terminating KEOSD")
-        keosd.send_signal(SIGINT)
-        keosd.wait()
