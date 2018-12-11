@@ -436,8 +436,13 @@ namespace eosiosystem {
       eosio_assert( asset() <= unstake_cpu_quantity, "must unstake a positive amount" );
       eosio_assert( asset() <= unstake_net_quantity, "must unstake a positive amount" );
       eosio_assert( asset() < unstake_cpu_quantity + unstake_net_quantity, "must unstake a positive amount" );
-      eosio_assert( _gstate.total_activated_stake >= _min_activated_stake,
-                    "cannot undelegate bandwidth until the chain is activated (at least 15% of all tokens participate in voting)" );
+      if ( _gstate.total_activated_stake < _min_activated_stake ) {
+         std::string msg( "cannot undelegate bandwidth until the chain is activated (at least " );
+         msg += std::to_string(_min_activated_stake_percent);
+         msg += "% of all tokens participate in voting)";
+
+         eosio_assert( false, msg.c_str() );
+      }
 
       changebw( from, receiver, -unstake_net_quantity, -unstake_cpu_quantity, false);
    } // undelegatebw

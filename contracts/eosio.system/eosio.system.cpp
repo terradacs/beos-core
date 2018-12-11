@@ -20,7 +20,7 @@ namespace eosiosystem {
       else
       {
          _gstate = _global.get();
-         _min_activated_stake = get_min_activated_stake();
+         _min_activated_stake = get_min_activated_stake( &_min_activated_stake_percent );
       }
 
       flush_voting_stats();
@@ -56,8 +56,9 @@ namespace eosiosystem {
      std::string memo("initialissue");
      INLINE_ACTION_SENDER(eosio::token, issue)( N(eosio.token), { _self, N(active) }, { _self, value, memo } );
      // min_activated_stake_percent % of quantity
+     _min_activated_stake_percent = min_activated_stake_percent;
      _min_activated_stake = static_cast<int64_t>( static_cast<int128_t>(quantity) * min_activated_stake_percent / 100 );
-     set_min_activated_stake( _min_activated_stake );
+     set_min_activated_stake( _min_activated_stake, _min_activated_stake_percent );
      }
 
    eosio_global_state system_contract::get_default_parameters() {

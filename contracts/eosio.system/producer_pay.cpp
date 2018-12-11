@@ -76,8 +76,13 @@ namespace eosiosystem {
       const auto& prod = _producers.get( owner );
       eosio_assert( prod.active(), "producer does not have an active key" );
 
-      eosio_assert( _gstate.total_activated_stake >= _min_activated_stake,
-                    "cannot claim rewards until the chain is activated (at least 15% of all tokens participate in voting)" );
+      if ( _gstate.total_activated_stake < _min_activated_stake) {
+         std::string msg( "cannot claim rewards until the chain is activated (at least " );
+         msg += std::to_string(_min_activated_stake_percent);
+         msg += "% of all tokens participate in voting)";
+
+         eosio_assert( false, msg.c_str() );
+      }
       eosio_assert(is_allowed_vote_operation(), "cannot claim rewards until intial witness election phase will complete");
 
       auto ct = current_time();

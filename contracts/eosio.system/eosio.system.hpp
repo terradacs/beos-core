@@ -144,6 +144,7 @@ namespace eosiosystem {
          rammarket              _rammarket;
 
          int64_t                _min_activated_stake = std::numeric_limits<int64_t>::max();
+         uint32_t               _min_activated_stake_percent = 100; // it is only for print message properly
 
       public:
          system_contract( account_name s );
