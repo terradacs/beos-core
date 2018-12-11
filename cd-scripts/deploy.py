@@ -330,31 +330,11 @@ def build_beos(c_compiler, cxx_compiler):
 
 def initialize_wallet():
     import eosio
-    keosd = None
-    logger.info("Starting initialize_wallet")
     try:
         wallet_url = "http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)
         eosio.run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR, False, True)
         eosio.create_wallet(wallet_url, False)
-        # import producer keys
-        for producer, data in config.PRODUCERS_ARRAY.items():
-            logger.info("Importing keys for producer: {0}".format(producer))
-            eosio.import_key(config.MASTER_WALLET_NAME, data["prv_owner"], wallet_url)
-            eosio.import_key(config.MASTER_WALLET_NAME, data["prv_active"], wallet_url)
-
-        return keosd
-    except Exception as ex:
-        eosio.terminate_running_tasks(None, keosd)
-        logger.error("Exception during initialize_wallet: {0}".format(ex))
-        raise
-
-def initialize_beos():
-    import eosio
-    keosd = None
-    nodeos = None
-    try:
-        keosd = initialize_wallet()
-        nodeos = eosio.run_nodeos(config.START_NODE_INDEX, config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY)
+        eosio.run_nodeos(config.START_NODE_INDEX, config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY)
 
         eosio_actions.create_account("eosio", "eosio.msig", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
         eosio_actions.create_account("eosio", "eosio.names", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
