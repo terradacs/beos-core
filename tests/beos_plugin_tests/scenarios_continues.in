@@ -74,17 +74,6 @@
 		"name": "[5.2] Basic issue test.",
 		"scenario_blocks": 40,
 		"params": {
-<<<<<<< HEAD
-			"authorized_by": "beos.init",
-			"code": "beos.init",
-			"action": "changeparams",
-			"args": {
-				"new_params": ["0.0000 PXBTS",  120, [10, 30, 5, 8000000],
-					[10, 20, 5, 5000000],
-					[10, 30, 10, 200000]
-				]
-			}
-=======
       "starting_block_for_initial_witness_election": 120,
 			"starting_block_for_beos_distribution": 10,
 			"ending_block_for_beos_distribution": 30,
@@ -95,7 +84,6 @@
 			"distribution_payment_block_interval_for_ram_distribution": 5,
 			"trustee_reward_ram": 0,
 			"distrib_ram_leftover": 300000
->>>>>>> 84e431f6a... [ABW]: first steps to correct scenarios
 		},
 		"actions": [{
 			"start_block": 2,
