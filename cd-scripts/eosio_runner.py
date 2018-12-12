@@ -34,7 +34,8 @@ def show_wallet_unlock_postconf():
         wallet_password = password_file.readline()
         #wallet_password = wallet_password[1:-1] # remove " character from begin and end of string
 
-    parameters = [config.CLEOS_EXECUTABLE, 
+    parameters = [
+        config.CLEOS_EXECUTABLE, 
         "wallet", "unlock", 
         "-n", config.MASTER_WALLET_NAME, 
         "--password", wallet_password
@@ -42,19 +43,17 @@ def show_wallet_unlock_postconf():
     logger.info("Dont forget to unlock your wallet with command: {0}".format(" ".join(parameters)))
 
 def show_keosd_postconf(ip_address, port, wallet_dir, use_https = False):
-    parameters = None
+    parameters = [config.KEOSD_EXECUTABLE,
+        "--http-server-address","{0}:{1}".format(ip_address, port) ,
+        "--wallet-dir", wallet_dir,
+    ]
     if use_https:
         # run kleosd in https mode
-        parameters = [config.KEOSD_EXECUTABLE,
+        parameters = [
+            config.KEOSD_EXECUTABLE,
             "--https-server-address","{0}:{1}".format(ip_address, port),
             "--https-certificate-chain-file", config.KEOSD_CERTIFICATE_CHAIN_FILE,
             "--https-private-key-file", config.KEOSD_PRIVATE_KEY_FILE,
-            "--wallet-dir", wallet_dir,
-        ]
-    else:
-        # run kleosd in http mode
-        parameters = [config.KEOSD_EXECUTABLE,
-            "--http-server-address","{0}:{1}".format(ip_address, port) ,
             "--wallet-dir", wallet_dir,
         ]
     logger.info("Configuration complete, you can now run keosd with command (consider running in screen): {0}".format(" ".join(parameters)))
@@ -99,7 +98,11 @@ def run_keosd(ip_address, port, wallet_dir, use_https = False, forceWalletCleanu
     if os.path.exists(log_file_name):
         move(log_file_name, log_file_name + ".old")
 
-    parameters = None
+    parameters = [
+        config.KEOSD_EXECUTABLE,
+        "--http-server-address","{0}:{1}".format(ip_address, port) ,
+        "--wallet-dir", wallet_dir,
+    ]
     if use_https:
         # run kleosd in https mode
         parameters = [
@@ -109,14 +112,7 @@ def run_keosd(ip_address, port, wallet_dir, use_https = False, forceWalletCleanu
             "--https-private-key-file", config.KEOSD_PRIVATE_KEY_FILE,
             "--wallet-dir", wallet_dir,
         ]
-    else:
-        # run kleosd in http mode
-        parameters = [
-            config.KEOSD_EXECUTABLE,
-            "--http-server-address","{0}:{1}".format(ip_address, port) ,
-            "--wallet-dir", wallet_dir,
-        ]
-    
+
     eosio_tools.save_screen_cfg("./keosd_screen.cfg", log_file_name)
     screen_params = [
         "screen",
