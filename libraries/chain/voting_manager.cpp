@@ -351,23 +351,28 @@ void voting_manager::process_voters(const account_name& lowerBound, const accoun
       }
    }
 
-void voting_manager::set_min_activated_stake(int64_t min_activated_stake)
+void voting_manager::set_min_activated_stake(int64_t min_activated_stake, uint32_t min_activated_stake_percent)
   {
   DBG("voting_manager::set_min_activated_stake: min_activated_stake = %lu", min_activated_stake);
+  DBG("voting_manager::set_min_activated_stake: min_activated_stake_percent = %u", min_activated_stake_percent);
   const auto& defaultStatObject = _db.get<global_vote_stat_object>(0);
 
-  _db.modify<global_vote_stat_object>(defaultStatObject, [min_activated_stake] (global_vote_stat_object& obj)
+  _db.modify<global_vote_stat_object>(defaultStatObject, [min_activated_stake, min_activated_stake_percent] (global_vote_stat_object& obj)
     {
     obj.min_activated_stake = min_activated_stake;
+    obj.min_activated_stake_percent = min_activated_stake_percent;
     });
   }
 
-int64_t voting_manager::get_min_activated_stake() const
+int64_t voting_manager::get_min_activated_stake(uint32_t* min_activated_stake_percent) const
   {
   const auto& defaultStatObject = _db.get<global_vote_stat_object>(0);
-  int64_t min_activated_stake = defaultStatObject.min_activated_stake;
-  DBG("voting_manager::get_min_activated_stake(): min_activated_stake = %lu", min_activated_stake);
-  return min_activated_stake;
+  if ( min_activated_stake_percent ) {
+     *min_activated_stake_percent = defaultStatObject.min_activated_stake_percent;
+  }
+  DBG("voting_manager::get_min_activated_stake(): min_activated_stake = %lu", defaultStatObject.min_activated_stake);
+  DBG("voting_manager::get_min_activated_stake(): min_activated_stake_percent = %u", defaultStatObject.min_activated_stake_percent);
+  return defaultStatObject.min_activated_stake;
   }
 
 inline uint64_t voting_manager::current_time() const {

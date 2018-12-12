@@ -73,6 +73,7 @@ struct global_vote_stat_object : chainbase::object<global_vote_stat_object_type,
    uint64_t thresh_activated_stake_time = 0;
    double total_producer_vote_weight = 0;
    int64_t min_activated_stake = std::numeric_limits<int64_t>::max();
+   uint32_t min_activated_stake_percent = 100;
 };
 
 using global_vote_stat_index = chainbase::shared_multi_index_container<
@@ -124,9 +125,9 @@ class voting_manager final
       */
       void process_voters(const account_name& lowerBound, const account_name& upperBound, voter_processor processor) const;
 
-      void set_min_activated_stake(int64_t min_activated_stake);
+      void set_min_activated_stake(int64_t min_activated_stake, uint32_t min_activated_stake_percent);
 
-      int64_t get_min_activated_stake() const;
+      int64_t get_min_activated_stake(uint32_t* min_activated_stake_percent = nullptr) const;
 
    private:
       friend struct eosio::chain::controller_impl;
@@ -173,6 +174,7 @@ FC_REFLECT(eosio::chain::voter_info_object, (owner)(proxy)(producers)(staked)(la
 
 FC_REFLECT(eosio::chain::global_vote_stat_object, (total_activated_stake)(thresh_activated_stake_time)
                                                   (total_producer_vote_weight)(min_activated_stake)
+                                                  (min_activated_stake_percent)
           )
 
 CHAINBASE_SET_INDEX_TYPE(eosio::chain::voter_info_object, eosio::chain::voter_info_index)

@@ -332,14 +332,14 @@ class privileged_api : public context_aware_api {
             total_producer_vote_weight);
          }
 
-      void set_min_activated_stake(int64_t min_activated_stake)
+      void set_min_activated_stake(int64_t min_activated_stake, uint32_t min_activated_stake_percent)
         {
-        context.control.get_mutable_voting_manager().set_min_activated_stake( min_activated_stake );
+        context.control.get_mutable_voting_manager().set_min_activated_stake( min_activated_stake, min_activated_stake_percent );
         }
 
-      int64_t get_min_activated_stake()
+      int64_t get_min_activated_stake(uint32_t* min_activated_stake_percent)
         {
-        return context.control.get_mutable_voting_manager().get_min_activated_stake();
+        return context.control.get_mutable_voting_manager().get_min_activated_stake( min_activated_stake_percent );
         }
 
    private:
@@ -1917,8 +1917,8 @@ REGISTER_INTRINSICS(privileged_api,
    (update_votes,                     void(int64_t, int64_t, int, int, int, int, int) )
    (get_voting_stats,                 void(int, int, int)                             )
    (store_voting_stats,               void(int64_t, int64_t, double)                  )
-   (set_min_activated_stake,          void(int64_t)                                   )
-   (get_min_activated_stake,          int64_t()                                       )
+   (set_min_activated_stake,          void(int64_t, int)                              )
+   (get_min_activated_stake,          int64_t(int)                                    )
 );
 
 REGISTER_INJECTED_INTRINSICS(transaction_context,

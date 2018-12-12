@@ -138,9 +138,9 @@ extern "C" {
    void store_voting_stats(int64_t total_activated_stake, uint64_t thresh_activated_stake_time,
       double total_producer_vote_weight);
 
-   void set_min_activated_stake(int64_t);
+   void set_min_activated_stake(int64_t min_activated_state, uint32_t min_activated_state_percent);
 
-   int64_t get_min_activated_stake();
+   int64_t get_min_activated_stake(uint32_t* min_activated_state_percent);
 
    /** @brief Registers given account as a proxy (if is_proxy is true)
        Part of system_contract implementation (regproxy action).
