@@ -74,7 +74,9 @@ def create_wallet(wallet_url = None, unlock = False):
     logger.info("*** Create wallet, wallet url {0}".format(wallet_url))
 
     parameters = [
-        config.CLEOS_EXECUTABLE
+        config.CLEOS_EXECUTABLE,
+        "--print-request",
+        "--print-response"
     ]
 
     if config.LOG_LEVEL == logging.DEBUG:
