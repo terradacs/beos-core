@@ -150,14 +150,19 @@ namespace eosio {
          distribution( account_name self ) : contract( self ),
             _global( _self, _self )
          {
-            _gstate = _global.exists() ? _global.get() : get_default_parameters();
+            if (_global.exists())
+               _gstate = _global.get();
+            else {
+               _gstate = get_default_parameters();
+               _global.set(_gstate, _self);
+            }
          }
 
          ~distribution() {}
 
          void onblock( uint32_t block_nr );
          void changeparams( distrib_global_state new_params );
-         void storeparams();
+         void storeparams(uint32_t dummy);
 
          inline distrib_global_state get_global_state() const {
             return _gstate;

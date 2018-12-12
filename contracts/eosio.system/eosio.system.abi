@@ -560,6 +560,10 @@
       "type": "set_global_limits",
       "ricardian_contract": ""
     },{
+      "name": "defineprods",
+      "type": "set_producers",
+      "ricardian_contract": ""
+    },{
       "name": "setprods",
       "type": "set_producers",
       "ricardian_contract": ""

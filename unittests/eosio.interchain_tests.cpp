@@ -387,7 +387,7 @@ class eosio_interchain_tester : public actions
 
   action_result store_params_init()
   {
-    return push_action( N(beos.init), N(storeparams), mvo(),
+    return push_action( N(beos.init), N(storeparams), mvo()("dummy",0),
         beos_init_abi_ser,
         N(beos.init)
       );
@@ -395,7 +395,7 @@ class eosio_interchain_tester : public actions
 
   action_result store_params_distrib()
   {
-    return push_action( N(beos.distrib), N(storeparams), mvo(),
+    return push_action( N(beos.distrib), N(storeparams), mvo()("dummy", 0),
         beos_distrib_abi_ser,
         N(beos.distrib)
       );
@@ -709,7 +709,7 @@ BOOST_AUTO_TEST_SUITE(eosio_init_tests)
 BOOST_FIXTURE_TEST_CASE( store_params_test, eosio_init_tester ) try {
 
   auto var_tgs = get_distrib_param();
-  BOOST_REQUIRE_EQUAL( true, var_tgs.is_null() );
+  BOOST_REQUIRE_EQUAL( false, var_tgs.is_null() ); /// Distribution parameters must be immediately saved once contract has been used
 
   BOOST_REQUIRE_EQUAL( success(), store_params_distrib() );
 

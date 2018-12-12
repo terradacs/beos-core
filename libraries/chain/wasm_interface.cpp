@@ -33,17 +33,19 @@ namespace eosio { namespace chain {
 
    namespace
    {
-   inline voting_manager::producer_info_index prepare_producers(array_ptr<block_producer_voting_info> _producerInfos,
+   inline voting_manager::producer_info_index prepare_producers(array_ptr<char> _producerInfos,
       size_t producerInfoSize)
       {
       voting_manager::producer_info_index _producers;
 
-      block_producer_voting_info* producerInfos = _producerInfos;
+      block_producer_voting_info* producerInfos = reinterpret_cast<block_producer_voting_info*>(_producerInfos.value);
 
       for(size_t i = 0; i < producerInfoSize; ++i)
          {
          account_name owner(producerInfos[i].owner_account_name);
          _producers[owner] = producerInfos + i;
+
+         ///dlog("Got producer info: ${p}: ${v}, ${a}\n", ("p", owner.to_string())("v", producerInfos[i].total_votes)("a", producerInfos[i].is_active));
          }
 
       return _producers;
@@ -292,13 +294,13 @@ class privileged_api : public context_aware_api {
       }
 
       void register_voting_proxy(const account_name proxy, bool is_proxy,
-         array_ptr<block_producer_voting_info> producerInfos, size_t producerInfoSize) {
+         array_ptr<char> producerInfos, size_t producerInfoSize) {
          voting_manager::producer_info_index _producers = prepare_producers(producerInfos, producerInfoSize);
          context.control.get_mutable_voting_manager().register_voting_proxy(proxy, is_proxy, _producers);
       }
 
       void update_voting_power(const account_name voter, int64_t stake_delta,
-         array_ptr<block_producer_voting_info> producerInfos, size_t producerInfoSize) {
+         array_ptr<char> producerInfos, size_t producerInfoSize) {
          
          voting_manager::producer_info_index _producers = prepare_producers(producerInfos, producerInfoSize);
 
@@ -307,7 +309,7 @@ class privileged_api : public context_aware_api {
 
       void update_votes(const account_name voter_name, const account_name proxy, array_ptr<account_name> voter_producers, size_t producer_size,
          bool voting,
-         array_ptr<block_producer_voting_info> producerInfos, size_t producerInfoSize) {
+         array_ptr<char> producerInfos, size_t producerInfoSize) {
          std::vector<account_name> _voter_producers;
          _voter_producers.insert(_voter_producers.end(), voter_producers.value, voter_producers.value + producer_size);
 
@@ -1825,8 +1827,8 @@ class distribution_api : public context_aware_api {
 
       void reward_all( uint64_t beos_to_distribute, uint64_t beos_to_distribute_trustee, uint64_t ram_to_distribute,
             uint64_t ram_to_distribute_trustee, array_ptr<char> pxbtsAsset, size_t assetLen,
-            array_ptr<block_producer_voting_info> producerInfos, size_t producerInfoSize ) {
-         datastream<const char*> ds( pxbtsAsset, assetLen );
+            array_ptr<char> producerInfos, size_t producerInfoSize ) {
+         datastream<const char*> ds(pxbtsAsset, assetLen);
          asset pxbts;
          fc::raw::unpack(ds, pxbts);
 

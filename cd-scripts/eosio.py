@@ -287,6 +287,7 @@ def set_contract(account, contract, permission, schema = "http"):
         "set", "contract", account, contract, "-p", permission]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
     run_command(parameters)
+    time.sleep(2)
 
 def push_action(account, action, data, permission, schema = "http"):
     parameters = [config.CLEOS_EXECUTABLE, 
@@ -295,6 +296,7 @@ def push_action(account, action, data, permission, schema = "http"):
         "push", "action", account, action, data, "-p", permission]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
     run_command(parameters)
+    time.sleep(2)
 
 def get_balance(_account_name, _currency, schema = "http"):
     parameters = [config.CLEOS_EXECUTABLE, 
@@ -305,17 +307,19 @@ def get_balance(_account_name, _currency, schema = "http"):
     return float(run_command_and_return_output(parameters).decode('utf-8').split()[0])
 
 def get_account(_account_name, schema = "http"):
+    time.sleep(2)
     parameters = [config.CLEOS_EXECUTABLE, 
         "--url", "{0}://{1}:{2}".format(schema, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT),
         "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
         "get", "account", "-j", _account_name]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
-    logger.info(json.dumps(json.loads(run_command_and_return_output(parameters)),indent=2,separators=(',', ': ')))
+    #logger.info(json.dumps(json.loads(run_command_and_return_output(parameters)),indent=2,separators=(',', ': ')))
+    logger.info(run_command_and_return_output(parameters))
 
 def terminate_running_tasks(nodeos, keosd):
     from signal import SIGINT
     #Just to produce few blocks and accept lately scheduled transaction(s)
-    time.sleep(2)
+    time.sleep(4)
 
     if nodeos is not None:
         logger.info("Terminating NODEOS")

@@ -241,6 +241,8 @@ namespace eosiosystem {
           */
          void initresource( account_name receiver, int64_t bytes, int64_t stake_net_quantity, int64_t stake_cpu_quantity );
 
+         void defineprods(std::vector<eosio::producer_key> schedule);
+
          bool is_allowed_vote_operation() const;
          bool is_allowed_ram_operation() const;
 

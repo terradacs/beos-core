@@ -32,6 +32,7 @@ import requests
 import os
 import subprocess
 import sys
+import time
 
 MODULE_NAME = "BEOS deploy"
 
@@ -336,14 +337,32 @@ def install_beos(c_compiler, cxx_compiler):
 def build_beos(c_compiler, cxx_compiler):
     build_eosio(c_compiler, cxx_compiler)
 
+def initialize_wallet():
+    import eosio
+    keosd = None
+    logger.info("Starting initialize_wallet")
+    try:
+        wallet_url = "http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)
+        keosd = eosio.run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR, False, True)
+        eosio.create_wallet(wallet_url, False)
+        # import producer keys
+        for producer, data in config.PRODUCERS_ARRAY.items():
+            logger.info("Importing keys for producer: {0}".format(producer))
+            eosio.import_key(config.MASTER_WALLET_NAME, data["prv_owner"], wallet_url)
+            eosio.import_key(config.MASTER_WALLET_NAME, data["prv_active"], wallet_url)
+
+        return keosd
+    except Exception as ex:
+        eosio.terminate_running_tasks(None, keosd)
+        logger.error("Exception during initialize_wallet: {0}".format(ex))
+        raise
+
 def initialize_beos():
     import eosio
     keosd = None
     nodeos = None
     try:
-        wallet_url = "http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)
-        keosd = eosio.run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR, False, True)
-        eosio.create_wallet(wallet_url, False)
+        keosd = initialize_wallet()
         nodeos = eosio.run_nodeos(config.START_NODE_INDEX, config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY)
 
         eosio.create_account("eosio", "eosio.msig", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
@@ -368,8 +387,6 @@ def initialize_beos():
         # create producer accounts
         for producer, data in config.PRODUCERS_ARRAY.items():
             logger.info("Creating producer account for: {0}".format(producer))
-            eosio.import_key(config.MASTER_WALLET_NAME, data["prv_owner"], wallet_url)
-            eosio.import_key(config.MASTER_WALLET_NAME, data["prv_active"], wallet_url)
             eosio.create_account("eosio", producer, data["pub_owner"], data["pub_active"])
 
         eosio.set_contract("eosio.token", config.CONTRACTS_DIR + "/eosio.token", "eosio.token")
@@ -377,28 +394,13 @@ def initialize_beos():
         eosio.push_action("eosio.token", "create", '[ "eosio", "{0} {1}"]'.format(config.CORE_TOTAL_SUPPLY, config.CORE_SYMBOL_NAME), "eosio.token")
         eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PROXY_TOTAL_SUPPLY, config.PROXY_ASSET_NAME), "eosio.token")
 
-        # set initial producers, setprods is in eosio.bios contract so we need to load it first
-        logger.info("Setting initial producers via setprods")
-        eosio.set_contract("eosio", config.CONTRACTS_DIR + "eosio.bios", "eosio")
-        producers = [{"producer_name": config.PRODUCER_NAME, "block_signing_key": config.EOSIO_PUBLIC_KEY}]
-        if config.PRODUCERS_ARRAY:
-            for producer, data in config.PRODUCERS_ARRAY.items():
-                producers.append({"producer_name": producer, "block_signing_key": data["pub_active"]})
-            import json
-            args = {"schedule" : producers}
-            eosio.push_action("eosio", "setprods", '{0}'.format(json.dumps(args)), "eosio")
-
         # registering initial producers, regproducer is in eosio.system contract so it need to be loaded first
         eosio.set_contract("eosio", config.CONTRACTS_DIR + "eosio.system", "eosio")
-        # special case, register eosio as producer
-        eosio.push_action("eosio", "regproducer", '["{0}", "{1}", "{2}", 0]'.format(config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY, "http://dummy.net"), config.PRODUCER_NAME)
-        for producer, data in config.PRODUCERS_ARRAY.items():
-            logger.info("Registering producer account for: {0}".format(producer))
-            eosio.push_action("eosio", "regproducer", '["{0}", "{1}", "{2}", 0]'.format(producer, data["pub_active"], data["url"]), producer)
-
+        time.sleep(2)
         eosio.set_contract("beos.init", config.CONTRACTS_DIR + "eosio.init", "beos.init")
         eosio.set_contract("beos.gateway", config.CONTRACTS_DIR + "eosio.gateway", "beos.gateway")
         eosio.set_contract("beos.distrib", config.CONTRACTS_DIR + "eosio.distribution", "beos.distrib")
+        time.sleep(2)
         eosio.set_contract("producerjson", config.CONTRACTS_DIR + "producerjson", "producerjson")
         eosio.set_contract("regproxyinfo", config.CONTRACTS_DIR + "proxyinfo", "regproxyinfo")
 
@@ -408,17 +410,37 @@ def initialize_beos():
         # eosio.get_account("beos.gateway")
         eosio.push_action("eosio", "initresource", '[ "beos.distrib", "{0}", "-1", "-1"]'.format(config.DISTRIB_INIT_RAM), "eosio")
         # eosio.get_account("eosio")
-        # eosio.get_account("beos.distrib")
+        eosio.get_account("beos.distrib")
         balance = eosio.get_balance("eosio", config.CORE_SYMBOL_NAME)
         balance_int = int(balance * (10 ** config.CORE_SYMBOL_PRECISION) - config.DISTRIB_NETCPU_LEFTOVER)
         # all bandwidth resources to distribute must be stored as net! leftover value in cpu will also be subtracted from net reward pool
         eosio.push_action("eosio", "initresource", '[ "beos.distrib", "-1", "{0}", "{1}"]'.format(balance_int, config.DISTRIB_NETCPU_LEFTOVER), "eosio")
         # eosio.get_account("eosio")
-        # eosio.get_account("beos.distrib")
+        eosio.get_account("beos.distrib")
 
-        eosio.push_action("beos.init", "storeparams", '[]', "beos.init")
-        eosio.push_action("beos.distrib", "storeparams", '[]', "beos.distrib")
+        producers = []
 
+        if len(config.PRODUCERS_ARRAY) == 0:
+            # special case, register eosio as producer but only if it is defined as single one.
+            producers.append({"producer_name": config.PRODUCER_NAME, "block_signing_key": config.EOSIO_PUBLIC_KEY})
+            eosio.push_action("eosio", "regproducer", '["{0}", "{1}", "{2}", 0]'.format(config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY, "http://dummy.net"), config.PRODUCER_NAME)
+
+        for producer, data in config.PRODUCERS_ARRAY.items():
+            logger.info("Registering producer account for: {0}".format(producer))
+            eosio.push_action("eosio", "regproducer", '["{0}", "{1}", "{2}", 0]'.format(producer, data["pub_active"], data["url"]), producer)
+
+        for producer, data in config.PRODUCERS_ARRAY.items():
+            producers.append({"producer_name": producer, "block_signing_key": data["pub_active"]})
+        import json
+        args = {"schedule" : producers}
+        # set initial producers, setprods is in eosio.bios contract so we need to load it first
+        logger.info("Setting initial producers via setprods: '{0}'".format(json.dumps(args)))
+        eosio.push_action("eosio", "defineprods", '{0}'.format(json.dumps(args)), "eosio")
+
+        eosio.push_action("beos.init", "storeparams", '[0]', "beos.init")
+        eosio.push_action("beos.distrib", "storeparams", '[0]', "beos.distrib")
+
+        eosio.get_account("beos.distrib")
         eosio.terminate_running_tasks(nodeos, keosd)
         eosio.show_keosd_postconf(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
         eosio.show_wallet_unlock_postconf()
@@ -426,7 +448,8 @@ def initialize_beos():
     except Exception as ex:
         eosio.terminate_running_tasks(nodeos, keosd)
         logger.error("Exception during initialize: {0}".format(ex))
-        sys.exit(1)
+        raise
+        #sys.exit(1)
 
 def clear_initialization_data(node_index, name):
     from shutil import rmtree
@@ -493,6 +516,8 @@ if __name__ == '__main__':
 
     postinstallGroup = OptionGroup(parser, "Postinstallation actions")
     postinstallGroup.add_option("--clear-initialization-data", action="store_true", dest="clear_init_data", help="Removes all data set in initialization process!")
+    
+    postinstallGroup.add_option("--initialize-wallet", action="store_true", dest="initialize_wallet", help="")
     postinstallGroup.add_option("--initialize-beos", action="store_true", dest="initialize_beos", help="Runs executable and creates system accounts.")
     postinstallGroup.add_option("--create-genesis-and-config", action="store_true", dest="create_genesis_and_config", help="Creates genesis.json and config.ini files.")
 
@@ -586,6 +611,9 @@ if __name__ == '__main__':
 
     if options.initialize_beos:
         initialize_beos()
+
+    if options.initialize_wallet:
+      initialize_wallet()
 
     # close loggers
     config.log_main.close()

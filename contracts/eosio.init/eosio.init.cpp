@@ -18,7 +18,7 @@ namespace eosio {
     _beos_global.set( _beos_gstate, _self );
   }
 
-  void init::storeparams()
+  void init::storeparams(uint32_t )
   {
     require_auth( _self );
 
