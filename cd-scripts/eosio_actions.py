@@ -205,6 +205,7 @@ def get_balance(_account_name, _currency, schema = "http"):
         "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
         "get", "currency", "balance", "eosio.token", _account_name, _currency
     ]
+
     logger.info("Executing command: {0}".format(" ".join(parameters)))
     return float(eosio_tools.run_command_and_return_output(parameters).decode('utf-8').split()[0])
 
