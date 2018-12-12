@@ -34,6 +34,8 @@ logger.addHandler(fh)
 def unlock_wallet(wallet_name, wallet_password):
     parameters = [
         config.CLEOS_EXECUTABLE, 
+        "--print-request",
+        "--print-response",
         "wallet", "unlock", 
         "-n", wallet_name, 
         "--password", wallet_password
@@ -44,7 +46,9 @@ def unlock_wallet(wallet_name, wallet_password):
 def import_key(wallet_name, key, wallet_url = None):
     if key:
         parameters = [
-            config.CLEOS_EXECUTABLE
+            config.CLEOS_EXECUTABLE,
+            "--print-request",
+            "--print-response",
         ]
 
         if wallet_url is not None:
@@ -67,7 +71,9 @@ def create_wallet(wallet_url = None, unlock = False):
     logger.info("*** Create wallet, wallet url {0}".format(wallet_url))
 
     parameters = [
-        config.CLEOS_EXECUTABLE
+        config.CLEOS_EXECUTABLE,
+        "--print-request",
+        "--print-response"
     ]
 
     if wallet_url is not None:
