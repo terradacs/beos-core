@@ -32,7 +32,8 @@ logger.addHandler(ch)
 logger.addHandler(fh)
 
 def unlock_wallet(wallet_name, wallet_password):
-    parameters = [config.CLEOS_EXECUTABLE, 
+    parameters = [
+        config.CLEOS_EXECUTABLE, 
         "wallet", "unlock", 
         "-n", wallet_name, 
         "--password", wallet_password
@@ -42,19 +43,21 @@ def unlock_wallet(wallet_name, wallet_password):
 
 def import_key(wallet_name, key, wallet_url = None):
     if key:
-        parameters = [config.CLEOS_EXECUTABLE, 
-            "wallet", "import", 
-            "-n", wallet_name, 
-            "--private-key", key
+        parameters = [
+            config.CLEOS_EXECUTABLE
         ]
+
         if wallet_url is not None:
-            parameters = [config.CLEOS_EXECUTABLE, 
-            "--wallet-url", wallet_url,
+            parameters = parameters + [
+                "--wallet-url", wallet_url,
+            ]
+
+        parameters = parameters + [
             "wallet", "import", 
             "-n", wallet_name, 
             "--private-key", key
         ]
-        
+
         logger.info("Executing command: {0}".format(" ".join(parameters)))
         eosio_tools.run_command(parameters)
     else:
@@ -63,19 +66,20 @@ def import_key(wallet_name, key, wallet_url = None):
 def create_wallet(wallet_url = None, unlock = False):
     logger.info("*** Create wallet, wallet url {0}".format(wallet_url))
 
-    # if wallet_url is empty run local wallet
-    parameters = [config.CLEOS_EXECUTABLE, 
+    parameters = [
+        config.CLEOS_EXECUTABLE
+    ]
+
+    if wallet_url is not None:
+        parameters = parameters + [
+            "--wallet-url", wallet_url
+        ]
+
+    parameters = parameters + [
         "wallet", "create", 
-        "-n", config.MASTER_WALLET_NAME, 
+        "-n", config.MASTER_WALLET_NAME,
         "-f", config.WALLET_PASSWORD_PATH
     ]
-    if wallet_url is not None:
-        parameters = [config.CLEOS_EXECUTABLE, 
-            "--wallet-url", wallet_url,
-            "wallet", "create", 
-            "-n", config.MASTER_WALLET_NAME,
-            "-f", config.WALLET_PASSWORD_PATH
-        ]
 
     logger.info("Executing command: {0}".format(" ".join(parameters)))
     eosio_tools.run_command(parameters)
@@ -84,7 +88,6 @@ def create_wallet(wallet_url = None, unlock = False):
         wallet_password = None
         with open(config.WALLET_PASSWORD_PATH, "r") as password_file:
             wallet_password = password_file.readline()
-            #wallet_password = wallet_password[1:-1] # remove " character from begin and end of string
         unlock_wallet(config.MASTER_WALLET_NAME, wallet_password)
 
     for key in config.SYSTEM_ACCOUNT_KEYS:
@@ -94,51 +97,61 @@ def create_account(creator, name, owner_key, active_key, schema = "http"):
     if not owner_key and not active_key:
         logger.error("Owner key or active key are empty, aborting")
         raise eosio_tools.EOSIOException("Owner key or active key are empty, aborting")
-    parameters = [config.CLEOS_EXECUTABLE, 
+    parameters = [
+        config.CLEOS_EXECUTABLE, 
         "--print-request",
         "--print-response",
         "--url", "{0}://{1}:{2}".format(schema, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT),
         "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
-        "create", "account", creator, name, owner_key, active_key]
+        "create", "account", creator, name, owner_key, active_key
+    ]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
     eosio_tools.run_command(parameters)
 
 def set_contract(account, contract, permission, schema = "http"):
-    parameters = [config.CLEOS_EXECUTABLE, 
+    parameters = [
+        config.CLEOS_EXECUTABLE, 
         "--print-request",
         "--print-response",
         "--url", "{0}://{1}:{2}".format(schema, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT),
         "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
-        "set", "contract", account, contract, "-p", permission]
+        "set", "contract", account, contract, "-p", permission
+    ]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
     eosio_tools.run_command(parameters)
 
 def push_action(account, action, data, permission, schema = "http"):
-    parameters = [config.CLEOS_EXECUTABLE, 
+    parameters = [
+        config.CLEOS_EXECUTABLE, 
         "--print-request",
         "--print-response",
         "--url", "{0}://{1}:{2}".format(schema, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT),
         "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
-        "push", "action", account, action, data, "-p", permission]
+        "push", "action", account, action, data, "-p", permission
+    ]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
     eosio_tools.run_command(parameters)
 
 def get_balance(_account_name, _currency, schema = "http"):
-    parameters = [config.CLEOS_EXECUTABLE, 
+    parameters = [
+        config.CLEOS_EXECUTABLE, 
         "--print-request",
         "--print-response",
         "--url", "{0}://{1}:{2}".format(schema, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT),
         "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
-        "get", "currency", "balance", "eosio.token", _account_name, _currency]
+        "get", "currency", "balance", "eosio.token", _account_name, _currency
+    ]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
     return float(eosio_tools.run_command_and_return_output(parameters).decode('utf-8').split()[0])
 
 def get_account(_account_name, schema = "http"):
-    parameters = [config.CLEOS_EXECUTABLE, 
+    parameters = [
+        config.CLEOS_EXECUTABLE, 
         "--print-request",
         "--print-response",
         "--url", "{0}://{1}:{2}".format(schema, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT),
         "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
-        "get", "account", "-j", _account_name]
+        "get", "account", "-j", _account_name
+    ]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
     logger.info(json.dumps(json.loads(eosio_tools.run_command_and_return_output(parameters)),indent=2,separators=(',', ': ')))
