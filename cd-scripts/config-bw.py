@@ -155,10 +155,20 @@ START_NODE_INDEX = 0
 
 ##############      configuration data for contracts/accounts     ###############
 #################################################################################
-PROXY_ASSET_NAME = "PXBTS"
-PROXY_ASSET_PRECISION = 4 # 10^4
+PXBTS_ASSET_NAME = "PXBTS"
+PXBTS_ASSET_PRECISION = 4 # 10^4
 # maximum amount that will ever be allowed to be issued (must cover all BTS)
-PROXY_TOTAL_SUPPLY = "10000000000.0000" # as string to preserve zeros (they establish precision)
+PXBTS_TOTAL_SUPPLY = "10000000000.0000" # as string to preserve zeros (they establish precision)
+
+PXBPTS_ASSET_NAME = "PXBPTS"
+PXBPTS_ASSET_PRECISION = 4 # 10^4
+# maximum amount that will ever be allowed to be issued (must cover all Brownie.PTS)
+PXBPTS_TOTAL_SUPPLY = "10000000000.0000" # as string to preserve zeros (they establish precision)
+
+PXEOS_ASSET_NAME = "PXEOS"
+PXEOS_ASSET_PRECISION = 4 # 10^4
+# maximum amount that will ever be allowed to be issued (must cover all EOS)
+PXEOS_TOTAL_SUPPLY = "10000000000.0000" # as string to preserve zeros (they establish precision)
 
 CORE_SYMBOL_PRECISION = 4 # 10^4
 # maximum amount that will ever be allowed to be issued (includes "perpetual" inflation)

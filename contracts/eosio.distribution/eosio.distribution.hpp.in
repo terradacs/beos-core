@@ -34,9 +34,10 @@ namespace eosio {
    {
       distribution_parameters beos;
       distribution_parameters ram;
+      std::vector<asset> proxy_assets;
       uint64_t ram_leftover;
 
-      EOSLIB_SERIALIZE( distrib_global_state, (beos)(ram)(ram_leftover) )
+      EOSLIB_SERIALIZE( distrib_global_state, (beos)(ram)(proxy_assets)(ram_leftover) )
    };
 
    typedef eosio::singleton<N(distribstate), distrib_global_state> distrib_global_state_singleton;
@@ -131,6 +132,13 @@ namespace eosio {
             dp.ram.trustee_reward = ${TRUSTEE_REWARD_RAM};
 
             /*
+               Proxy assets that will be base for user weights for distribution.
+               Only add such assets here even if there is more (f.e. PXEOS does not participate).
+            */
+            dp.proxy_assets.emplace_back( 0, S( ${PXBTS_ASSET_PRECISION}, ${PXBTS_ASSET_NAME} ) );
+            dp.proxy_assets.emplace_back( 0, S( ${PXBPTS_ASSET_PRECISION}, ${PXBPTS_ASSET_NAME} ) );
+
+            /*
                DISTRIB_RAM_LEFTOVER
                Distribution process will leave all used RAM on beos.distrib account or as much as this parameter
                whichever is greater value. Mostly to be used for stabilizing RAM reward tests, with 0 for mainnet.
@@ -141,7 +149,6 @@ namespace eosio {
             return dp;
          }
 
-         asset get_active_PXBTS();
          void calculate_current_reward( uint64_t* to_distribute, uint64_t* to_distribute_trustee,
             uint32_t block_nr, const distribution_parameters& params );
 

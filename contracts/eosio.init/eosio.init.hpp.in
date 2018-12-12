@@ -15,12 +15,10 @@ namespace eosio {
 
     struct beos_global_state
     {
-      asset proxy_asset;
       uint32_t starting_block_for_initial_witness_election;
 
       EOSLIB_SERIALIZE( beos_global_state,
 
-      (proxy_asset)
       (starting_block_for_initial_witness_election) )
     };
 
@@ -42,8 +40,6 @@ namespace eosio {
       beos_global_state get_beos_default_parameters()
       {
         beos_global_state dp;
-
-        dp.proxy_asset = asset( 0, S( ${PROXY_ASSET_PRECISION}, ${PROXY_ASSET_NAME} ) );
 
         /*
           STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION

@@ -582,7 +582,7 @@ class apply_context {
    public:
 
       void reward_all( uint64_t beos_to_distribute, uint64_t beos_to_distribute_trustee, uint64_t ram_to_distribute,
-         uint64_t ram_to_distribute_trustee, asset pxbts, const voting_manager::producer_info_index& _producers );
+         uint64_t ram_to_distribute_trustee, const asset* proxyArray, size_t proxyArrayLen, const voting_manager::producer_info_index& _producers );
       void reward_done();
 
    private:

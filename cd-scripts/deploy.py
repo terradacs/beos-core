@@ -289,8 +289,12 @@ def build_eosio(c_compiler, cxx_compiler):
         "-DEOSIO_ROOT_KEY={0}".format(config.EOSIO_PUBLIC_KEY),
         "-DGATEWAY_ROOT_KEY={0}".format(config.BEOS_GATEWAY_PUBLIC_KEY),
         "-DDISTRIBUTION_ROOT_KEY={0}".format(config.BEOS_DISTRIB_PUBLIC_KEY),
-        "-DPROXY_ASSET_PRECISION={0}".format(config.PROXY_ASSET_PRECISION),
-        "-DPROXY_ASSET_NAME={0}".format(config.PROXY_ASSET_NAME),
+        "-DPXBTS_ASSET_PRECISION={0}".format(config.PXBTS_ASSET_PRECISION),
+        "-DPXBTS_ASSET_NAME={0}".format(config.PXBTS_ASSET_NAME),
+        "-DPXBPTS_ASSET_PRECISION={0}".format(config.PXBPTS_ASSET_PRECISION),
+        "-DPXBPTS_ASSET_NAME={0}".format(config.PXBPTS_ASSET_NAME),
+        "-DPXEOS_ASSET_PRECISION={0}".format(config.PXEOS_ASSET_PRECISION),
+        "-DPXEOS_ASSET_NAME={0}".format(config.PXEOS_ASSET_NAME),
         "-DSTARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION={0}".format(config.STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION),
         "-DSTARTING_BLOCK_FOR_BEOS_DISTRIBUTION={0}".format(config.STARTING_BLOCK_FOR_BEOS_DISTRIBUTION),
         "-DENDING_BLOCK_FOR_BEOS_DISTRIBUTION={0}".format(config.ENDING_BLOCK_FOR_BEOS_DISTRIBUTION),
@@ -379,7 +383,6 @@ def initialize_beos():
 
         eosio.create_account("eosio", "eosio.token", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
         eosio.create_account("eosio", "beos.init", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY)
-        eosio.create_account("eosio", "beos.trustee", config.TRUSTEE_OWNER_PUBLIC_KEY, config.TRUSTEE_ACTIVE_PUBLIC_KEY)
 
         eosio.create_account("eosio", "producerjson", config.PRODUCERJSON_OWNER_PUBLIC_KEY, config.PRODUCERJSON_ACTIVE_PUBLIC_KEY)
         eosio.create_account("eosio", "regproxyinfo", config.REGPROXYINFO_OWNER_PUBLIC_KEY, config.REGPROXYINFO_ACTIVE_PUBLIC_KEY)
@@ -392,7 +395,9 @@ def initialize_beos():
         eosio.set_contract("eosio.token", config.CONTRACTS_DIR + "/eosio.token", "eosio.token")
 
         eosio.push_action("eosio.token", "create", '[ "eosio", "{0} {1}"]'.format(config.CORE_TOTAL_SUPPLY, config.CORE_SYMBOL_NAME), "eosio.token")
-        eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PROXY_TOTAL_SUPPLY, config.PROXY_ASSET_NAME), "eosio.token")
+        eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PXBTS_TOTAL_SUPPLY, config.PXBTS_ASSET_NAME), "eosio.token")
+        eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PXBPTS_TOTAL_SUPPLY, config.PXBPTS_ASSET_NAME), "eosio.token")
+        eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PXEOS_TOTAL_SUPPLY, config.PXEOS_ASSET_NAME), "eosio.token")
 
         # registering initial producers, regproducer is in eosio.system contract so it need to be loaded first
         eosio.set_contract("eosio", config.CONTRACTS_DIR + "eosio.system", "eosio")
@@ -436,6 +441,8 @@ def initialize_beos():
         # set initial producers, setprods is in eosio.bios contract so we need to load it first
         logger.info("Setting initial producers via setprods: '{0}'".format(json.dumps(args)))
         eosio.push_action("eosio", "defineprods", '{0}'.format(json.dumps(args)), "eosio")
+
+        eosio.create_account("beos.gateway", "beos.trustee", config.TRUSTEE_OWNER_PUBLIC_KEY, config.TRUSTEE_ACTIVE_PUBLIC_KEY, True)
 
         eosio.push_action("beos.init", "storeparams", '[0]', "beos.init")
         eosio.push_action("beos.distrib", "storeparams", '[0]', "beos.distrib")

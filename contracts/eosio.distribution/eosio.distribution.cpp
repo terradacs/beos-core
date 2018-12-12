@@ -51,13 +51,12 @@ void distribution::onblock( uint32_t block_nr ) {
    }
 
    // execute actual distribution
-   asset pxbts = get_active_PXBTS();
    eosiosystem::immutable_system_contract sc(N(eosio));
    eosiosystem::eosio_voting_data vud = sc.prepare_data_for_voting_update();
    eosio::print("Distributing @block ", block_nr, " bandwidth ", beos_to_distribute, " (", beos_to_distribute_trustee,
       "), ram ", ram_to_distribute, " (", ram_to_distribute_trustee, ")\n");
    reward_all( beos_to_distribute, beos_to_distribute_trustee, ram_to_distribute, ram_to_distribute_trustee,
-      &pxbts, sizeof(asset), vud.producer_infos.data(), vud.producer_infos.size() );
+      _gstate.proxy_assets.data(), _gstate.proxy_assets.size(), vud.producer_infos.data(), vud.producer_infos.size() );
 
    INLINE_ACTION_SENDER(eosiosystem::system_contract, updateprods)( N(eosio), {N(eosio),N(active)},{ vud } );
 
@@ -71,16 +70,6 @@ void distribution::onblock( uint32_t block_nr ) {
    // finish distribution if this was last block
    if ( _gstate.beos.next_block <= block_nr && _gstate.ram.next_block <= block_nr )
       reward_done();
-}
-
-asset distribution::get_active_PXBTS() {
-   eosio::beos_global_state b_state = eosio::init( N(beos.init) ).get_beos_global_state();
-   auto issued = eosio::token( N(eosio.token) ).get_supply( b_state.proxy_asset.symbol.name() );
-   auto withdrawn = eosio::token( N(eosio.token) ).check_balance( N(beos.gateway), b_state.proxy_asset.symbol );
-  
-   eosio_assert( issued >= withdrawn, "issued PXBTS >= withdrawn PXBTS" );
-
-   return issued - withdrawn;
 }
 
 void distribution::calculate_current_reward( uint64_t* to_distribute, uint64_t* to_distribute_trustee,

@@ -6,7 +6,6 @@
       "name": "beos_global_state",
       "base": "",
       "fields": [
-        {"name":"proxy_asset",                                  "type":"asset"},
         {"name":"starting_block_for_initial_witness_election",  "type":"uint32"}
       ]
     },{

@@ -254,6 +254,8 @@ class eosio_interchain_tester : public actions
 
     create_currency( N(eosio.token), config::system_account_name, asset::from_string("10000000000.0000 BEOS") );
     create_currency( N(eosio.token), config::gateway_account_name, asset::from_string("10000000000.0000 PROXY") );
+    create_currency( N(eosio.token), config::gateway_account_name, asset::from_string("10000000000.0000 BROWNIE") );
+    create_currency( N(eosio.token), config::gateway_account_name, asset::from_string("10000000000.0000 PXEOS") );
     produce_blocks( 1 );
 
     prepare_account( config::system_account_name, eosio_system_wast, eosio_system_abi, &system_abi_ser );
@@ -355,7 +357,6 @@ class eosio_interchain_tester : public actions
   action_result change_init_params( const test_global_state& tgs )
   {
     variants v;
-    v.emplace_back( std::move( tgs.proxy_asset ) );
     v.emplace_back( tgs.starting_block_for_initial_witness_election );
     return push_action( N(beos.init), N(changeparams), mvo()
        ("new_params", v), beos_init_abi_ser, N(beos.init) );
@@ -366,6 +367,7 @@ class eosio_interchain_tester : public actions
     variants v;
     v.emplace_back( std::move( tgs.beos ) );
     v.emplace_back( std::move( tgs.ram ) );
+    v.emplace_back( std::move( tgs.proxy_assets ) );
     v.emplace_back( std::move( tgs.ram_leftover ) );
     return push_action( N(beos.distrib), N(changeparams), mvo()
        ("new_params", v), beos_distrib_abi_ser, N(beos.distrib) );
@@ -377,7 +379,7 @@ class eosio_interchain_tester : public actions
      BOOST_REQUIRE_EQUAL( success(), change_distrib_params( tgs ) );
   }
 
-  fc::variant get_init_param()
+fc::variant get_init_param()
   {
     vector<char> data = get_row_by_account( N(beos.init), N(beos.init), N(beosglobal), N(beosglobal) );
     if( data.empty() )
@@ -771,6 +773,12 @@ BOOST_FIXTURE_TEST_CASE( store_params_test, eosio_init_tester ) try {
 
   BOOST_REQUIRE_EQUAL( var_tgs_beos["starting_block"].as_uint64(), 7 * 24 * 3600 * 2 /* days(7).to_seconds() * 2 */ );
 
+  auto var_proxy = var_tgs["proxy_assets"];
+  BOOST_REQUIRE_EQUAL( false, var_proxy.is_null() );
+  std::vector<asset> proxy_assets = var_proxy.as< std::vector<asset> >();
+  BOOST_REQUIRE_EQUAL( asset::from_string("0.0000 PXBTS"), proxy_assets[0] );
+  BOOST_REQUIRE_EQUAL( asset::from_string("0.0000 PXBPTS"), proxy_assets[1] );
+
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( store_params_test2, eosio_init_tester ) try {
@@ -782,7 +790,6 @@ BOOST_FIXTURE_TEST_CASE( store_params_test2, eosio_init_tester ) try {
 
   var_tgs = get_init_param();
   BOOST_REQUIRE_EQUAL( false, var_tgs.is_null() );
-  BOOST_REQUIRE_EQUAL( asset::from_string("0.0000 PXBTS"), var_tgs["proxy_asset"].as< asset >() );
 
 } FC_LOG_AND_RETHROW()
 
@@ -915,6 +922,202 @@ BOOST_FIXTURE_TEST_CASE( basic_param_test3, eosio_init_tester ) try {
   //note: all remaining rewards distributed in second round
   CHECK_STATS(beos.distrib, "0.0000 PROXY", "2.0000 BEOS", "294552"); //+DEFAULT_RAM
   */
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( rewarding2, eosio_init_tester ) try {
+
+  test_global_state tgs;
+
+  tgs.ram.starting_block = 80;
+  tgs.ram.ending_block = 205;
+  tgs.ram.block_interval = 25;
+
+  tgs.beos.starting_block = 80;
+  tgs.beos.ending_block = 170;
+  tgs.beos.block_interval = 10;
+
+  tgs.proxy_assets.emplace_back(0, symbol(SY(4, BROWNIE)));
+  //each beos reward per asset per interval is 10mln
+  //each ram reward per asset per interval is 2.5bln
+
+  check_change_params( tgs );
+
+  issue( N(alice), asset::from_string("100.0000 PROXY") );
+  issue( N(bob), asset::from_string("100.0000 PROXY") );
+  issue( N(bob), asset::from_string("10.0000 PXEOS") );
+  issue( N(carol), asset::from_string("10.0000 BROWNIE") );
+  issue( N(carol), asset::from_string("1.2345 PXEOS") );
+  issue( N(dan), asset::from_string("300.0000 PROXY") );
+  issue( N(dan), asset::from_string("40.0000 BROWNIE") );
+  issue( N(dan), asset::from_string("12345.6589 PXEOS") );
+
+  produce_blocks( 80 - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 80u );
+
+  //note: PXEOS is not registered as asset that gives rewards
+  CHECK_STATS(alice, "", "2000000.0000 BEOS", "500000000");
+  CHECK_STATS(bob, "", "2000000.0000 BEOS", "500000000");
+  CHECK_STATS(carol, "", "2000000.0000 BEOS", "500000000");
+  CHECK_STATS(dan, "", "14000000.0000 BEOS", "3500000000");
+
+  BOOST_REQUIRE_EQUAL( success(), withdraw( N(bob), asset::from_string("10.0000 PXEOS") ) );
+  transfer(N(dan), N(alice), asset::from_string("300.0000 PXEOS"), "order.1234", N(eosio.token));
+
+  produce_blocks( 90 - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 90u );
+
+  CHECK_STATS(alice, "", "4000000.0000 BEOS", "500000000");
+  CHECK_STATS(bob, "", "4000000.0000 BEOS", "500000000");
+  CHECK_STATS(carol, "", "4000000.0000 BEOS", "500000000");
+  CHECK_STATS(dan, "", "28000000.0000 BEOS", "3500000000");
+
+  transfer(N(alice), N(dan), asset::from_string("50.0000 PROXY"), "buy brownie", N(eosio.token));
+  transfer(N(dan), N(alice), asset::from_string("20.0000 BROWNIE"), "sell brownie", N(eosio.token));
+  transfer(N(bob), N(dan), asset::from_string("50.0000 PROXY"), "buy brownie", N(eosio.token));
+  transfer(N(dan), N(bob), asset::from_string("20.0000 BROWNIE"), "sell brownie", N(eosio.token));
+  issue( N(dan), asset::from_string("50.0000 BROWNIE") );
+  //proxy weights: alice 0.1, bob 0.1, carol 0, dan 0.8; brownie: alice 0.2, bob 0.2, carol 0.1, dan 0.5
+
+  produce_blocks( 105 - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 105u );
+
+  CHECK_STATS(alice, "", "7000000.0000 BEOS", "1250000000");
+  CHECK_STATS(bob, "", "7000000.0000 BEOS", "1250000000");
+  CHECK_STATS(carol, "", "5000000.0000 BEOS", "750000000");
+  CHECK_STATS(dan, "", "41000000.0000 BEOS", "6750000000");
+
+  produce_blocks( 170 - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 170u );
+
+  CHECK_STATS(alice, "", "28000000.0000 BEOS", "2750000000");
+  CHECK_STATS(bob, "", "28000000.0000 BEOS", "2750000000");
+  CHECK_STATS(carol, "", "12000000.0000 BEOS", "1250000000");
+  CHECK_STATS(dan, "", "132000000.0000 BEOS", "13250000000");
+
+  //note: all beos rewards were distributed at this point
+  CHECK_STATS(beos.distrib, "", "2.0000 BEOS", "10000294552"); //+DEFAULT_RAM
+
+  BOOST_REQUIRE_EQUAL( success(), withdraw( N(dan), asset::from_string("400.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( success(), withdraw( N(bob), asset::from_string("50.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( success(), withdraw( N(alice), asset::from_string("50.0000 PROXY") ) );
+  BOOST_REQUIRE_EQUAL( success(), withdraw( N(dan), asset::from_string("50.0000 BROWNIE") ) );
+  transfer(N(alice), N(carol), asset::from_string("10.0000 BROWNIE"), "order.133", N(eosio.token));
+  transfer(N(bob), N(carol), asset::from_string("20.0000 BROWNIE"), "order.134", N(eosio.token));
+  //proxy weights: 0 for all; brownie: alice 0.2, bob 0, carol 0.8, dan 0
+  
+  produce_blocks( 180 - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 180u );
+
+  CHECK_STATS(alice, "", "28000000.0000 BEOS", "3250000000");
+  CHECK_STATS(bob, "", "28000000.0000 BEOS", "2750000000");
+  CHECK_STATS(carol, "", "12000000.0000 BEOS", "3250000000");
+  CHECK_STATS(dan, "", "132000000.0000 BEOS", "13250000000");
+
+  CHECK_STATS(beos.distrib, "", "2.0000 BEOS", "7500294552"); //+DEFAULT_RAM
+
+  issue( N(dan), asset::from_string("0.0001 PROXY") );
+
+  produce_blocks( 205 - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 205u );
+  //note: ram rewards from unused proxy pool are added to last reward pool and split evenly between both asset pools
+  //ram reward per asset in last interval is 3.75bln
+
+  CHECK_STATS(alice, "", "28000000.0000 BEOS", "4000000000");
+  CHECK_STATS(bob, "", "28000000.0000 BEOS", "2750000000");
+  CHECK_STATS(carol, "", "12000000.0000 BEOS", "6250000000");
+  CHECK_STATS(dan, "", "132000000.0000 BEOS", "17000000000");
+
+  //note: all rewards were distributed
+  CHECK_STATS(beos.distrib, "", "2.0000 BEOS", "294552"); //+DEFAULT_RAM
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( rewarding3, eosio_init_tester ) try {
+
+  test_global_state tgs;
+
+  tgs.ram.starting_block = 80;
+  tgs.ram.ending_block = 100;
+  tgs.ram.block_interval = 10;
+  tgs.ram.trustee_reward += 3'000'000'000; //extra trustee reward so the remaining amount splits evenly
+
+  tgs.beos.starting_block = 80;
+  tgs.beos.ending_block = 100;
+  tgs.beos.block_interval = 10;
+  tgs.beos.trustee_reward += 20'000'000'0000; //extra trustee reward so the remaining amount splits evenly
+
+  tgs.proxy_assets.emplace_back(0, symbol(SY(4, BROWNIE)));
+  tgs.proxy_assets.emplace_back(0, symbol(SY(4, PXEOS)));
+  //each beos reward per asset per interval is 20mln
+  //each ram reward per asset per interval is 3bln
+
+  check_change_params( tgs );
+
+  issue( N(alice), asset::from_string("0.0100 PROXY") );
+  issue( N(bob), asset::from_string("0.0200 PROXY") );
+  issue( N(carol), asset::from_string("0.0200 PROXY") );
+  //proxy weights: alice 0.2, bob 0.4, carol 0.4, dan 0
+
+  issue( N(alice), asset::from_string("10.0000 BROWNIE") );
+  issue( N(carol), asset::from_string("10.0000 BROWNIE") );
+  issue( N(dan), asset::from_string("30.0000 BROWNIE") );
+  //brownie weights: alice 0.2, bob 0, carol 0.2, dan 0.6
+
+  issue( N(carol), asset::from_string("1.0000 PXEOS") );
+  issue( N(dan), asset::from_string("8.0000 PXEOS") );
+  issue( N(beos.trustee), asset::from_string("1.0000 PXEOS") );
+  //pxeos weights: alice 0, bob 0, carol 0.1, dan 0.8, beos.trustee 0.1 (extra over its own reward)
+
+  produce_blocks( 80 - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 80u );
+
+  CHECK_STATS(alice, "", "8000000.0000 BEOS", "1200000000");
+  CHECK_STATS(bob, "", "8000000.0000 BEOS", "1200000000");
+  CHECK_STATS(carol, "", "14000000.0000 BEOS", "2100000000");
+  CHECK_STATS(dan, "", "28000000.0000 BEOS", "4200000000");
+  CHECK_STATS(beos.trustee, "", "8667000.0000 BEOS", "1300000000");
+
+  transfer(N(bob), N(dan), asset::from_string("0.0100 PROXY"), "sell", N(eosio.token));
+  transfer(N(carol), N(dan), asset::from_string("0.0200 PROXY"), "sell", N(eosio.token));
+  //proxy weights: alice 0.2, bob 0.2, carol 0, dan 0.6
+  BOOST_REQUIRE_EQUAL( success(), withdraw( N(dan), asset::from_string("30.0000 BROWNIE") ) );
+  //brownie weights: alice 0.5, bob 0, carol 0.5, dan 0
+  transfer(N(dan), N(carol), asset::from_string("1.0000 PXEOS"), "buy", N(eosio.token));
+  transfer(N(dan), N(beos.trustee), asset::from_string("1.0000 PXEOS"), "buy", N(eosio.token));
+  issue( N(dan), asset::from_string("10.0000 PXEOS") );
+  //pxeos weights: alice 0, bob 0, carol 0.1, dan 0.8, beos.trustee 0.1 (extra over its own reward)
+
+  produce_blocks( 90 - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 90u );
+
+  CHECK_STATS(alice, "", "22000000.0000 BEOS", "3300000000");
+  CHECK_STATS(bob, "", "12000000.0000 BEOS", "1800000000");
+  CHECK_STATS(carol, "", "26000000.0000 BEOS", "3900000000");
+  CHECK_STATS(dan, "", "56000000.0000 BEOS", "8400000000");
+  CHECK_STATS(beos.trustee, "", "17334000.0000 BEOS", "2600000000");
+
+  transfer(N(bob), N(dan), asset::from_string("0.0100 PROXY"), "sell", N(eosio.token));
+  transfer(N(alice), N(dan), asset::from_string("0.0100 PROXY"), "sell", N(eosio.token));
+  BOOST_REQUIRE_EQUAL( success(), withdraw( N(dan), asset::from_string("0.0400 PROXY") ) );
+  //proxy weights: alice 0, bob 0, carol 0, dan 1
+  //brownie weights: alice 0.5, bob 0, carol 0.5, dan 0
+  transfer(N(dan), N(alice), asset::from_string("2.0000 PXEOS"), "buy", N(eosio.token));
+  transfer(N(dan), N(bob), asset::from_string("2.0000 PXEOS"), "buy", N(eosio.token));
+  transfer(N(dan), N(carol), asset::from_string("4.0000 PXEOS"), "buy", N(eosio.token));
+  //pxeos weights: alice 0.1, bob 0.1, carol 0.3, dan 0.4, beos.trustee 0.1 (extra over its own reward)
+
+  produce_blocks( 100 - control->head_block_num() );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 100u );
+
+  CHECK_STATS(alice, "", "34000000.0000 BEOS", "5100000000");
+  CHECK_STATS(bob, "", "14000000.0000 BEOS", "2100000000");
+  CHECK_STATS(carol, "", "42000000.0000 BEOS", "6300000000");
+  CHECK_STATS(dan, "", "84000000.0000 BEOS", "12600000000");
+  CHECK_STATS(beos.trustee, "", "26001000.0000 BEOS", "3900000000");
+
+  //note: all rewards were distributed
+  CHECK_STATS(beos.distrib, "", "2.0000 BEOS", "294552"); //+DEFAULT_RAM
+
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( liquid_ram_test, eosio_init_tester ) try {

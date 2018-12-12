@@ -18,6 +18,7 @@
       "fields": [
         {"name":"beos",         "type":"distribution_parameters"},
         {"name":"ram",          "type":"distribution_parameters"},
+        {"name":"proxy_assets", "type":"asset[]"},
         {"name":"ram_leftover", "type":"uint64"}
       ]
     },{

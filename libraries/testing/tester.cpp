@@ -623,7 +623,6 @@ namespace eosio { namespace testing {
       produce_block();
 
       variants v;
-      v.emplace_back(tgs.proxy_asset);
       v.emplace_back(tgs.starting_block_for_initial_witness_election);
 
       push_action(N(beos.init), N(changeparams),
@@ -634,6 +633,7 @@ namespace eosio { namespace testing {
       v.clear();
       v.emplace_back(std::move(tgs.beos));
       v.emplace_back(std::move(tgs.ram));
+      v.emplace_back(std::move(tgs.proxy_assets));
       v.emplace_back(std::move(tgs.ram_leftover));
 
       push_action(N(beos.distrib), N(changeparams),
