@@ -773,6 +773,12 @@ BOOST_FIXTURE_TEST_CASE( store_params_test, eosio_init_tester ) try {
 
   BOOST_REQUIRE_EQUAL( var_tgs_beos["starting_block"].as_uint64(), 7 * 24 * 3600 * 2 /* days(7).to_seconds() * 2 */ );
 
+  auto var_proxy = var_tgs["proxy_assets"];
+  BOOST_REQUIRE_EQUAL( false, var_proxy.is_null() );
+  std::vector<asset> proxy_assets = var_proxy.as< std::vector<asset> >();
+  BOOST_REQUIRE_EQUAL( asset::from_string("0.0000 PXBTS"), proxy_assets[0] );
+  BOOST_REQUIRE_EQUAL( asset::from_string("0.0000 PXBPTS"), proxy_assets[1] );
+
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( store_params_test2, eosio_init_tester ) try {
@@ -784,7 +790,6 @@ BOOST_FIXTURE_TEST_CASE( store_params_test2, eosio_init_tester ) try {
 
   var_tgs = get_init_param();
   BOOST_REQUIRE_EQUAL( false, var_tgs.is_null() );
-  BOOST_REQUIRE_EQUAL( asset::from_string("0.0000 PXBTS"), var_tgs["proxy_asset"].as< asset >() );
 
 } FC_LOG_AND_RETHROW()
 
