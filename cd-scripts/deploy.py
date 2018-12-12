@@ -327,100 +327,103 @@ def install_beos(c_compiler, cxx_compiler):
 def build_beos(c_compiler, cxx_compiler):
     build_eosio(c_compiler, cxx_compiler)
 
-def initialize_wallet():
-    import eosio
+def initialize_beos():
+    import eosio_actions
+    import eosio_runner
+    import eosio_tools
     try:
         wallet_url = "http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)
-        eosio.run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR, False, True)
-        eosio.create_wallet(wallet_url, False)
-        eosio.run_nodeos(config.START_NODE_INDEX, config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY)
+        eosio_runner.run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR, False, True)
+        eosio_actions.create_wallet(wallet_url, False)
+        eosio_runner.run_nodeos(config.START_NODE_INDEX, config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY)
 
-        eosio.create_account("eosio", "eosio.msig", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-        eosio.create_account("eosio", "eosio.names", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-        eosio.create_account("eosio", "eosio.saving", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-        eosio.create_account("eosio", "eosio.vpay", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-        eosio.create_account("eosio", "eosio.unregd", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+        eosio_actions.create_account("eosio", "eosio.msig", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+        eosio_actions.create_account("eosio", "eosio.names", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+        eosio_actions.create_account("eosio", "eosio.saving", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+        eosio_actions.create_account("eosio", "eosio.vpay", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+        eosio_actions.create_account("eosio", "eosio.unregd", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
 
-        eosio.create_account("eosio", "eosio.bpay", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+        eosio_actions.create_account("eosio", "eosio.bpay", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
 
-        eosio.create_account("eosio", "eosio.ram", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-        eosio.create_account("eosio", "eosio.ramfee", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-        eosio.create_account("eosio", "eosio.stake", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+        eosio_actions.create_account("eosio", "eosio.ram", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+        eosio_actions.create_account("eosio", "eosio.ramfee", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+        eosio_actions.create_account("eosio", "eosio.stake", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
 
-        eosio.create_account("eosio", "eosio.token", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
-        eosio.create_account("eosio", "beos.init", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY)
+        eosio_actions.create_account("eosio", "eosio.token", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
+        eosio_actions.create_account("eosio", "beos.init", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY)
+        eosio_actions.create_account("eosio", "beos.trustee", config.TRUSTEE_OWNER_PUBLIC_KEY, config.TRUSTEE_ACTIVE_PUBLIC_KEY)
 
-        eosio.create_account("eosio", "producerjson", config.PRODUCERJSON_OWNER_PUBLIC_KEY, config.PRODUCERJSON_ACTIVE_PUBLIC_KEY)
-        eosio.create_account("eosio", "regproxyinfo", config.REGPROXYINFO_OWNER_PUBLIC_KEY, config.REGPROXYINFO_ACTIVE_PUBLIC_KEY)
+        eosio_actions.create_account("eosio", "producerjson", config.PRODUCERJSON_OWNER_PUBLIC_KEY, config.PRODUCERJSON_ACTIVE_PUBLIC_KEY)
+        eosio_actions.create_account("eosio", "regproxyinfo", config.REGPROXYINFO_OWNER_PUBLIC_KEY, config.REGPROXYINFO_ACTIVE_PUBLIC_KEY)
 
         # create producer accounts
         for producer, data in config.PRODUCERS_ARRAY.items():
             logger.info("Creating producer account for: {0}".format(producer))
-            eosio.create_account("eosio", producer, data["pub_owner"], data["pub_active"])
+            eosio_actions.create_account("eosio", producer, data["pub_owner"], data["pub_active"])
 
-        eosio.set_contract("eosio.token", config.CONTRACTS_DIR + "/eosio.token", "eosio.token")
+        eosio_actions.set_contract("eosio.token", config.CONTRACTS_DIR + "/eosio.token", "eosio.token")
 
-        eosio.push_action("eosio.token", "create", '[ "eosio", "{0}"]'.format(config.CORE_TOTAL_SUPPLY), "eosio.token")
-        eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0}"]'.format(config.PXBTS_TOTAL_SUPPLY), "eosio.token")
-        eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0}"]'.format(config.PXBRNP_TOTAL_SUPPLY), "eosio.token")
-        eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0}"]'.format(config.PXEOS_TOTAL_SUPPLY), "eosio.token")
+        eosio_actions.push_action("eosio.token", "create", '[ "eosio", "{0}"]'.format(config.CORE_TOTAL_SUPPLY), "eosio.token")
+        eosio_actions.push_action("eosio.token", "create", '[ "beos.gateway", "{0}"]'.format(config.PXBTS_TOTAL_SUPPLY), "eosio.token")
+        eosio_actions.push_action("eosio.token", "create", '[ "beos.gateway", "{0}"]'.format(config.PXBRNP_TOTAL_SUPPLY), "eosio.token")
+        eosio_actions.push_action("eosio.token", "create", '[ "beos.gateway", "{0}"]'.format(config.PXEOS_TOTAL_SUPPLY), "eosio.token")
 
         # registering initial producers, regproducer is in eosio.system contract so it need to be loaded first
-        eosio.set_contract("eosio", config.CONTRACTS_DIR + "eosio.system", "eosio")
+        eosio_actions.set_contract("eosio", config.CONTRACTS_DIR + "eosio.system", "eosio")
         time.sleep(2)
-        eosio.set_contract("beos.init", config.CONTRACTS_DIR + "eosio.init", "beos.init")
-        eosio.set_contract("beos.gateway", config.CONTRACTS_DIR + "eosio.gateway", "beos.gateway")
-        eosio.set_contract("beos.distrib", config.CONTRACTS_DIR + "eosio.distribution", "beos.distrib")
+        eosio_actions.set_contract("beos.init", config.CONTRACTS_DIR + "eosio.init", "beos.init")
+        eosio_actions.set_contract("beos.gateway", config.CONTRACTS_DIR + "eosio.gateway", "beos.gateway")
+        eosio_actions.set_contract("beos.distrib", config.CONTRACTS_DIR + "eosio.distribution", "beos.distrib")
         time.sleep(2)
-        eosio.set_contract("producerjson", config.CONTRACTS_DIR + "producerjson", "producerjson")
-        eosio.set_contract("regproxyinfo", config.CONTRACTS_DIR + "proxyinfo", "regproxyinfo")
+        eosio_actions.set_contract("producerjson", config.CONTRACTS_DIR + "producerjson", "producerjson")
+        eosio_actions.set_contract("regproxyinfo", config.CONTRACTS_DIR + "proxyinfo", "regproxyinfo")
 
-        eosio.push_action("eosio", "initialissue", '[ "{0}", "{1}" ]'.format(config.CORE_INITIAL_SUPPLY, config.MIN_ACTIVATED_STAKE_PERCENT), "eosio")
-        eosio.push_action("eosio", "initresource", '[ "beos.gateway", "{0}", "{1}", "{2}"]'.format(config.GATEWAY_INIT_RAM, config.GATEWAY_INIT_NET, config.GATEWAY_INIT_CPU), "eosio")
+        eosio_actions.push_action("eosio", "initialissue", '[ "{0}", "{1}" ]'.format(config.CORE_INITIAL_SUPPLY, config.MIN_ACTIVATED_STAKE_PERCENT), "eosio")
+        eosio_actions.push_action("eosio", "initresource", '[ "beos.gateway", "{0}", "{1}", "{2}"]'.format(config.GATEWAY_INIT_RAM, config.GATEWAY_INIT_NET, config.GATEWAY_INIT_CPU), "eosio")
         # eosio.get_account("eosio")
         # eosio.get_account("beos.gateway")
-        eosio.push_action("eosio", "initresource", '[ "beos.distrib", "{0}", "-1", "-1"]'.format(config.DISTRIB_INIT_RAM), "eosio")
+        eosio_actions.push_action("eosio", "initresource", '[ "beos.distrib", "{0}", "-1", "-1"]'.format(config.DISTRIB_INIT_RAM), "eosio")
         # eosio.get_account("eosio")
         # eosio.get_account("beos.distrib")
-        balance = eosio.get_balance("eosio", config.CORE_SYMBOL_NAME)
+        balance = eosio_actions.get_balance("eosio", config.CORE_SYMBOL_NAME)
         balance_int = int(balance * (10 ** config.CORE_SYMBOL_PRECISION) - config.DISTRIB_NETCPU_LEFTOVER)
         # all bandwidth resources to distribute must be stored as net! leftover value in cpu will also be subtracted from net reward pool
-        eosio.push_action("eosio", "initresource", '[ "beos.distrib", "-1", "{0}", "{1}"]'.format(balance_int, config.DISTRIB_NETCPU_LEFTOVER), "eosio")
+        eosio_actions.push_action("eosio", "initresource", '[ "beos.distrib", "-1", "{0}", "{1}"]'.format(balance_int, config.DISTRIB_NETCPU_LEFTOVER), "eosio")
         # eosio.get_account("eosio")
         # eosio.get_account("beos.distrib")
-        eosio.push_action("beos.init", "storeparams", '[0]', "beos.init")
+        eosio_actions.push_action("beos.init", "storeparams", '[0]', "beos.init")
         import json
-        eosio.push_action("beos.distrib", "changeparams", '{{"new_params": {0}}}'.format(json.dumps(config.DISTRIBUTION_PARAMS)), "beos.distrib")
+        eosio_actions.push_action("beos.distrib", "changeparams", '{{"new_params": {0}}}'.format(json.dumps(config.DISTRIBUTION_PARAMS)), "beos.distrib")
 
         producers = []
 
         if len(config.PRODUCERS_ARRAY) == 0:
             # special case, register eosio as producer but only if it is defined as single one.
             producers.append({"producer_name": config.PRODUCER_NAME, "block_signing_key": config.EOSIO_PUBLIC_KEY})
-            eosio.push_action("eosio", "regproducer", '["{0}", "{1}", "{2}", 0]'.format(config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY, "http://dummy.net"), config.PRODUCER_NAME)
+            eosio_actions.push_action("eosio", "regproducer", '["{0}", "{1}", "{2}", 0]'.format(config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY, "http://dummy.net"), config.PRODUCER_NAME)
 
         for producer, data in config.PRODUCERS_ARRAY.items():
             logger.info("Registering producer account for: {0}".format(producer))
-            eosio.push_action("eosio", "regproducer", '["{0}", "{1}", "{2}", 0]'.format(producer, data["pub_active"], data["url"]), producer)
+            eosio_actions.push_action("eosio", "regproducer", '["{0}", "{1}", "{2}", 0]'.format(producer, data["pub_active"], data["url"]), producer)
 
         for producer, data in config.PRODUCERS_ARRAY.items():
             producers.append({"producer_name": producer, "block_signing_key": data["pub_active"]})
         args = {"schedule" : producers}
         # set initial producers, setprods is in eosio.bios contract so we need to load it first
         logger.info("Setting initial producers via setprods: '{0}'".format(json.dumps(args)))
-        eosio.push_action("eosio", "defineprods", '{0}'.format(json.dumps(args)), "eosio")
+        eosio_actions.push_action("eosio", "defineprods", '{0}'.format(json.dumps(args)), "eosio")
 
-        eosio.create_account("beos.gateway", "beos.trustee", config.TRUSTEE_OWNER_PUBLIC_KEY, config.TRUSTEE_ACTIVE_PUBLIC_KEY, True)
+        eosio_actions.create_account("beos.gateway", "beos.trustee", config.TRUSTEE_OWNER_PUBLIC_KEY, config.TRUSTEE_ACTIVE_PUBLIC_KEY, True)
 
         #Just to produce few blocks and accept lately scheduled transaction(s)
         # we will wait for approx 10 blocks to be produced
-        eosio.wait_for_blocks_produced(10, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
-        eosio.terminate_running_tasks()
-        eosio.show_keosd_postconf(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
-        eosio.show_wallet_unlock_postconf()
-        eosio.show_nodeos_postconf(config.START_NODE_INDEX, config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY)
+        eosio_tools.wait_for_blocks_produced(10, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
+        eosio_runner.terminate_running_tasks()
+        eosio_runner.show_keosd_postconf(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
+        eosio_runner.show_wallet_unlock_postconf()
+        eosio_runner.show_nodeos_postconf(config.START_NODE_INDEX, config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY)
     except Exception as ex:
-        eosio.terminate_running_tasks()
+        eosio_runner.terminate_running_tasks()
         logger.error("Exception during initialize: {0}".format(ex))
         raise
         #sys.exit(1)
