@@ -84,6 +84,8 @@ var/lib/node_*
 .DS_Store
 
 .vs
-cd-scripts/beos_deploy_main.*
 cd-scripts/config.py
+cd-scripts/*.log*
+cd-scripts/*.cfg
+cd-scripts/*.bak
 CMakeSettings.json
