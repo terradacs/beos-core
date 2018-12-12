@@ -6,6 +6,13 @@ namespace eosiosystem {
       real_type R(supply.amount);
       real_type C(c.balance.amount+in.amount);
       real_type F(c.weight/1000.0);
+      //ABW: the value of above effective F weight is discussed here:
+      //https://medium.com/@bytemaster/eosio-ram-market-bancor-algorithm-b8e8d4e20c73 (see Bancor Relay Volatility)
+      //and it was even later changed to F(c.weight/1.0), however as expected it has essentially zero influence
+      //on exchange output; the whole exchange_state::convert is unnecessarily elaborate way of expressing
+      //f(in) = OUT*(in/(IN+in)) where IN/OUT are current amounts of input/output assets on exchange (omitting
+      //truncations and assuming weight parameters on input and output connectors are the same); as you can see there
+      //is no weight in the formula, no wonder it has no effect
       real_type T(in.amount);
       real_type ONE(1.0);
 
@@ -24,7 +31,7 @@ namespace eosiosystem {
 
       real_type R(supply.amount - in.amount);
       real_type C(c.balance.amount);
-      real_type F(1000.0/c.weight);
+      real_type F(1000.0/c.weight); //see comment in convert_to_exchange
       real_type E(in.amount);
       real_type ONE(1.0);
 
