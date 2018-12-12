@@ -112,7 +112,6 @@ def run_keosd(ip_address, port, wallet_dir, use_https = False, forceWalletCleanu
             "--https-private-key-file", config.KEOSD_PRIVATE_KEY_FILE,
             "--wallet-dir", wallet_dir,
         ]
-
     eosio_tools.save_screen_cfg("./keosd_screen.cfg", log_file_name)
     screen_params = [
         "screen",

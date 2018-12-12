@@ -61,7 +61,6 @@ def import_key(wallet_name, key, wallet_url = None):
             "-n", wallet_name, 
             "--private-key", key
         ]
-
         logger.info("Executing command: {0}".format(" ".join(parameters)))
         eosio_tools.run_command(parameters)
     else:
