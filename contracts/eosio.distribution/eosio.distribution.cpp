@@ -13,7 +13,7 @@ void distribution::onblock( uint32_t block_nr ) {
    if ( !(distribute_beos|distribute_ram) )
       return;
 
-   int64_t distrib_ram_bytes, distrib_net_weight, distrib_cpu_weight;
+   int64_t distrib_ram_bytes=0, distrib_net_weight=0, distrib_cpu_weight=0;
    get_resource_limits( _self, &distrib_ram_bytes, &distrib_net_weight, &distrib_cpu_weight );
    eosio_assert(distrib_ram_bytes > 0 && distrib_net_weight >= 0 && distrib_cpu_weight >= 0,
       "initresource not called properly on beos.distrib");
@@ -105,7 +105,7 @@ void distribution::changeparams( distrib_global_state new_params ) {
    _global.set( _gstate, _self );
 }
 
-void distribution::storeparams()
+void distribution::storeparams(uint32_t )
 {
   require_auth( _self );
 

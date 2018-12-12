@@ -180,7 +180,7 @@ namespace eosiosystem {
    void system_contract::initresource( account_name receiver, int64_t bytes, int64_t stake_net_quantity, int64_t stake_cpu_quantity )
    {
       require_auth( _self );
-      int64_t _ram_bytes, _net_weight, _cpu_weight;
+      int64_t _ram_bytes=0, _net_weight=0, _cpu_weight=0;
       get_resource_limits( receiver, &_ram_bytes, &_net_weight, &_cpu_weight );
       eosio_assert( (bytes < 0 || _ram_bytes < 0) &&
                     (stake_net_quantity < 0 || _net_weight < 0) &&

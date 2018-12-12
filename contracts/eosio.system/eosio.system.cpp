@@ -116,6 +116,22 @@ namespace eosiosystem {
          });
    }
 
+   void system_contract::defineprods(std::vector<eosio::producer_key> schedule) {
+      eosio::print("Entering system_contract::defineprods\n");
+      (void)schedule; // schedule argument just forces the deserialization of the action data into vector<producer_key> (necessary check)
+      require_auth(_self);
+
+      eosio::print_f("system_contract::defineprods called to set %d producers\n", schedule.size());
+
+      constexpr size_t max_stack_buffer_size = 512;
+      size_t size = action_data_size();
+      char* buffer = (char*)(max_stack_buffer_size < size ? malloc(size) : alloca(size));
+      read_action_data(buffer, size);
+      set_proposed_producers(buffer, size);
+
+      eosio::print("Leaving system_contract::defineprods\n");
+      }
+
    void system_contract::bidname( account_name bidder, account_name newname, asset bid ) {
       require_auth( bidder );
       eosio_assert( eosio::name_suffix(newname) == newname, "you can only bid on top-level suffix" );
@@ -228,7 +244,7 @@ EOSIO_ABI( eosiosystem::system_contract,
      // native.hpp (newaccount definition is actually in eosio.system.cpp)
      (initresource)(newaccount)(updateauth)(deleteauth)(linkauth)(unlinkauth)(canceldelay)(onerror)
      // eosio.system.cpp
-     (initialissue)(setram)(setparams)(setpriv)(rmvproducer)(bidname)
+     (initialissue)(setram)(setparams)(setpriv)(rmvproducer)(bidname)(defineprods)
      // delegate_bandwidth.cpp
      (buyrambytes)(buyram)(sellram)(delegatebw)(undelegatebw)(refund)
      // voting.cpp

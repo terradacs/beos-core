@@ -19,6 +19,7 @@
       "name": "storeparams",
       "base": "",
       "fields": [
+        { "name": "dummy", "type": "uint32" }
       ]
     }],
   "actions": [{
