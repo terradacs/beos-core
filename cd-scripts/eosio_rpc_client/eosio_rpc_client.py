@@ -35,11 +35,7 @@ class EosioInterface(object):
       self.method_name = method_name
       self.backend = backend
 
-    def __call__(self, *args, **kwargs):
-      if len(args) == 0:
-        args = None
-      if len(kwargs) == 0:
-        kwargs = None
+    def __call__(self, args = None):
       return self.backend.request(api = self.api_name, method = self.method_name, method_args = args)
 
 class EosioBackend(object):
@@ -56,6 +52,7 @@ class EosioBackend(object):
     self.use_https = use_https
 
   def request(self, api, method, method_args = None):
+    print("API: {0}, Method: {1}, Args: {2}".format(api, method, method_args))
     url = None
     if api in NODEOS_API_LIST:
       url = self.nodeos_url
@@ -63,9 +60,10 @@ class EosioBackend(object):
       url = self.keosd_url
 
     url = url + api + "/" + method
+    print("Composed url: {0}".format(url))
 
     try:
-      response = requests.post(url, json = method_args)
+      response = requests.request("POST", url, json = method_args)
       return response.json()
     except Exception as ex:
       print("Exception during processing request: {0}".format(ex))
