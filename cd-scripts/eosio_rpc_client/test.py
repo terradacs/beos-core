@@ -10,3 +10,9 @@ if __name__ == '__main__':
   print("Get Info test")
   resp = ifce.chain.get_info()
   print(resp)
+
+  print("Get Block test")
+  import json
+  data = {"block_num_or_id" : "1"}
+  resp = ifce.chain.get_block(data)
+  print(resp)
