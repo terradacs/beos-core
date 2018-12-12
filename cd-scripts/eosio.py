@@ -427,6 +427,8 @@ def create_account(creator, name, owner_key, active_key, transfer_ram = False, s
         logger.error("Owner key or active key are empty, aborting")
         raise EOSIOException("Owner key or active key are empty, aborting")
     parameters = [config.CLEOS_EXECUTABLE, 
+        "--print-request",
+        "--print-response",
         "--url", "{0}://{1}:{2}".format(schema, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT),
         "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
         "create", "account"]
@@ -438,6 +440,8 @@ def create_account(creator, name, owner_key, active_key, transfer_ram = False, s
 
 def set_contract(account, contract, permission, schema = "http"):
     parameters = [config.CLEOS_EXECUTABLE, 
+        "--print-request",
+        "--print-response",
         "--url", "{0}://{1}:{2}".format(schema, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT),
         "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
         "set", "contract", account, contract, "-p", permission]
@@ -447,6 +451,8 @@ def set_contract(account, contract, permission, schema = "http"):
 
 def push_action(account, action, data, permission, schema = "http"):
     parameters = [config.CLEOS_EXECUTABLE, 
+        "--print-request",
+        "--print-response",
         "--url", "{0}://{1}:{2}".format(schema, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT),
         "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
         "push", "action", account, action, data, "-p", permission]
@@ -456,6 +462,8 @@ def push_action(account, action, data, permission, schema = "http"):
 
 def get_balance(_account_name, _currency, schema = "http"):
     parameters = [config.CLEOS_EXECUTABLE, 
+        "--print-request",
+        "--print-response",
         "--url", "{0}://{1}:{2}".format(schema, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT),
         "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
         "get", "currency", "balance", "eosio.token", _account_name, _currency]
@@ -465,6 +473,8 @@ def get_balance(_account_name, _currency, schema = "http"):
 def get_account(_account_name, schema = "http"):
     time.sleep(2)
     parameters = [config.CLEOS_EXECUTABLE, 
+        "--print-request",
+        "--print-response",
         "--url", "{0}://{1}:{2}".format(schema, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT),
         "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
         "get", "account", "-j", _account_name]
