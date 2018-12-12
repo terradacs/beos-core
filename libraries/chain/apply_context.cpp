@@ -173,7 +173,7 @@ void apply_context::reward_ram( const account_name& account, int64_t val )
 }
 
 void apply_context::reward_all( uint64_t beos_to_distribute, uint64_t beos_to_distribute_trustee, uint64_t ram_to_distribute,
-      uint64_t ram_to_distribute_trustee, asset pxbts, const voting_manager::producer_info_index& _producers ) {
+      uint64_t ram_to_distribute_trustee, const asset* proxyArray, size_t proxyArrayLen, const voting_manager::producer_info_index& _producers ) {
    const auto& accounts_index = db.template get_index<account_index, by_id>();
 
    // trustee is always rewarded with full given value
@@ -189,13 +189,8 @@ void apply_context::reward_all( uint64_t beos_to_distribute, uint64_t beos_to_di
       this_->change_resource_limits(config::distribution_account_name, -actual_ram_reward_sum, -actual_beos_reward_sum, 0 );
    } BOOST_SCOPE_EXIT_END;
 
-   if (pxbts.get_amount() == 0)
-     return; // nothing more to do here
-
-   auto get_currency_balance = [this]( const account_name& name, const symbol& asset_symbol ) -> asset {
-      const auto* tbl = db.template find<table_id_object, by_code_scope_table>(std::make_tuple(N(eosio.token), name, N(accounts)));
+   auto get_currency_balance = [this]( const symbol& asset_symbol, const table_id_object* tbl ) -> share_type {
       share_type result = 0;
-
       // the balance is implied to be 0 if either the table or row does not exist
       if (tbl) {
          const auto *obj = db.template find<key_value_object, by_scope_primary>(std::make_tuple(tbl->id, asset_symbol.to_symbol_code().value));
@@ -205,40 +200,76 @@ void apply_context::reward_all( uint64_t beos_to_distribute, uint64_t beos_to_di
             fc::raw::unpack(ds, result);
          }
       }
-      return asset(result, asset_symbol);
+      return result;
    };
+
+   if (proxyArrayLen == 0)
+      return; // distributing only to beos.trustee since no proxy assets declared
+
+   // split current rewards for equal shares for each proxy asset
+   beos_to_distribute /= proxyArrayLen;
+   ram_to_distribute /= proxyArrayLen;
+
+   // prepare divisors for weights (only leave nonzero)
+   std::vector<asset> divisors;
+   const auto* gateway_tbl = db.template find<table_id_object, by_code_scope_table>(std::make_tuple(N(eosio.token), config::gateway_account_name, N(accounts)));
+   for (size_t i = 0; i < proxyArrayLen; ++i) {
+      const asset& proxy = proxyArray[i];
+      share_type issued = 0;
+      const auto* tbl = db.template find<table_id_object, by_code_scope_table>(std::make_tuple(N(eosio.token), proxy.get_symbol().to_symbol_code().value, N(stat)));
+      if (tbl) {
+         const auto *obj = db.template find<key_value_object, by_scope_primary>(std::make_tuple(tbl->id, proxy.get_symbol().to_symbol_code().value));
+         if (obj) {
+            //supply is the first field in the serialization
+            fc::datastream<const char *> ds(obj->value.data(), obj->value.size());
+            fc::raw::unpack(ds, issued);
+         }
+      }
+      share_type withdrawn = get_currency_balance(proxy.get_symbol(), gateway_tbl);
+      if (issued > withdrawn)
+        divisors.emplace_back(issued - withdrawn, proxy.get_symbol());
+   }
+
+   if (divisors.empty())
+      return; // nothing more to do here
 
    for (auto& account : accounts_index) {
       auto& name = account.name;
       if (name == config::gateway_account_name || name == config::distribution_account_name)
-        continue; //neither beos.gateway (issuer of proxy) nor beos.distrib (source of rewards) can be rewarded
+         continue; //neither beos.gateway (issuer of proxy) nor beos.distrib (source of rewards) can be rewarded
       auto& resource_limit_mgr = control.get_mutable_resource_limits_manager();
       int64_t current_ram_bytes = 0;
       int64_t current_net_weight = 0;
       int64_t current_cpu_weight = 0;
       resource_limit_mgr.get_account_limits( name, current_ram_bytes, current_net_weight, current_cpu_weight );
 
-      asset balance( get_currency_balance(name, pxbts.get_symbol()) );
-
-      if ( beos_to_distribute > 0 && current_net_weight >= 0 && current_cpu_weight >= 0 ) {
-         //account that has unlimited bandwidth cannot be rewarded with bandwidth
-         int128_t block_amount = static_cast<int128_t>(balance.get_amount()) * beos_to_distribute;
-         long double dreward = static_cast<long double>(block_amount) / pxbts.get_amount();
-         int64_t beos_reward = static_cast<int64_t>(dreward);
-         if ( beos_reward > 0 ) {
-            actual_beos_reward_sum += beos_reward;
-            reward_stake( name, beos_reward, _producers );
+      const auto* user_tbl = db.template find<table_id_object, by_code_scope_table>(std::make_tuple(N(eosio.token), name, N(accounts)));
+      int64_t beos_reward = 0;
+      int64_t ram_reward = 0;
+      for (auto& proxy : divisors) {
+         int128_t balance = get_currency_balance(proxy.get_symbol(), user_tbl);
+         if ( beos_to_distribute > 0 && current_net_weight >= 0 && current_cpu_weight >= 0 ) {
+            //account that has unlimited bandwidth cannot be rewarded with bandwidth
+            int128_t block_amount = balance * beos_to_distribute;
+            long double dreward = static_cast<long double>(block_amount) / proxy.get_amount();
+            beos_reward += static_cast<int64_t>(dreward);
+         }
+         if ( ram_to_distribute > 0 && current_ram_bytes >= 0 ) {
+            //account that has unlimited ram cannot be rewarded with ram
+            int128_t block_amount = balance * ram_to_distribute;
+            long double dreward = static_cast<long double>(block_amount) / proxy.get_amount();
+            ram_reward += static_cast<int64_t>(dreward);
          }
       }
-      if ( ram_to_distribute > 0 && current_ram_bytes >= 0 ) {
-         //account that has unlimited ram cannot be rewarded with ram
-         int128_t block_amount = static_cast<int128_t>(balance.get_amount()) * ram_to_distribute;
-         long double dreward = static_cast<long double>(block_amount) / pxbts.get_amount();
-         int64_t ram_reward = static_cast<int64_t>(dreward);
-         if ( ram_reward > 0 ) {
-            actual_ram_reward_sum += ram_reward;
-            reward_ram( name, ram_reward );
-         }
+      if ( beos_reward > 0 ) {
+         DBG("apply_context::reward_all: rewarding %s with beos %li",name.to_string().c_str(),beos_reward);
+         actual_beos_reward_sum += beos_reward;
+         reward_stake( name, beos_reward, _producers );
+      }
+      if ( ram_reward > 0 ) {
+         DBG("apply_context::reward_all: rewarding %s with ram %li",name.to_string().c_str(),ram_reward);
+         actual_ram_reward_sum += ram_reward;
+         reward_ram( name, ram_reward );
       }
    }
 }

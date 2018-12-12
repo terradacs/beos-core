@@ -285,12 +285,28 @@ install(FILES libraries/fc/src/network/LICENSE.go DESTINATION ${CMAKE_INSTALL_FU
 include(package)
 include(doxygen)
 
-if ("${PROXY_ASSET_NAME}" STREQUAL "")
-    set(PROXY_ASSET_NAME "PXBTS")
+if ("${PXBTS_ASSET_NAME}" STREQUAL "")
+    set(PXBTS_ASSET_NAME "PXBTS")
 endif()
 
-if ("${PROXY_ASSET_PRECISION}" STREQUAL "")
-    set(PROXY_ASSET_PRECISION "4")
+if ("${PXBTS_ASSET_PRECISION}" STREQUAL "")
+    set(PXBTS_ASSET_PRECISION "4")
+endif()
+
+if ("${PXBPTS_ASSET_NAME}" STREQUAL "")
+    set(PXBPTS_ASSET_NAME "PXBPTS")
+endif()
+
+if ("${PXBPTS_ASSET_PRECISION}" STREQUAL "")
+    set(PXBPTS_ASSET_PRECISION "4")
+endif()
+
+if ("${PXEOS_ASSET_NAME}" STREQUAL "")
+    set(PXEOS_ASSET_NAME "PXEOS")
+endif()
+
+if ("${PXEOS_ASSET_PRECISION}" STREQUAL "")
+    set(PXEOS_ASSET_PRECISION "4")
 endif()
 
 if ("${STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION}" STREQUAL "")

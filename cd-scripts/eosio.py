@@ -269,14 +269,17 @@ def run_nodeos(node_index, name, public_key, use_https = False):
     logger.info("Executing command: {0}".format(" ".join(parameters)))
     return run_service("NODEOS", parameters, "] Produced block", False)
 
-def create_account(creator, name, owner_key, active_key, schema = "http"):
+def create_account(creator, name, owner_key, active_key, transfer_ram = False, schema = "http"):
     if not owner_key and not active_key:
         logger.error("Owner key or active key are empty, aborting")
         raise EOSIOException("Owner key or active key are empty, aborting")
     parameters = [config.CLEOS_EXECUTABLE, 
         "--url", "{0}://{1}:{2}".format(schema, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT),
         "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
-        "create", "account", creator, name, owner_key, active_key]
+        "create", "account"]
+    if transfer_ram:
+        parameters.append("--transfer-ram")
+    parameters += [creator, name, owner_key, active_key]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
     run_command(parameters)
 

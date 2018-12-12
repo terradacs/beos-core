@@ -539,23 +539,25 @@ namespace eosio { namespace testing {
 
   struct test_global_state
      {
-     asset proxy_asset;
      uint32_t starting_block_for_initial_witness_election;
      test_global_state_element beos;
      test_global_state_element ram;
+     std::vector<asset> proxy_assets;
      uint64_t ram_leftover;
 
      test_global_state()
-        : proxy_asset(0, symbol(SY(4, PROXY))),
+        : 
         starting_block_for_initial_witness_election(100),
         beos(240, 270, 10, 1'000'0000),
         ram(240, 248, 4, 0),
         ram_leftover(300000)
-        {}
+        {
+           proxy_assets.emplace_back(0, symbol(SY(4, PROXY)));
+        }
      };
 
 } } /// eosio::testing
 
 FC_REFLECT(eosio::testing::test_global_state_element, (starting_block)(next_block)(ending_block)(block_interval)(trustee_reward))
-FC_REFLECT(eosio::testing::test_global_state, (proxy_asset)(starting_block_for_initial_witness_election)(beos)(ram)(ram_leftover))
+FC_REFLECT(eosio::testing::test_global_state, (starting_block_for_initial_witness_election)(beos)(ram)(proxy_assets)(ram_leftover))
 

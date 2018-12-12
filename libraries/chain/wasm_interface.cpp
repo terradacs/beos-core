@@ -1826,15 +1826,14 @@ class distribution_api : public context_aware_api {
       }
 
       void reward_all( uint64_t beos_to_distribute, uint64_t beos_to_distribute_trustee, uint64_t ram_to_distribute,
-            uint64_t ram_to_distribute_trustee, array_ptr<char> pxbtsAsset, size_t assetLen,
+            uint64_t ram_to_distribute_trustee, array_ptr<asset> proxyAssets, size_t assetsLen,
             array_ptr<char> producerInfos, size_t producerInfoSize ) {
-         datastream<const char*> ds(pxbtsAsset, assetLen);
-         asset pxbts;
-         fc::raw::unpack(ds, pxbts);
+         const asset* proxyArray = proxyAssets;
 
          voting_manager::producer_info_index _producers = prepare_producers(producerInfos, producerInfoSize);
 
-         context.reward_all( beos_to_distribute, beos_to_distribute_trustee, ram_to_distribute, ram_to_distribute_trustee, pxbts, _producers);
+         context.reward_all( beos_to_distribute, beos_to_distribute_trustee, ram_to_distribute, ram_to_distribute_trustee,
+            proxyAssets, assetsLen, _producers);
       }
 
       void reward_done()
