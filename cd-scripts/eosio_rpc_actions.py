@@ -5,7 +5,6 @@ import json
 import sys
 import datetime
 
-import eosio_tools
 import eosio_rpc_client
 
 try:
@@ -29,7 +28,7 @@ fh.setFormatter(logging.Formatter(config.LOG_FORMAT))
 logger.addHandler(ch)
 logger.addHandler(fh)
 
-EOSIO = eosio_rpc_client.eosio_rpc_client.EosioInterface(config.NODEOS_IP_ADDRESS, config.NODEOS_PORT, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)
+EOSIO = eosio_rpc_client.EosioInterface(config.NODEOS_IP_ADDRESS, config.NODEOS_PORT, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)
 
 def extend_expiration_time(_time, _extend_by_seconds = 60):
   format = "%Y-%m-%dT%H:%M:%S.%f"
@@ -53,50 +52,67 @@ def create_wallet():
         import_key(config.MASTER_WALLET_NAME, key)
 
 def create_account(creator, name, owner_key, active_key):
-  create_acnt_data = {
-    "creator": creator,
-    "name": name,
-    "init_ram":True,
-    "owner": {
-      "threshold": 1,
-      "keys": [{
-          "key": owner_key,
-          "weight": 1
-        }
-      ],
-      "accounts": [],
-      "waits": []
-    },
-    "active": {
-      "threshold": 1,
-      "keys": [{
-          "key": active_key,
-          "weight": 1
-        }
-      ],
-      "accounts": [],
-      "waits": []
+  create_acnt_data = {"newaccount" : {
+    "code" : "eosio",
+    "action" : "newaccount",
+    "authorized_by" : creator,
+    "args" : {
+      "creator": creator,
+      "name": name,
+      "init_ram":True,
+      "owner": {
+        "threshold": 1,
+        "keys": [{
+            "key": owner_key,
+            "weight": 1
+          }
+        ],
+        "accounts": [],
+        "waits": []
+      },
+      "active": {
+        "threshold": 1,
+        "keys": [{
+            "key": active_key,
+            "weight": 1
+          }
+        ],
+        "accounts": [],
+        "waits": []
+      }
     }
-  }
+  }}
 
-  push_action(creator, "newaccount", create_acnt_data, creator)
+  push_action(creator, creator, create_acnt_data, "active")
 
-def push_action(account, action, data, permission):
+def push_action(account, actor, action_data, permission):
   actions = []
-  abi_to_json_bin_resp = EOSIO.chain.abi_json_to_bin(data)
-  actions.append({ 
-    "account": account,
-    "name":  action,
-    "authorization": [{ 
-      "actor" : account,
-      "permission": permission
-    }],
-    "data" : abi_to_json_bin_resp["binargs"]
-  })
+  for action, data in action_data.items():
+    abi_to_json_bin_resp = EOSIO.chain.abi_json_to_bin(data)
+    logger.info("abi_to_json_bin_resp")
+    logger.info(abi_to_json_bin_resp)
+    actions.append({ 
+      "account": account,
+      "name":  action,
+      "authorization": [{ 
+        "actor" : actor,
+        "permission": permission
+      }],
+      "data" : abi_to_json_bin_resp["binargs"]
+    })
 
   get_info_resp = EOSIO.chain.get_info()
-  get_block_resp = EOSIO.chain.get_block(get_info_resp["head_block_num"])
+  logger.info("get_info_resp")
+  logger.info(get_info_resp)
+
+  get_block_data = {"block_num_or_id" : get_info_resp["head_block_num"]}
+  get_block_resp = EOSIO.chain.get_block(get_block_data)
+  logger.info("get_block_resp")
+  logger.info(get_block_resp)
+
   public_keys_resp = EOSIO.wallet.get_public_keys()
+  logger.info("public_keys_resp")
+  logger.info(public_keys_resp)
 
   get_required_key_data = {
     "available_keys" : public_keys_resp,
@@ -114,7 +130,9 @@ def push_action(account, action, data, permission):
     }
   }
 
-  get_required_key_resp = EOSIO.chain.get_required_key(get_required_key_data)
+  get_required_key_resp = EOSIO.chain.get_required_keys(get_required_key_data)
+  logger.info("get_required_key_resp")
+  logger.info(get_required_key_resp)
 
   sign_transaction_data = [
     {
@@ -125,10 +143,12 @@ def push_action(account, action, data, permission):
       "signatures":[],
     },
     get_required_key_resp["required_keys"],
-    get_block_resp["chain_id"]
+    get_info_resp["chain_id"]
   ]
 
-  sign_transaction_resp = EOSIO.chain.sign_transaction(sign_transaction_data)
+  sign_transaction_resp = EOSIO.wallet.sign_transaction(sign_transaction_data)
+  logger.info("sign_transaction_resp")
+  logger.info(sign_transaction_resp)
 
   push_transaction_data = {
     "compression": "none",
@@ -144,14 +164,71 @@ def push_action(account, action, data, permission):
   }
 
   push_transaction_resp = EOSIO.chain.push_transaction(push_transaction_data)
+  logger.info("push_transaction_resp")
+  logger.info(push_transaction_resp)
   if "transaction_id" in push_transaction_resp:
     logger.info("[ACTION][OK] {0} pushed to block {1}".format(actions, push_transaction_resp["processed"]["block_num"]))
   else:
     logger.error("[ACTION][ERROR] failed to push action {0} to block".format(actions))
 
+def set_contract(account, actor, contract_dir_path, permission):
+  import os
+  norm_dir_path = os.path.normpath(contract_dir_path)
+  if not os.path.exists(contract_dir_path):
+    msg = "Contract dir does not exists"
+    logger.error(msg)
+    raise FileNotFoundError()
 
-def set_contract(account, contract, permission):
-  pass
+  contract_name = os.path.basename(norm_dir_path)
+
+  abi_file_name = norm_dir_path + "/" + contract_name + ".abi"
+  abi_binary_data = None
+  if not os.path.exists(abi_file_name):
+    msg = "ABI file does not exists"
+    logger.error(msg)
+    raise FileNotFoundError()
+
+  wasm_file_name = norm_dir_path + "/" + contract_name + ".wasm"
+  wasm_binary_data = None
+  if not os.path.exists(wasm_file_name):
+    msg = "WASM file does not exists"
+    logger.error(msg)
+    raise FileNotFoundError()
+
+  with open(abi_file_name, "r") as abi_file:
+    abi_binary_data = abi_file.read()
+  
+  abi_binary_data = abi_binary_data.replace(" ", "")
+  abi_binary_data = abi_binary_data.replace("\n", "")
+  abi_binary_data = abi_binary_data.encode('utf-8')
+
+  with open(wasm_file_name, "br") as wasm_file:
+    wasm_binary_data = wasm_file.read()
+
+  set_contract_actions = {
+    "setcode" : {
+      "code" : "eosio",
+      "action" : "setcode",
+      "authorized_by" : "eosio",
+      "args" : {
+        "account" : actor,
+        "vmtype" : 0,
+        "vmversion" : 0,
+        "code" : wasm_binary_data.hex()
+      }
+    },
+    "setabi" : {
+      "code" : "eosio",
+      "action" : "setabi",
+      "authorized_by" : "eosio",
+      "args" : {
+        "account" : actor,
+        "abi" : abi_binary_data.hex()
+      }
+    }
+  }
+
+  push_action(account, actor, set_contract_actions, permission)
 
 def get_balance(account_name, currency):
   data = {"code" : "eosio.token", "account" : account_name, "symbol" : currency}
