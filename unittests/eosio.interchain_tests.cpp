@@ -777,7 +777,7 @@ BOOST_FIXTURE_TEST_CASE( store_params_test, eosio_init_tester ) try {
   BOOST_REQUIRE_EQUAL( false, var_proxy.is_null() );
   std::vector<asset> proxy_assets = var_proxy.as< std::vector<asset> >();
   BOOST_REQUIRE_EQUAL( asset::from_string("0.0000 PXBTS"), proxy_assets[0] );
-  BOOST_REQUIRE_EQUAL( asset::from_string("0.0000 PXBPTS"), proxy_assets[1] );
+  BOOST_REQUIRE_EQUAL( asset::from_string("0.0000 PXBRNP"), proxy_assets[1] );
 
 } FC_LOG_AND_RETHROW()
 
