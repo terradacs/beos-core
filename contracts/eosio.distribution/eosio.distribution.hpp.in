@@ -55,17 +55,41 @@ namespace eosio {
                "Starting block already passed" );
             eosio_assert( state.ending_block >= state.starting_block, "Distribution period must not be empty" );
             eosio_assert( state.block_interval > 0, "Distribution block interval must be positive value" );
-            eosio_assert( state.starting_block == state.next_block, "Distribution should start in starting block" );
          }
 
-         void check( const distrib_global_state& state ) {
+         void check_and_calculate_parameters(distrib_global_state* state) {
+            state->beos.next_block = state->beos.starting_block;
+            state->ram.next_block = state->ram.starting_block;
             uint32_t block_no = get_blockchain_block_number();
-            check( state.beos, block_no );
-            check( state.ram, block_no );
-            if (state.ram_leftover > 0) {
+            check( state->beos, block_no );
+            check( state->ram, block_no );
+            if (state->ram_leftover > 0) {
                int64_t distrib_ram_bytes, distrib_net_weight, distrib_cpu_weight;
                get_resource_limits( _self, &distrib_ram_bytes, &distrib_net_weight, &distrib_cpu_weight );
-               eosio_assert( static_cast<uint64_t>(distrib_ram_bytes) > state.ram_leftover, "Cannot request to leave more than allocated ram" );
+               eosio_assert( static_cast<uint64_t>(distrib_ram_bytes) > state->ram_leftover, "Cannot request to leave more than allocated ram" );
+            }
+            if (state->proxy_assets.empty())
+               return;
+
+            bool calculate_weights = state->proxy_assets.front().amount == 0;
+            auto precision_depth = state->proxy_assets.front().symbol.precision();
+            for (auto& proxy : state->proxy_assets) {
+               eosio_assert( calculate_weights == (proxy.amount == 0) , "All assets need positive weight or all must be 0" );
+               if (calculate_weights) {
+                  auto precision = proxy.symbol.precision();
+                  if (precision > precision_depth)
+                     precision_depth = precision;
+               } else {
+                  eosio_assert( proxy.amount > 0, "Asset weight cannot be negative" );
+               }
+            }
+            if (calculate_weights) {
+               for (auto& proxy : state->proxy_assets) {
+                  proxy.amount = 1;
+                  int difference = static_cast<int>( precision_depth - proxy.symbol.precision() );
+                  for (int i = 0; i < difference; ++i)
+                     proxy.amount *= 10;
+               }
             }
          }
 
@@ -78,7 +102,6 @@ namespace eosio {
                Set this to 7 days worth of blocks.
             */
             dp.beos.starting_block = ${STARTING_BLOCK_FOR_BEOS_DISTRIBUTION};
-            dp.beos.next_block = dp.beos.starting_block;
 
             /*
                ENDING_BLOCK_FOR_BEOS_DISTRIBUTION
@@ -145,7 +168,7 @@ namespace eosio {
             */
             dp.ram_leftover = ${DISTRIB_RAM_LEFTOVER};
 
-            check( dp );
+            check_and_calculate_parameters( &dp );
             return dp;
          }
 
