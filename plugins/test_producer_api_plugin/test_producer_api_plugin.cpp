@@ -37,6 +37,7 @@ void test_producer_api_plugin::plugin_startup() {
    auto rw_api = app().get_plugin<test_producer_plugin>().get_read_write_api();
 
    app().get_plugin<http_plugin>().add_api({
+      CHAIN_RW_CALL(accelerate_time, 200l),
       CHAIN_RW_CALL(accelerate_blocks, 200l)
    });
 }

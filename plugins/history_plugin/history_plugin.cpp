@@ -264,7 +264,7 @@ namespace eosio {
                   datastream<char*> ds( aho.packed_action_trace.data(), ps );
                   fc::raw::pack( ds, at );
                   aho.action_sequence_num = at.receipt.global_sequence;
-                  aho.block_num = chain.pending_block_state()->block_num;
+                  aho.block_num = chain.pending_block_number();
                   aho.block_time = chain.pending_block_time();
                   aho.trx_id     = at.trx_id;
                });

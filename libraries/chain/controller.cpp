@@ -116,6 +116,12 @@ struct pending_state {
 };
 
 struct controller_impl {
+  private:
+
+   uint32_t                       accelerated_block_num = 0;//used for testing purposes
+
+  public:
+
    controller&                    self;
    chainbase::database            db;
    chainbase::database            reversible_blocks; ///< a special database to persist blocks that have successfully been applied but are still reversible
@@ -697,7 +703,7 @@ struct controller_impl {
 
          if( !replaying ) {
             reversible_blocks.create<reversible_block_object>( [&]( auto& ubo ) {
-               ubo.blocknum = pending->_pending_block_state->block_num;
+               ubo.blocknum = pending_block_number();
                ubo.set_block( pending->_pending_block_state->block );
             });
          }
@@ -845,7 +851,7 @@ struct controller_impl {
       if( gtrx.expiration < self.pending_block_time() ) {
          trace = std::make_shared<transaction_trace>();
          trace->id = gtrx.trx_id;
-         trace->block_num = self.pending_block_state()->block_num;
+         trace->block_num = self.pending_block_number();
          trace->block_time = self.pending_block_time();
          trace->producer_block_id = self.pending_producer_block_id();
          trace->scheduled = true;
@@ -1405,7 +1411,7 @@ struct controller_impl {
          { CPU_TARGET, chain_config.max_block_cpu_usage, config::block_cpu_usage_average_window_ms / config::block_interval_ms, max_virtual_mult, {99, 100}, {1000, 999}},
          {EOS_PERCENT(chain_config.max_block_net_usage, chain_config.target_block_net_usage_pct), chain_config.max_block_net_usage, config::block_size_average_window_ms / config::block_interval_ms, max_virtual_mult, {99, 100}, {1000, 999}}
       );
-      resource_limits.process_block_usage(pending->_pending_block_state->block_num);
+      resource_limits.process_block_usage(pending_block_number());
 
       set_action_merkle();
       set_trx_merkle();
@@ -1555,7 +1561,7 @@ struct controller_impl {
    signed_transaction get_on_block_transaction()
    {
       const block_header& bh = self.head_block_header();
-      uint32_t block_num = self.head_block_num();
+      uint32_t block_num = head->block_num + get_accelerated_block_num();
 
       action on_block_act;
       on_block_act.account = config::system_account_name;
@@ -1576,6 +1582,21 @@ struct controller_impl {
       trx.set_reference_block(self.head_block_id());
       trx.expiration = self.pending_block_time() + fc::microseconds(999'999); // Round up to nearest second to avoid appearing expired
       return trx;
+   }
+
+   void accelerate_blocks( uint32_t value )
+   {
+      accelerated_block_num += value;
+   }
+
+   uint32_t pending_block_number()const
+   {
+     return pending->_pending_block_state->block_num + accelerated_block_num;
+   }
+
+   uint32_t get_accelerated_block_num()const
+   {
+     return accelerated_block_num;
    }
 
 }; /// controller_impl
@@ -1730,6 +1751,15 @@ void controller::set_key_blacklist( const flat_set<public_key_type>& new_key_bla
    my->conf.key_blacklist = new_key_blacklist;
 }
 
+uint32_t controller::get_accelerated_block_num()const {
+  return my->get_accelerated_block_num();
+}
+
+void controller::accelerate_blocks( uint32_t value )
+{
+   my->accelerate_blocks( value );
+}
+
 uint32_t controller::head_block_num()const {
    return my->head->block_num;
 }
@@ -1769,6 +1799,12 @@ block_state_ptr controller::pending_block_state()const {
    if( my->pending ) return my->pending->_pending_block_state;
    return block_state_ptr();
 }
+
+uint32_t controller::pending_block_number()const {
+  if( my->pending ) return my->pending_block_number();
+  return 0;
+}
+
 time_point controller::pending_block_time()const {
    EOS_ASSERT( my->pending, block_validate_exception, "no pending block" );
    return my->pending->_pending_block_state->header.timestamp;
