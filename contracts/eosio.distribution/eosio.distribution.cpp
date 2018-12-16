@@ -85,10 +85,8 @@ void distribution::calculate_current_reward( uint64_t* to_distribute, uint64_t* 
 
 void distribution::changeparams( distrib_global_state new_params ) {
    require_auth( _self );
-   new_params.beos.next_block = new_params.beos.starting_block;
-   new_params.ram.next_block = new_params.ram.starting_block;
 
-   check( new_params );
+   check_and_calculate_parameters( &new_params );
 
    _gstate = new_params;
    _global.set( _gstate, _self );

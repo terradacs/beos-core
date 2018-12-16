@@ -206,12 +206,8 @@ void apply_context::reward_all( uint64_t beos_to_distribute, uint64_t beos_to_di
    if (proxyArrayLen == 0)
       return; // distributing only to beos.trustee since no proxy assets declared
 
-   // split current rewards for equal shares for each proxy asset
-   beos_to_distribute /= proxyArrayLen;
-   ram_to_distribute /= proxyArrayLen;
-
-   // prepare divisors for weights (only leave nonzero)
-   std::vector<asset> divisors;
+   // prepare divisor from weighted amounts of active assets
+   share_type divisor = 0;
    const auto* gateway_tbl = db.template find<table_id_object, by_code_scope_table>(std::make_tuple(N(eosio.token), config::gateway_account_name, N(accounts)));
    for (size_t i = 0; i < proxyArrayLen; ++i) {
       const asset& proxy = proxyArray[i];
@@ -226,11 +222,13 @@ void apply_context::reward_all( uint64_t beos_to_distribute, uint64_t beos_to_di
          }
       }
       share_type withdrawn = get_currency_balance(proxy.get_symbol(), gateway_tbl);
-      if (issued > withdrawn)
-        divisors.emplace_back(issued - withdrawn, proxy.get_symbol());
+      issued -= withdrawn;
+      if (issued > 0) {
+        divisor += issued * proxy.get_amount();
+      }
    }
 
-   if (divisors.empty())
+   if ( divisor <= 0 )
       return; // nothing more to do here
 
    for (auto& account : accounts_index) {
@@ -244,32 +242,36 @@ void apply_context::reward_all( uint64_t beos_to_distribute, uint64_t beos_to_di
       resource_limit_mgr.get_account_limits( name, current_ram_bytes, current_net_weight, current_cpu_weight );
 
       const auto* user_tbl = db.template find<table_id_object, by_code_scope_table>(std::make_tuple(N(eosio.token), name, N(accounts)));
-      int64_t beos_reward = 0;
-      int64_t ram_reward = 0;
-      for (auto& proxy : divisors) {
-         int128_t balance = get_currency_balance(proxy.get_symbol(), user_tbl);
-         if ( beos_to_distribute > 0 && current_net_weight >= 0 && current_cpu_weight >= 0 ) {
-            //account that has unlimited bandwidth cannot be rewarded with bandwidth
-            int128_t block_amount = balance * beos_to_distribute;
-            long double dreward = static_cast<long double>(block_amount) / proxy.get_amount();
-            beos_reward += static_cast<int64_t>(dreward);
-         }
-         if ( ram_to_distribute > 0 && current_ram_bytes >= 0 ) {
-            //account that has unlimited ram cannot be rewarded with ram
-            int128_t block_amount = balance * ram_to_distribute;
-            long double dreward = static_cast<long double>(block_amount) / proxy.get_amount();
-            ram_reward += static_cast<int64_t>(dreward);
+      int128_t balance = 0;
+      // compute weighted balance for the account
+      for (size_t i = 0; i < proxyArrayLen; ++i) {
+         const asset& proxy = proxyArray[i];
+         share_type proxy_balance = get_currency_balance(proxy.get_symbol(), user_tbl);
+         balance += proxy_balance * proxy.get_amount();
+      }
+      if ( balance == 0 )
+         continue; // not eligible for rewards
+      if ( beos_to_distribute > 0 && current_net_weight >= 0 && current_cpu_weight >= 0 ) {
+         // account that has unlimited bandwidth cannot be rewarded with bandwidth
+         int128_t block_amount = balance * beos_to_distribute;
+         long double dreward = static_cast<long double>(block_amount) / divisor;
+         int64_t beos_reward = static_cast<int64_t>(dreward);
+         if ( beos_reward > 0 ) {
+            DBG("apply_context::reward_all: rewarding %s with beos %li",name.to_string().c_str(),beos_reward);
+            actual_beos_reward_sum += beos_reward;
+            reward_stake( name, beos_reward, _producers );
          }
       }
-      if ( beos_reward > 0 ) {
-         DBG("apply_context::reward_all: rewarding %s with beos %li",name.to_string().c_str(),beos_reward);
-         actual_beos_reward_sum += beos_reward;
-         reward_stake( name, beos_reward, _producers );
-      }
-      if ( ram_reward > 0 ) {
-         DBG("apply_context::reward_all: rewarding %s with ram %li",name.to_string().c_str(),ram_reward);
-         actual_ram_reward_sum += ram_reward;
-         reward_ram( name, ram_reward );
+      if ( ram_to_distribute > 0 && current_ram_bytes >= 0 ) {
+         // account that has unlimited ram cannot be rewarded with ram
+         int128_t block_amount = balance * ram_to_distribute;
+         long double dreward = static_cast<long double>(block_amount) / divisor;
+         int64_t ram_reward = static_cast<int64_t>(dreward);
+         if ( ram_reward > 0 ) {
+            DBG("apply_context::reward_all: rewarding %s with ram %li",name.to_string().c_str(),ram_reward);
+            actual_ram_reward_sum += ram_reward;
+            reward_ram( name, ram_reward );
+         }
       }
    }
 }
