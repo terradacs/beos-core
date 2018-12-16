@@ -291,8 +291,8 @@ def build_eosio(c_compiler, cxx_compiler):
         "-DDISTRIBUTION_ROOT_KEY={0}".format(config.BEOS_DISTRIB_PUBLIC_KEY),
         "-DPXBTS_ASSET_PRECISION={0}".format(config.PXBTS_ASSET_PRECISION),
         "-DPXBTS_ASSET_NAME={0}".format(config.PXBTS_ASSET_NAME),
-        "-DPXBPTS_ASSET_PRECISION={0}".format(config.PXBPTS_ASSET_PRECISION),
-        "-DPXBPTS_ASSET_NAME={0}".format(config.PXBPTS_ASSET_NAME),
+        "-DPXBRNP_ASSET_PRECISION={0}".format(config.PXBRNP_ASSET_PRECISION),
+        "-DPXBRNP_ASSET_NAME={0}".format(config.PXBRNP_ASSET_NAME),
         "-DPXEOS_ASSET_PRECISION={0}".format(config.PXEOS_ASSET_PRECISION),
         "-DPXEOS_ASSET_NAME={0}".format(config.PXEOS_ASSET_NAME),
         "-DSTARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION={0}".format(config.STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION),
@@ -396,7 +396,7 @@ def initialize_beos():
 
         eosio.push_action("eosio.token", "create", '[ "eosio", "{0} {1}"]'.format(config.CORE_TOTAL_SUPPLY, config.CORE_SYMBOL_NAME), "eosio.token")
         eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PXBTS_TOTAL_SUPPLY, config.PXBTS_ASSET_NAME), "eosio.token")
-        eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PXBPTS_TOTAL_SUPPLY, config.PXBPTS_ASSET_NAME), "eosio.token")
+        eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PXBRNP_TOTAL_SUPPLY, config.PXBRNP_ASSET_NAME), "eosio.token")
         eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PXEOS_TOTAL_SUPPLY, config.PXEOS_ASSET_NAME), "eosio.token")
 
         # registering initial producers, regproducer is in eosio.system contract so it need to be loaded first
@@ -415,13 +415,13 @@ def initialize_beos():
         # eosio.get_account("beos.gateway")
         eosio.push_action("eosio", "initresource", '[ "beos.distrib", "{0}", "-1", "-1"]'.format(config.DISTRIB_INIT_RAM), "eosio")
         # eosio.get_account("eosio")
-        eosio.get_account("beos.distrib")
+        # eosio.get_account("beos.distrib")
         balance = eosio.get_balance("eosio", config.CORE_SYMBOL_NAME)
         balance_int = int(balance * (10 ** config.CORE_SYMBOL_PRECISION) - config.DISTRIB_NETCPU_LEFTOVER)
         # all bandwidth resources to distribute must be stored as net! leftover value in cpu will also be subtracted from net reward pool
         eosio.push_action("eosio", "initresource", '[ "beos.distrib", "-1", "{0}", "{1}"]'.format(balance_int, config.DISTRIB_NETCPU_LEFTOVER), "eosio")
         # eosio.get_account("eosio")
-        eosio.get_account("beos.distrib")
+        # eosio.get_account("beos.distrib")
 
         producers = []
 
@@ -447,7 +447,6 @@ def initialize_beos():
         eosio.push_action("beos.init", "storeparams", '[0]', "beos.init")
         eosio.push_action("beos.distrib", "storeparams", '[0]', "beos.distrib")
 
-        eosio.get_account("beos.distrib")
         eosio.terminate_running_tasks(nodeos, keosd)
         eosio.show_keosd_postconf(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
         eosio.show_wallet_unlock_postconf()

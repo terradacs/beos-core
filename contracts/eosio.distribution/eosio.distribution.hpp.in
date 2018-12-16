@@ -136,7 +136,7 @@ namespace eosio {
                Only add such assets here even if there is more (f.e. PXEOS does not participate).
             */
             dp.proxy_assets.emplace_back( 0, S( ${PXBTS_ASSET_PRECISION}, ${PXBTS_ASSET_NAME} ) );
-            dp.proxy_assets.emplace_back( 0, S( ${PXBPTS_ASSET_PRECISION}, ${PXBPTS_ASSET_NAME} ) );
+            dp.proxy_assets.emplace_back( 0, S( ${PXBRNP_ASSET_PRECISION}, ${PXBRNP_ASSET_NAME} ) );
 
             /*
                DISTRIB_RAM_LEFTOVER
