@@ -49,7 +49,7 @@ test_producer_apis::read_write test_producer_plugin::get_read_write_api() const
 namespace test_producer_apis
 {
  
-  read_write::accelerate_blocks_results read_write::accelerate_blocks( const accelerate_blocks_params& params )
+  read_write::accelerate_results read_write::accelerate_time( const accelerate_time_params& params )
   {
     try {
 
@@ -66,11 +66,11 @@ namespace test_producer_apis
       else if( params.type == "d" )
         res = fc::days( params.time );
       else
-        return accelerate_blocks_results( false );
+        return accelerate_results( false );
 
-      producer_plug->accelerate_blocks( res );
+      producer_plug->accelerate_time( res );
 
-      return accelerate_blocks_results( true );
+      return accelerate_results( true );
 
       } catch (const fc::exception& e) {
         throw e;
@@ -90,9 +90,38 @@ namespace test_producer_apis
         throw fce;
       }
 
-    return accelerate_blocks_results( false );
+    return accelerate_results( false );
   }
 
+  read_write::accelerate_results read_write::accelerate_blocks( const accelerate_blocks_params& params )
+  {
+    try {
+
+      assert( producer_plug );
+      producer_plug->accelerate_blocks( params.blocks );
+
+      return accelerate_results( true );
+
+      } catch (const fc::exception& e) {
+        throw e;
+      } catch( const std::exception& e ) {
+        auto fce = fc::exception(
+            FC_LOG_MESSAGE( info, "Caught std::exception: ${what}", ("what",e.what())),
+            fc::std_exception_code,
+            BOOST_CORE_TYPEID(e).name(),
+            e.what()
+        );
+        throw fce;
+      } catch( ... ) {
+        auto fce = fc::unhandled_exception(
+            FC_LOG_MESSAGE( info, "Caught unknown exception"),
+            std::current_exception()
+        );
+        throw fce;
+      }
+
+    return accelerate_results( false );
+  }
 }
 
 } // namespace eosio

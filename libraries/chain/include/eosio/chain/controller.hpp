@@ -177,6 +177,9 @@ namespace eosio { namespace chain {
          void   set_action_blacklist( const flat_set< pair<account_name, action_name> >& );
          void   set_key_blacklist( const flat_set<public_key_type>& );
 
+         uint32_t get_accelerated_block_num()const;
+         void accelerate_blocks( uint32_t value );
+
          uint32_t             head_block_num()const;
          time_point           head_block_time()const;
          block_id_type        head_block_id()const;
@@ -189,6 +192,7 @@ namespace eosio { namespace chain {
          time_point           fork_db_head_block_time()const;
          account_name         fork_db_head_block_producer()const;
 
+         uint32_t                pending_block_number()const;
          time_point              pending_block_time()const;
          block_state_ptr         pending_block_state()const;
          optional<block_id_type> pending_producer_block_id()const;

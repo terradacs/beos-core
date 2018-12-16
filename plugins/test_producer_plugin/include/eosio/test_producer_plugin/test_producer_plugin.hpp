@@ -25,16 +25,16 @@ namespace test_producer_apis
        * This structure holds length of time, which will generate shift in blockchain timeline.
        */
 
-      struct accelerate_blocks_params
+      struct accelerate_time_params
       {
-        int32_t time;
+        uint32_t time;
         std::string type;
       };
 
      /**
       * RPC request example:
 
-        curl --url http://127.0.0.1:8888/v1/test_producer/accelerate_blocks --data
+        curl --url http://127.0.0.1:8888/v1/test_producer/accelerate_time --data
          '{
             "time":1,
             "type":"m"
@@ -43,13 +43,32 @@ namespace test_producer_apis
      */
 
       /**
-       * This structure holds information if acceleration of time was done.
+       * This structure holds number of blocks, which will be skipped.
        */
 
-      struct accelerate_blocks_results
+      struct accelerate_blocks_params
+      {
+        uint32_t blocks;
+      };
+
+     /**
+      * RPC request example:
+
+        curl --url http://127.0.0.1:8888/v1/test_producer/accelerate_blocks --data
+         '{
+            "blocks":1
+          }
+          '
+     */
+
+      /**
+       * This structure holds information if acceleration was done.
+       */
+
+      struct accelerate_results
       {
         bool done;
-        accelerate_blocks_results(bool _done ) : done(_done)
+        accelerate_results(bool _done ) : done(_done)
         {
         }
       };
@@ -65,7 +84,8 @@ namespace test_producer_apis
           : producer_plug( _producer_plug ) {}
 
 
-      accelerate_blocks_results accelerate_blocks( const accelerate_blocks_params& params );
+      accelerate_results accelerate_time( const accelerate_time_params& params );
+      accelerate_results accelerate_blocks( const accelerate_blocks_params& params );
   };
 
 } // namespace chain_apis
@@ -94,5 +114,6 @@ class test_producer_plugin : public plugin<test_producer_plugin>
 
 } /// namespace eosio
 
-FC_REFLECT( eosio::test_producer_apis::read_write::accelerate_blocks_params, (time)(type))
-FC_REFLECT( eosio::test_producer_apis::read_write::accelerate_blocks_results, (done) )
+FC_REFLECT( eosio::test_producer_apis::read_write::accelerate_time_params, (time)(type))
+FC_REFLECT( eosio::test_producer_apis::read_write::accelerate_blocks_params, (blocks))
+FC_REFLECT( eosio::test_producer_apis::read_write::accelerate_results, (done) )

@@ -455,7 +455,8 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
 
       start_block_result start_block(bool &last_block);
 
-      void accelerate_blocks( const fc::microseconds& value );
+      void accelerate_time( const fc::microseconds& value );
+      void accelerate_blocks( uint32_t value );
       fc::time_point calculate_pending_block_time() const;
       void schedule_delayed_production_loop(const std::weak_ptr<producer_plugin_impl>& weak_this, const block_timestamp_type& current_block_time);
 };
@@ -922,7 +923,12 @@ producer_plugin::snapshot_information producer_plugin::create_snapshot() const {
    return {head_id, snapshot_path};
 }
 
-void producer_plugin::accelerate_blocks( const fc::microseconds& value )
+void producer_plugin::accelerate_time( const fc::microseconds& value )
+{
+  my->accelerate_time( value );
+}
+
+void producer_plugin::accelerate_blocks( uint32_t value )
 {
   my->accelerate_blocks( value );
 }
@@ -983,13 +989,19 @@ optional<fc::time_point> producer_plugin_impl::calculate_next_block_time(const a
    }
 }
 
-void producer_plugin_impl::accelerate_blocks( const fc::microseconds& value )
+void producer_plugin_impl::accelerate_time( const fc::microseconds& value )
 {
   if( value.count() > config::block_interval_us )
   {
     _acceleration_enabled = true;
     _acceleration += value.count();
   }
+}
+
+void producer_plugin_impl::accelerate_blocks( uint32_t value )
+{
+   chain::controller& chain = app().get_plugin<chain_plugin>().chain();
+   chain.accelerate_blocks( value );
 }
 
 fc::time_point producer_plugin_impl::calculate_pending_block_time() const {
@@ -1381,17 +1393,17 @@ void producer_plugin_impl::schedule_production_loop() {
          auto deadline = chain.pending_block_time().time_since_epoch().count() + (last_block ? _last_block_time_offset_us : _produce_time_offset_us);
          deadline -= _acceleration;
          _timer.expires_at( epoch + boost::posix_time::microseconds( deadline ));
-         fc_dlog(_log, "Scheduling Block Production on Normal Block #${num} for ${time}", ("num", chain.pending_block_state()->block_num)("time",deadline));
+         fc_dlog(_log, "Scheduling Block Production on Normal Block #${num} for ${time}", ("num", chain.pending_block_number())("time",deadline));
       } else {
          EOS_ASSERT( chain.pending_block_state(), missing_pending_block_state, "producing without pending_block_state" );
          auto expect_time = chain.pending_block_time() - fc::microseconds(config::block_interval_us);
          // ship this block off up to 1 block time earlier or immediately
          if (fc::time_point::now() >= expect_time) {
             _timer.expires_from_now( boost::posix_time::microseconds( 0 ));
-            fc_dlog(_log, "Scheduling Block Production on Exhausted Block #${num} immediately", ("num", chain.pending_block_state()->block_num));
+            fc_dlog(_log, "Scheduling Block Production on Exhausted Block #${num} immediately", ("num", chain.pending_block_number()));
          } else {
             _timer.expires_at(epoch + boost::posix_time::microseconds(expect_time.time_since_epoch().count()));
-            fc_dlog(_log, "Scheduling Block Production on Exhausted Block #${num} at ${time}", ("num", chain.pending_block_state()->block_num)("time",expect_time));
+            fc_dlog(_log, "Scheduling Block Production on Exhausted Block #${num} at ${time}", ("num", chain.pending_block_number())("time",expect_time));
          }
       }
 
@@ -1399,7 +1411,7 @@ void producer_plugin_impl::schedule_production_loop() {
          auto self = weak_this.lock();
          if (self && ec != boost::asio::error::operation_aborted && cid == self->_timer_corelation_id) {
             // pending_block_state expected, but can't assert inside async_wait
-            auto block_num = chain.pending_block_state() ? chain.pending_block_state()->block_num : 0;
+            auto block_num = chain.pending_block_number();
             auto res = self->maybe_produce_block();
             fc_dlog(_log, "Producing Block #${num} returned: ${res}", ("num", block_num)("res", res));
          }
@@ -1509,10 +1521,11 @@ void producer_plugin_impl::produce_block() {
 
    block_state_ptr new_bs = chain.head_block_state();
    _producer_watermarks[new_bs->header.producer] = chain.head_block_num();
+   auto block_num = new_bs->block_num + chain.get_accelerated_block_num();
 
    ilog("Produced block ${id}... #${n} @ ${t} signed by ${p} [trxs: ${count}, lib: ${lib}, confirmed: ${confs}]",
         ("p",new_bs->header.producer)("id",fc::variant(new_bs->id).as_string().substr(0,16))
-        ("n",new_bs->block_num)("t",new_bs->header.timestamp)
+        ("n",block_num)("t",new_bs->header.timestamp)
         ("count",new_bs->block->transactions.size())("lib",chain.last_irreversible_block_num())("confs", new_bs->header.confirmed));
 
 }

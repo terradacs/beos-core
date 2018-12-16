@@ -81,7 +81,8 @@ public:
    integrity_hash_information get_integrity_hash() const;
    snapshot_information create_snapshot() const;
 
-   void accelerate_blocks( const fc::microseconds& value );
+   void accelerate_time( const fc::microseconds& value );
+   void accelerate_blocks( uint32_t value );
 
    signal<void(const chain::producer_confirmation&)> confirmed_block;
 private:
