@@ -118,15 +118,7 @@ parser.add_argument('--master-wallet-name', metavar='', help="Name of main walle
 parser.add_argument('--add-block-number', action="store_true", help="", default=False )
 parser.add_argument('--restore-node-params', action="store_true", help="", default=False )
 parser.add_argument('--starting-block-for-initial-witness-election', default=100)
-parser.add_argument('--starting-block-for-beos-distribution', default=7 * 24 * 3600 * 2)
-parser.add_argument('--ending-block-for-beos-distribution', default=98 * 24 * 3600 * 2)
-parser.add_argument('--distribution-payment-block-interval-for-beos-distribution', default=1 * 3600 * 2)
-parser.add_argument('--trustee-reward-beos', default=0)
-parser.add_argument('--starting-block-for-ram-distribution', default= 7 * 24 * 3600 * 2)
-parser.add_argument('--ending-block-for-ram-distribution', default=280 * 24 * 3600 * 2)
-parser.add_argument('--distribution-payment-block-interval-for-ram-distribution', default=1 * 3600 * 2)
-parser.add_argument('--trustee-reward-ram', default=0)
-parser.add_argument('--distrib-ram-leftover', default=0)
+parser.add_argument('--distribution-params', default=[ [7 * 24 * 3600 * 2, 0, 98 * 24 * 3600 * 2, 1 * 3600 * 2, 0], [7 * 24 * 3600 * 2, 0, 280 * 24 * 3600 * 2, 1 * 3600 * 2, 0], 0] )
 
 if __name__ == "__main__":
   args = parser.parse_args()
@@ -156,15 +148,7 @@ if __name__ == "__main__":
     if args.restore_node_params :
       scenario.restore_node_params(
                 args.starting_block_for_initial_witness_election,
-                args.starting_block_for_beos_distribution,
-                args.ending_block_for_beos_distribution,
-                args.distribution_payment_block_interval_for_beos_distribution,
-                args.trustee_reward_beos,
-                args.starting_block_for_ram_distribution,
-                args.ending_block_for_ram_distribution,
-                args.distribution_payment_block_interval_for_ram_distribution,
-                args.trustee_reward_ram,
-                args.distrib_ram_leftover)
+                args.distribution_params)
 
   if error:
     exit(1)

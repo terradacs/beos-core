@@ -31,7 +31,8 @@ namespace eosio {
                         asset        quantity,
                         string       memo );
       
-      
+         inline account_name get_issuer( symbol_name sym )const;
+
          inline asset get_supply( symbol_name sym )const;
          
          inline asset get_balance( account_name owner, symbol_name sym )const;
@@ -67,6 +68,13 @@ namespace eosio {
             string        memo;
          };
    };
+
+   account_name token::get_issuer( symbol_name sym )const
+   {
+      stats statstable( _self, sym );
+      const auto& st = statstable.get( sym, "Unknown asset symbol" );
+      return st.issuer;
+   }
 
    asset token::get_supply( symbol_name sym )const
    {

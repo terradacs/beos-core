@@ -188,15 +188,7 @@ set_property(TEST eos_voter_rpc_tests PROPERTY LABELS beos_tests)
 # --restore-node-params
 # --master-wallet-name ${MASTER_WALLET_NAME}
 # --starting-block-for-initial-witness-election ${STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION}
-# --starting-block-for-beos-distribution ${STARTING_BLOCK_FOR_BEOS_DISTRIBUTION}
-# --ending-block-for-beos-distribution ${ENDING_BLOCK_FOR_BEOS_DISTRIBUTION}
-# --distribution-payment-block-interval-for-beos-distribution ${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION}
-# --trustee-reward-beos ${TRUSTEE_REWARD_BEOS}
-# --starting-block-for-ram-distribution ${STARTING_BLOCK_FOR_RAM_DISTRIBUTION}
-# --ending-block-for-ram-distribution ${ENDING_BLOCK_FOR_RAM_DISTRIBUTION}
-# --distribution-payment-block-interval-for-ram-distribution ${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION}
-# --trustee-reward-ram ${TRUSTEE_REWARD_RAM}
-# --distrib-ram-leftover ${DISTRIB_RAM_LEFTOVER}
+# --distribution-params ${DISTRIBUTION_PARAMS}
 #  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests/beos_plugin_tests/)
 # set_property(TEST test03_scenarios_deploy PROPERTY LABELS nonparallelizable_tests)
 add_test(NAME test04_account_creation_and_get_account_deploy COMMAND tests/beos_plugin_tests/test04_account_creation_and_get_account_deploy.py  --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --master-wallet-name ${MASTER_WALLET_NAME}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})

@@ -760,24 +760,28 @@ BOOST_AUTO_TEST_SUITE(eosio_init_tests)
 BOOST_FIXTURE_TEST_CASE( store_params_test, eosio_init_tester ) try {
 
   auto var_tgs = get_distrib_param();
-  BOOST_REQUIRE_EQUAL( false, var_tgs.is_null() ); /// Distribution parameters must be immediately saved once contract has been used
+  BOOST_REQUIRE_EQUAL( true, var_tgs.is_null() );
 
   BOOST_REQUIRE_EQUAL( success(), store_params_distrib() );
 
+  //distribution is turned off by default
   var_tgs = get_distrib_param();
   BOOST_REQUIRE_EQUAL( false, var_tgs.is_null() );
   BOOST_REQUIRE_EQUAL( true, var_tgs["beos"].is_object() );
+  BOOST_REQUIRE_EQUAL( true, var_tgs["ram"].is_object() );
 
   auto var_tgs_beos = var_tgs["beos"].get_object();
-  BOOST_REQUIRE_EQUAL( true, var_tgs_beos["starting_block"].is_uint64() );
+  BOOST_REQUIRE_EQUAL( true, var_tgs_beos["ending_block"].is_uint64() );
+  BOOST_REQUIRE_EQUAL( var_tgs_beos["ending_block"].as_uint64(), 0 );
 
-  BOOST_REQUIRE_EQUAL( var_tgs_beos["starting_block"].as_uint64(), 7 * 24 * 3600 * 2 /* days(7).to_seconds() * 2 */ );
+  auto var_tgs_ram = var_tgs["ram"].get_object();
+  BOOST_REQUIRE_EQUAL( true, var_tgs_ram["ending_block"].is_uint64() );
+  BOOST_REQUIRE_EQUAL( var_tgs_ram["ending_block"].as_uint64(), 0 );
 
   auto var_proxy = var_tgs["proxy_assets"];
   BOOST_REQUIRE_EQUAL( false, var_proxy.is_null() );
   std::vector<asset> proxy_assets = var_proxy.as< std::vector<asset> >();
-  BOOST_REQUIRE_EQUAL( asset::from_string("0.0001 PXBTS"), proxy_assets[0] );
-  BOOST_REQUIRE_EQUAL( asset::from_string("0.0001 PXBRNP"), proxy_assets[1] );
+  BOOST_REQUIRE_EQUAL( true, proxy_assets.empty() );
 
 } FC_LOG_AND_RETHROW()
 
@@ -1155,9 +1159,9 @@ BOOST_FIXTURE_TEST_CASE( rewarding_weights, eosio_init_tester ) try {
   tgs.ram_leftover -= 20000000000; //back to default leftover
 
   tgs.proxy_assets.clear();
-  tgs.proxy_assets.emplace_back(750, symbol(SY(4, PROXY)));
-  tgs.proxy_assets.emplace_back(25, symbol(SY(5, PXEOS)));
-  //asset weights: PROXY.satoshi gives 750 units of reward, PXEOS.satoshi gives 25 units of reward (1 PROXY = 3 PXEOS)
+  tgs.proxy_assets.emplace_back(30, symbol(SY(4, PROXY)));
+  tgs.proxy_assets.emplace_back(1, symbol(SY(5, PXEOS)));
+  //asset weights: PROXY.satoshi gives 30 units of reward, PXEOS.satoshi gives 1 unit of reward (1 PROXY = 3 PXEOS)
   //two ram rewards: 10bln each
 
   //ABW: we need to refill net for beos.distrib or the changeparams won't work since it has very little net compared to other accounts
@@ -1282,6 +1286,16 @@ BOOST_FIXTURE_TEST_CASE( false_tests, eosio_init_tester ) try {
 
   tgs.proxy_assets.front() -= asset(2, symbol(SY(4, PROXY)));
   BOOST_REQUIRE_EQUAL( wasm_assert_msg("Asset weight cannot be negative"), change_distrib_params( tgs ) );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 30u );
+
+  tgs.proxy_assets.clear();
+  tgs.proxy_assets.emplace_back(asset(0, symbol(SY(3, COOKIE))));
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("Unknown asset symbol"), change_distrib_params( tgs ) );
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), 30u );
+
+  tgs.proxy_assets.clear();
+  tgs.proxy_assets.emplace_back(asset(0, symbol(SY(4, BEOS))));
+  BOOST_REQUIRE_EQUAL( wasm_assert_msg("Proxy assets must be created with beos.gateway as issuer"), change_distrib_params( tgs ) );
   BOOST_REQUIRE_EQUAL( control->head_block_num(), 30u );
 } FC_LOG_AND_RETHROW()
 

@@ -466,15 +466,7 @@ class TestScenarios(object):
 
     def restore_node_params(self,
                 _starting_block_for_initial_witness_election,
-                _starting_block_for_beos_distribution,
-                _ending_block_for_beos_distribution,
-                _distribution_payment_block_interval_for_beos_distribution,
-                _trustee_reward_beos,
-                _starting_block_for_ram_distribution,
-                _ending_block_for_ram_distribution,
-                _distribution_payment_block_interval_for_ram_distribution,
-                _trustee_reward_ram,
-                _distrib_ram_leftover):
+                _distribution_params):
         try:
             params=list()
             params.append({
@@ -490,19 +482,7 @@ class TestScenarios(object):
                     "code":"beos.distrib",
                     "action":"changeparams",
                     "args":{
-                        "new_params":[
-                            [ _starting_block_for_beos_distribution,
-                              _starting_block_for_beos_distribution,
-                              _ending_block_for_beos_distribution,
-                              _distribution_payment_block_interval_for_beos_distribution,
-                              _trustee_reward_beos ],
-                            [ _starting_block_for_ram_distribution,
-                              _starting_block_for_ram_distribution,
-                              _ending_block_for_ram_distribution,
-                              _distribution_payment_block_interval_for_ram_distribution,
-                              _trustee_reward_ram ],
-                            _distrib_ram_leftover
-                        ]
+                        "new_params":_distribution_params
                     }
                 })
 

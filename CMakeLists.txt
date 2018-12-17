@@ -285,72 +285,15 @@ install(FILES libraries/fc/src/network/LICENSE.go DESTINATION ${CMAKE_INSTALL_FU
 include(package)
 include(doxygen)
 
-if ("${PXBTS_ASSET_NAME}" STREQUAL "")
-    set(PXBTS_ASSET_NAME "PXBTS")
-endif()
-
-if ("${PXBTS_ASSET_PRECISION}" STREQUAL "")
-    set(PXBTS_ASSET_PRECISION "4")
-endif()
-
-if ("${PXBRNP_ASSET_NAME}" STREQUAL "")
-    set(PXBRNP_ASSET_NAME "PXBRNP")
-endif()
-
-if ("${PXBRNP_ASSET_PRECISION}" STREQUAL "")
-    set(PXBRNP_ASSET_PRECISION "4")
-endif()
-
-if ("${PXEOS_ASSET_NAME}" STREQUAL "")
-    set(PXEOS_ASSET_NAME "PXEOS")
-endif()
-
-if ("${PXEOS_ASSET_PRECISION}" STREQUAL "")
-    set(PXEOS_ASSET_PRECISION "4")
-endif()
-
 if ("${STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION}" STREQUAL "")
     set(STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION "100")
 endif()
 
-if ("${STARTING_BLOCK_FOR_BEOS_DISTRIBUTION}" STREQUAL "")
-    set(STARTING_BLOCK_FOR_BEOS_DISTRIBUTION "days(7).to_seconds() * 2")
-endif()
-
-if ("${ENDING_BLOCK_FOR_BEOS_DISTRIBUTION}" STREQUAL "")
-    set(ENDING_BLOCK_FOR_BEOS_DISTRIBUTION "days(98).to_seconds() * 2")
-endif()
-
-if ("${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION}" STREQUAL "")
-    set(DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION "hours(1).to_seconds() * 2")
-endif()
-
-if ("${TRUSTEE_REWARD_BEOS}" STREQUAL "")
-    set(TRUSTEE_REWARD_BEOS "0")
-endif()
-
-if ("${STARTING_BLOCK_FOR_RAM_DISTRIBUTION}" STREQUAL "")
-    set(STARTING_BLOCK_FOR_RAM_DISTRIBUTION "days(7).to_seconds() * 2")
-endif()
-
-if ("${ENDING_BLOCK_FOR_RAM_DISTRIBUTION}" STREQUAL "")
-    set(ENDING_BLOCK_FOR_RAM_DISTRIBUTION "days(280).to_seconds() * 2")
-endif()
-
-if ("${DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION}" STREQUAL "")
-    set(DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION "hours(1).to_seconds() * 2")
-endif()
-
-if ("${TRUSTEE_REWARD_RAM}" STREQUAL "")
-    set(TRUSTEE_REWARD_RAM "0")
-endif()
-
-if ("${DISTRIB_RAM_LEFTOVER}" STREQUAL "")
-    set(DISTRIB_RAM_LEFTOVER "0")
+if ("${DISTRIBUTION_PARAMS}" STREQUAL "")
+    message(FATAL_ERROR "missing distribution parameter settings - define DISTRIBUTION_PARAMS json argument for changeparams")
 endif()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/contracts/eosio.init/eosio.init.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/contracts/eosio.init/eosio.init.hpp)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/contracts/eosio.distribution/eosio.distribution.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/contracts/eosio.distribution/eosio.distribution.hpp)
 
 if ("${SIGNATURE_PROVIDER}" STREQUAL "")
     set(SIGNATURE_PROVIDER "${EOSIO_ROOT_KEY}=KEOSD:http://127.0.0.1:8900/v1/wallet/sign_digest")
