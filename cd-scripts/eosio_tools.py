@@ -105,26 +105,31 @@ def wait_for_blocks_produced_from_log_file(block_count, nodeos_log_file_name, ti
         if curr_block_number - last_block_number > block_count:
             return
 
-def get_last_block_number(nodeos_ip, nodeos_port, timeout = 60., use_https = False):
+def get_last_get_info(nodeos_ip, nodeos_port, timeout = 60., use_https = False):
     import requests
     prefix = "http://"
     if use_https:
         prefix = "https://"
-    step = 0.5
+    step = 0.25
     timeout_cnt = 0.
     url = prefix + "{0}:{1}/v1/chain/get_info".format(nodeos_ip, nodeos_port)
     while True:
         try:
             response = requests.get(url)
             if  response.status_code == 200:
-                response_json = response.json()
-                return int(response_json['head_block_num'])
+                return response.json()
         except:
             pass
         time.sleep(step)
         timeout_cnt += step
         if timeout_cnt >= timeout:
             raiseEOSIOException("Timeout during get_last_block_number_rpc")
+
+def get_last_block_number(nodeos_ip, nodeos_port, timeout = 60., use_https = False):
+    return get_last_get_info(nodeos_ip, nodeos_port, timeout, use_https)['head_block_num']
+   
+def get_last_irreversible_block_number(nodeos_ip, nodeos_port, timeout = 60., use_https = False):
+    return get_last_get_info(nodeos_ip, nodeos_port, timeout, use_https)['last_irreversible_block_num']
 
 def wait_for_blocks_produced(block_count, nodeos_ip, nodeos_port, timeout = 60., use_https = False):
     logger.info("Waiting for {0} blocks to be produced...".format(block_count))

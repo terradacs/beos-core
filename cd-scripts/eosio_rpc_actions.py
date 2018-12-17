@@ -51,7 +51,7 @@ def create_wallet():
   for key in config.SYSTEM_ACCOUNT_KEYS:
         import_key(config.MASTER_WALLET_NAME, key)
 
-def create_account(creator, name, owner_key, active_key):
+def create_account(creator, name, owner_key, active_key, blocking = False):
   create_acnt_data = {"newaccount" : {
     "code" : "eosio",
     "action" : "newaccount",
@@ -83,9 +83,9 @@ def create_account(creator, name, owner_key, active_key):
     }
   }}
 
-  push_action(creator, creator, create_acnt_data, "active")
+  push_action(creator, creator, create_acnt_data, "active", blocking)
 
-def push_action(account, actor, action_data, permission):
+def push_action(account, actor, action_data, permission, blocking = False):
   actions = []
   for action, data in action_data.items():
     abi_to_json_bin_resp = EOSIO.chain.abi_json_to_bin(data)
@@ -167,10 +167,34 @@ def push_action(account, actor, action_data, permission):
   logger.info("push_transaction_resp")
   logger.info(push_transaction_resp)
   if "transaction_id" in push_transaction_resp:
-    logger.info("[ACTION][OK] {0} pushed to block {1}".format(actions, push_transaction_resp["processed"]["block_num"]))
+    processed_block_num = push_transaction_resp["processed"]["block_num"]
+    logger.info("[ACTION][OK] {0} pushed to block {1}".format(actions, processed_block_num))
+    if blocking:
+      block_until_transaction_in_irreversible_block(push_transaction_resp['transaction_id'], processed_block_num)
   else:
     logger.error("[ACTION][ERROR] failed to push action {0} to block".format(actions))
 
+def block_until_transaction_in_irreversible_block(transaction_id, block_num, timeout = 60.):
+  logger.info("Block until transaction_id: {0} is in irreversible block {1}".format(transaction_id, block_num))
+  import time
+  step = 0.25
+  timeout_cnt = 0.
+  while True:
+    last_irreversible_block_num = EOSIO.chain.get_info()['last_irreversible_block_num']
+    if last_irreversible_block_num >= block_num:
+      get_block_data = {"block_num_or_id" : block_num}
+      get_block_resp = EOSIO.chain.get_block(get_block_data)
+      logger.info("get_block_resp")
+      logger.info(get_block_resp)
+      return
+    time.sleep(step)
+    timeout_cnt = timeout_cnt + step
+    if timeout_cnt > timeout:
+      msg = "Timeout reached during block_until_transaction_in_irreversible_block"
+      logger.error(msg)
+      raise TimeoutError()
+
+#TODO: Not working atm, cleos is using some sort of custom packing. Without that packing deployment for contracts via RPC will not work
 def set_contract(account, actor, contract_dir_path, permission):
   import os
   norm_dir_path = os.path.normpath(contract_dir_path)
@@ -194,13 +218,12 @@ def set_contract(account, actor, contract_dir_path, permission):
     msg = "WASM file does not exists"
     logger.error(msg)
     raise FileNotFoundError()
-
-  with open(abi_file_name, "r") as abi_file:
-    abi_binary_data = abi_file.read()
   
-  abi_binary_data = abi_binary_data.replace(" ", "")
-  abi_binary_data = abi_binary_data.replace("\n", "")
-  abi_binary_data = abi_binary_data.encode('utf-8')
+  import json
+  import abi_def
+  with open(abi_file_name, "r") as abi_file:
+    abi_json = json.loads(abi_file.read())
+    abi_binary_data = abi_def.Abi(abi_json).pack()
 
   with open(wasm_file_name, "br") as wasm_file:
     wasm_binary_data = wasm_file.read()
