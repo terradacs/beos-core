@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 
 import config
-import eosio_rpc_actions
-import eosio_runner
-import eosio_tools
 import logging
 import sys
 
-MODULE_NAME = "BEOS deploy"
+MODULE_NAME = "EOSIO RPC Actions Test"
 
 logger = logging.getLogger(MODULE_NAME)
 logger.setLevel(config.LOG_LEVEL)
@@ -25,9 +22,9 @@ logger.addHandler(fh)
 
 if __name__ == "__main__":
   try:
-    import config
     import eosio_rpc_actions
     import eosio_runner
+    import eosio_tools
 
     wallet_url = "http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)
     eosio_runner.run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR, False, True)
