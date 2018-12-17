@@ -188,24 +188,18 @@ DISABLE_WASM_TESTS = "true"
 
 ##############      configuration data for contracts/accounts     ###############
 #################################################################################
-PXBTS_ASSET_NAME = "PXBTS"
-PXBTS_ASSET_PRECISION = 4 # 10^4
 # maximum amount that will ever be allowed to be issued (must cover all BTS)
-PXBTS_TOTAL_SUPPLY = "10000000000.0000" # as string to preserve zeros (they establish precision)
+PXBTS_TOTAL_SUPPLY = "10000000000.0000 PXBTS" # as string to preserve zeros (they establish precision)
 
-PXBRNP_ASSET_NAME = "PXBRNP"
-PXBRNP_ASSET_PRECISION = 4 # 10^4
 # maximum amount that will ever be allowed to be issued (must cover all Brownie.PTS)
-PXBRNP_TOTAL_SUPPLY = "10000000000.0000" # as string to preserve zeros (they establish precision)
+PXBRNP_TOTAL_SUPPLY = "10000000000.0000 PXBRNP" # as string to preserve zeros (they establish precision)
 
-PXEOS_ASSET_NAME = "PXEOS"
-PXEOS_ASSET_PRECISION = 4 # 10^4
 # maximum amount that will ever be allowed to be issued (must cover all EOS)
-PXEOS_TOTAL_SUPPLY = "10000000000.0000" # as string to preserve zeros (they establish precision)
+PXEOS_TOTAL_SUPPLY = "10000000000.0000 PXEOS" # as string to preserve zeros (they establish precision)
 
 CORE_SYMBOL_PRECISION = 4 # 10^4
 # maximum amount that will ever be allowed to be issued (includes "perpetual" inflation)
-CORE_TOTAL_SUPPLY = "10000000000.0000" # as string to preserve zeros (they establish precision)
+CORE_TOTAL_SUPPLY = "10000000000.0000 {0}".format(CORE_SYMBOL_NAME) # as string to preserve zeros (they establish precision)
 CORE_INITIAL_SUPPLY = 3674470000 * (10 ** CORE_SYMBOL_PRECISION) # equals total supply of BTS
 MIN_ACTIVATED_STAKE_PERCENT = 15
 
@@ -221,14 +215,25 @@ DISTRIB_RAM_LEFTOVER = 0
 DISTRIB_NETCPU_LEFTOVER = 10000
 
 STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION = 1800 * 2 
-STARTING_BLOCK_FOR_BEOS_DISTRIBUTION = 100 # days(7).to_seconds() * 2
-ENDING_BLOCK_FOR_BEOS_DISTRIBUTION =  24 * 3600 * 2 # days(98).to_seconds() * 2
-DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION = 1 * 600  # hours(1).to_seconds() * 2
-TRUSTEE_REWARD_BEOS = CORE_INITIAL_SUPPLY * 2 // 7 # 2/7 of initial supply
-STARTING_BLOCK_FOR_RAM_DISTRIBUTION = 100  # days(7).to_seconds() * 2
-ENDING_BLOCK_FOR_RAM_DISTRIBUTION = 24 * 3600 * 2 # days(280).to_seconds() * 2
-DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION = 1 * 600  # hours(1).to_seconds() * 2
-TRUSTEE_REWARD_RAM = 0 # no ram for trustee as reward
+
+DISTRIBUTION_PARAMS = {
+  "beos" : {
+    "starting_block" : 100,
+    "next_block" : 0,
+    "ending_block" : 24 * 3600 * 2,
+    "block_interval" : 1 * 600,
+    "trustee_reward" : CORE_INITIAL_SUPPLY * 2 // 7 # 2/7 of initial supply
+  },
+  "ram" : {
+    "starting_block" : 100,
+    "next_block" : 0,
+    "ending_block" : 24 * 3600 * 2,
+    "block_interval" : 1 * 600,
+    "trustee_reward" : 0 # no ram for trustee as reward
+  },
+  "proxy_assets" : [ "0.0000 PXBTS", "0.0000 PXBRNP" ],
+  "ram_leftover" : DISTRIB_RAM_LEFTOVER,
+}
 
 ### init loggers
 global log_main

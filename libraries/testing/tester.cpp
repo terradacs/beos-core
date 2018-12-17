@@ -610,34 +610,12 @@ namespace eosio { namespace testing {
 
       produce_block();
 
-      test_global_state tgs;
-
-      //with such params distribution will be disabled, since these blocks are in the past
-      tgs.ram.starting_block = 1;
-      tgs.ram.ending_block = 2;
-      tgs.starting_block_for_initial_witness_election = 1;
-      tgs.beos.starting_block = 1;
-      tgs.beos.ending_block = 2;
-      tgs.ram_leftover = 0;
-
-      produce_block();
-
       variants v;
+      test_global_state tgs;
       v.emplace_back(tgs.starting_block_for_initial_witness_election);
 
       push_action(N(beos.init), N(changeparams),
          N(beos.init), mutable_variant_object()
-         ("new_params", v)
-      );
-
-      v.clear();
-      v.emplace_back(std::move(tgs.beos));
-      v.emplace_back(std::move(tgs.ram));
-      v.emplace_back(std::move(tgs.proxy_assets));
-      v.emplace_back(std::move(tgs.ram_leftover));
-
-      push_action(N(beos.distrib), N(changeparams),
-         N(beos.distrib), mutable_variant_object()
          ("new_params", v)
       );
 

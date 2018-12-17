@@ -289,22 +289,8 @@ def build_eosio(c_compiler, cxx_compiler):
         "-DEOSIO_ROOT_KEY={0}".format(config.EOSIO_PUBLIC_KEY),
         "-DGATEWAY_ROOT_KEY={0}".format(config.BEOS_GATEWAY_PUBLIC_KEY),
         "-DDISTRIBUTION_ROOT_KEY={0}".format(config.BEOS_DISTRIB_PUBLIC_KEY),
-        "-DPXBTS_ASSET_PRECISION={0}".format(config.PXBTS_ASSET_PRECISION),
-        "-DPXBTS_ASSET_NAME={0}".format(config.PXBTS_ASSET_NAME),
-        "-DPXBRNP_ASSET_PRECISION={0}".format(config.PXBRNP_ASSET_PRECISION),
-        "-DPXBRNP_ASSET_NAME={0}".format(config.PXBRNP_ASSET_NAME),
-        "-DPXEOS_ASSET_PRECISION={0}".format(config.PXEOS_ASSET_PRECISION),
-        "-DPXEOS_ASSET_NAME={0}".format(config.PXEOS_ASSET_NAME),
         "-DSTARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION={0}".format(config.STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION),
-        "-DSTARTING_BLOCK_FOR_BEOS_DISTRIBUTION={0}".format(config.STARTING_BLOCK_FOR_BEOS_DISTRIBUTION),
-        "-DENDING_BLOCK_FOR_BEOS_DISTRIBUTION={0}".format(config.ENDING_BLOCK_FOR_BEOS_DISTRIBUTION),
-        "-DDISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION={0}".format(config.DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_BEOS_DISTRIBUTION),
-        "-DTRUSTEE_REWARD_BEOS={0}".format(config.TRUSTEE_REWARD_BEOS),
-        "-DSTARTING_BLOCK_FOR_RAM_DISTRIBUTION={0}".format(config.STARTING_BLOCK_FOR_RAM_DISTRIBUTION),
-        "-DENDING_BLOCK_FOR_RAM_DISTRIBUTION={0}".format(config.ENDING_BLOCK_FOR_RAM_DISTRIBUTION),
-        "-DDISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION={0}".format(config.DISTRIBUTION_PAYMENT_BLOCK_INTERVAL_FOR_RAM_DISTRIBUTION),
-        "-DTRUSTEE_REWARD_RAM={0}".format(config.TRUSTEE_REWARD_RAM),
-        "-DDISTRIB_RAM_LEFTOVER={0}".format(config.DISTRIB_RAM_LEFTOVER),
+        "-DDISTRIBUTION_PARAMS={0}".format(config.DISTRIBUTION_PARAMS),
         "-DNODEOS_HTTP_SERVER_PORT={0}".format("{0}:{1}".format(config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)),
         "-DSIGNATURE_PROVIDER={0}".format("{0}=KEOSD:http://{1}:{2}/v1/wallet/sign_digest".format(config.EOSIO_PUBLIC_KEY, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)),
         "-DDISABLE_FAILING_TESTS={0}".format(config.DISABLE_FAILING_TESTS),
@@ -394,10 +380,10 @@ def initialize_beos():
 
         eosio.set_contract("eosio.token", config.CONTRACTS_DIR + "/eosio.token", "eosio.token")
 
-        eosio.push_action("eosio.token", "create", '[ "eosio", "{0} {1}"]'.format(config.CORE_TOTAL_SUPPLY, config.CORE_SYMBOL_NAME), "eosio.token")
-        eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PXBTS_TOTAL_SUPPLY, config.PXBTS_ASSET_NAME), "eosio.token")
-        eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PXBRNP_TOTAL_SUPPLY, config.PXBRNP_ASSET_NAME), "eosio.token")
-        eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0} {1}"]'.format(config.PXEOS_TOTAL_SUPPLY, config.PXEOS_ASSET_NAME), "eosio.token")
+        eosio.push_action("eosio.token", "create", '[ "eosio", "{0}"]'.format(config.CORE_TOTAL_SUPPLY), "eosio.token")
+        eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0}"]'.format(config.PXBTS_TOTAL_SUPPLY), "eosio.token")
+        eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0}"]'.format(config.PXBRNP_TOTAL_SUPPLY), "eosio.token")
+        eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0}"]'.format(config.PXEOS_TOTAL_SUPPLY), "eosio.token")
 
         # registering initial producers, regproducer is in eosio.system contract so it need to be loaded first
         eosio.set_contract("eosio", config.CONTRACTS_DIR + "eosio.system", "eosio")
@@ -422,6 +408,9 @@ def initialize_beos():
         eosio.push_action("eosio", "initresource", '[ "beos.distrib", "-1", "{0}", "{1}"]'.format(balance_int, config.DISTRIB_NETCPU_LEFTOVER), "eosio")
         # eosio.get_account("eosio")
         # eosio.get_account("beos.distrib")
+        eosio.push_action("beos.init", "storeparams", '[0]', "beos.init")
+        import json
+        eosio.push_action("beos.distrib", "changeparams", '{{"new_params": {0}}}'.format(json.dumps(config.DISTRIBUTION_PARAMS)), "beos.distrib")
 
         producers = []
 
@@ -436,16 +425,12 @@ def initialize_beos():
 
         for producer, data in config.PRODUCERS_ARRAY.items():
             producers.append({"producer_name": producer, "block_signing_key": data["pub_active"]})
-        import json
         args = {"schedule" : producers}
         # set initial producers, setprods is in eosio.bios contract so we need to load it first
         logger.info("Setting initial producers via setprods: '{0}'".format(json.dumps(args)))
         eosio.push_action("eosio", "defineprods", '{0}'.format(json.dumps(args)), "eosio")
 
         eosio.create_account("beos.gateway", "beos.trustee", config.TRUSTEE_OWNER_PUBLIC_KEY, config.TRUSTEE_ACTIVE_PUBLIC_KEY, True)
-
-        eosio.push_action("beos.init", "storeparams", '[0]', "beos.init")
-        eosio.push_action("beos.distrib", "storeparams", '[0]', "beos.distrib")
 
         eosio.terminate_running_tasks(nodeos, keosd)
         eosio.show_keosd_postconf(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)

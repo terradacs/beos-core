@@ -83,6 +83,55 @@ void distribution::calculate_current_reward( uint64_t* to_distribute, uint64_t* 
    *to_distribute_trustee /= remaining_distribution_steps;
 }
 
+void distribution::check( const distribution_parameters& state, uint32_t current_block ) {
+   //distribution must be wholly in the future or in the past (to effectively disable it)
+   eosio_assert( state.starting_block > current_block || state.ending_block < current_block,
+      "Starting block already passed" );
+   eosio_assert( state.ending_block >= state.starting_block, "Distribution period must not be empty" );
+   eosio_assert( state.block_interval > 0, "Distribution block interval must be positive value" );
+   }
+
+void distribution::check_and_calculate_parameters(distrib_global_state* state) {
+   state->beos.next_block = state->beos.starting_block;
+   state->ram.next_block = state->ram.starting_block;
+
+   uint32_t block_no = get_blockchain_block_number();
+   check( state->beos, block_no );
+   check( state->ram, block_no );
+   
+   if (state->ram_leftover > 0) {
+      int64_t distrib_ram_bytes, distrib_net_weight, distrib_cpu_weight;
+      get_resource_limits( _self, &distrib_ram_bytes, &distrib_net_weight, &distrib_cpu_weight );
+      eosio_assert( static_cast<uint64_t>(distrib_ram_bytes) > state->ram_leftover, "Cannot request to leave more than allocated ram" );
+   }
+
+   if (state->proxy_assets.empty())
+      return;
+
+   bool calculate_weights = state->proxy_assets.front().amount == 0;
+   auto precision_depth = state->proxy_assets.front().symbol.precision();
+   for (auto& proxy : state->proxy_assets) {
+      eosio_assert( eosio::token( N(eosio.token) ).get_issuer(proxy.symbol.name()) == N(beos.gateway), "Proxy assets must be created with beos.gateway as issuer" );
+      eosio_assert( calculate_weights == (proxy.amount == 0) , "All assets need positive weight or all must be 0" );
+      if (calculate_weights) {
+         auto precision = proxy.symbol.precision();
+         if (precision > precision_depth)
+            precision_depth = precision;
+      } else {
+         eosio_assert( proxy.amount > 0, "Asset weight cannot be negative" );
+      }
+   }
+   
+   if (calculate_weights) {
+      for (auto& proxy : state->proxy_assets) {
+         proxy.amount = 1;
+         int difference = static_cast<int>( precision_depth - proxy.symbol.precision() );
+         for (int i = 0; i < difference; ++i)
+            proxy.amount *= 10;
+      }
+   }
+}
+
 void distribution::changeparams( distrib_global_state new_params ) {
    require_auth( _self );
 
