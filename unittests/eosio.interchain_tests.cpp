@@ -943,6 +943,58 @@ BOOST_FIXTURE_TEST_CASE( basic_param_test3, eosio_init_tester ) try {
   */
 } FC_LOG_AND_RETHROW()
 
+BOOST_FIXTURE_TEST_CASE( many_producers_test, eosio_init_tester ) try {
+  BOOST_TEST_MESSAGE( "Creating many producers");
+
+  test_global_state tgs;
+
+  tgs.beos.starting_block = 5000;
+  tgs.beos.ending_block = 6000;
+  tgs.beos.block_interval = 1000;
+
+  tgs.ram.starting_block = 300000;
+  tgs.ram.ending_block = 300000;
+  tgs.ram.block_interval = 300000;
+
+  check_change_params( tgs );
+
+  const uint32_t nr_accounts = 500;
+
+  const auto& StN = eosio::chain::string_to_name;
+  using Accounts = std::vector<std::string>;
+  Accounts accounts;
+
+  for( uint32_t i = 0; i < nr_accounts; ++i )
+  {
+    std::string str_name = std::to_string( i );
+    std::string res = "x";
+    for( auto c : str_name )
+      res += char( c - 48/*'0'*/ + 97/*'a'*/ );
+
+    accounts.emplace_back( res );
+  }
+
+  for( auto account : accounts )
+  {
+    create_account_with_resources( config::gateway_account_name, StN( account.c_str() ) );
+    BOOST_REQUIRE_EQUAL( success(), issue( StN( account.c_str() ), asset::from_string("5.0000 PROXY") ) );
+  }
+
+  produce_blocks( tgs.beos.starting_block - control->head_block_num() );
+
+  for( auto account : accounts )
+    CHECK_STATS_( StN( account.c_str() ), "5.0000 PROXY", "200000.0000 BEOS", "0");
+
+  for( auto account : accounts )
+    BOOST_REQUIRE_EQUAL( success(), create_producer( StN( account.c_str() ) ) );
+
+  produce_blocks( tgs.beos.ending_block - control->head_block_num() );
+
+  for( auto account : accounts )
+    CHECK_STATS_( StN( account.c_str() ), "5.0000 PROXY", "400000.0000 BEOS", "0");
+
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( rewarding2, eosio_init_tester ) try {
 
   test_global_state tgs;

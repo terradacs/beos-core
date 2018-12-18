@@ -116,8 +116,9 @@ void apply_context::exec_one( action_trace& trace )
          }
       } FC_RETHROW_EXCEPTIONS( warn, "pending console output: ${console}", ("console", _pending_console_output.str()) )
    } catch( fc::exception& e ) {
-      DBG("apply_context::exec_one exception: receiver: %s, action.account: %s, action.name: %s",
-         receiver.to_string().c_str(), act.account.to_string().c_str(), act.name.to_string().c_str());
+      DBG("apply_context::exec_one exception: receiver: %s, action.account: %s, action.name: %s, name: %s, what: %s",
+         receiver.to_string().c_str(), act.account.to_string().c_str(), act.name.to_string().c_str(),
+         e.name(), e.what() );
       trace.receipt = r; // fill with known data
       trace.except = e;
       finalize_trace( trace, start );

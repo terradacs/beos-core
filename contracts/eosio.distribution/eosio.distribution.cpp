@@ -6,6 +6,30 @@
 
 namespace eosio {
 
+void update_producers( const std::vector<block_producer_voting_info>& producer_infos )
+{
+   auto begin = producer_infos.begin();
+
+   const int MAX_LENGTH = 200;//because 200 * sizeof( block_producer_voting_info ) < "inline_action_too_big( 4096 bytes )"
+   auto size = producer_infos.size();
+   int cnt = 0;
+
+   while( cnt + MAX_LENGTH < size )
+   {
+      std::vector<block_producer_voting_info> smaller_vect;
+      smaller_vect.assign( begin + cnt, begin + cnt + MAX_LENGTH );
+      INLINE_ACTION_SENDER(eosiosystem::system_contract, updateprods)( N(eosio), {N(eosio),N(active)},{ smaller_vect } );
+      cnt += MAX_LENGTH;
+   }
+
+   if( size - cnt > 0 )
+   {
+      std::vector<block_producer_voting_info> smaller_vect;
+      smaller_vect.assign( begin + cnt, producer_infos.end() );
+      INLINE_ACTION_SENDER(eosiosystem::system_contract, updateprods)( N(eosio), {N(eosio),N(active)},{ smaller_vect } );
+   }
+}
+
 //This method is triggered every block.
 void distribution::onblock( uint32_t block_nr ) {
    bool distribute_beos = false, distribute_beos_late = false, distribute_ram = false, distribute_ram_late = false;
@@ -83,13 +107,13 @@ void distribution::onblock( uint32_t block_nr ) {
 
    // execute actual distribution
    eosiosystem::immutable_system_contract sc(N(eosio));
-   eosiosystem::eosio_voting_data vud = sc.prepare_data_for_voting_update();
+   std::vector<block_producer_voting_info> producer_infos = sc.prepare_data_for_voting_update();
    eosio::print("Distributing @block ", block_nr, " bandwidth ", beos_to_distribute, " (", beos_to_distribute_trustee,
       "), ram ", ram_to_distribute, " (", ram_to_distribute_trustee, ")\n");
    reward_all( beos_to_distribute, beos_to_distribute_trustee, ram_to_distribute, ram_to_distribute_trustee,
-      _gstate.proxy_assets.data(), _gstate.proxy_assets.size(), vud.producer_infos.data(), vud.producer_infos.size() );
+      _gstate.proxy_assets.data(), _gstate.proxy_assets.size(), producer_infos.data(), producer_infos.size() );
 
-   INLINE_ACTION_SENDER(eosiosystem::system_contract, updateprods)( N(eosio), {N(eosio),N(active)},{ vud } );
+   update_producers( producer_infos );
 
    // reduce total trustee reward by values rewarded above
    _gstate.beos.trustee_reward -= beos_to_distribute_trustee;

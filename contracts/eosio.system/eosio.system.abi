@@ -33,12 +33,6 @@
           {"name":"is_active", "type":"bool"}
        ]
     },{
-       "name": "eosio_voting_data",
-       "base": "",
-       "fields": [
-          {"name":"producer_infos", "type":"block_producer_voting_info[]"}
-       ]
-    },{
       "name": "initresource",
       "base": "",
       "fields": [
@@ -344,7 +338,7 @@
       "name": "updateprods",
       "base": "",
       "fields": [
-        {"name":"voting_data",     "type":"eosio_voting_data"}
+        {"name":"producer_infos",     "type":"block_producer_voting_info[]"}
       ]
     },{
       "name": "voter_info",
