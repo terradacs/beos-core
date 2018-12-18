@@ -556,8 +556,25 @@ namespace eosio { namespace testing {
         }
      };
 
+   struct test_gateway_proxy_asset
+   {
+      asset proxy_asset;
+      std::string description;
+      
+      test_gateway_proxy_asset( const asset& _asset = asset(), std::string _description = "" )
+      : proxy_asset( _asset ), description( _description )
+      {
+
+      }
+   };
+   struct test_gateway_global_state
+   {
+      std::vector< test_gateway_proxy_asset > proxy_assets;
+   };
+
 } } /// eosio::testing
 
 FC_REFLECT(eosio::testing::test_global_state_element, (starting_block)(next_block)(ending_block)(block_interval)(trustee_reward))
 FC_REFLECT(eosio::testing::test_global_state, (starting_block_for_initial_witness_election)(beos)(ram)(proxy_assets)(ram_leftover))
-
+FC_REFLECT(eosio::testing::test_gateway_proxy_asset, (proxy_asset)(description))
+FC_REFLECT(eosio::testing::test_gateway_global_state, (proxy_assets))

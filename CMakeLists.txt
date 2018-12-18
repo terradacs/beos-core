@@ -293,6 +293,10 @@ if ("${DISTRIBUTION_PARAMS}" STREQUAL "")
     message(FATAL_ERROR "missing distribution parameter settings - define DISTRIBUTION_PARAMS json argument for changeparams")
 endif()
 
+if ("${GATEWAY_PARAMS}" STREQUAL "")
+    message(FATAL_ERROR "missing gateway parameter settings - define GATEWAY_PARAMS json argument for changeparams")
+endif()
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/contracts/eosio.init/eosio.init.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/contracts/eosio.init/eosio.init.hpp)
 
 if ("${SIGNATURE_PROVIDER}" STREQUAL "")

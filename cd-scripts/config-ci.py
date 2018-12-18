@@ -235,6 +235,24 @@ DISTRIBUTION_PARAMS = {
   "ram_leftover" : DISTRIB_RAM_LEFTOVER,
 }
 
+GATEWAY_PARAMS = {
+  "proxy_assets" :
+  [
+     {
+        "proxy_asset" : "0.0000 PXBTS",
+        "description" : "bts"
+     },
+     {
+        "proxy_asset" : "0.0000 PXBRNP",
+        "description" : "brownie.pts"
+     },
+     {
+        "proxy_asset" : "0.0000 PXEOS",
+        "description" : "eos"
+     }
+  ]
+}
+
 ### init loggers
 global log_main
 log_main = open(MAIN_LOG_PATH, "a+")
