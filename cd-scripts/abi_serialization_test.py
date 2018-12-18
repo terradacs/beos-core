@@ -22,7 +22,9 @@ if __name__ == "__main__":
       print("ABI file as dict:")
       print(abi_def_ob.to_dict())
       print("ABI file serialized:")
-      print(abi_def_ob.pack().hex())
+      packed = abi_def_ob.pack()
+      print(packed)
+      print(packed.hex())
   except Exception as ex:
     print("Exception during test: {0}".format(ex))
     sys.exit(1)
