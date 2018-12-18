@@ -351,7 +351,6 @@ def initialize_beos():
 
         eosio_actions.create_account("eosio", "eosio.token", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
         eosio_actions.create_account("eosio", "beos.init", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY)
-        eosio_actions.create_account("eosio", "beos.trustee", config.TRUSTEE_OWNER_PUBLIC_KEY, config.TRUSTEE_ACTIVE_PUBLIC_KEY)
 
         eosio_actions.create_account("eosio", "producerjson", config.PRODUCERJSON_OWNER_PUBLIC_KEY, config.PRODUCERJSON_ACTIVE_PUBLIC_KEY)
         eosio_actions.create_account("eosio", "regproxyinfo", config.REGPROXYINFO_OWNER_PUBLIC_KEY, config.REGPROXYINFO_ACTIVE_PUBLIC_KEY)
@@ -370,11 +369,11 @@ def initialize_beos():
 
         # registering initial producers, regproducer is in eosio.system contract so it need to be loaded first
         eosio_actions.set_contract("eosio", config.CONTRACTS_DIR + "eosio.system", "eosio")
-        time.sleep(2)
+        eosio_tools.wait_for_blocks_produced(5, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
         eosio_actions.set_contract("beos.init", config.CONTRACTS_DIR + "eosio.init", "beos.init")
         eosio_actions.set_contract("beos.gateway", config.CONTRACTS_DIR + "eosio.gateway", "beos.gateway")
         eosio_actions.set_contract("beos.distrib", config.CONTRACTS_DIR + "eosio.distribution", "beos.distrib")
-        time.sleep(2)
+        eosio_tools.wait_for_blocks_produced(5, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
         eosio_actions.set_contract("producerjson", config.CONTRACTS_DIR + "producerjson", "producerjson")
         eosio_actions.set_contract("regproxyinfo", config.CONTRACTS_DIR + "proxyinfo", "regproxyinfo")
 
