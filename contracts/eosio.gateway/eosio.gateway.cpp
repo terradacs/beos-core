@@ -11,6 +11,21 @@
 
 namespace eosio {
 
+std::string gateway::get_description( const asset& proxy_asset )
+{
+   auto cmp = [ & ]( const gateway_proxy_asset& obj )
+   {
+      return obj.proxy_asset.symbol == proxy_asset.symbol;
+   };
+
+   auto found = std::find_if( _gstate.proxy_assets.begin(), _gstate.proxy_assets.end(), cmp );
+
+   if( found == _gstate.proxy_assets.end() )
+      return "";
+   else
+      return found->description;
+}
+
 void gateway::issue( account_name to, asset quantity, std::string memo)
 {
   auto from = N(beos.gateway);
@@ -71,7 +86,7 @@ void gateway::withdraw( account_name from, std::string bts_to, asset quantity )
   auto balance = eosio::token( N(eosio.token) ).check_balance( from, quantity.symbol );
   eosio_assert( balance >= quantity, "overdrawn balance during withdraw" );
 
-  std::string new_memo = "bts";
+  std::string new_memo = get_description( quantity );
   new_memo += ":" + bts_to;
 
   INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {from,N(active)},
@@ -87,6 +102,14 @@ void gateway::checker( account_name any_account, asset value )
   eosio_assert( value.symbol == token_supply.symbol, "symbol precision mismatch" );
 }
 
+void gateway::changeparams( gateway_global_state new_params )
+{
+   require_auth( _self );
+
+   _gstate = new_params;
+   _global.set( _gstate, _self );
+}
+
 } /// namespace eosio
 
-EOSIO_ABI( eosio::gateway, (issue)(withdraw) )
+EOSIO_ABI( eosio::gateway, (issue)(withdraw)(changeparams) )

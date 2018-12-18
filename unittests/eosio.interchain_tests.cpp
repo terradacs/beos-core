@@ -373,10 +373,25 @@ class eosio_interchain_tester : public actions
        ("new_params", v), beos_distrib_abi_ser, N(beos.distrib) );
   }
 
+  action_result change_gateway_params()
+  {
+    test_gateway_global_state tgs;
+
+    tgs.proxy_assets.emplace_back( asset( 0, symbol(SY(6, PROXY)) ), "bts" );
+    tgs.proxy_assets.emplace_back( asset( 0, symbol(SY(6, BROWNIE)) ), "brownie.pts" );
+    tgs.proxy_assets.emplace_back( asset( 0, symbol(SY(6, PXEOS)) ), "eos" );
+
+    variants v;
+    v.emplace_back( std::move( tgs.proxy_assets ) );
+    return push_action( N(beos.gateway), N(changeparams), mvo()
+       ("new_params", v), beos_gateway_abi_ser, N(beos.gateway) );
+  }
+
   void check_change_params( const test_global_state& tgs )
   {
      BOOST_REQUIRE_EQUAL( success(), change_init_params( tgs ) );
      BOOST_REQUIRE_EQUAL( success(), change_distrib_params( tgs ) );
+     BOOST_REQUIRE_EQUAL( success(), change_gateway_params() );
   }
 
 fc::variant get_init_param()

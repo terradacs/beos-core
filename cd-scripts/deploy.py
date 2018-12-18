@@ -291,6 +291,7 @@ def build_eosio(c_compiler, cxx_compiler):
         "-DDISTRIBUTION_ROOT_KEY={0}".format(config.BEOS_DISTRIB_PUBLIC_KEY),
         "-DSTARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION={0}".format(config.STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION),
         "-DDISTRIBUTION_PARAMS={0}".format(config.DISTRIBUTION_PARAMS),
+        "-DGATEWAY_PARAMS={0}".format(config.GATEWAY_PARAMS),
         "-DNODEOS_HTTP_SERVER_PORT={0}".format("{0}:{1}".format(config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)),
         "-DSIGNATURE_PROVIDER={0}".format("{0}=KEOSD:http://{1}:{2}/v1/wallet/sign_digest".format(config.EOSIO_PUBLIC_KEY, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)),
         "-DDISABLE_FAILING_TESTS={0}".format(config.DISABLE_FAILING_TESTS),
@@ -411,6 +412,7 @@ def initialize_beos():
         eosio.push_action("beos.init", "storeparams", '[0]', "beos.init")
         import json
         eosio.push_action("beos.distrib", "changeparams", '{{"new_params": {0}}}'.format(json.dumps(config.DISTRIBUTION_PARAMS)), "beos.distrib")
+        eosio.push_action("beos.gateway", "changeparams", '{{"new_params": {0}}}'.format(json.dumps(config.GATEWAY_PARAMS)), "beos.gateway")
 
         producers = []
 

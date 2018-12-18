@@ -3,6 +3,25 @@
   "version": "eosio::abi/1.0",
   "types": [],
   "structs": [{
+      "name": "gateway_proxy_asset",
+      "base": "",
+      "fields": [
+        {"name":"proxy_asset",         "type":"asset"},
+        {"name":"description",         "type":"string"}
+      ]
+    },{
+      "name": "gateway_global_state",
+      "base": "",
+      "fields": [
+        {"name":"proxy_assets",         "type":"gateway_proxy_asset[]"}
+      ]
+    },{
+      "name": "changeparams",
+      "base": "",
+      "fields": [
+        {"name":"new_params", "type":"gateway_global_state"}
+      ]
+    },{
       "name": "issue",
       "base": "",
     "fields": [
@@ -42,6 +61,10 @@
     },{
       "name": "withdraw",
       "type": "withdraw",
+      "ricardian_contract": ""
+    },{
+      "name": "changeparams",
+      "type": "changeparams",
       "ricardian_contract": ""
     }
   ],

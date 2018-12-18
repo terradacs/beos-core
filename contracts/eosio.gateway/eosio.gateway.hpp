@@ -14,13 +14,45 @@ namespace eosio {
 
   using std::string;
 
+   struct gateway_proxy_asset
+   {
+      asset proxy_asset;
+      std::string description;
+
+      EOSLIB_SERIALIZE( gateway_proxy_asset, (proxy_asset)(description) )
+   };
+   struct gateway_global_state
+   {
+      std::vector< gateway_proxy_asset > proxy_assets;
+
+      EOSLIB_SERIALIZE( gateway_global_state, (proxy_assets) )
+   };
+
+   typedef eosio::singleton<N(gatewaystate), gateway_global_state> gateway_global_state_singleton;
+
   class gateway : public contract {
+    private:
+
+      gateway_global_state            _gstate;
+      gateway_global_state_singleton  _global;
+
+      gateway_global_state get_default_parameters()
+      {
+         return gateway_global_state();
+      }
+
+      std::string get_description( const asset& proxy_asset );
+
     public:
 
       gateway( account_name self )
-                : contract( self )
+                : contract( self ),
+                  _global( _self, _self )
       {
+         _gstate = _global.exists() ? _global.get() : get_default_parameters();
       }
+
+      void changeparams( gateway_global_state new_params );
 
       /**
       * Triggered by user. This action is executed
