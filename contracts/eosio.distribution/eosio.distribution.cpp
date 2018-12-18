@@ -8,10 +8,45 @@ namespace eosio {
 
 //This method is triggered every block.
 void distribution::onblock( uint32_t block_nr ) {
-   bool distribute_beos = block_nr == _gstate.beos.next_block;
-   bool distribute_ram = block_nr == _gstate.ram.next_block;
-   if ( !(distribute_beos|distribute_ram) )
+   bool distribute_beos = false, distribute_beos_late = false, distribute_ram = false, distribute_ram_late = false;
+   if ( !is_past_beos_distribution_period(block_nr) ) {
+      distribute_beos = block_nr == _gstate.beos.next_block;
+      distribute_beos_late = block_nr > _gstate.beos.next_block;
+      if ( distribute_beos_late ) {
+         // last scheduled beos distribution block failed
+         // reschedule to next block or try now if next block would be past end of distribution
+         _gstate.beos.next_block += _gstate.beos.block_interval;
+         if ( is_past_beos_distribution_period(_gstate.beos.next_block) || _gstate.beos.next_block == block_nr) {
+            _gstate.beos.next_block = block_nr;
+            eosio::print("Last bandwidth distribution transaction failed. Retrying now.\n");
+            distribute_beos = true;
+         } else {
+            eosio::print("Last bandwidth distribution transaction failed. Setting retry @block ", _gstate.beos.next_block, "\n");
+         }
+      }
+   }
+   if ( !is_past_ram_distribution_period(block_nr) ) {
+      distribute_ram = block_nr == _gstate.ram.next_block;
+      distribute_ram_late = block_nr > _gstate.ram.next_block;
+      if ( distribute_ram_late ) {
+         // last scheduled ram distribution block failed
+         // reschedule to next block or try now if next block would be past end of distribution
+         _gstate.ram.next_block += _gstate.ram.block_interval;
+         if ( is_past_ram_distribution_period(_gstate.ram.next_block || _gstate.ram.next_block == block_nr) ) {
+            _gstate.ram.next_block = block_nr;
+            eosio::print("Last ram distribution transaction failed. Retrying now.\n");
+            distribute_ram = true;
+         } else {
+            eosio::print("Last ram distribution transaction failed. Setting retry @block ", _gstate.ram.next_block, "\n");
+         }
+      }
+   }
+
+   if ( !(distribute_beos|distribute_ram) ) {
+      if (distribute_beos_late|distribute_ram_late)
+         _global.set( _gstate, _self );
       return;
+   }
 
    int64_t distrib_ram_bytes=0, distrib_net_weight=0, distrib_cpu_weight=0;
    get_resource_limits( _self, &distrib_ram_bytes, &distrib_net_weight, &distrib_cpu_weight );
@@ -24,10 +59,8 @@ void distribution::onblock( uint32_t block_nr ) {
    uint64_t ram_to_distribute_trustee = 0;
 
    if ( distribute_beos ) {
-      // set next beos distribution block (leave on current if this one is last)
+      // set next beos distribution block
       _gstate.beos.next_block += _gstate.beos.block_interval;
-      if ( !is_within_beos_distribution_period(_gstate.beos.next_block) )
-         _gstate.beos.next_block = block_nr;
       // calculate value of user/trustee beos rewards for current distribution
       beos_to_distribute = static_cast<uint64_t>(distrib_net_weight); //beos.distrib holds all rewards on net weight
         //ABW: for perfect safety we should actually subtract all resources beos.distrib might currently have
@@ -38,10 +71,8 @@ void distribution::onblock( uint32_t block_nr ) {
       calculate_current_reward( &beos_to_distribute, &beos_to_distribute_trustee, block_nr, _gstate.beos );
    }
    if ( distribute_ram ) {
-      // set next ram distribution block (leave on current if this one is last)
+      // set next ram distribution block
       _gstate.ram.next_block += _gstate.ram.block_interval;
-      if ( !is_within_ram_distribution_period(_gstate.ram.next_block) )
-         _gstate.ram.next_block = block_nr;
       // calculate value of user/trustee ram rewards for current distribution
       uint64_t used_ram = static_cast<uint64_t>(get_account_ram_usage(_self));
       if (used_ram < _gstate.ram_leftover)
@@ -68,7 +99,7 @@ void distribution::onblock( uint32_t block_nr ) {
    _global.set( _gstate, _self );
 
    // finish distribution if this was last block
-   if ( _gstate.beos.next_block <= block_nr && _gstate.ram.next_block <= block_nr )
+   if ( is_past_beos_distribution_period(_gstate.beos.next_block) && is_past_ram_distribution_period(_gstate.ram.next_block) )
       reward_done();
 }
 
