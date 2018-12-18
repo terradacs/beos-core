@@ -1,4 +1,3 @@
-import struct
 import logging
 import sys
 
@@ -10,10 +9,20 @@ ch.setLevel(logging.DEBUG)
 logger.addHandler(ch)
 
 def pack_string(string):
-  return struct.pack('I{0}s'.format(len(string)), len(string), string.encode('utf-8'))
+  packed = pack_int(len(string)) + string.encode('utf-8')
+  return packed
 
 def pack_int(integer):
-  return struct.pack('I', integer)
+  val = integer
+  ret = []
+  while True:
+    b = val & 0x7f
+    val = val >> 7
+    b = b | ((val > 0) << 7)
+    ret.append(b)
+    if val == 0:
+      break
+  return bytes(ret)
 
 class Abi_Type(object):
   def __init__(self, type_name, new_type):
@@ -125,7 +134,13 @@ class Abi(object):
     self.tables = []
     if "tables" in abi_as_json:
       for table in abi_as_json["tables"]:
-        self.tables.append(Abi_Table(table["name"], table["index_type"], table["key_names"], table["key_types"], table["type"]))
+        key_names = []
+        for key_name in table["key_names"]:
+          key_names.append(key_name)
+        key_types = []
+        for key_type in table["key_types"]:
+          key_types.append(key_type)
+        self.tables.append(Abi_Table(table["name"], table["index_type"], key_names, key_types, table["type"]))
     # parsing ABI ricardian clauses
     self.ricardian_clauses = []
     if "ricardian_clauses" in abi_as_json:
