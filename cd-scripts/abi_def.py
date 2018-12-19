@@ -9,7 +9,7 @@ ch.setLevel(logging.DEBUG)
 logger.addHandler(ch)
 
 def pack_string(string):
-  packed = pack_int(len(string)) + string.encode('utf-8')
+  packed = pack_int(len(string)) + string.encode('ascii')
   return packed
 
 def pack_int(integer):
