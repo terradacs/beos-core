@@ -1,5 +1,19 @@
 import requests
 import json
+import logging
+import sys
+
+MODULE_NAME = "EOSIO RPC Client Py"
+LOG_FORMAT = '%(asctime)-15s - %(name)s - %(levelname)s - %(message)s'
+
+logger = logging.getLogger(MODULE_NAME)
+logger.setLevel(logging.INFO)
+
+ch = logging.StreamHandler(sys.stdout)
+ch.setLevel(logging.INFO)
+ch.setFormatter(logging.Formatter(LOG_FORMAT))
+
+logger.addHandler(ch)
 
 NODEOS_API_LIST = [
   "chain",
@@ -26,7 +40,7 @@ class EosioInterface(object):
     self.use_https = use_https
   
   def request(self, api, method, method_args = None):
-    print("API: {0}, Method: {1}, Args: {2}".format(api, method, method_args))
+    logger.debug("API: {0}, Method: {1}, Args: {2}".format(api, method, method_args))
     url = None
     if api in NODEOS_API_LIST:
       url = self.nodeos_url
@@ -34,13 +48,13 @@ class EosioInterface(object):
       url = self.keosd_url
 
     url = url + api + "/" + method
-    print("Composed url: {0}".format(url))
+    logger.debug("Composed url: {0}".format(url))
 
     try:
       response = requests.request("POST", url, json = method_args)
       return response.json()
     except Exception as ex:
-      print("Exception during processing request: {0}".format(ex))
+      logger.error("Exception during processing request: {0}".format(ex))
       return None
 
   def __getattr__(self, name):
