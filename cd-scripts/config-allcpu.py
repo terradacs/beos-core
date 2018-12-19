@@ -4,10 +4,10 @@ LOG_FORMAT = '%(asctime)-15s - %(name)s - %(levelname)s - %(message)s'
 from logging import INFO, DEBUG, ERROR, WARNING, CRITICAL
 LOG_LEVEL = INFO
 
-# directory where all sources will be downloaded
-SOURCES_DOWNLOAD_DIR = os.environ["HOME"] + "/ci/beos-core" + os.environ["CI_COMMIT_REF_NAME"] + "/sources"
 # beos main directory
-BEOS_DIR = os.environ["HOME"] + "/ci/beos-core/" + os.environ["CI_COMMIT_REF_NAME"]
+BEOS_DIR = os.environ["HOME"] + "/ci/beos-core/" + os.environ["CI_ENVIRONMENT_SLUG"] + os.environ["CI_COMMIT_REF_NAME"]
+# directory where all sources will be downloaded
+SOURCES_DOWNLOAD_DIR = BEOS_DIR + "/sources"
 # path to beos sources repository
 #BEOS_REPOSITORY_PATH = "git@gitlab.syncad.com:blocktrades/beos-core.git"
 BEOS_REPOSITORY_PATH = "https://gitlab.syncad.com/blocktrades/beos-core.git" 
@@ -15,7 +15,7 @@ BEOS_REPOSITORY_PATH = "https://gitlab.syncad.com/blocktrades/beos-core.git"
 BEOS_REPOSITORY_BRANCH = 'beos-initial-release'
 #
 # eosio build directory - here will land final build
-BEOS_BUILD_DIR = os.environ["HOME"] + "/ci/beos-core/" + os.environ["CI_COMMIT_REF_NAME"] + "/build"
+BEOS_BUILD_DIR = BEOS_DIR + "/build"
 
 MAIN_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
 ERROR_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
@@ -67,6 +67,9 @@ CORE_SYMBOL_NAME = "BEOS"
 OPENSSL_ROOT_DIR = "/usr/include/openssl"
 
 #######################       EOSIO config parameters     #######################
+# Keys stored here are special keys needed to make unittests passing (they must be generated using
+# the account name as seed).
+# This is requirement defined by EOS testsuite
 #################################################################################
 # When account is created, its public keys (owner & active) are set. The keys below are given to all system accounts, i.e.
 # eosio.msig, eosio.names, eosio.saving, eosio.bpay, eosio.vpay, eosio.unregd, eosio.ram, eosio.ramfee,
@@ -82,7 +85,6 @@ CONTRACTS_DIR = BEOS_BUILD_DIR + "/contracts/"
 # The main keys to the blockchain net, that allow creation of system accounts
 # EOSIO public key
 EOSIO_PUBLIC_KEY = "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
-# KEEPING KEYS IN PUBLIC FILE IS NOT WISE!
 # EOSIO private key
 EOSIO_PRIVATE_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
 
@@ -120,7 +122,7 @@ KEOSD_EXECUTABLE = BEOS_BUILD_DIR + "/programs/keosd/keosd"
 # keosd ip address
 KEOSD_IP_ADDRESS = "192.168.6.242"
 # keosd port
-KEOSD_PORT = 8900
+KEOSD_PORT = 18900
 # keosd certificate chain file - mandatory for https
 KEOSD_CERTIFICATE_CHAIN_FILE = None
 # keosd private key file path - mandatory for https
@@ -133,15 +135,15 @@ NODEOS_EXECUTABLE = BEOS_BUILD_DIR + "/programs/nodeos/nodeos"
 # nodeos ip address
 NODEOS_IP_ADDRESS = "192.168.6.242"
 # nodeos port
-NODEOS_PORT = 8888
+NODEOS_PORT = 18888
 # nodeos certificate chain file - mandatory for https
 NODEOS_CERTIFICATE_CHAIN_FILE = None
 # nodeos private key file path - mandatory for https
 NODEOS_PRIVATE_KEY_FILE = None
 # direcotry with nodes data
-NODEOS_WORKING_DIR = os.environ["HOME"] + "/tmp/"
+NODEOS_WORKING_DIR = os.environ["HOME"] + "/tmp/" + os.environ["CI_ENVIRONMENT_SLUG"]
 # directory in which wallet files are held
-DEFAULT_WALLET_DIR = os.environ["HOME"] + "/eosio-wallet"
+DEFAULT_WALLET_DIR = os.environ["HOME"] + "/eosio-wallet/" + os.environ["CI_ENVIRONMENT_SLUG"]
 # name of the master wallet
 MASTER_WALLET_NAME = "beos_master_wallet"
 # directory with password file for master wallet

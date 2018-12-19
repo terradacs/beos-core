@@ -4,10 +4,10 @@ LOG_FORMAT = '%(asctime)-15s - %(name)s - %(levelname)s - %(message)s'
 from logging import INFO, DEBUG, ERROR, WARNING, CRITICAL
 LOG_LEVEL = INFO
 
-# directory where all sources will be downloaded
-SOURCES_DOWNLOAD_DIR = os.environ["HOME"] + "/ci/beos-core" + os.environ["CI_COMMIT_REF_NAME"] + "/sources"
 # beos main directory
-BEOS_DIR = os.environ["HOME"] + "/ci/beos-core/" + os.environ["CI_COMMIT_REF_NAME"]
+BEOS_DIR = os.environ["HOME"] + "/ci/beos-core/" + os.environ["CI_ENVIRONMENT_SLUG"] + os.environ["CI_COMMIT_REF_NAME"]
+# directory where all sources will be downloaded
+SOURCES_DOWNLOAD_DIR = BEOS_DIR + "/sources"
 # path to beos sources repository
 #BEOS_REPOSITORY_PATH = "git@gitlab.syncad.com:blocktrades/beos-core.git"
 BEOS_REPOSITORY_PATH = "https://gitlab.syncad.com/blocktrades/beos-core.git" 
@@ -15,7 +15,7 @@ BEOS_REPOSITORY_PATH = "https://gitlab.syncad.com/blocktrades/beos-core.git"
 BEOS_REPOSITORY_BRANCH = 'beos-initial-release'
 #
 # eosio build directory - here will land final build
-BEOS_BUILD_DIR = os.environ["HOME"] + "/ci/beos-core/" + os.environ["CI_COMMIT_REF_NAME"] + "/build"
+BEOS_BUILD_DIR = BEOS_DIR + "/build"
 
 MAIN_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
 ERROR_LOG_PATH = os.path.dirname(os.path.abspath(__file__)) + "/beos_deploy_main.log"
@@ -139,8 +139,8 @@ NODEOS_PORT = 8888
 NODEOS_CERTIFICATE_CHAIN_FILE = None
 # nodeos private key file path - mandatory for https
 NODEOS_PRIVATE_KEY_FILE = None
-# direcotry with nodes data
-NODEOS_WORKING_DIR = os.environ["HOME"] + "/tmp/"
+# directory with nodeos data
+NODEOS_WORKING_DIR = os.environ["HOME"] + "/tmp/" + os.environ["CI_ENVIRONMENT_SLUG"]
 # directory in which wallet files are held
 DEFAULT_WALLET_DIR = os.environ["HOME"] + "/eosio-wallet"
 # name of the master wallet

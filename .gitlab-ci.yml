@@ -2,23 +2,24 @@ stages:
   - staging-build
   - development-build
   - staging-deploy
+  - production-deploy
 
 before_script:
   - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
   - eval $(ssh-agent -s)
   - ssh-add <(echo "$SSH_PRIVATE_KEY")
-  - echo "Working for branch" $CI_COMMIT_REF_NAME
-  - rm -rf ~/ci/beos-core/$CI_COMMIT_REF_NAME
-  - git clone git@gitlab.syncad.com:blocktrades/beos-core.git ~/ci/beos-core/$CI_COMMIT_REF_NAME
-  - cd ~/ci/beos-core/$CI_COMMIT_REF_NAME
+  - echo "Working for branch" $CI_COMMIT_REF_NAME " and environment: " $CI_ENVIRONMENT_SLUG
+  - rm -rf ~/ci/beos-core/$CI_ENVIRONMENT_SLUG/$CI_COMMIT_REF_NAME
+  - git clone git@gitlab.syncad.com:blocktrades/beos-core.git ~/ci/beos-core/$CI_ENVIRONMENT_SLUG/$CI_COMMIT_REF_NAME
+  - cd ~/ci/beos-core/$CI_ENVIRONMENT_SLUG/$CI_COMMIT_REF_NAME
   - git checkout $CI_COMMIT_REF_NAME
   - git status
   - git submodule sync --recursive
   - git submodule update --init --recursive
 
 after_script:
- - echo "Repository for this pipeline located on" ~/ci/beos-core/$CI_COMMIT_REF_NAME
- - echo "Build for this pipeline located on" ~/ci/beos-core/$CI_COMMIT_REF_NAME/build
+ - echo "Repository for this pipeline located on" ~/ci/beos-core/$CI_ENVIRONMENT_SLUG/$CI_COMMIT_REF_NAME
+ - echo "Build for this pipeline located on" ~/ci/beos-core/$CI_ENVIRONMENT_SLUG/$CI_COMMIT_REF_NAME/build
 
 staging-build:
   stage: staging-build
@@ -96,14 +97,39 @@ staging-deploy:
     - beos-initial-release
   environment:  
     name: staging
+    url: http://192.168.6.242:18888/v1/chain/get_info
+
+production-deploy:
+  stage: production-deploy
+  variables:
+    LC_ALL: "C"
+    CI_BEOS_CONFIG_NAME: "production-deploy"
+    GIT_STRATEGY: none
+    GIT_SUBMODULE_STRATEGY: recursive
+    
+  script:
+    - chmod +x ./gitlab-ci/build.sh
+    - ./gitlab-ci/build.sh
+    - chmod +x ./gitlab-ci/run.sh
+    - ./gitlab-ci/run.sh
+
+  cache: {}
+  tags:
+    - allcpu
+  allow_failure: false
+  when: manual
+  only:
+    - beos-initial-release
+  environment:  
+    name: production
     url: http://192.168.6.242:8888/v1/chain/get_info
 
-staging-deploy-docker:
-  stage: staging-deploy
+production-deploy-docker:
+  stage: production-deploy
   variables:
     GIT_STRATEGY: none
     LC_ALL: "C"
-    CI_BEOS_CONFIG_NAME: "docker-deploy"
+    CI_BEOS_CONFIG_NAME: "production-deploy"
     GIT_SUBMODULE_STRATEGY: recursive
     BEOS_TESTNET_DOCKER_REPOSITORY: registry.gitlab.syncad.com/blocktrades/docker/beos-testnet
     BEOS_DOCKER_LATEST: "yes"
