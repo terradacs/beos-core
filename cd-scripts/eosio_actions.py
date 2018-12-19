@@ -129,7 +129,7 @@ def create_account(creator, name, owner_key, active_key, transfer_ram = False, s
         parameters.append("--transfer-ram")
     parameters += [creator, name, owner_key, active_key, "--json"]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
-    ret = json.loads(eosio_tools.run_command_and_return_output(parameters))
+    ret = json.loads(eosio_tools.run_command_and_return_output(parameters).decode('utf-8'))
     logger.debug(ret)
     transaction_id = ret.get("transaction_id", None)
     if transaction_id is not None:
@@ -155,7 +155,7 @@ def set_contract(account, contract, permission, schema = "http"):
         "set", "contract", account, contract, "-p", permission, "--json"
     ]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
-    ret = json.loads(eosio_tools.run_command_and_return_output(parameters))
+    ret = json.loads(eosio_tools.run_command_and_return_output(parameters).decode('utf-8'))
     logger.debug(ret)
     transaction_id = ret.get("transaction_id", None)
     if transaction_id is not None:
@@ -181,7 +181,7 @@ def push_action(account, action, data, permission, schema = "http"):
         "push", "action", account, action, data, "-p", permission, "--json"
     ]
     logger.info("Executing command: {0}".format(" ".join(parameters)))
-    ret = json.loads(eosio_tools.run_command_and_return_output(parameters))
+    ret = json.loads(eosio_tools.run_command_and_return_output(parameters).decode('utf-8'))
     logger.debug(ret)
     transaction_id = ret.get("transaction_id", None)
     if transaction_id is not None:
