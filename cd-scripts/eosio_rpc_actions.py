@@ -170,29 +170,39 @@ def push_action(account, actor, action_data, permission, blocking = False):
     processed_block_num = push_transaction_resp["processed"]["block_num"]
     logger.info("[ACTION][OK] {0} pushed to block {1}".format(actions, processed_block_num))
     if blocking:
-      block_until_transaction_in_irreversible_block(push_transaction_resp['transaction_id'], processed_block_num)
+      block_until_transaction_in_block(push_transaction_resp['transaction_id'], processed_block_num)
   else:
     logger.error("[ACTION][ERROR] failed to push action {0} to block".format(actions))
 
-def block_until_transaction_in_irreversible_block(transaction_id, block_num, timeout = 60.):
-  logger.info("Block until transaction_id: {0} is in irreversible block {1}".format(transaction_id, block_num))
+BLOCK_TYPE_HEADBLOCK = "head_block_num"
+BLOCK_TYPE_IRREVERSIBLE = "last_irreversible_block_num"
+def block_until_transaction_in_block(transaction_id, block_num, block_type = BLOCK_TYPE_HEADBLOCK, timeout = 60.):
+  logger.info("Block until transaction_id: {0} is in block {1}".format(transaction_id, block_num))
   import time
   step = 0.25
   timeout_cnt = 0.
   while True:
-    last_irreversible_block_num = EOSIO.chain.get_info()['last_irreversible_block_num']
-    if last_irreversible_block_num >= block_num:
+    last_block_num = EOSIO.chain.get_info()[BLOCK_TYPE_HEADBLOCK]
+    logger.debug("Waiting for block: {0}, current block is {1}".format(block_num, last_block_num))
+    if last_block_num >= block_num:
+      logger.debug("Scanning block: {0}".format(last_block_num))
       get_block_data = {"block_num_or_id" : block_num}
       get_block_resp = EOSIO.chain.get_block(get_block_data)
-      logger.info("get_block_resp")
-      logger.info(get_block_resp)
-      return
+      for transaction in get_block_resp["transactions"]:
+        status = transaction.get("status", None)
+        trx = transaction.get("trx", None)
+        if trx is not None and status == "executed":
+          tid = trx.get("id", None)
+          if tid is not None and tid == transaction_id:
+            logger.info("Transaction id: {0} found in block: {1}".format(transaction_id, block_num))
+            return
+      logger.info("Transaction id: {0} not found in block: {1}".format(transaction_id, block_num))
     time.sleep(step)
     timeout_cnt = timeout_cnt + step
     if timeout_cnt > timeout:
-      msg = "Timeout reached during block_until_transaction_in_irreversible_block"
+      msg = "Timeout reached during block_until_transaction_in_block"
       logger.error(msg)
-      raise TimeoutError()
+      raise TimeoutError(msg)
 
 #TODO: Not working atm, cleos is using some sort of custom packing. Without that packing deployment for contracts via RPC will not work
 def set_contract(account, actor, contract_dir_path, permission):
