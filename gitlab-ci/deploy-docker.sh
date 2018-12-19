@@ -1,5 +1,5 @@
 #!/bin/bash
-cd ~/ci/beos-core/$CI_COMMIT_REF_NAME
+cd ~/ci/beos-core/$CI_ENVIRONMENT_SLUG/$CI_COMMIT_REF_NAME
 
 if [ -z "$BEOS_REVISION" ]
 then
@@ -40,9 +40,9 @@ fi
 cd docker-deploy
 cd beos-testnet
 
-cp ~/ci/beos-core/$CI_COMMIT_REF_NAME/build/programs/nodeos/nodeos ./node/
-cp ~/ci/beos-core/$CI_COMMIT_REF_NAME/build/resources/genesis.json ./node/
-cp ~/ci/beos-core/$CI_COMMIT_REF_NAME/build/programs/keosd/keosd ./wallet/
+cp ~/ci/beos-core/$CI_ENVIRONMENT_SLUG/$CI_COMMIT_REF_NAME/build/programs/nodeos/nodeos ./node/
+cp ~/ci/beos-core/$CI_ENVIRONMENT_SLUG/$CI_COMMIT_REF_NAME/build/resources/genesis.json ./node/
+cp ~/ci/beos-core/$CI_ENVIRONMENT_SLUG/$CI_COMMIT_REF_NAME/build/programs/keosd/keosd ./wallet/
 
 cd node
 

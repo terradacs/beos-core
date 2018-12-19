@@ -1,5 +1,5 @@
 #!/bin/bash
-cd ~/ci/beos-core/$CI_COMMIT_REF_NAME
+cd ~/ci/beos-core/$CI_ENVIRONMENT_SLUG/$CI_COMMIT_REF_NAME
 cd cd-scripts
 cp config-$CI_BEOS_CONFIG_NAME.py config.py
 if ! ./deploy.py --build-beos
@@ -12,7 +12,7 @@ fi
 cat beos_deploy_main.log
 
 echo "Removing object files"
-find ~/ci/beos-core/$CI_COMMIT_REF_NAME -type f -name '*.o' -delete
+find ~/ci/beos-core/$CI_ENVIRONMENT_SLUG/$CI_COMMIT_REF_NAME -type f -name '*.o' -delete
 echo "Stopping old keosd instance"
 kill -2 $(lsof -t -i:8900) || true
 python3 ./wait.py $(lsof -t -i:8900)
