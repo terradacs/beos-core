@@ -8,7 +8,7 @@ before_script:
   - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
   - eval $(ssh-agent -s)
   - ssh-add <(echo "$SSH_PRIVATE_KEY")
-  - echo "Working for branch" $CI_COMMIT_REF_NAME " and environment: " $CI_ENVIRONMENT_SLUG
+  - echo "Working for branch" $CI_COMMIT_REF_NAME " and environment " $CI_ENVIRONMENT_SLUG
   - rm -rf ~/ci/beos-core/$CI_ENVIRONMENT_SLUG/$CI_COMMIT_REF_NAME
   - git clone git@gitlab.syncad.com:blocktrades/beos-core.git ~/ci/beos-core/$CI_ENVIRONMENT_SLUG/$CI_COMMIT_REF_NAME
   - cd ~/ci/beos-core/$CI_ENVIRONMENT_SLUG/$CI_COMMIT_REF_NAME
