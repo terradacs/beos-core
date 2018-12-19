@@ -5,7 +5,7 @@ from logging import INFO, DEBUG, ERROR, WARNING, CRITICAL
 LOG_LEVEL = INFO
 
 # beos main directory
-BEOS_DIR = os.environ["HOME"] + "/ci/beos-core/" + os.environ["CI_ENVIRONMENT_SLUG"] + os.environ["CI_COMMIT_REF_NAME"]
+BEOS_DIR = os.environ["HOME"] + "/ci/beos-core/" + os.environ["CI_ENVIRONMENT_SLUG"] + "/" + os.environ["CI_COMMIT_REF_NAME"]
 # directory where all sources will be downloaded
 SOURCES_DOWNLOAD_DIR = BEOS_DIR + "/sources"
 
