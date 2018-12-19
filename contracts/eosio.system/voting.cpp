@@ -34,19 +34,39 @@ namespace eosiosystem {
    inline void update_producers_table(const std::vector<block_producer_voting_info>& producer_infos,
       producers_table& producers)
       {
-      for(const auto& pi : producer_infos)
+        auto itr = producers.begin();
+        auto itr_end = producers.end();
+
+        if( itr == itr_end )
+          return;
+
+        auto found_producer = itr;
+
+        for(const auto& pi : producer_infos)
+        {
+
+         if( itr != itr_end && pi.owner_account_name == itr->owner )
          {
-         auto found_producer = producers.find(pi.owner_account_name);
-         if(found_producer != producers.end())
-            {
-            producers.modify(found_producer, 0, [&pi](auto& p)
-               {
-               p.total_votes = pi.total_votes;
-               p.is_active = pi.is_active;
-               }
-               );
-            }
+          found_producer = itr;
          }
+         else
+         {
+          found_producer = producers.find(pi.owner_account_name);
+          itr = found_producer;
+         }
+
+         if( found_producer != itr_end )
+         {
+          ++itr;
+          producers.modify(found_producer, 0, [&pi](auto& p)
+          {
+            p.total_votes = pi.total_votes;
+            p.is_active = pi.is_active;
+          });
+         }
+
+        }
+
       }
 
    bool system_contract::is_allowed_vote_operation() const
@@ -159,11 +179,11 @@ namespace eosiosystem {
       update_votes( voter_name, proxy, producers, true);
    }
 
-   void system_contract::updateprods( const eosio_voting_data& voting_data )
+   void system_contract::updateprods( const std::vector<block_producer_voting_info>& producer_infos )
    {
       require_auth( _self );
 
-      update_producers_table( voting_data.producer_infos, _producers );
+      update_producers_table( producer_infos, _producers );
 
       flush_voting_stats();
    }
