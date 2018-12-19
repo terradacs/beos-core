@@ -66,14 +66,6 @@ namespace eosiosystem {
                                 (last_producer_schedule_size)(total_producer_vote_weight)(last_name_close) )
    };
 
-   /// Helper structure to retrieve data next to be passed to `update_voting_power` method (priviledged_api)
-   struct eosio_voting_data
-    {
-      std::vector<block_producer_voting_info> producer_infos;
-
-      EOSLIB_SERIALIZE( eosio_voting_data, (producer_infos) )
-    };
-
    struct producer_info {
       account_name          owner;
       double                total_votes = 0;
@@ -127,11 +119,9 @@ namespace eosiosystem {
       public:
          immutable_system_contract(account_name s) : native(s), _producers(_self, _self) {}
 
-         inline eosio_voting_data prepare_data_for_voting_update() const
+         inline std::vector<block_producer_voting_info> prepare_data_for_voting_update() const
             {
-            eosio_voting_data d;
-            d.producer_infos = prepare_producer_infos(_producers);
-            return d;
+               return prepare_producer_infos(_producers);
             }
 
       };
@@ -220,7 +210,7 @@ namespace eosiosystem {
 
          void voteproducer( const account_name voter, const account_name proxy, const std::vector<account_name>& producers );
 
-         void updateprods( const eosio_voting_data& voting_data );
+         void updateprods( const std::vector<block_producer_voting_info>& producer_infos );
 
          void regproxy( const account_name proxy, bool isproxy );
 
