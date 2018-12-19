@@ -46,6 +46,10 @@ staging-build:
   allow_failure: false
   only:
    - beos-initial-release
+  environment:  
+    name: staging
+    url: http://192.168.6.144:8888/v1/chain/get_info
+   
 
 development-build:
   stage: development-build
