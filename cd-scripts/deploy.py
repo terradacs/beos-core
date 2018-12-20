@@ -382,9 +382,8 @@ def initialize_beos():
         eosio.set_contract("eosio.token", config.CONTRACTS_DIR + "/eosio.token", "eosio.token")
 
         eosio.push_action("eosio.token", "create", '[ "eosio", "{0}"]'.format(config.CORE_TOTAL_SUPPLY), "eosio.token")
-        eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0}"]'.format(config.PXBTS_TOTAL_SUPPLY), "eosio.token")
-        eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0}"]'.format(config.PXBRNP_TOTAL_SUPPLY), "eosio.token")
-        eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0}"]'.format(config.PXEOS_TOTAL_SUPPLY), "eosio.token")
+        for asset in config.GATEWAY_PARAMS["proxy_assets"]:
+            eosio.push_action("eosio.token", "create", '[ "beos.gateway", "{0}"]'.format(asset["proxy_asset"]), "eosio.token")
 
         # registering initial producers, regproducer is in eosio.system contract so it need to be loaded first
         eosio.set_contract("eosio", config.CONTRACTS_DIR + "eosio.system", "eosio")

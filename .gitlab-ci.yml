@@ -77,6 +77,9 @@ development-build:
   when: manual
   except:
    - beos-initial-release
+  environment:  
+    name: development
+    url: http://192.168.6.144:8888/v1/chain/get_info
 
 staging-deploy:
   stage: staging-deploy
