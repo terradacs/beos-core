@@ -58,7 +58,7 @@ set_property(TEST nodeos_sanity_test PROPERTY LABELS nonparallelizable_tests)
 add_test(NAME nodeos_sanity_bnet_test COMMAND tests/nodeos_run_test.py -v --sanity-test --clean-run --p2p-plugin bnet --dump-error-detail WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_property(TEST nodeos_sanity_bnet_test PROPERTY LABELS nonparallelizable_tests)
 
-# DISABLE_FAILING_TESTS was introduced to disable test with nondeteministic behaviour. Results of these test varies depending on 
+# DISABLE_FAILING_TESTS was introduced to disable test with nondeteministic behaviour. Results of these test varies depending on
 # machine properties.
 if (NOT DISABLE_FAILING_TESTS)
   add_test(NAME nodeos_run_test COMMAND tests/nodeos_run_test.py -v --clean-run --dump-error-detail WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -178,12 +178,12 @@ endif()
 
 add_test(NAME start_nodeos_keosd_via_run_py COMMAND run.py WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_property(TEST start_nodeos_keosd_via_run_py PROPERTY LABELS beos_tests)
-add_test(NAME eos_voter_rpc_tests COMMAND python3 eos_voter_rpc_tests.py 
-  --nodeos-ip ${NODEOS_IP_ADDRESS} 
+add_test(NAME eos_voter_rpc_tests COMMAND python3 eos_voter_rpc_tests.py
+  --nodeos-ip ${NODEOS_IP_ADDRESS}
   --nodeos-port ${NODEOS_PORT}
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
 set_property(TEST eos_voter_rpc_tests PROPERTY LABELS beos_tests)
-# add_test(NAME test03_scenarios_deploy COMMAND test03_scenarios_deploy.py --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} 
+# add_test(NAME test03_scenarios_deploy COMMAND test03_scenarios_deploy.py --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT}
 # --add-block-number
 # --restore-node-params
 # --master-wallet-name ${MASTER_WALLET_NAME}
@@ -197,6 +197,10 @@ add_test(NAME test05_account_creation_with_delegate_ram COMMAND tests/beos_plugi
 set_property(TEST test05_account_creation_with_delegate_ram PROPERTY LABELS nonparallelizable_tests)
 add_test(NAME test06_account_creation_and_account_validator_deploy COMMAND tests/beos_plugin_tests/test06_account_creation_and_account_validator_deploy.py  --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --master-wallet-name ${MASTER_WALLET_NAME}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR} )
 set_property(TEST test06_account_creation_and_account_validator_deploy PROPERTY LABELS nonparallelizable_tests)
+add_test(NAME test08_voting_test COMMAND tests/beos_plugin_tests/test08_voting_test.py  --main-dir ${CMAKE_BINARY_DIR} --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_property(TEST test08_voting_test PROPERTY LABELS nonparallelizable_tests)
+add_test(NAME test09_vote_actions_test COMMAND tests/beos_plugin_tests/test09_vote_actions_test.py  --main-dir ${CMAKE_BINARY_DIR} --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_property(TEST test09_vote_actions_test PROPERTY LABELS nonparallelizable_tests)
 
 add_test(NAME stop_nodeos_keosd_via_run_py COMMAND run.py --cancel WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_property(TEST stop_nodeos_keosd_via_run_py PROPERTY LABELS beos_tests)
