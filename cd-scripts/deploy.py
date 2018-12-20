@@ -412,8 +412,8 @@ def initialize_beos():
         # eosio.get_account("beos.distrib")
         eosio_actions.push_action("beos.init", "storeparams", '[0]', "beos.init")
         import json
-        eosio.push_action("beos.distrib", "changeparams", '{{"new_params": {0}}}'.format(json.dumps(config.DISTRIBUTION_PARAMS)), "beos.distrib")
-        eosio.push_action("beos.gateway", "changeparams", '{{"new_params": {0}}}'.format(json.dumps(config.GATEWAY_PARAMS)), "beos.gateway")
+        eosio_actions.push_action("beos.distrib", "changeparams", '{{"new_params": {0}}}'.format(json.dumps(config.DISTRIBUTION_PARAMS)), "beos.distrib")
+        eosio_actions.push_action("beos.gateway", "changeparams", '{{"new_params": {0}}}'.format(json.dumps(config.GATEWAY_PARAMS)), "beos.gateway")
 
         producers = []
 
