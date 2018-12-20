@@ -187,15 +187,6 @@ DISABLE_WASM_TESTS = "true"
 
 ##############      configuration data for contracts/accounts     ###############
 #################################################################################
-# maximum amount that will ever be allowed to be issued (must cover all BTS)
-PXBTS_TOTAL_SUPPLY = "10000000000.0000 PXBTS" # as string to preserve zeros (they establish precision)
-
-# maximum amount that will ever be allowed to be issued (must cover all Brownie.PTS)
-PXBRNP_TOTAL_SUPPLY = "10000000000.0000 PXBRNP" # as string to preserve zeros (they establish precision)
-
-# maximum amount that will ever be allowed to be issued (must cover all EOS)
-PXEOS_TOTAL_SUPPLY = "10000000000.0000 PXEOS" # as string to preserve zeros (they establish precision)
-
 CORE_SYMBOL_PRECISION = 4 # 10^4
 # maximum amount that will ever be allowed to be issued (includes "perpetual" inflation)
 CORE_TOTAL_SUPPLY = "10000000000.0000 {0}".format(CORE_SYMBOL_NAME) # as string to preserve zeros (they establish precision)
@@ -238,15 +229,15 @@ GATEWAY_PARAMS = {
   "proxy_assets" :
   [
      {
-        "proxy_asset" : "0.0000 PXBTS",
+        "proxy_asset" : "10000000000.0000 PXBTS", # maximum amount that will ever be allowed to be issued (must cover all BTS)
         "description" : "bts"
      },
      {
-        "proxy_asset" : "0.0000 PXBRNP",
+        "proxy_asset" : "10000000000.0000 PXBRNP", # maximum amount that will ever be allowed to be issued (must cover all Brownie.PTS)
         "description" : "brownie.pts"
      },
      {
-        "proxy_asset" : "0.0000 PXEOS",
+        "proxy_asset" : "10000000000.0000 PXEOS", # maximum amount that will ever be allowed to be issued (must cover all EOS)
         "description" : "eos"
      }
   ]
