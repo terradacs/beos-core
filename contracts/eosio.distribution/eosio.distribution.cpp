@@ -106,14 +106,22 @@ void distribution::onblock( uint32_t block_nr ) {
    }
 
    // execute actual distribution
-   eosiosystem::immutable_system_contract sc(N(eosio));
-   std::vector<block_producer_voting_info> producer_infos = sc.prepare_data_for_voting_update();
    eosio::print("Distributing @block ", block_nr, " bandwidth ", beos_to_distribute, " (", beos_to_distribute_trustee,
       "), ram ", ram_to_distribute, " (", ram_to_distribute_trustee, ")\n");
+
+   std::vector<block_producer_voting_info> producer_infos;
+
+   if( distribute_beos )
+   {
+      eosiosystem::immutable_system_contract sc(N(eosio));
+      producer_infos = sc.prepare_data_for_voting_update();
+   }
+
    reward_all( beos_to_distribute, beos_to_distribute_trustee, ram_to_distribute, ram_to_distribute_trustee,
       _gstate.proxy_assets.data(), _gstate.proxy_assets.size(), producer_infos.data(), producer_infos.size() );
 
-   update_producers( producer_infos );
+   if( distribute_beos )
+      update_producers( producer_infos );
 
    // reduce total trustee reward by values rewarded above
    _gstate.beos.trustee_reward -= beos_to_distribute_trustee;
