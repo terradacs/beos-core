@@ -1,7 +1,5 @@
 stages:
-  - staging-build
-  - development-build
-  - production-deploy
+  - build
   - staging-deploy
 
 before_script:
@@ -22,7 +20,7 @@ after_script:
  - echo "Build for this pipeline located on" ~/ci/beos-core/$CI_ENVIRONMENT_SLUG/$CI_COMMIT_REF_NAME/build
 
 staging-build:
-  stage: staging-build
+  stage: build
   variables:
     LC_ALL: "C"
     CI_BEOS_CONFIG_NAME: "ci"
@@ -52,7 +50,7 @@ staging-build:
    
 
 development-build:
-  stage: development-build
+  stage: build
   variables:
     LC_ALL: "C"
     CI_BEOS_CONFIG_NAME: "ci"
@@ -82,7 +80,7 @@ development-build:
     url: http://192.168.6.144:8888/v1/chain/get_info
 
 staging-deploy:
-  stage: staging-deploy
+  stage: build
   variables:
     LC_ALL: "C"
     CI_BEOS_CONFIG_NAME: "allcpu"
@@ -107,7 +105,7 @@ staging-deploy:
     url: http://192.168.6.242:18888/v1/chain/get_info
 
 production-deploy:
-  stage: production-deploy
+  stage: build
   variables:
     LC_ALL: "C"
     CI_BEOS_CONFIG_NAME: "production-deploy"
@@ -127,12 +125,12 @@ production-deploy:
   when: manual
   only:
     - beos-initial-release
-  environment:  
+  environment:
     name: production
     url: http://192.168.6.242:8888/v1/chain/get_info
 
 production-deploy-docker:
-  stage: production-deploy
+  stage: build
   variables:
     GIT_STRATEGY: none
     LC_ALL: "C"
