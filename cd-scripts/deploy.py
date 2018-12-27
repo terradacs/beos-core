@@ -350,9 +350,7 @@ def initialize_beos():
     import eosio_runner
     import eosio_tools
     try:
-        wallet_url = "http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)
-        eosio_runner.run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR, False, True)
-        eosio_actions.create_wallet(wallet_url, False)
+        initialize_wallet()
         eosio_runner.run_nodeos(config.START_NODE_INDEX, config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY)
 
         eosio_actions.create_account("eosio", "eosio.msig", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
