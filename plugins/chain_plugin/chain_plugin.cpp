@@ -1249,10 +1249,9 @@ fc::variant read_only::get_currency_stats( const read_only::get_currency_stats_p
    const abi_def abi = eosio::chain_apis::get_abi( db, p.code );
    auto table_type = get_table_type( abi, "stat" );
 
-   uint64_t scope = ( eosio::chain::string_to_symbol( 0, boost::algorithm::to_upper_copy(p.symbol).c_str() ) >> 8 );
-
-   walk_key_value_table(p.code, scope, N(stat), [&](const key_value_object& obj){
-      EOS_ASSERT( obj.value.size() >= sizeof(read_only::get_currency_stats_result), chain::asset_type_exception, "Invalid data on table");
+   auto collector = [&](const key_value_object& obj) {
+      EOS_ASSERT(obj.value.size() >= sizeof(read_only::get_currency_stats_result), chain::asset_type_exception,
+         "Invalid data on table");
 
       fc::datastream<const char *> ds(obj.value.data(), obj.value.size());
       read_only::get_currency_stats_result result;
@@ -1263,7 +1262,16 @@ fc::variant read_only::get_currency_stats( const read_only::get_currency_stats_p
 
       results[result.supply.symbol_name()] = result;
       return true;
-   });
+      };
+
+   if(p.symbol.empty()) {
+      /// Special case when we want to iterate stats for all currencies
+      walk_key_value_tables(p.code, N(stat), collector);
+   }
+   else {
+      uint64_t scope = ( eosio::chain::string_to_symbol( 0, boost::algorithm::to_upper_copy(p.symbol).c_str() ) >> 8 );
+      walk_key_value_table(p.code, scope, N(stat), collector);
+   }
 
    return results;
 }

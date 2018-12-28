@@ -383,6 +383,24 @@ public:
       }
    }
 
+   /** Allows to iterate over contents of table specified by given `code` (account) and table name: `table`.
+   */
+   template<typename Function>
+   void walk_key_value_tables(const name& code, const name& table, Function f) const {
+      const auto& d = db.db();
+      const auto& tableStorage = d.get_index<chain::table_id_multi_index, chain::by_code_scope_table>();
+
+      auto startI = tableStorage.lower_bound(boost::make_tuple(code, 0, 0));
+
+      for(; startI != tableStorage.end(); ++startI) {
+         const auto& tableObject = *startI;
+         if(tableObject.code != code || tableObject.table != table)
+            break;
+
+         walk_key_value_table(code, tableObject.scope, table, f);
+      }
+   }
+
    static uint64_t get_table_index_name(const read_only::get_table_rows_params& p, bool& primary);
 
    template <typename IndexType, typename SecKeyType, typename ConvFn>
