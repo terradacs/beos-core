@@ -421,14 +421,19 @@ def initialize_beos():
             logger.info("Registering producer account for: {0}".format(producer))
             eosio_actions.push_action("eosio", "regproducer", '["{0}", "{1}", "{2}", 0]'.format(producer, data["pub_active"], data["url"]), producer)
 
+        eosio_actions.create_account("beos.gateway", "beos.trustee", config.TRUSTEE_OWNER_PUBLIC_KEY, config.TRUSTEE_ACTIVE_PUBLIC_KEY, True)
+
         for producer, data in config.PRODUCERS_ARRAY.items():
             producers.append({"producer_name": producer, "block_signing_key": data["pub_active"]})
         args = {"schedule" : producers}
+
         # set initial producers, setprods is in eosio.bios contract so we need to load it first
         logger.info("Setting initial producers via setprods: '{0}'".format(json.dumps(args)))
         eosio_actions.push_action("eosio", "defineprods", '{0}'.format(json.dumps(args)), "eosio")
 
-        eosio_actions.create_account("beos.gateway", "beos.trustee", config.TRUSTEE_OWNER_PUBLIC_KEY, config.TRUSTEE_ACTIVE_PUBLIC_KEY, True)
+        #####################################################################################################
+        ### CAN'T PUT ANY ACTION HERE - it can be skipped if eosio is not in producer list defined above  ###
+        #####################################################################################################
 
         #Just to produce few blocks and accept lately scheduled transaction(s)
         # we will wait for approx 10 blocks to be produced
