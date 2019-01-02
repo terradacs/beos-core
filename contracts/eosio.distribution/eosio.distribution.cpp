@@ -40,7 +40,7 @@ void distribution::onblock( uint32_t block_nr ) {
          // last scheduled beos distribution block failed
          // reschedule to next block or try now if next block would be past end of distribution
          _gstate.beos.next_block += _gstate.beos.block_interval;
-         if ( is_past_beos_distribution_period(_gstate.beos.next_block) || _gstate.beos.next_block == block_nr) {
+         if ( is_past_beos_distribution_period(_gstate.beos.next_block) || _gstate.beos.next_block == block_nr ) {
             _gstate.beos.next_block = block_nr;
             eosio::print("Last bandwidth distribution transaction failed. Retrying now.\n");
             distribute_beos = true;
@@ -56,7 +56,7 @@ void distribution::onblock( uint32_t block_nr ) {
          // last scheduled ram distribution block failed
          // reschedule to next block or try now if next block would be past end of distribution
          _gstate.ram.next_block += _gstate.ram.block_interval;
-         if ( is_past_ram_distribution_period(_gstate.ram.next_block || _gstate.ram.next_block == block_nr) ) {
+         if ( is_past_ram_distribution_period(_gstate.ram.next_block) || _gstate.ram.next_block == block_nr ) {
             _gstate.ram.next_block = block_nr;
             eosio::print("Last ram distribution transaction failed. Retrying now.\n");
             distribute_ram = true;
