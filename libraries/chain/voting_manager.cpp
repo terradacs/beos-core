@@ -222,7 +222,10 @@ void voting_manager::update_voting_power(const account_name& from, int64_t stake
       validate_b1_vesting(foundVoterInfo->staked);
 
    if(foundVoterInfo->producers.empty() == false || foundVoterInfo->proxy)
-      update_votes(from, foundVoterInfo->proxy, foundVoterInfo->producers, false, _producers);
+      {
+      std::vector<account_name> temp(foundVoterInfo->producers.cbegin(), foundVoterInfo->producers.cend());
+      update_votes(from, foundVoterInfo->proxy, temp, false, _producers);
+      }
    }
 
 void voting_manager::update_votes(const account_name& voter_name, const account_name& proxy,
@@ -322,7 +325,8 @@ void voting_manager::update_votes(const account_name& voter_name, const account_
 
    writableVoters.modify(*voter, [&](auto& av) {
       av.last_vote_weight = new_vote_weight;
-      av.producers = producers;
+      av.producers.clear();
+      av.producers.insert(av.producers.end(), producers.cbegin(), producers.cend());
       av.proxy = proxy;
       });
    }
