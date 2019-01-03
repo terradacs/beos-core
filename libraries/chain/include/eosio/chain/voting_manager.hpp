@@ -23,13 +23,13 @@ struct controller_impl;
 
 struct voter_info_object : public chainbase::object<voter_info_object_type, voter_info_object> {
    
-   OBJECT_CTOR(voter_info_object)
+   OBJECT_CTOR(voter_info_object, (producers))
 
    id_type                     id;
 
    account_name                owner = 0; /// the voter
    account_name                proxy = 0; /// the proxy set by the voter, if any
-   std::vector<account_name>   producers; /// the producers approved by this voter if no proxy set
+   shared_vector<account_name> producers; /// the producers approved by this voter if no proxy set
    int64_t                     staked = 0;
 
    /**

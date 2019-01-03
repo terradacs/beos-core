@@ -400,7 +400,6 @@ struct controller_impl {
          const auto hash = calculate_integrity_hash();
          ilog( "database initialized with hash: ${hash}", ("hash", hash) );
       }
-
    }
 
    ~controller_impl() {
