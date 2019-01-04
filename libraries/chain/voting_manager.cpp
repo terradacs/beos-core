@@ -223,13 +223,14 @@ void voting_manager::update_voting_power(const account_name& from, int64_t stake
 
    if(foundVoterInfo->producers.empty() == false || foundVoterInfo->proxy)
       {
-      std::vector<account_name> temp(foundVoterInfo->producers.cbegin(), foundVoterInfo->producers.cend());
-      update_votes(from, foundVoterInfo->proxy, temp, false, _producers);
+         //When a power is changed, updating of producers is not necessary, because set of producers is still the same
+	      update_votes_impl(from, foundVoterInfo->proxy, foundVoterInfo->producers, false, _producers, false/*update_producers*/ );
       }
    }
 
-void voting_manager::update_votes(const account_name& voter_name, const account_name& proxy,
-   const std::vector<account_name>& producers, bool voting, const producer_info_index& _producers)
+template< typename COLLECTION >
+void voting_manager::update_votes_impl(const account_name& voter_name, const account_name& proxy,
+   const COLLECTION& producers, bool voting, const producer_info_index& _producers, bool update_producers )
    {
    const auto& _voters = _db.get_index<voter_info_index, by_owner>();
    auto& writableVoters = _db.get_mutable_index<voter_info_index>();
@@ -325,11 +326,18 @@ void voting_manager::update_votes(const account_name& voter_name, const account_
 
    writableVoters.modify(*voter, [&](auto& av) {
       av.last_vote_weight = new_vote_weight;
-      av.producers.clear();
-      av.producers.insert(av.producers.end(), producers.cbegin(), producers.cend());
+      if( update_producers )
+         av.producers.assign( producers.cbegin(), producers.cend() );
       av.proxy = proxy;
       });
    }
+
+void voting_manager::update_votes(const account_name& voter_name, const account_name& proxy,
+   const std::vector<account_name>& producers, bool voting,
+   const producer_info_index& _producers)
+{
+   update_votes_impl( voter_name, proxy, producers, voting, _producers, true/*update_producers*/ );
+}
 
 const voter_info_object* voting_manager::find_voter_info(const account_name& name) const
    {
