@@ -38,6 +38,8 @@ add_library( eosio_chain
               snapshot.cpp
 
               voting_manager.cpp
+              voting_performance.cpp
+              table_helper.cpp
 
              webassembly/wavm.cpp
              webassembly/wabt.cpp

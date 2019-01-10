@@ -3,6 +3,8 @@
 #include <eosio/chain/snapshot.hpp>
 #include <eosio/chain/types.hpp>
 #include <eosio/chain/asset.hpp>
+#include <eosio/chain/table_helper.hpp>
+#include <eosio/chain/voting_performance.hpp>
 
 #include <chainbase/chainbase.hpp>
 
@@ -87,7 +89,6 @@ using global_vote_stat_index = chainbase::shared_multi_index_container<
 class voting_manager final
    {
    public:
-      typedef boost::container::flat_map<account_name, block_producer_voting_info*> producer_info_index;
 
       /// Allows to retrieve data related to eosio.system stats which are also modified during voting process, thus stored at native side.
       void get_voting_stats(int64_t* total_activated_stake, uint64_t* thresh_activated_stake_time,
@@ -100,26 +101,35 @@ class voting_manager final
           It's a part of system_contract::regproxy implementation and underlying priviledged_api::register_voting_proxy.
       */
       void register_voting_proxy(const account_name& proxy, bool is_proxy,
-         const producer_info_index& _producers);
+         block_producer_voting_info* start_producers, uint32_t size );
+
+      void register_voting_proxy(const account_name& proxy, bool is_proxy);
 
       /** Allows to update given account voting power according to specified stake change.
           Actual implementation of priviledged_api::update_voting_power.
       */
       void update_voting_power(const account_name& voter, int64_t stake_delta,
-         const producer_info_index& _producers);
+         block_producer_voting_info* start_producers, uint32_t size );
+
+      void update_voting_power(const account_name& voter, int64_t stake_delta);
+
+      void prepare_producers( block_producer_voting_info* start_producers, uint32_t size );
+      uint32_t get_new_producers_size() const;
 
    private:
 
       template< typename COLLECTION >
       void update_votes_impl(const account_name& voter_name, const account_name& proxy,
-         const COLLECTION& producers, bool voting,
-         const producer_info_index& _producers, bool update_producers );
+         const COLLECTION& producers, bool voting, bool update_producers );
 
    public:
 
       void update_votes(const account_name& voter_name, const account_name& proxy,
          const std::vector<account_name>& producers, bool voting,
-         const producer_info_index& _producers);
+         block_producer_voting_info* start_producers, uint32_t size );
+
+      void update_votes(const account_name& voter_name, const account_name& proxy,
+         const std::vector<account_name>& producers, bool voting);
 
       const voter_info_object* find_voter_info(const account_name& name) const;
 
@@ -152,7 +162,7 @@ class voting_manager final
       double get_producer_vote_weight() const;
       void set_producer_vote_weight(double w);
 
-      void propagate_weight_change(const voter_info_object& voter, const producer_info_index& _producers);
+      void propagate_weight_change(const voter_info_object& voter);
 
       uint64_t current_time() const;
       /**
@@ -173,6 +183,9 @@ class voting_manager final
    private:
       controller& _controller;
       chainbase::database& _db;
+
+      mutable wasm_data_writer wasm_writer;
+      mutable producer_information producer_info;
    };
 
 } }

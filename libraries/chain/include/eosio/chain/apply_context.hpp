@@ -582,7 +582,10 @@ class apply_context {
    public:
 
       void reward_all( uint64_t beos_to_distribute, uint64_t beos_to_distribute_trustee, uint64_t ram_to_distribute,
-         uint64_t ram_to_distribute_trustee, const asset* proxyArray, size_t proxyArrayLen, const voting_manager::producer_info_index& _producers );
+         uint64_t ram_to_distribute_trustee, const asset* proxyArray, size_t proxyArrayLen, block_producer_voting_info* start_producers, uint32_t* size );
+
+      void reward_all( uint64_t beos_to_distribute, uint64_t beos_to_distribute_trustee, uint64_t ram_to_distribute,
+         uint64_t ram_to_distribute_trustee, const asset* proxyArray, size_t proxyArrayLen );
       void reward_done();
 
    private:
@@ -590,8 +593,7 @@ class apply_context {
       inline void change_distribution_resource_limits( const account_name& acc, int64_t ram, int64_t net, int64_t cpu )const;
       inline void change_resource_limits( const account_name& acc, int64_t ram, int64_t net, int64_t cpu )const;
       
-      void reward_stake( const account_name& account, int64_t val,
-         const voting_manager::producer_info_index& _producers);
+      void reward_stake( const account_name& account, int64_t val );
 
       void reward_ram( const account_name& account, int64_t val );
 

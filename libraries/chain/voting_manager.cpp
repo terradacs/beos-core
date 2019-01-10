@@ -5,6 +5,8 @@
 #include <eosio/chain/database_utils.hpp>
 #include <eosio/chain/exceptions.hpp>
 
+#include <memory>
+
 //ABW: uncomment the following symbol to unconditionally write eosio::print calls to file (works even during unit tests)
 //#define CAVEMEN_DEBUG
 #ifdef CAVEMEN_DEBUG
@@ -40,7 +42,7 @@ fc::mutable_variant_object voter_info_object::convert_to_public_voter_info() con
    }
 
 voting_manager::voting_manager(controller& c, chainbase::database& d)
-  : _controller(c), _db(d)
+  : _controller(c), _db(d), producer_info(c, d)
   {
   }
 
@@ -121,20 +123,26 @@ inline void voting_manager::set_producer_vote_weight(double w)
    );
    }
 
-void voting_manager::register_voting_proxy(const account_name& proxy, bool isproxy,
-   const producer_info_index& _producers)
+void voting_manager::register_voting_proxy(const account_name& proxy, bool is_proxy,
+   block_producer_voting_info* start_producers, uint32_t size )
+{
+   prepare_producers( start_producers, size );
+   register_voting_proxy( proxy, is_proxy );
+}
+
+void voting_manager::register_voting_proxy(const account_name& proxy, bool isproxy)
    {
    const auto& _voters = _db.get_index<voter_info_index, by_owner>();
    auto& writableVoters = _db.get_mutable_index<voter_info_index>();
 
    auto pitr = _voters.find(proxy);
    if(pitr != _voters.end()) {
-      eosio_assert(isproxy != pitr->is_proxy, "action has no effect");
-      eosio_assert(!isproxy || !pitr->proxy, "account that uses a proxy is not allowed to become a proxy");
+      aux::eosio_assert(isproxy != pitr->is_proxy, "action has no effect");
+      aux::eosio_assert(!isproxy || !pitr->proxy, "account that uses a proxy is not allowed to become a proxy");
       writableVoters.modify(*pitr, [&](auto& p) {
          p.is_proxy = isproxy;
          });
-      propagate_weight_change(*pitr,  _producers);
+      propagate_weight_change(*pitr);
       }
    else {
       writableVoters.emplace([&](auto& p) {
@@ -144,12 +152,12 @@ void voting_manager::register_voting_proxy(const account_name& proxy, bool ispro
       }
    }
 
-void voting_manager::propagate_weight_change(const voter_info_object& voter, const producer_info_index& _producers)
+void voting_manager::propagate_weight_change(const voter_info_object& voter)
    {
    const auto& _voters = _db.get_index<voter_info_index, by_owner>();
    auto& writableVoters = _db.get_mutable_index<voter_info_index>();
 
-   eosio_assert(voter.proxy.empty() || !voter.is_proxy, "account registered as a proxy is not allowed to use a proxy");
+   aux::eosio_assert(voter.proxy.empty() || !voter.is_proxy, "account registered as a proxy is not allowed to use a proxy");
    double new_weight = stake2vote(voter.staked);
    if(voter.is_proxy) {
       new_weight += voter.proxied_vote_weight;
@@ -159,24 +167,28 @@ void voting_manager::propagate_weight_change(const voter_info_object& voter, con
    if(fabs(new_weight - voter.last_vote_weight) > 1) {
       if(voter.proxy) {
          auto foundProxyI = _voters.find(voter.proxy);
-         eosio_assert(foundProxyI != _voters.end(), "proxy not found"); //data corruption
+         aux::eosio_assert(foundProxyI != _voters.end(), "proxy not found"); //data corruption
          const auto& proxy = *foundProxyI; 
          writableVoters.modify(proxy, [&](auto& p) {
             p.proxied_vote_weight += new_weight - voter.last_vote_weight;
             }
          );
-         propagate_weight_change(proxy, _producers);
+         propagate_weight_change(proxy);
          }
       else {
          auto delta = new_weight - voter.last_vote_weight;
          auto total_producer_vote_weight = get_producer_vote_weight();
 
-         for(auto acnt : voter.producers) {
-            auto pitr = _producers.find(acnt); 
-            eosio_assert(pitr != _producers.end(), "producer not found"); //data corruption
+         auto call = [&]( const producer_information::producer_info_index::iterator& pitr, bool exists )
+         {
+            aux::eosio_assert( exists, "producer not found"); //data corruption
             pitr->second->total_votes += delta;
+            wasm_writer.save( pitr->second->owner, pitr->second->total_votes, pitr->second->is_active );
             total_producer_vote_weight += delta;
-            }
+         };
+
+         for(auto acnt : voter.producers)
+            producer_info.process_producer( acnt, call );
 
          set_producer_vote_weight(total_producer_vote_weight);
          }
@@ -189,8 +201,14 @@ void voting_manager::propagate_weight_change(const voter_info_object& voter, con
 
    }
 
-void voting_manager::update_voting_power(const account_name& from, int64_t stake_delta,
-   const producer_info_index& _producers)
+void voting_manager::update_voting_power(const account_name& voter, int64_t stake_delta,
+         block_producer_voting_info* start_producers, uint32_t size )
+{
+   prepare_producers( start_producers, size );
+   update_voting_power( voter, stake_delta );
+}
+
+void voting_manager::update_voting_power(const account_name& from, int64_t stake_delta )
    {
    const auto& voters = _db.get_index<voter_info_index, by_owner>();
    auto& writableVoters = _db.get_mutable_index<voter_info_index>();
@@ -216,7 +234,7 @@ void voting_manager::update_voting_power(const account_name& from, int64_t stake
          });
       }
    
-   eosio_assert(0 <= foundVoterInfo->staked, "stake for voting cannot be negative");
+   aux::eosio_assert(0 <= foundVoterInfo->staked, "stake for voting cannot be negative");
 
    if(from == N(b1))
       validate_b1_vesting(foundVoterInfo->staked);
@@ -224,20 +242,39 @@ void voting_manager::update_voting_power(const account_name& from, int64_t stake
    if(foundVoterInfo->producers.empty() == false || foundVoterInfo->proxy)
       {
          //When a power is changed, updating of producers is not necessary, because set of producers is still the same
-	      update_votes_impl(from, foundVoterInfo->proxy, foundVoterInfo->producers, false, _producers, false/*update_producers*/ );
+	      update_votes_impl(from, foundVoterInfo->proxy, foundVoterInfo->producers, false, false/*update_producers*/ );
       }
    }
 
+void voting_manager::prepare_producers( block_producer_voting_info* start_producers, uint32_t size )
+{
+   wasm_writer.clear( start_producers, size );
+   producer_info.clear();
+}
+
+uint32_t voting_manager::get_new_producers_size() const
+{
+   return wasm_writer.get_size();
+}
+
+void voting_manager::update_votes(const account_name& voter_name, const account_name& proxy,
+   const std::vector<account_name>& producers, bool voting,
+   block_producer_voting_info* start_producers, uint32_t size )
+{
+   prepare_producers( start_producers, size );
+   update_votes_impl( voter_name, proxy, producers, voting, true/*update_producers*/ );
+}
+
 template< typename COLLECTION >
 void voting_manager::update_votes_impl(const account_name& voter_name, const account_name& proxy,
-   const COLLECTION& producers, bool voting, const producer_info_index& _producers, bool update_producers )
+   const COLLECTION& producers, bool voting, bool update_producers )
    {
    const auto& _voters = _db.get_index<voter_info_index, by_owner>();
    auto& writableVoters = _db.get_mutable_index<voter_info_index>();
 
    auto voter = _voters.find(voter_name);
-   eosio_assert(voter != _voters.end(), "user must stake before they can vote"); /// staking creates voter object
-   eosio_assert(!proxy || !voter->is_proxy, "account registered as a proxy is not allowed to use a proxy");
+   aux::eosio_assert(voter != _voters.end(), "user must stake before they can vote"); /// staking creates voter object
+   aux::eosio_assert(!proxy || !voter->is_proxy, "account registered as a proxy is not allowed to use a proxy");
 
    int64_t total_activated_stake = 0; uint64_t thresh_activated_stake_time = 0;
    double total_producer_vote_weight = 0;
@@ -265,13 +302,13 @@ void voting_manager::update_votes_impl(const account_name& voter_name, const acc
    if(voter->last_vote_weight > 0) {
       if(voter->proxy) {
          auto old_proxy = _voters.find(voter->proxy);
-         eosio_assert(old_proxy != _voters.end(), "old proxy not found"); //data corruption
+         aux::eosio_assert(old_proxy != _voters.end(), "old proxy not found"); //data corruption
          writableVoters.modify(*old_proxy, [&](auto& vp) {
             vp.proxied_vote_weight -= voter->last_vote_weight;
             });
          
          store_voting_stats(total_activated_stake, thresh_activated_stake_time, total_producer_vote_weight);
-         propagate_weight_change(*old_proxy, _producers);
+         propagate_weight_change(*old_proxy);
          }
       else {
          for(const auto& p : voter->producers) {
@@ -284,15 +321,15 @@ void voting_manager::update_votes_impl(const account_name& voter_name, const acc
 
    if(proxy) {
       auto new_proxy = _voters.find(proxy);
-      eosio_assert(new_proxy != _voters.end(), "invalid proxy specified"); //if ( !voting ) { data corruption } else { wrong vote }
-      eosio_assert(!voting || new_proxy->is_proxy, "proxy not found");
+      aux::eosio_assert(new_proxy != _voters.end(), "invalid proxy specified"); //if ( !voting ) { data corruption } else { wrong vote }
+      aux::eosio_assert(!voting || new_proxy->is_proxy, "proxy not found");
       if(new_vote_weight >= 0) {
          writableVoters.modify(*new_proxy, [&](auto& vp) {
             vp.proxied_vote_weight += new_vote_weight;
             });
 
          store_voting_stats(total_activated_stake, thresh_activated_stake_time, total_producer_vote_weight);
-         propagate_weight_change(*new_proxy, _producers);
+         propagate_weight_change(*new_proxy);
          }
       }
    else {
@@ -305,22 +342,29 @@ void voting_manager::update_votes_impl(const account_name& voter_name, const acc
          }
       }
 
-   for(const auto& pd : producer_deltas) {
-      auto pitr = _producers.find(pd.first);
-      if(pitr != _producers.end()) {
-         eosio_assert(!voting || pitr->second->is_active || !pd.second.second /* not from new set */, "producer is not currently registered");
-            pitr->second->total_votes += pd.second.first;
-            if(pitr->second->total_votes < 0) { // floating point arithmetics can give small negative numbers
-               pitr->second->total_votes = 0;
-               }
-            
-            total_producer_vote_weight += pd.second.first;
-            //eosio_assert( p.total_votes >= 0, "something bad happened" );
-         }
-      else {
-         eosio_assert(!pd.second.second /* not from new set */, "producer is not registered"); //data corruption
-         }
-      }
+   for(const auto& pd : producer_deltas)
+   {
+      auto call = [&]( const producer_information::producer_info_index::iterator& pitr, bool exists )
+      {
+         if( exists ) {
+            aux::eosio_assert(!voting || pitr->second->is_active || !pd.second.second /* not from new set */, "producer is not currently registered");
+               pitr->second->total_votes += pd.second.first;
+               if(pitr->second->total_votes < 0) { // floating point arithmetics can give small negative numbers
+                  pitr->second->total_votes = 0;
+                  }
+
+               wasm_writer.save( pitr->second->owner, pitr->second->total_votes, pitr->second->is_active );
+
+               total_producer_vote_weight += pd.second.first;
+               //eosio_assert( p.total_votes >= 0, "something bad happened" );
+            }
+         else {
+            aux::eosio_assert(!pd.second.second /* not from new set */, "producer is not registered"); //data corruption
+            }
+      };
+
+      producer_info.process_producer( pd.first, call );
+   }
 
    store_voting_stats(total_activated_stake, thresh_activated_stake_time, total_producer_vote_weight);
 
@@ -331,13 +375,6 @@ void voting_manager::update_votes_impl(const account_name& voter_name, const acc
       av.proxy = proxy;
       });
    }
-
-void voting_manager::update_votes(const account_name& voter_name, const account_name& proxy,
-   const std::vector<account_name>& producers, bool voting,
-   const producer_info_index& _producers)
-{
-   update_votes_impl( voter_name, proxy, producers, voting, _producers, true/*update_producers*/ );
-}
 
 const voter_info_object* voting_manager::find_voter_info(const account_name& name) const
    {
@@ -398,22 +435,13 @@ inline void voting_manager::validate_b1_vesting(int64_t stake) const
    const uint32_t seconds_per_year = 52 * 7 * 24 * 3600;
    const int64_t claimable = int64_t(max_claimable * double(now() - base_time) / (10 * seconds_per_year));
 
-   eosio_assert(max_claimable - claimable <= stake, "b1 can only claim their tokens over 10 years");
+   aux::eosio_assert(max_claimable - claimable <= stake, "b1 can only claim their tokens over 10 years");
    }
 
 inline double voting_manager::stake2vote(int64_t staked) const {
    /// TODO subtract 2080 brings the large numbers closer to this decade
    double weight = int64_t((now() - (config::block_timestamp_epoch / 1000)) / (seconds_per_day * 7)) / double(52);
    return double(staked) * std::pow(2, weight);
-   }
-
-inline void voting_manager::eosio_assert(bool condition, const char* msg) const
-   {
-   if(BOOST_UNLIKELY(!condition)) {
-      std::string message(msg);
-      edump((message));
-      EOS_THROW(eosio_assert_message_exception, "assertion failure with message: ${s}", ("s", message));
-      }
    }
 
 } } /// namespace eosio::chain

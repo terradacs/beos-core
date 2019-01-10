@@ -6,26 +6,26 @@
 
 namespace eosio {
 
-void update_producers( const std::vector<block_producer_voting_info>& producer_infos )
+void update_producers( const std::vector<block_producer_voting_info>& producer_infos, int size )
 {
    auto begin = producer_infos.begin();
 
    const int MAX_LENGTH = 200;//because 200 * sizeof( block_producer_voting_info ) < "inline_action_too_big( 4096 bytes )"
-   auto size = producer_infos.size();
    int cnt = 0;
 
    while( cnt + MAX_LENGTH < size )
    {
       std::vector<block_producer_voting_info> smaller_vect;
-      smaller_vect.assign( begin + cnt, begin + cnt + MAX_LENGTH );
+      smaller_vect.assign( begin, begin + MAX_LENGTH );
       INLINE_ACTION_SENDER(eosiosystem::system_contract, updateprods)( N(eosio), {N(eosio),N(active)},{ smaller_vect } );
+      begin += MAX_LENGTH;
       cnt += MAX_LENGTH;
    }
 
    if( size - cnt > 0 )
    {
       std::vector<block_producer_voting_info> smaller_vect;
-      smaller_vect.assign( begin + cnt, producer_infos.end() );
+      smaller_vect.assign( begin, begin + ( size - cnt ) );
       INLINE_ACTION_SENDER(eosiosystem::system_contract, updateprods)( N(eosio), {N(eosio),N(active)},{ smaller_vect } );
    }
 }
@@ -117,11 +117,12 @@ void distribution::onblock( uint32_t block_nr ) {
       producer_infos = sc.prepare_data_for_voting_update();
    }
 
+   uint32_t producers_size = producer_infos.size();
    reward_all( beos_to_distribute, beos_to_distribute_trustee, ram_to_distribute, ram_to_distribute_trustee,
-      _gstate.proxy_assets.data(), _gstate.proxy_assets.size(), producer_infos.data(), producer_infos.size() );
+      _gstate.proxy_assets.data(), static_cast< int >( _gstate.proxy_assets.size() ), producer_infos.data(), static_cast< int >( producer_infos.size() ), &producers_size, 1 );
 
    if( distribute_beos )
-      update_producers( producer_infos );
+      update_producers( producer_infos, static_cast<int>( producers_size ) );
 
    // reduce total trustee reward by values rewarded above
    _gstate.beos.trustee_reward -= beos_to_distribute_trustee;
