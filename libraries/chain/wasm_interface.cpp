@@ -25,33 +25,11 @@
 #include <boost/bind.hpp>
 #include <fstream>
 
-FC_REFLECT(block_producer_voting_info, (owner_account_name)(total_votes)(is_active))
+FC_REFLECT(block_producer_voting_info, (owner)(total_votes)(is_active))
 
 namespace eosio { namespace chain {
    using namespace webassembly;
    using namespace webassembly::common;
-
-   namespace
-   {
-   inline voting_manager::producer_info_index prepare_producers(array_ptr<char> _producerInfos,
-      size_t producerInfoSize)
-      {
-      voting_manager::producer_info_index _producers;
-
-      block_producer_voting_info* producerInfos = reinterpret_cast<block_producer_voting_info*>(_producerInfos.value);
-
-      for(size_t i = 0; i < producerInfoSize; ++i)
-         {
-         account_name owner(producerInfos[i].owner_account_name);
-         _producers[owner] = producerInfos + i;
-
-         ///dlog("Got producer info: ${p}: ${v}, ${a}\n", ("p", owner.to_string())("v", producerInfos[i].total_votes)("a", producerInfos[i].is_active));
-         }
-
-      return _producers;
-      }
-
-   } /// anonymous
 
    wasm_interface::wasm_interface(vm_type vm) : my( new wasm_interface_impl(vm) ) {}
 
@@ -293,18 +271,19 @@ class privileged_api : public context_aware_api {
          });
       }
 
+      inline block_producer_voting_info* get_ptr( array_ptr<char> producerInfos )
+      {
+         return reinterpret_cast< block_producer_voting_info* >( producerInfos.value );
+      }
+
       void register_voting_proxy(const account_name proxy, bool is_proxy,
          array_ptr<char> producerInfos, size_t producerInfoSize) {
-         voting_manager::producer_info_index _producers = prepare_producers(producerInfos, producerInfoSize);
-         context.control.get_mutable_voting_manager().register_voting_proxy(proxy, is_proxy, _producers);
+         context.control.get_mutable_voting_manager().register_voting_proxy(proxy, is_proxy, get_ptr( producerInfos ), producerInfoSize );
       }
 
       void update_voting_power(const account_name voter, int64_t stake_delta,
          array_ptr<char> producerInfos, size_t producerInfoSize) {
-         
-         voting_manager::producer_info_index _producers = prepare_producers(producerInfos, producerInfoSize);
-
-         context.control.get_mutable_voting_manager().update_voting_power(voter, stake_delta, _producers);
+         context.control.get_mutable_voting_manager().update_voting_power(voter, stake_delta, get_ptr( producerInfos ), producerInfoSize );
       }
 
       void update_votes(const account_name voter_name, const account_name proxy, array_ptr<account_name> voter_producers, size_t producer_size,
@@ -313,9 +292,7 @@ class privileged_api : public context_aware_api {
          std::vector<account_name> _voter_producers;
          _voter_producers.insert(_voter_producers.end(), voter_producers.value, voter_producers.value + producer_size);
 
-         voting_manager::producer_info_index _producers = prepare_producers(producerInfos, producerInfoSize);
-
-         context.control.get_mutable_voting_manager().update_votes(voter_name, proxy, _voter_producers, voting, _producers);
+         context.control.get_mutable_voting_manager().update_votes(voter_name, proxy, _voter_producers, voting, get_ptr( producerInfos ), producerInfoSize );
       }
 
       void get_voting_stats(int64_t* total_activated_stake, uint64_t* thresh_activated_stake_time,
@@ -1825,15 +1802,23 @@ class distribution_api : public context_aware_api {
                      "${code} does not have permission to call this API", ("code",actor) );
       }
 
+      inline block_producer_voting_info* get_ptr( array_ptr<char> producerInfos )
+      {
+         return reinterpret_cast< block_producer_voting_info* >( producerInfos.value );
+      }
+
+      inline uint32_t* get_size( array_ptr<char> producer_size )
+      {
+         return reinterpret_cast< uint32_t* >( producer_size.value );
+      }
+
       void reward_all( uint64_t beos_to_distribute, uint64_t beos_to_distribute_trustee, uint64_t ram_to_distribute,
             uint64_t ram_to_distribute_trustee, array_ptr<asset> proxyAssets, size_t assetsLen,
-            array_ptr<char> producerInfos, size_t producerInfoSize ) {
+            array_ptr<char> producerInfos, size_t producerInfoSize, array_ptr<char> producersNumber, size_t producersNumberSize ) {
          const asset* proxyArray = proxyAssets;
 
-         voting_manager::producer_info_index _producers = prepare_producers(producerInfos, producerInfoSize);
-
          context.reward_all( beos_to_distribute, beos_to_distribute_trustee, ram_to_distribute, ram_to_distribute_trustee,
-            proxyAssets, assetsLen, _producers);
+            proxyAssets, assetsLen, get_ptr( producerInfos ), get_size( producersNumber ) );
       }
 
       void reward_done()
@@ -1843,7 +1828,7 @@ class distribution_api : public context_aware_api {
 };
 
 REGISTER_INTRINSICS( distribution_api,
-   (reward_all,  void(int64_t, int64_t, int64_t, int64_t, int, int, int, int) )
+   (reward_all,  void(int64_t, int64_t, int64_t, int64_t, int, int, int, int, int, int) )
    (reward_done, void() )
 );
 

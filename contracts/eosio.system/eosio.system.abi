@@ -28,7 +28,7 @@
        "name": "block_producer_voting_info",
        "base": "",
        "fields": [
-          {"name":"owner_account_name", "type":"account_name"},
+          {"name":"owner", "type":"account_name"},
           {"name":"total_votes", "type":"float64"},
           {"name":"is_active", "type":"bool"}
        ]
@@ -283,6 +283,7 @@
          {"name":"thresh_activated_stake_time",   "type":"uint64"},
          {"name":"last_producer_schedule_size",   "type":"uint16"},
          {"name":"total_producer_vote_weight",    "type":"float64"},
+         {"name":"total_producers",               "type":"uint32"},
          {"name":"last_name_close",               "type":"block_timestamp_type"}
       ]
     },{
