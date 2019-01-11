@@ -45,6 +45,7 @@ if __name__ == "__main__":
 
     eosio_rpc_actions.create_account("eosio", "eosio.token", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
     eosio_rpc_actions.create_account("eosio", "beos.init", config.EOSIO_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY)
+    eosio_rpc_actions.create_account("eosio", "terradacs", config.TERRADACS_OWNER_PUBLIC_KEY, config.TERRADACS_ACTIVE_PUBLIC_KEY)
     eosio_rpc_actions.create_account("eosio", "beos.trustee", config.TRUSTEE_OWNER_PUBLIC_KEY, config.TRUSTEE_ACTIVE_PUBLIC_KEY)
 
     eosio_rpc_actions.create_account("eosio", "producerjson", config.PRODUCERJSON_OWNER_PUBLIC_KEY, config.PRODUCERJSON_ACTIVE_PUBLIC_KEY)
