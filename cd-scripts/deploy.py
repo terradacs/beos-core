@@ -421,6 +421,7 @@ def initialize_beos():
             logger.info("Registering producer account for: {0}".format(producer))
             eosio_actions.push_action("eosio", "regproducer", '["{0}", "{1}", "{2}", 0]'.format(producer, data["pub_active"], data["url"]), producer)
 
+        eosio_actions.create_account("beos.gateway", "terradacs", config.TERRADACS_OWNER_PUBLIC_KEY, config.TERRADACS_ACTIVE_PUBLIC_KEY, True)
         eosio_actions.create_account("beos.gateway", "beos.trustee", config.TRUSTEE_OWNER_PUBLIC_KEY, config.TRUSTEE_ACTIVE_PUBLIC_KEY, True)
 
         for producer, data in config.PRODUCERS_ARRAY.items():
