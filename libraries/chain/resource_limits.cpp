@@ -366,7 +366,7 @@ bool resource_limits_manager::set_account_limits( const account_name& account, i
   return set_any_account_limits_impl( account, ram_bytes, net_weight, cpu_weight, false/*is_distribution*/ );
 }
 
-void resource_limits_manager::get_any_account_data( const account_name& account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight, bool is_distribution ) const
+bool resource_limits_manager::get_any_account_data( const account_name& account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight, bool is_distribution ) const
 {
    const auto* pending_buo = _db.find<resource_limits_object,by_owner>( boost::make_tuple(true, account) );
    if (pending_buo) {
@@ -391,6 +391,7 @@ void resource_limits_manager::get_any_account_data( const account_name& account,
         net_weight = pending_buo->net_weight;
         cpu_weight = pending_buo->cpu_weight;
       }
+      return pending_buo->unstaked_mode;
    } else {
       const auto& buo = _db.get<resource_limits_object,by_owner>( boost::make_tuple( false, account ) );
       if( is_distribution )
@@ -414,6 +415,8 @@ void resource_limits_manager::get_any_account_data( const account_name& account,
         net_weight = buo.net_weight;
         cpu_weight = buo.cpu_weight;
       }
+
+      return buo.unstaked_mode;
    }
 }
 
@@ -438,8 +441,8 @@ void resource_limits_manager::enable_unstake_mode_distribution_resource_rewards(
    }
 }
 
-void resource_limits_manager::get_distribution_resource_rewards( const account_name& account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight ) const {
-  get_any_account_data( account, ram_bytes, net_weight, cpu_weight, true/*is_distribution*/ );
+bool resource_limits_manager::get_distribution_resource_rewards( const account_name& account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight ) const {
+  return get_any_account_data( account, ram_bytes, net_weight, cpu_weight, true/*is_distribution*/ );
 }
 
 void resource_limits_manager::get_account_limits( const account_name& account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight ) const {

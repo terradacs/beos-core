@@ -299,6 +299,7 @@ class eosio_interchain_tester : public actions
     //because if it was calculated as in case of normal initialization phase test results for distribution would be more unstable)
 
     // [MK]: need to change creation with multisig
+    create_account_with_resources( config::gateway_account_name, N(terradacs) );
     create_account_with_resources( config::gateway_account_name, N(beos.trustee) );
 
     create_account_with_resources( config::gateway_account_name, N(alice) );

@@ -108,6 +108,15 @@ class voting_manager final
       void update_voting_power(const account_name& voter, int64_t stake_delta,
          const producer_info_index& _producers);
 
+   private:
+
+      template< typename COLLECTION >
+      void update_votes_impl(const account_name& voter_name, const account_name& proxy,
+         const COLLECTION& producers, bool voting,
+         const producer_info_index& _producers, bool update_producers );
+
+   public:
+
       void update_votes(const account_name& voter_name, const account_name& proxy,
          const std::vector<account_name>& producers, bool voting,
          const producer_info_index& _producers);

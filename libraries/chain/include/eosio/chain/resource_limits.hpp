@@ -64,7 +64,11 @@ namespace eosio { namespace chain { namespace resource_limits {
          bool set_distribution_account_limits( const account_name& account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight);
          bool set_account_limits( const account_name& account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight);
          void enable_unstake_mode_distribution_resource_rewards( account_name account );
-         void get_distribution_resource_rewards( const account_name& account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight) const;
+         /** Allows to retrieve amount of resources associated to given account by rewarding process performed during distribution period.
+             Returns true if given account has beeen already imported 'reward' info into `eosio::system::delband` table, next displayed
+             i.e. by get_account RPC call.
+         */
+         bool get_distribution_resource_rewards( const account_name& account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight) const;
          void get_account_limits( const account_name& account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight) const;
 
          void process_account_limit_updates();
@@ -104,7 +108,7 @@ namespace eosio { namespace chain { namespace resource_limits {
       private:
          chainbase::database& _db;
 
-         void get_any_account_data( const account_name& account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight, bool is_distribution ) const;
+         bool get_any_account_data( const account_name& account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight, bool is_distribution ) const;
          bool set_any_account_limits_impl( const account_name& account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight, bool is_distribution );
 
          template <typename TObjectConverter, typename TProcessor>

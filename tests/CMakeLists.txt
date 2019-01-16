@@ -176,34 +176,88 @@ else()
   message(WARNING "nodeos_under_min_avail_ram_lr_test test has been disabled")
 endif()
 
-add_test(NAME start_nodeos_keosd_via_run_py COMMAND run.py WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST start_nodeos_keosd_via_run_py PROPERTY LABELS beos_tests)
-add_test(NAME eos_voter_rpc_tests COMMAND python3 eos_voter_rpc_tests.py
-  --nodeos-ip ${NODEOS_IP_ADDRESS}
-  --nodeos-port ${NODEOS_PORT}
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
-set_property(TEST eos_voter_rpc_tests PROPERTY LABELS beos_tests)
-# add_test(NAME test03_scenarios_deploy COMMAND test03_scenarios_deploy.py --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT}
-# --add-block-number
-# --restore-node-params
-# --master-wallet-name ${MASTER_WALLET_NAME}
-# --starting-block-for-initial-witness-election ${STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION}
-# --distribution-params ${DISTRIBUTION_PARAMS}
-#  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests/beos_plugin_tests/)
-# set_property(TEST test03_scenarios_deploy PROPERTY LABELS nonparallelizable_tests)
-add_test(NAME test04_account_creation_and_get_account_deploy COMMAND tests/beos_plugin_tests/test04_account_creation_and_get_account_deploy.py  --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --master-wallet-name ${MASTER_WALLET_NAME}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST test04_account_creation_and_get_account_deploy PROPERTY LABELS nonparallelizable_tests)
-add_test(NAME test05_account_creation_with_delegate_ram COMMAND tests/beos_plugin_tests/test05_account_creation_with_delegate_ram.py  --main-dir ${CMAKE_BINARY_DIR} --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST test05_account_creation_with_delegate_ram PROPERTY LABELS nonparallelizable_tests)
-add_test(NAME test06_account_creation_and_account_validator_deploy COMMAND tests/beos_plugin_tests/test06_account_creation_and_account_validator_deploy.py  --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --master-wallet-name ${MASTER_WALLET_NAME}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR} )
-set_property(TEST test06_account_creation_and_account_validator_deploy PROPERTY LABELS nonparallelizable_tests)
-add_test(NAME test08_voting_test COMMAND tests/beos_plugin_tests/test08_voting_test.py  --main-dir ${CMAKE_BINARY_DIR} --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST test08_voting_test PROPERTY LABELS nonparallelizable_tests)
-add_test(NAME test09_vote_actions_test COMMAND tests/beos_plugin_tests/test09_vote_actions_test.py  --main-dir ${CMAKE_BINARY_DIR} --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST test09_vote_actions_test PROPERTY LABELS nonparallelizable_tests)
+add_test(NAME start_keosd_for_scenarios COMMAND run.py --wallet WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+add_test(NAME stop_keosd_for_scenarios COMMAND run.py --cancel --wallet WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
+add_test(NAME start_nodeos_keosd_via_run_py COMMAND run.py WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 add_test(NAME stop_nodeos_keosd_via_run_py COMMAND run.py --cancel WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST stop_nodeos_keosd_via_run_py PROPERTY LABELS beos_tests)
+
+set_property(TEST start_keosd_for_scenarios PROPERTY LABELS beos_tests)
+set_tests_properties(stop_keosd_for_scenarios  PROPERTIES LABELS beos_tests DEPENDS start_keosd_for_scenarios)
+set_property(TEST start_nodeos_keosd_via_run_py PROPERTY LABELS beos_tests)
+set_tests_properties(stop_nodeos_keosd_via_run_py PROPERTIES LABELS beos_tests DEPENDS start_nodeos_keosd_via_run_py)
+
+if(NOT DISABLE_FAILING_TESTS)
+  set_tests_properties(start_keosd_for_scenarios PROPERTIES LABELS beos_tests DEPENDS nodeos_under_min_avail_ram_lr_test)
+else()
+  set_tests_properties(start_keosd_for_scenarios PROPERTIES LABELS beos_tests DEPENDS nodeos_sanity_bnet_lr_test)
+endif()
+
+set_property(TEST stop_keosd_for_scenarios APPEND PROPERTY DEPENDS start_keosd_for_scenarios)
+
+macro(SUBDIRLIST result curdir)
+  file(GLOB children RELATIVE ${curdir} ${curdir}/*)
+  set(dirlist "")
+  foreach(child ${children})
+    if(IS_DIRECTORY ${curdir}/${child})
+      list(APPEND dirlist ${child})
+    endif()
+  endforeach()
+  set(${result} ${dirlist})
+endmacro()
+
+SUBDIRLIST(Scenarios ${CMAKE_BINARY_DIR}/tests/beos_plugin_tests/scenarios/)
+
+list(LENGTH Scenarios nr_of_scenarios_folders)
+math(EXPR nr_of_scenarios_folders "${nr_of_scenarios_folders}-1")
+set(port_counter 1)
+set(test_base_name "test03_scenarios_deploy_")
+foreach(scenario_dir ${Scenarios})
+  math(EXPR NODEOS_SCENARIO_PORT "10000+${port_counter}")
+  set(test_name "${test_base_name}${scenario_dir}")
+  add_test(NAME ${test_name} COMMAND tests/beos_plugin_tests/test03_scenarios_deploy.py
+  --nodeos-ip ${NODEOS_IP_ADDRESS}
+  --nodeos-port ${NODEOS_SCENARIO_PORT}
+  --keosd-ip ${KEOSD_IP_ADDRESS}
+  --keosd-port ${KEOSD_PORT} 
+  --master-wallet-name ${MASTER_WALLET_NAME}
+  --scenarios ${CMAKE_BINARY_DIR}/tests/beos_plugin_tests/scenarios/${scenario_dir}
+  --path-to-cleos ${CMAKE_BINARY_DIR}/build/programs/cleos/
+  --path-to-keosd ${CMAKE_BINARY_DIR}/build/programs/keosd/
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+  set_tests_properties( ${test_name} PROPERTIES LABELS beos_tests DEPENDS start_keosd_for_scenarios)
+  set_property(TEST stop_keosd_for_scenarios APPEND PROPERTY DEPENDS ${test_name})
+  set_property(TEST start_nodeos_keosd_via_run_py APPEND PROPERTY DEPENDS ${test_name})
+  math(EXPR port_counter "${port_counter}+1")
+endforeach()
+
+set_property(TEST start_nodeos_keosd_via_run_py APPEND PROPERTY DEPENDS stop_keosd_for_scenarios )
+
+add_test(NAME eos_voter_rpc_tests COMMAND python3 eos_voter_rpc_tests.py --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+set_tests_properties(eos_voter_rpc_tests PROPERTIES LABELS beos_tests DEPENDS start_nodeos_keosd_via_run_py)
+
+add_test(NAME test04_account_creation_and_get_account_deploy COMMAND tests/beos_plugin_tests/test04_account_creation_and_get_account_deploy.py --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT}  --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --master-wallet-name ${MASTER_WALLET_NAME}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(test04_account_creation_and_get_account_deploy PROPERTIES LABELS beos_tests DEPENDS start_nodeos_keosd_via_run_py)
+
+add_test(NAME test05_account_creation_with_delegate_ram COMMAND tests/beos_plugin_tests/test05_account_creation_with_delegate_ram.py  --main-dir ${CMAKE_BINARY_DIR} --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(test05_account_creation_with_delegate_ram PROPERTIES LABELS beos_tests DEPENDS start_nodeos_keosd_via_run_py)
+
+add_test(NAME test06_account_creation_and_account_validator_deploy COMMAND tests/beos_plugin_tests/test06_account_creation_and_account_validator_deploy.py --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT} --keosd-ip ${KEOSD_IP_ADDRESS}  --keosd-port ${KEOSD_PORT} --master-wallet-name ${MASTER_WALLET_NAME} WORKING_DIRECTORY ${CMAKE_BINARY_DIR} )
+set_tests_properties(test06_account_creation_and_account_validator_deploy PROPERTIES LABELS beos_tests DEPENDS start_nodeos_keosd_via_run_py)
+
+add_test(NAME test08_voting_test COMMAND tests/beos_plugin_tests/test08_voting_test.py  --main-dir ${CMAKE_BINARY_DIR} --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(test08_voting_test PROPERTIES LABELS beos_tests DEPENDS start_nodeos_keosd_via_run_py)
+
+add_test(NAME test09_vote_actions_test COMMAND tests/beos_plugin_tests/test09_vote_actions_test.py  --main-dir ${CMAKE_BINARY_DIR} --nodeos-ip ${NODEOS_IP_ADDRESS} --nodeos-port ${NODEOS_PORT}  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(test09_vote_actions_test PROPERTIES LABELS beos_tests DEPENDS start_nodeos_keosd_via_run_py)
+
+
+set_tests_properties(stop_nodeos_keosd_via_run_py PROPERTIES LABELS beos_tests DEPENDS start_nodeos_keosd_via_run_py)
+set_property(TEST stop_nodeos_keosd_via_run_py APPEND PROPERTY DEPENDS test04_account_creation_and_get_account_deploy)
+set_property(TEST stop_nodeos_keosd_via_run_py APPEND PROPERTY DEPENDS test05_account_creation_with_delegate_ram)
+set_property(TEST stop_nodeos_keosd_via_run_py APPEND PROPERTY DEPENDS test06_account_creation_and_account_validator_deploy)
+set_property(TEST stop_nodeos_keosd_via_run_py APPEND PROPERTY DEPENDS test08_voting_test)
+set_property(TEST stop_nodeos_keosd_via_run_py APPEND PROPERTY DEPENDS test09_vote_actions_test)
 
 if(ENABLE_COVERAGE_TESTING)
 

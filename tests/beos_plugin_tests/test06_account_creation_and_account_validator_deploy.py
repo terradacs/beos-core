@@ -9,7 +9,6 @@ import requests
 import datetime
 import argparse
 
-from testscenarios  import TestScenarios
 from eosrpcexecutor import EOSRPCExecutor
 
 args        = None
