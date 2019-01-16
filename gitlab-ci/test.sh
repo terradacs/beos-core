@@ -1,7 +1,8 @@
 #!/bin/bash
 cd ~/ci/beos-core/$CI_ENVIRONMENT_SLUG/$CI_COMMIT_REF_NAME/build
 echo "Starting integration tests"
-if ! make test
+#if ! make test
+if ! ctest -LE "beos_tests" || ! ctest -j4 -L "beos_tests" ;
 then
   printf "Test failure. Exiting..."
   exit 1

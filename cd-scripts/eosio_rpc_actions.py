@@ -30,7 +30,7 @@ logger.addHandler(fh)
 
 EOSIO = eosio_rpc_client.EosioInterface(config.NODEOS_IP_ADDRESS, config.NODEOS_PORT, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)
 
-def extend_expiration_time(_time, _extend_by_seconds = 60):
+def extend_expiration_time(_time, _extend_by_seconds = 300):
   format = "%Y-%m-%dT%H:%M:%S.%f"
   d = datetime.datetime.strptime(_time, format)
   d = d + datetime.timedelta(seconds = _extend_by_seconds)
@@ -166,13 +166,15 @@ def push_action(account, actor, action_data, permission, blocking = False):
   push_transaction_resp = EOSIO.chain.push_transaction(push_transaction_data)
   logger.info("push_transaction_resp")
   logger.info(push_transaction_resp)
+  
   if "transaction_id" in push_transaction_resp:
     processed_block_num = push_transaction_resp["processed"]["block_num"]
     logger.info("[ACTION][OK] {0} pushed to block {1}".format(actions, processed_block_num))
     if blocking:
-      block_until_transaction_in_block(push_transaction_resp['transaction_id'], processed_block_num)
+      return (block_until_transaction_in_block(push_transaction_resp['transaction_id'], processed_block_num), push_transaction_resp)
   else:
     logger.error("[ACTION][ERROR] failed to push action {0} to block".format(actions))
+  return (0, push_transaction_resp)
 
 BLOCK_TYPE_HEADBLOCK = "head_block_num"
 BLOCK_TYPE_IRREVERSIBLE = "last_irreversible_block_num"
@@ -181,6 +183,7 @@ def block_until_transaction_in_block(transaction_id, block_num, block_type = BLO
   import time
   step = 0.25
   timeout_cnt = 0.
+  enter_block = EOSIO.chain.get_info()[BLOCK_TYPE_HEADBLOCK]
   while True:
     last_block_num = EOSIO.chain.get_info()[BLOCK_TYPE_HEADBLOCK]
     logger.debug("Waiting for block: {0}, current block is {1}".format(block_num, last_block_num))
@@ -195,7 +198,7 @@ def block_until_transaction_in_block(transaction_id, block_num, block_type = BLO
           tid = trx.get("id", None)
           if tid is not None and tid == transaction_id:
             logger.info("Transaction id: {0} found in block: {1}".format(transaction_id, block_num))
-            return
+            return block_num - enter_block 
       logger.info("Transaction id: {0} not found in block: {1}".format(transaction_id, block_num))
     time.sleep(step)
     timeout_cnt = timeout_cnt + step

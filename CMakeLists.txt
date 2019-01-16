@@ -308,6 +308,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cd-scripts/resources/config.ini.in ${
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cd-scripts/resources/genesis.json.in ${CMAKE_CURRENT_BINARY_DIR}/resources/genesis.json)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cd-scripts/resources/run.py.in ${CMAKE_CURRENT_BINARY_DIR}/run.py)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cd-scripts/resources/run.py.in ${CMAKE_CURRENT_SOURCE_DIR}/tests/beos_plugin_tests/beos_test_utils/run.py)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cd-scripts/resources/run.py.in ${CMAKE_CURRENT_SOURCE_DIR}/build/tests/beos_plugin_tests/beos_test_utils/run.py)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/api.ini ${CMAKE_CURRENT_BINARY_DIR}/resources/api.ini COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/all_in_one.ini ${CMAKE_CURRENT_BINARY_DIR}/resources/all_in_one.ini COPYONLY)

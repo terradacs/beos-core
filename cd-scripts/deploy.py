@@ -310,6 +310,7 @@ def build_eosio(c_compiler, cxx_compiler):
         "-DNODEOS_PORT={0}".format(config.NODEOS_PORT),
         "-DNODEOS_EXECUTABLE={0}".format(config.NODEOS_EXECUTABLE),
         "-DPRODUCER_NAME={0}".format(config.PRODUCER_NAME),
+        "-DSTART_NODE_INDEX={0}".format(config.START_NODE_INDEX),
         config.BEOS_DIR
     ]
     logger.info("Running cmake with params {0}".format(" ".join(params)))
