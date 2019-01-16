@@ -310,6 +310,7 @@ def build_eosio(c_compiler, cxx_compiler):
         "-DNODEOS_PORT={0}".format(config.NODEOS_PORT),
         "-DNODEOS_EXECUTABLE={0}".format(config.NODEOS_EXECUTABLE),
         "-DPRODUCER_NAME={0}".format(config.PRODUCER_NAME),
+        "-DSTART_NODE_INDEX={0}".format(config.START_NODE_INDEX),
         config.BEOS_DIR
     ]
     logger.info("Running cmake with params {0}".format(" ".join(params)))
@@ -421,6 +422,7 @@ def initialize_beos():
             logger.info("Registering producer account for: {0}".format(producer))
             eosio_actions.push_action("eosio", "regproducer", '["{0}", "{1}", "{2}", 0]'.format(producer, data["pub_active"], data["url"]), producer)
 
+        eosio_actions.create_account("beos.gateway", "terradacs", config.TERRADACS_OWNER_PUBLIC_KEY, config.TERRADACS_ACTIVE_PUBLIC_KEY, True)
         eosio_actions.create_account("beos.gateway", "beos.trustee", config.TRUSTEE_OWNER_PUBLIC_KEY, config.TRUSTEE_ACTIVE_PUBLIC_KEY, True)
 
         for producer, data in config.PRODUCERS_ARRAY.items():

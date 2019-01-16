@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 
-import subprocess
+
 import os
+import re
 import sys
-import datetime
 import time
+import argparse
+import datetime
+import fileinput
+import subprocess
 
 class BeosRunnerException(Exception):
     def __init__(self, message):
@@ -49,7 +53,7 @@ def wait_for_string_in_file(log_file_name, string, timeout):
             continue
         with open(log_file_name, "r") as log_file:
             leave = False
-            for line in log_file.readlines():
+            for line in log_file.readlines()[-5:]:
                 if string in line:
                     leave = True
                     break
@@ -153,14 +157,110 @@ def kill_process(pid_file_name, proc_name, ip_address, port):
     if os.path.exists(pid_file_name):
         os.remove(pid_file_name)
 
-def usage():
-    print("Usage:")
-    print("To run beos wallet and node use: python3 run.py")
-    print("To kill running beos wallet and node use: python3 run.py --cancel")
+def clone_nodeos( _path_to_clone_to, _clone_index, _name, _additional_producers = None):
+    config_ini = "config.ini"
+    p2p_listen_endpoint = "p2p-listen-endpoint"
+    http_server_address = "http-server-address"
+    working_dir = "{0}{1}-{2}/".format("${NODEOS_WORKING_DIR}", "${START_NODE_INDEX}", "eosio")
+    copied_working_dir  = "{0}/{1}-{2}/".format(_path_to_clone_to, _clone_index, _name)
+    if os.path.exists(copied_working_dir):
+        clear = "rm -rf {0}".format(copied_working_dir)
+        subprocess.call(clear, shell=True)
+    copy = "cp -rf {0} {1}".format(working_dir, copied_working_dir)
+    subprocess.call(copy, shell=True)
+    with fileinput.FileInput(copied_working_dir + '/' + config_ini, inplace=True) as config:
+        for line in config:
+            if p2p_listen_endpoint in line or http_server_address in line:
+                port = re.findall(":[0-9]+", line)
+                if port:
+                    if p2p_listen_endpoint in line:
+                        print(line.replace(port[0][1:], str(int(port[0][1:])+_clone_index)), end='') 
+                    else:
+                        print(line.replace(port[0][1:], str(_clone_index)), end='')
+                else :
+                   print(line, end='')
+            else :
+                print(line, end='')
+    if _additional_producers:
+        with open(copied_working_dir + '/' + config_ini, "a") as config:
+            for prod, key in _additional_producers.items():
+                config.write("producer-name = {0}\n".format(prod))
+                config.write("signature-provider = {0}=KEOSD:http://${KEOSD_IP_ADDRESS}:${KEOSD_PORT}/v1/wallet/sign_digest\n".format(key))
+
+
+def run_custom_nodeos(_node_index, _name, _path_to_data_dir, _log_path):
+    working_dir = "{0}/{1}-{2}/".format(_path_to_data_dir, _node_index, _name)
+
+    parameters = [
+        "${NODEOS_EXECUTABLE}",
+        "--contracts-console",
+        "--blocks-dir", os.path.abspath(working_dir) + '/blocks',
+        "--config-dir", os.path.abspath(working_dir),
+        "--data-dir", os.path.abspath(working_dir),
+    ]
+
+    log_file_name = _log_path+"/{0}-{1}-{2}-{3}.log".format("nodeos", datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S"), _node_index, _name)
+
+    save_screen_cfg(_path_to_data_dir+"/nodeos_screen_{0}_{1}.cfg".format(_node_index, _name), log_file_name)
+    screen_params = [
+        "screen",
+        "-m",
+        "-d",
+        "-L",
+        "-c",
+        _path_to_data_dir+"/nodeos_screen_{0}_{1}.cfg".format(_node_index, _name),
+        "-S",
+        "{0}-{1}".format("nodeos-{0}".format(_node_index), datetime.datetime.now().strftime("%Y-%m-%d"))
+    ]
+
+    parameters = screen_params + parameters
+    print("Running nodeos with command: {0}".format(" ".join(parameters)))
+    try:
+        subprocess.Popen(parameters)
+        save_pid_file(_path_to_data_dir+"/run_nodeos_{0}_{1}.pid".format(_node_index, _name), "nodeos-{0}".format(_node_index))
+        wait_for_string_in_file(log_file_name, "] Produced block", 60.)
+    except Exception as ex:
+        print("Exception during nodeos run: {0}".format(ex))
+        kill_process(_path_to_data_dir+"/run_nodeos_{0}_{1}.pid".format(_node_index, _name), "nodeos-{0}".format(_node_index), "${NODEOS_IP_ADDRESS}", "${NODEOS_PORT}")
+        sys.exit(1)
+
+description = """\nUsage:
+    \nTo run beos wallet and node use: python3 run.py
+    \nTo kill running beos wallet and node use: python3 run.py --cancel
+    \nTo only run beos wallet use: python3 run.py --wallet
+    \nTo kill running beos wallet and node use: python3 run.py --cancel --wallet """
+
+parser = argparse.ArgumentParser(description=description)
+parser.add_argument('--cancel', help="Cancel runned nodeo(s) and keosd.", default=False, action="store_true")
+parser.add_argument('--wallet',  help="Run/kill wallet.", default=False, action="store_true")
+parser.add_argument('--node',  help="Run/kill node.", default=False, action="store_true")
 
 if __name__ == "__main__":
-    argc = len(sys.argv)
-    if argc == 1:
+    args = parser.parse_args()
+    if args.cancel:
+        if args.wallet or args.node:
+            if args.wallet:
+                kill_process("./run_keosd.pid", "keosd", "${KEOSD_IP_ADDRESS}", "${KEOSD_PORT}")
+            if args.node:
+                kill_process("./run_nodeos.pid", "nodeos", "${NODEOS_IP_ADDRESS}", "${NODEOS_PORT}")
+            sys.exit(0)
+        else:
+            kill_process("./run_keosd.pid", "keosd", "${KEOSD_IP_ADDRESS}", "${KEOSD_PORT}")
+            kill_process("./run_nodeos.pid", "nodeos", "${NODEOS_IP_ADDRESS}", "${NODEOS_PORT}")
+            sys.exit(0)
+
+    if args.wallet or args.node:
+        if args.wallet:
+            if os.path.exists("./run_keosd.pid"):
+                print("run_keosd.pid exists in the filesystem. Please use --cancel option first")
+                sys.exit(1)
+            run_keosd_postconf("${KEOSD_IP_ADDRESS}", "${KEOSD_PORT}", "${DEFAULT_WALLET_DIR}")
+        if args.node:
+            if os.path.exists("./run_nodeos.pid"):
+                print("run_nodeos.pid exists in the filesystem. Please use --cancel option first")
+                sys.exit(1)
+            run_nodeos_postconf(0, "eosio", "${EOSIO_ROOT_KEY}")
+    else:
         if os.path.exists("./run_keosd.pid"):
             print("run_keosd.pid exists in the filesystem. Please use --cancel option first")
             sys.exit(1)
@@ -170,13 +270,7 @@ if __name__ == "__main__":
         run_keosd_postconf("${KEOSD_IP_ADDRESS}", "${KEOSD_PORT}", "${DEFAULT_WALLET_DIR}")
         run_nodeos_postconf(0, "eosio", "${EOSIO_ROOT_KEY}")
         sys.exit(0)
-    elif argc == 2 and sys.argv[1] == "--cancel":
-        kill_process("./run_keosd.pid", "keosd", "${KEOSD_IP_ADDRESS}", "${KEOSD_PORT}")
-        kill_process("./run_nodeos.pid", "nodeos", "${NODEOS_IP_ADDRESS}", "${NODEOS_PORT}")
-        sys.exit(0)
-    else:
-        usage()
-        sys.exit(1)
+
 
 
 

@@ -1753,6 +1753,21 @@ read_only::get_account_results read_only::get_account( const get_account_params&
          }
       }
 
+      int64_t rewardRam = 0, rewardCpu = 0, rewardNet = 0;
+      bool delbandTableUpdated = rm.get_distribution_resource_rewards(params.account_name, rewardRam, rewardNet, rewardCpu);
+
+      if(delbandTableUpdated == false && rewardNet != 0 && rewardCpu != 0)
+         {
+         FC_ASSERT(result.self_delegated_bandwidth.is_null(), "mismatch between already filled delband and get_distribution_resource_rewards unstake_mode");
+         result.self_delegated_bandwidth = mutable_variant_object()
+            ("from", params.account_name)
+            ("to", params.account_name)
+            ("net_weight", asset(rewardNet))
+            ("cpu_weight", asset(rewardCpu))
+            ;
+         }
+
+
       t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple( config::system_account_name, params.account_name, N(refunds) ));
       if (t_id != nullptr) {
          const auto &idx = d.get_index<key_value_index, by_scope_primary>();
