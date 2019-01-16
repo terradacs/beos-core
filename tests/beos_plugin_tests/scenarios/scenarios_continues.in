@@ -92,20 +92,6 @@
 			"owner_pub": "${key}",
 			"activ_pub": "${key}"
 		}, {
-			"start_block": 3,
-			"authorized_by": "${user_1}",
-			"code": "beos.gateway",
-			"action": "withdraw",
-			"args": {
-				"from": "${user_1}",
-				"bts_to": "any_account",
-				"quantity": "5.0000 PXBTS", "memo": ""
-			},
-			"expected_result": {
-				"status": true,
-				"message": ""
-			}
-		}, {
 			"start_block": 4,
 			"authorized_by": "beos.gateway",
 			"code": "beos.gateway",
@@ -227,16 +213,6 @@
 			"name": "${user_4}",
 			"owner_pub": "${key}",
 			"activ_pub": "${key}"
-		}, {
-			"start_block": 3,
-			"authorized_by": "${user_2}",
-			"code": "beos.gateway",
-			"action": "withdraw",
-			"args": {
-				"from": "${user_2}",
-				"bts_to": "any_account",
-				"quantity": "20.0000 PXBTS", "memo": ""
-			}
 		}, {
 			"start_block": 3,
 			"authorized_by": "beos.gateway",
@@ -426,26 +402,6 @@
 			"owner_pub": "${key}",
 			"activ_pub": "${key}"
 		}, {
-			"start_block": 2,
-			"authorized_by": "${user_3}",
-			"code": "beos.gateway",
-			"action": "withdraw",
-			"args": {
-				"from": "${user_3}",
-				"bts_to": "any_account",
-				"quantity": "20.0000 PXBTS", "memo": ""
-			}
-		}, {
-			"start_block": 2,
-			"authorized_by": "${user_4}",
-			"code": "beos.gateway",
-			"action": "withdraw",
-			"args": {
-				"from": "${user_4}",
-				"bts_to": "any_account",
-				"quantity": "15.0000 PXBTS", "memo": ""
-			}
-		}, {
 			"start_block": 3,
 			"authorized_by": "beos.gateway",
 			"code": "beos.gateway",
@@ -514,34 +470,6 @@
 			"owner_pub": "${key}",
 			"activ_pub": "${key}"
 		}, {
-			"start_block": 3,
-			"authorized_by": "${user_5}",
-			"code": "beos.gateway",
-			"action": "withdraw",
-			"args": {
-				"from": "${user_5}",
-				"bts_to": "any_account",
-				"quantity": "20.0000 PXBTS", "memo": ""
-			},
-			"expected_result": {
-				"status": false,
-				"message": "transaction net usage is too high"
-			}
-		}, {
-			"start_block": 3,
-			"authorized_by": "${user_6}",
-			"code": "beos.gateway",
-			"action": "withdraw",
-			"args": {
-				"from": "${user_6}",
-				"bts_to": "any_account",
-				"quantity": "20.0000 PXBTS", "memo": ""
-			},
-			"expected_result": {
-				"status": false,
-				"message": "transaction net usage is too high"
-			}
-		}, {
 			"start_block": 4,
 			"authorized_by": "beos.gateway",
 			"code": "beos.gateway",
@@ -598,48 +526,112 @@
 			}
 		},
 		"actions": [{
+			"start_block": 2,
+			"action": "newaccount_pattern",
+			"name": "${user_50}",
+			"owner_pub": "${key}",
+			"activ_pub": "${key}"
+		},{
+			"start_block": 2,
+			"action": "newaccount_pattern",
+			"name": "${user_60}",
+			"owner_pub": "${key}",
+			"activ_pub": "${key}"
+		},{
+			"start_block": 2,
+			"action": "newaccount_pattern",
+			"name": "${user_70}",
+			"owner_pub": "${key}",
+			"activ_pub": "${key}"
+		},{
+			"start_block": 2,
+			"action": "newaccount_pattern",
+			"name": "${user_80}",
+			"owner_pub": "${key}",
+			"activ_pub": "${key}"
+		},{
+			"start_block": 6,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "${user_50}",
+				"quantity": "20.0000 PXBTS"
+			}
+		},{
+			"start_block": 6,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "${user_60}",
+				"quantity": "20.0000 PXBTS"
+			}
+		},{
+			"start_block": 6,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "${user_70}",
+				"quantity": "20.0000 PXBTS"
+			}
+		},{
+			"start_block": 6,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "${user_80}",
+				"quantity": "20.0000 PXBTS"
+			}
+		},{
 			"start_block": 15,
-			"authorized_by": "${user_5}",
+			"authorized_by": "${user_50}",
 			"code": "beos.gateway",
 			"action": "withdraw",
 			"args": {
-				"from": "${user_5}",
+				"from": "${user_50}",
 				"bts_to": "any_account",
 				"quantity": "20.0000 PXBTS", "memo": ""
 			}
 		}, {
 			"start_block": 25,
-			"authorized_by": "${user_6}",
+			"authorized_by": "${user_60}",
 			"code": "beos.gateway",
 			"action": "withdraw",
 			"args": {
-				"from": "${user_6}",
+				"from": "${user_60}",
 				"bts_to": "any_account",
 				"quantity": "20.0000 PXBTS", "memo": ""
 			}
 		}, {
 			"start_block": 35,
-			"authorized_by": "${user_7}",
+			"authorized_by": "${user_70}",
 			"code": "beos.gateway",
 			"action": "withdraw",
 			"args": {
-				"from": "${user_7}",
+				"from": "${user_70}",
 				"bts_to": "any_account",
 				"quantity": "20.0000 PXBTS", "memo": ""
 			}
 		}, {
 			"start_block": 45,
-			"authorized_by": "${user_8}",
+			"authorized_by": "${user_80}",
 			"code": "beos.gateway",
 			"action": "withdraw",
 			"args": {
-				"from": "${user_8}",
+				"from": "${user_80}",
 				"bts_to": "any_account",
 				"quantity": "20.0000 PXBTS", "memo": ""
 			}
 		}],
 		"expected_results": [{
-			"user": "${user_5}",
+			"user": "${user_50}",
 			"at_end": {
 				"resources":{
 				"balance": "",
@@ -677,7 +669,7 @@
 				"ram_bytes": 1255448}
 			}]
 		}, {
-			"user": "${user_6}",
+			"user": "${user_60}",
 			"at_end": {
 				"resources":{
 				"balance": "",
@@ -715,7 +707,7 @@
 				"ram_bytes": 2922115}
 			}]
 		}, {
-			"user": "${user_7}",
+			"user": "${user_70}",
 			"at_end": {
 				"resources":{
 				"balance": "",
@@ -753,7 +745,7 @@
 				"ram_bytes": 5422115}
 			}]
 		}, {
-			"user": "${user_8}",
+			"user": "${user_80}",
 			"at_end": {
 				"resources":{
 				"balance": "",
@@ -806,12 +798,44 @@
 			}
 		},
 		"actions": [{
-			"start_block": 5,
-			"authorized_by": "${user_5}",
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "${user_51}",
+			"owner_pub": "${key}",
+			"activ_pub": "${key}"
+		},{
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "${user_61}",
+			"owner_pub": "${key}",
+			"activ_pub": "${key}"
+		},{
+			"start_block": 4,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "${user_51}",
+				"quantity": "20.0000 PXBTS"
+			}
+		},{
+			"start_block": 4,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "${user_61}",
+				"quantity": "20.0000 PXBTS"
+			}
+		},{
+			"start_block": 6,
+			"authorized_by": "${user_51}",
 			"code": "eosio",
 			"action": "sellram",
 			"args": {
-				"account": "${user_5}",
+				"account": "${user_51}",
 				"bytes": "10000"
 			},
 			"expected_result": {
@@ -819,13 +843,13 @@
 				"message": "RAM shouldn't be liquid during distribution period"
 			}
 		}, {
-			"start_block": 5,
-			"authorized_by": "${user_5}",
+			"start_block": 6,
+			"authorized_by": "${user_51}",
 			"code": "eosio",
 			"action": "buyram",
 			"args": {
-				"payer": "${user_5}",
-				"receiver": "${user_6}",
+				"payer": "${user_51}",
+				"receiver": "${user_61}",
 				"quant": "1.0000 BEOS"
 			},
 			"expected_result": {
@@ -834,11 +858,11 @@
 			}
 		}, {
 			"start_block": 20,
-			"authorized_by": "${user_5}",
+			"authorized_by": "${user_51}",
 			"code": "eosio",
 			"action": "sellram",
 			"args": {
-				"account": "${user_5}",
+				"account": "${user_51}",
 				"bytes": "10000"
 			},
 			"expected_result": {
@@ -847,12 +871,12 @@
 			}
 		}, {
 			"start_block": 20,
-			"authorized_by": "${user_5}",
+			"authorized_by": "${user_51}",
 			"code": "eosio",
 			"action": "buyram",
 			"args": {
-				"payer": "${user_5}",
-				"receiver": "${user_6}",
+				"payer": "${user_51}",
+				"receiver": "${user_61}",
 				"quant": "1.0000 BEOS"
 			},
 			"expected_result": {
@@ -861,21 +885,21 @@
 			}
 		}, {
 			"start_block": 35,
-			"authorized_by": "${user_5}",
+			"authorized_by": "${user_51}",
 			"code": "eosio",
 			"action": "sellram",
 			"args": {
-				"account": "${user_5}",
+				"account": "${user_51}",
 				"bytes": "10000"
 			}
 		}, {
 			"start_block": 35,
-			"authorized_by": "${user_5}",
+			"authorized_by": "${user_51}",
 			"code": "eosio",
 			"action": "buyram",
 			"args": {
-				"payer": "${user_5}",
-				"receiver": "${user_6}",
+				"payer": "${user_51}",
+				"receiver": "${user_61}",
 				"quant": "10.0000 BEOS"
 			},
 			"expected_result": {
@@ -884,43 +908,23 @@
 			}
 		}],
 		"expected_results": [{
-			"user": "${user_5}",
+			"user": "${user_51}",
 			"at_end": {
 				"resources":{
-				"balance": "",
+				"balance": "20.0000 PXBTS",
 				"net_weight": "100.0000 BEOS",
 				"cpu_weight": "100.0000 BEOS",
 				"ram_bytes": 1245448}
 			},
 			"after_block": []
 		}, {
-			"user": "${user_6}",
+			"user": "${user_61}",
 			"at_end": {
 				"resources":{
-				"balance": "",
+				"balance": "20.0000 PXBTS",
 				"net_weight": "233.3333 BEOS",
 				"cpu_weight": "233.3334 BEOS",
 				"ram_bytes": 2922115}
-			},
-			"after_block": []
-		}, {
-			"user": "${user_7}",
-			"at_end": {
-				"resources":{
-				"balance": "",
-				"net_weight": "433.3333 BEOS",
-				"cpu_weight": "433.3334 BEOS",
-				"ram_bytes": 5422115}
-			},
-			"after_block": []
-		}, {
-			"user": "${user_8}",
-			"at_end": {
-				"resources":{
-				"balance": "",
-				"net_weight": "833.3333 BEOS",
-				"cpu_weight": "833.3334 BEOS",
-				"ram_bytes": 10422115}
 			},
 			"after_block": []
 		}]

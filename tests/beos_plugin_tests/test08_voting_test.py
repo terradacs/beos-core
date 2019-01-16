@@ -44,7 +44,7 @@ def importKeys():
 
 def startWallet():
   run('rm -f ' + "~/eosio-wallet/default-test08.wallet" )
-  run('rm -rf ' + os.path.abspath(args.wallet_dir))
+  #run('rm -rf ' + os.path.abspath(args.wallet_dir))
   run('mkdir -p ' + os.path.abspath(args.wallet_dir))
   time.sleep(.4)
   run(args.cleos + 'wallet create -n default-test08 --to-console' )

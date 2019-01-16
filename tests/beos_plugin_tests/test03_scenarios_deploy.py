@@ -1,155 +1,82 @@
 #!/usr/bin/env python3
 
-import re
 import os
-import json
-import requests
-import datetime
+import sys
+import glob
 import argparse
+import datetime
+import subprocess
 
-from string import Template
-from logger import log
-from testscenarios  import TestScenarios
-from eosrpcexecutor import EOSRPCExecutor
 
-args        = None
+sys.path.append(os.path.dirname(os.path.abspath(__file__))+"/beos_test_utils")
+from cmdlineparser import parser
 
-def prepare_scenario_from_pattern_file(_pattern_file):
+test_args = []
+
+def omit_dir(_dir):
+  print(_dir)
+  if "beos_test_utils" in _dir or \
+     "cd_scripts" in _dir:
+    return True
+  else:
+    return False
+
+def check_subdirs(_dir):
+  error = False
+  for root, subdirs, _ in os.walk(_dir):
+    if omit_dir(root):
+      continue
+    tests = sorted(glob.glob(root+"/*.py"))
+    for test in tests:
+      root_error = run_script(test)
+      if root_error:
+        error = root_error
+    for subdir in subdirs:
+      if omit_dir(subdir):
+        continue
+      sub_error = check_subdirs(subdir)
+      if sub_error:
+        error = sub_error
+  return error
+
+
+def run_script(_test, _multiplier = 1, _interpreter = None ):
   try:
-    values = prepare_keys_for_test(_pattern_file)
-    values.update(prepare_user_for_test(_pattern_file))
-
-    with open(_pattern_file) as pattern_file:
-      src = Template(pattern_file.read())
-      prepared_scenarios = src.substitute(values)
-      with open(os.getcwd()+"/"+"scenarios_continues.json","w") as scenarios:
-        scenarios.write(prepared_scenarios)
-    return "scenarios_continues.json"
+    interpreter = _interpreter if _interpreter else "python3"
+    actual_args = test_args.split()
+    for index, arg in enumerate(actual_args) :
+      if arg == "--scenario-multiplier":
+        actual_args[index+1] = str(_multiplier)
+    actual_args = " ".join(actual_args)
+    ret_code = subprocess.call(interpreter + " " + _test + " " + actual_args, shell=True)
+    if ret_code == 0:
+      return False
+    else:
+      return True
   except Exception as _ex:
-    log.error("Exception `%s` occured while preparing scenario file."%_ex)
-    return None
+    print("Exception {0}".format(str(_ex)))
+    return True
 
-def prepare_user_for_test(_pattern_file):
-    all_users=[]
-    with open(_pattern_file) as pattern_file:
-      lines = pattern_file.readlines()
-      for line in lines:
-        users = re.findall('\$\{(user_.*?)\}', line)
-        if users:
-          for user in users:
-            all_users.append(user)
-    all_users = list(set(all_users))
-    all_users.sort()
-    testers = find_valid_testers_name(all_users)
-    log.info("Testers found :%s"%testers)
-    return testers
-
-def prepare_keys_for_test(_pattern_file):
-    all_keys=[]
-    with open(_pattern_file) as pattern_file:
-      lines = pattern_file.readlines()
-      for line in lines:
-        keys = re.findall('\$\{(key.*?)\}', line)
-        if keys:
-          for key in keys:
-            all_keys.append(key)
-    all_keys = list(set(all_keys))
-    all_keys.sort()
-    eos = EOSRPCExecutor(args.nodeos_ip, args.nodeos_port, args.keosd_ip, args.keosd_port, args.master_wallet_name)
-    keys = {}
-    for key in all_keys:
-      keys[key] = eos.create_key()
-    log.info("Keys found :%s"%keys)
-    return keys 
-
-def find_valid_testers_name(_users):
-  accounts      = {}
-  base          = "beos"
-  separator     = "."
-  function      = "tst"
-  suffix_base_1 = "a"
-  suffix_base_2 = "a"
-  suffix_base_3 = "a"
-  for user in _users:
-    valid = True
-    while valid:
-      name = base+separator+function+separator+suffix_base_1+suffix_base_2+suffix_base_3
-      req = {"account_name":name}
-      valid = is_account_valid(req)
-      if not valid:
-        accounts[user] = name
-      if ord(suffix_base_3) == ord('z'): 
-        if ord(suffix_base_2)  == ord('z'):
-          if ord(suffix_base_1)  == ord('z'):
-            log.error("So many test accounts?")
-            exit(1)
-          else:
-            suffix_base_3 = "a"
-            suffix_base_2 = "a"
-            suffix_base_1 = chr(ord(suffix_base_1)+1)  
-        else:
-          suffix_base_3 = "a"
-          suffix_base_2 = chr(ord(suffix_base_2)+1)
-      else:
-        suffix_base_3 = chr(ord(suffix_base_3)+1)
-  return accounts
-
-
-def is_account_valid(_request) :
-    try:
-        request=json.dumps(_request)
-        server = "http://%s:%s/v1/beos/address_validator" % (args.nodeos_ip, args.nodeos_port)
-        json_rpc_headers = {"content-type": "application/json"}
-        response = requests.post( server, data=request, headers=json_rpc_headers )
-        response_json = response.json()
-        return response_json['is_valid']
-    except Exception as _ex:
-        log.error("Something goes wrong during account validation.")
-        return False
-
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--nodeos-ip', metavar='', help="Ip address of nodeos ", default='127.0.0.1', dest="nodeos_ip")
-parser.add_argument('--keosd-ip', metavar='', help="Ip address of keosd", default='127.0.0.1', dest="keosd_ip")
-parser.add_argument('--nodeos-port', metavar='', help="Port", default='8888')
-parser.add_argument('--keosd-port', metavar='', help="Port", default='8900')
-parser.add_argument('--scenario-file-name-pattern', metavar='', help="Path to to scenarios.", default="scenarios_continues.in" )
-parser.add_argument('--master-wallet-name', metavar='', help="Name of main wallet.", default="beos_master_wallet" )
-parser.add_argument('--add-block-number', action="store_true", help="", default=False )
-parser.add_argument('--restore-node-params', action="store_true", help="", default=False )
-parser.add_argument('--starting-block-for-initial-witness-election', default=100)
-parser.add_argument('--distribution-params', default=[ [7 * 24 * 3600 * 2, 0, 98 * 24 * 3600 * 2, 1 * 3600 * 2, 0], [7 * 24 * 3600 * 2, 0, 280 * 24 * 3600 * 2, 1 * 3600 * 2, 0], 0] )
 
 if __name__ == "__main__":
   args = parser.parse_args()
+  for key, val in args.__dict__.items():
+    if val :
+      test_args.append("--"+key.replace("_","-")+ " ")
+      test_args.append(val)
+  test_args = " ".join(test_args)
   try:
-    error = False
-    scenario_file_name = prepare_scenario_from_pattern_file( os.getcwd()+"/"+args.scenario_file_name_pattern)
-    if not scenario_file_name:
-      log.error("Wrong scenario generated.")
-      exit(1)
-    log.info("scenario_file_name %s"%scenario_file_name)
-    scenarios = TestScenarios(args.nodeos_ip, args.nodeos_port, args.keosd_ip, args.keosd_port, os.getcwd()+"/"+scenario_file_name, args.add_block_number, args.master_wallet_name)
-    log.info("scenarios %s"%scenarios)
-    
-    for scenario in scenarios:
-      scenario.prepare_data()
-      scenario.make_scenario_actions()
-      scenario.wait_for_end()
-      scnenario_error = scenario.get_scenario_summary()
-      if scnenario_error:
-        error = scnenario_error
-  except Exception as _ex:
-    log.error("[ERROR] Exeption `%s` occured while executing scenario `%s`."%(str(_ex), scenario.get_current_scenario()))
     error = True
-  finally:
-    scenarios.stop_scenarios()
-    scenarios.add_scenario_status_to_summary_file()
-    if args.restore_node_params :
-      scenario.restore_node_params(
-                args.starting_block_for_initial_witness_election,
-                args.distribution_params)
+    if os.path.isfile(args.scenarios):
+      error = run_script(args.scenarios)
+      if error:
+        error = error
+    elif os.path.isdir(args.scenarios):
+      error = check_subdirs(args.scenarios)
 
+  except Exception as _ex:
+    error = True
+    
   if error:
     exit(1)
   else:

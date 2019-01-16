@@ -7,6 +7,9 @@ import time
 import sys
 import json
 import datetime
+import sys
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 try:
     import config

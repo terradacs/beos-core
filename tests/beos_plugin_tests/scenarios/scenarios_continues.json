@@ -1,0 +1,7072 @@
+{
+	"scenarios": [{
+		"name": "[5.1] Basic issue test.",
+		"scenario_blocks": 40,
+		"params": {
+			"starting_block_for_initial_witness_election": 10,
+			"starting_block_for_beos_distribution": 10,
+			"ending_block_for_beos_distribution": 30,
+			"distribution_payment_block_interval_for_beos_distribution": 5,
+			"trustee_reward_beos": 1000000,
+			"starting_block_for_ram_distribution": 10,
+			"ending_block_for_ram_distribution": 18,
+			"distribution_payment_block_interval_for_ram_distribution": 4,
+			"trustee_reward_ram": 0,
+			"distrib_ram_leftover": 300000
+		},
+		"actions": [{
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aaa",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 3,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.aaa",
+				"quantity": "5.0000 PXBTS"
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.aaa",
+			"at_end": {
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "2000.0000 BEOS",
+				"cpu_weight": "2000.0000 BEOS",
+				"ram_bytes": 15005448}
+			},
+			"after_block": [{
+				"after_block": 8,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 11,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}, {
+				"after_block": 16,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "800.0000 BEOS",
+				"cpu_weight": "800.0000 BEOS",
+				"ram_bytes": 10005448}
+			}, {
+				"after_block": 21,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "1200.0000 BEOS",
+				"cpu_weight": "1200.0000 BEOS",
+				"ram_bytes": 15005448}
+			}]
+		}]
+	}, {
+		"name": "[5.2] Basic issue test.",
+		"scenario_blocks": 40,
+		"params": {
+      "starting_block_for_initial_witness_election": 120,
+			"starting_block_for_beos_distribution": 10,
+			"ending_block_for_beos_distribution": 30,
+			"distribution_payment_block_interval_for_beos_distribution": 5,
+			"trustee_reward_beos": 1000000,
+			"starting_block_for_ram_distribution": 10,
+			"ending_block_for_ram_distribution": 20,
+			"distribution_payment_block_interval_for_ram_distribution": 5,
+			"trustee_reward_ram": 0,
+			"distrib_ram_leftover": 300000
+		},
+		"actions": [{
+			"start_block": 2,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aal",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 4,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.aal",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 10,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.aal",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 15,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.aal",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 20,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.aal",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.aal",
+			"at_end": {
+				"resources":{
+				"balance": "20.0000 PXBTS", 
+				"net_weight": "2000.0000 BEOS",
+				"cpu_weight": "2000.0000 BEOS",
+				"ram_bytes": 15005448}
+			},
+			"after_block": [{
+				"after_block": 7,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 12,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}, {
+				"after_block": 17,
+				"resources":{
+				"balance": "15.0000 PXBTS", 
+				"net_weight": "800.0000 BEOS",
+				"cpu_weight": "800.0000 BEOS",
+				"ram_bytes": 10005448}
+			}, {
+				"after_block": 22,
+				"resources":{
+				"balance": "20.0000 PXBTS", 
+				"net_weight": "1200.0000 BEOS",
+				"cpu_weight": "1200.0000 BEOS",
+				"ram_bytes": 15005448}
+			}]
+		}]
+	}, {
+		"name": "[5.3] Basic issue test",
+		"scenario_blocks": 70,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  140, [10, 50, 10, 8000000],
+					[10, 20, 5, 5000000],
+					[10, 50, 10, 200000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aaw",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abg",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 3,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.aaw",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			}
+		}, {
+			"start_block": 12,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.aaw",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			}
+		}, {
+			"start_block": 12,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abg",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			}
+		}, {
+			"start_block": 22,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.aaw",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			}
+		}, {
+			"start_block": 22,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abg",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			}
+		}, {
+			"start_block": 32,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.aaw",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			}
+		}, {
+			"start_block": 32,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abg",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.aaw",
+			"at_end": {
+				"resources":{
+				"balance": "20.0000 PXBTS", 
+				"net_weight": "1363.8094 BEOS",
+				"cpu_weight": "1363.8097 BEOS",
+				"ram_bytes": 11672114}
+			},
+			"after_block": [{
+				"after_block": 11,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}, {
+				"after_block": 20,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "666.6666 BEOS",
+				"cpu_weight": "666.6667 BEOS",
+				"ram_bytes": 11672114}
+			}, {
+				"after_block": 30,
+				"resources":{
+				"balance": "15.0000 PXBTS", 
+				"net_weight": "906.6666 BEOS",
+				"cpu_weight": "906.6667 BEOS",
+				"ram_bytes": 11672114}
+			}, {
+				"after_block": 40,
+				"resources":{
+				"balance": "20.0000 PXBTS", 
+				"net_weight": "1135.2380 BEOS",
+				"cpu_weight": "1135.2382 BEOS",
+				"ram_bytes": 11672114}
+			}, {
+				"after_block": 51,
+				"resources":{
+				"balance": "20.0000 PXBTS", 
+				"net_weight": "1363.8094 BEOS",
+				"cpu_weight": "1363.8097 BEOS",
+				"ram_bytes": 11672114}
+			}]
+		}, {
+			"user": "beos.tst.abg",
+			"at_end": {
+				"resources":{
+				"balance": "15.0000 PXBTS", 
+				"net_weight": "636.1903 BEOS",
+				"cpu_weight": "636.1906 BEOS",
+				"ram_bytes": 3338782}
+			},
+			"after_block": [{
+				"after_block": 11,
+				"resources":{
+				"balance": "",
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 21,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "133.3333 BEOS",
+				"cpu_weight": "133.3334 BEOS",
+				"ram_bytes": 3338782}
+			}, {
+				"after_block": 31,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "293.3333 BEOS",
+				"cpu_weight": "293.3334 BEOS",
+				"ram_bytes": 3338782}
+			}, {
+				"after_block": 41,
+				"resources":{
+				"balance": "15.0000 PXBTS", 
+				"net_weight": "464.7618 BEOS",
+				"cpu_weight": "464.7620 BEOS",
+				"ram_bytes": 3338782}
+			}, {
+				"after_block": 51,
+				"resources":{
+				"balance": "15.0000 PXBTS", 
+				"net_weight": "636.1903 BEOS",
+				"cpu_weight": "636.1906 BEOS",
+				"ram_bytes": 3338782}
+			}]
+		}]
+	}, {
+		"name": "[5.4] Basic issue test [issue before distr and ends before it].",
+		"scenario_blocks": 10,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  410, [1000, 1001, 10, 8000000],
+					[1000, 1001, 4, 5000000],
+					[1000, 1001, 10, 200000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abr",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aby",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 3,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abr",
+				"quantity": "20.0000 PXBTS", "memo": ""
+			}
+		}, {
+			"start_block": 3,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.aby",
+				"quantity": "20.0000 PXBTS", "memo": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.abr",
+			"at_end": {
+				"resources":{
+				"balance": "20.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			},
+			"after_block": []
+		}, {
+			"user": "beos.tst.aby",
+			"at_end": {
+				"resources":{
+				"balance": "20.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			},
+			"after_block": []
+		}]
+	}, {
+		"name": "[5.5] Basic issue test [issue after distribution period].",
+		"scenario_blocks": 10,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  420, [50, 51, 10, 8000000],
+					[50, 51, 4, 5000000],
+					[50, 51, 10, 200000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 2,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.acb",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 2,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.acd",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 4,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.acb",
+				"quantity": "20.0000 PXBTS", "memo": ""
+			}
+		}, {
+			"start_block": 4,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.acd",
+				"quantity": "20.0000 PXBTS", "memo": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.acb",
+			"at_end": {
+				"resources":{
+				"balance": "20.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			},
+			"after_block": []
+		}, {
+			"user": "beos.tst.acd",
+			"at_end": {
+				"resources":{
+				"balance": "20.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			},
+			"after_block": []
+		}]
+	}, {
+		"name": "[5.6] Withdraw of PXBTS attempt with BEOS inside distribution period.",
+		"scenario_blocks": 60,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  10, [10, 50, 10, 8000000],
+					[10, 50, 10, 5000000],
+					[10, 50, 10, 2000000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 2,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abs",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		},{
+			"start_block": 2,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abz",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		},{
+			"start_block": 2,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.acc",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		},{
+			"start_block": 2,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.ace",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		},{
+			"start_block": 6,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abs",
+				"quantity": "20.0000 PXBTS"
+			}
+		},{
+			"start_block": 6,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abz",
+				"quantity": "20.0000 PXBTS"
+			}
+		},{
+			"start_block": 6,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.acc",
+				"quantity": "20.0000 PXBTS"
+			}
+		},{
+			"start_block": 6,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.ace",
+				"quantity": "20.0000 PXBTS"
+			}
+		},{
+			"start_block": 15,
+			"authorized_by": "beos.tst.abs",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abs",
+				"bts_to": "any_account",
+				"quantity": "20.0000 PXBTS", "memo": ""
+			}
+		}, {
+			"start_block": 25,
+			"authorized_by": "beos.tst.abz",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abz",
+				"bts_to": "any_account",
+				"quantity": "20.0000 PXBTS", "memo": ""
+			}
+		}, {
+			"start_block": 35,
+			"authorized_by": "beos.tst.acc",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.acc",
+				"bts_to": "any_account",
+				"quantity": "20.0000 PXBTS", "memo": ""
+			}
+		}, {
+			"start_block": 45,
+			"authorized_by": "beos.tst.ace",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.ace",
+				"bts_to": "any_account",
+				"quantity": "20.0000 PXBTS", "memo": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.abs",
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1255448}
+			},
+			"after_block": [{
+				"after_block": 17,
+				"resources":{
+				"balance": "",
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1255448}
+			}, {
+				"after_block": 27,
+				"resources":{
+				"balance": "",
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1255448}
+			}, {
+				"after_block": 37,
+				"resources":{
+				"balance": "",
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1255448}
+			}, {
+				"after_block": 48,
+				"resources":{
+				"balance": "",
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1255448}
+			}]
+		}, {
+			"user": "beos.tst.abz",
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "233.3333 BEOS",
+				"cpu_weight": "233.3334 BEOS",
+				"ram_bytes": 2922115}
+			},
+			"after_block": [{
+				"after_block": 17,
+				"resources":{
+				"balance": "20.0000 PXBTS", 
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1255448}
+			}, {
+				"after_block": 27,
+				"resources":{
+				"balance": "",
+				"net_weight": "233.3333 BEOS",
+				"cpu_weight": "233.3334 BEOS",
+				"ram_bytes": 2922115}
+			}, {
+				"after_block": 37,
+				"resources":{
+				"balance": "",
+				"net_weight": "233.3333 BEOS",
+				"cpu_weight": "233.3334 BEOS",
+				"ram_bytes": 2922115}
+			}, {
+				"after_block": 41,
+				"resources":{
+				"balance": "",
+				"net_weight": "233.3333 BEOS",
+				"cpu_weight": "233.3334 BEOS",
+				"ram_bytes": 2922115}
+			}]
+		}, {
+			"user": "beos.tst.acc",
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "433.3333 BEOS",
+				"cpu_weight": "433.3334 BEOS",
+				"ram_bytes": 5422115}
+			},
+			"after_block": [{
+				"after_block": 17,
+				"resources":{
+				"balance": "20.0000 PXBTS", 
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1255448}
+			}, {
+				"after_block": 28,
+				"resources":{
+				"balance": "20.0000 PXBTS", 
+				"net_weight": "233.3333 BEOS",
+				"cpu_weight": "233.3334 BEOS",
+				"ram_bytes": 2922115}
+			}, {
+				"after_block": 37,
+				"resources":{
+				"balance": "",
+				"net_weight": "433.3333 BEOS",
+				"cpu_weight": "433.3334 BEOS",
+				"ram_bytes": 5422115}
+			}, {
+				"after_block": 47,
+				"resources":{
+				"balance": "",
+				"net_weight": "433.3333 BEOS",
+				"cpu_weight": "433.3334 BEOS",
+				"ram_bytes": 5422115}
+			}]
+		}, {
+			"user": "beos.tst.ace",
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "833.3333 BEOS",
+				"cpu_weight": "833.3334 BEOS",
+				"ram_bytes": 10422115}
+			},
+			"after_block": [{
+				"after_block": 17,
+				"resources":{
+				"balance": "20.0000 PXBTS", 
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1255448}
+			}, {
+				"after_block": 27,
+				"resources":{
+				"balance": "20.0000 PXBTS", 
+				"net_weight": "233.3333 BEOS",
+				"cpu_weight": "233.3334 BEOS",
+				"ram_bytes": 2922115}
+			}, {
+				"after_block": 37,
+				"resources":{
+				"balance": "20.0000 PXBTS", 
+				"net_weight": "433.3333 BEOS",
+				"cpu_weight": "433.3334 BEOS",
+				"ram_bytes": 5422115}
+			}, {
+				"after_block": 48,
+				"resources":{
+				"balance": "",
+				"net_weight": "833.3333 BEOS",
+				"cpu_weight": "833.3334 BEOS",
+				"ram_bytes": 10422115}
+			}]
+		}]
+	}, {
+		"name": "[5.7] Buy and sellram before, inside and after distribution period.",
+		"scenario_blocks": 40,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  420, [10, 30, 10, 8000000],
+					[10, 30, 10, 5000000],
+					[10, 30, 10, 2000000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abt",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		},{
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aca",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		},{
+			"start_block": 4,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abt",
+				"quantity": "20.0000 PXBTS"
+			}
+		},{
+			"start_block": 4,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.aca",
+				"quantity": "20.0000 PXBTS"
+			}
+		},{
+			"start_block": 6,
+			"authorized_by": "beos.tst.abt",
+			"code": "eosio",
+			"action": "sellram",
+			"args": {
+				"account": "beos.tst.abt",
+				"bytes": "10000"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "RAM shouldn't be liquid during distribution period"
+			}
+		}, {
+			"start_block": 6,
+			"authorized_by": "beos.tst.abt",
+			"code": "eosio",
+			"action": "buyram",
+			"args": {
+				"payer": "beos.tst.abt",
+				"receiver": "beos.tst.aca",
+				"quant": "1.0000 BEOS"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "RAM shouldn't be liquid during distribution period"
+			}
+		}, {
+			"start_block": 20,
+			"authorized_by": "beos.tst.abt",
+			"code": "eosio",
+			"action": "sellram",
+			"args": {
+				"account": "beos.tst.abt",
+				"bytes": "10000"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "RAM shouldn't be liquid during distribution period"
+			}
+		}, {
+			"start_block": 20,
+			"authorized_by": "beos.tst.abt",
+			"code": "eosio",
+			"action": "buyram",
+			"args": {
+				"payer": "beos.tst.abt",
+				"receiver": "beos.tst.aca",
+				"quant": "1.0000 BEOS"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "RAM shouldn't be liquid during distribution period"
+			}
+		}, {
+			"start_block": 35,
+			"authorized_by": "beos.tst.abt",
+			"code": "eosio",
+			"action": "sellram",
+			"args": {
+				"account": "beos.tst.abt",
+				"bytes": "10000"
+			}
+		}, {
+			"start_block": 35,
+			"authorized_by": "beos.tst.abt",
+			"code": "eosio",
+			"action": "buyram",
+			"args": {
+				"payer": "beos.tst.abt",
+				"receiver": "beos.tst.aca",
+				"quant": "10.0000 BEOS"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "overdrawn balance"
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.abt",
+			"at_end": {
+				"resources":{
+				"balance": "20.0000 PXBTS",
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1245448}
+			},
+			"after_block": []
+		}, {
+			"user": "beos.tst.aca",
+			"at_end": {
+				"resources":{
+				"balance": "20.0000 PXBTS",
+				"net_weight": "233.3333 BEOS",
+				"cpu_weight": "233.3334 BEOS",
+				"ram_bytes": 2922115}
+			},
+			"after_block": []
+		}]
+	}, {
+		"name": "[5.8] Test of issue, transfer and withdraw",
+		"scenario_blocks": 90,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  190, [55, 60, 5, 8000000],
+					[55, 60, 5, 5000000],
+					[55, 60, 5, 2000000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 40,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.acf",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 40,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aab",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 42,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.acf",
+				"quantity": "20.0000 PXBTS", "memo": ""
+			}
+		}, {
+			"start_block": 42,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.aab",
+				"quantity": "20.0000 PXBTS", "memo": ""
+			}
+		}, {
+			"start_block": 50,
+			"authorized_by": "beos.tst.acf",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.acf",
+				"to": "beos.tst.aab",
+				"quantity": "20.0000 PXBTS", 
+				"memo": " internal transfer 0"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "transaction net usage is too high"
+			}
+		}, {
+			"start_block": 55,
+			"authorized_by": "beos.tst.acf",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.acf",
+				"to": "beos.tst.aab",
+				"quantity": "20.0000 PXBTS", 
+				"memo": " internal transfer 1"
+			}
+		}, {
+			"start_block": 62,
+			"authorized_by": "beos.tst.aab",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.aab",
+				"to": "beos.tst.acf",
+				"quantity": "20.0000 PXBTS", 
+				"memo": " internal transfer 2"
+			}
+		}, {
+			"start_block": 65,
+			"authorized_by": "beos.tst.acf",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.acf",
+				"bts_to": "any_account",
+				"quantity": "20.0000 PXBTS", "memo": ""
+			}
+		}, {
+			"start_block": 65,
+			"authorized_by": "beos.tst.aab",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aab",
+				"bts_to": "any_account",
+				"quantity": "20.0000 PXBTS", "memo": ""
+			}
+		}, {
+			"start_block": 70,
+			"authorized_by": "beos.tst.acf",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.acf",
+				"to": "beos.tst.aab",
+				"quantity": "20.0000 PXBTS", 
+				"memo": " internal transfer 3"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "no balance object found"
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.acf",
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 2505448}
+			},
+			"after_block": []
+		}, {
+			"user": "beos.tst.aab",
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "600.0000 BEOS",
+				"cpu_weight": "600.0000 BEOS",
+				"ram_bytes": 7505448}
+			},
+			"after_block": []
+		}]
+	}, {
+		"name": "[2.1] Basic operations test",
+		"scenario_blocks": 100,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  40, [20, 40, 20, 4000000],
+					[20, 40, 20, 2000000],
+					[450, 460, 10, 200000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 5,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aac",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 5,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aad",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 10,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aac",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 10,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aad",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 15,
+			"authorized_by": "beos.tst.aac",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aac",
+				"bts_to": "any_account",
+				"quantity": "1.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "transaction net usage is too high: 128 > 0"
+			}
+		}, {
+			"start_block": 30,
+			"authorized_by": "beos.tst.aac",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aac",
+				"bts_to": "any_account",
+				"quantity": "1.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 30,
+			"authorized_by": "beos.tst.aad",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aad",
+				"bts_to": "any_account",
+				"quantity": "5.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 50,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aad",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 55,
+			"authorized_by": "beos.tst.aad",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aad",
+				"bts_to": "any_account",
+				"quantity": "1.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 60,
+			"authorized_by": "beos.tst.aad",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aad",
+				"bts_to": "any_account",
+				"quantity": "40.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "overdrawn balance during withdraw"
+			}
+		}, {
+			"start_block": 65,
+			"authorized_by": "beos.tst.aad",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.aad",
+				"to": "beos.tst.aac",
+				"quantity": "4.0000 PXBTS", 
+				"memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 75,
+			"authorized_by": "beos.tst.aad",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aad",
+				"bts_to": "any_account",
+				"quantity": "1.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "overdrawn balance during withdraw"
+			}
+		}, {
+			"start_block": 80,
+			"authorized_by": "beos.tst.aac",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aac",
+				"bts_to": "any_account",
+				"quantity": "2.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 80,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aad",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 85,
+			"authorized_by": "beos.tst.aad",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aad",
+				"bts_to": "any_account",
+				"quantity": "1.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 90,
+			"authorized_by": "beos.tst.aac",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aac",
+				"bts_to": "any_account",
+				"quantity": "6.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 90,
+			"authorized_by": "beos.tst.aad",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aad",
+				"bts_to": "any_account",
+				"quantity": "4.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.aac",
+			"after_block": [{
+				"after_block": 15,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 35,
+				"resources":{
+				"balance": "4.0000 PXBTS", 
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1005448}
+			}, {
+				"after_block": 45,
+				"resources":{
+				"balance": "4.0000 PXBTS", 
+				"net_weight": "300.0000 BEOS",
+				"cpu_weight": "300.0000 BEOS",
+				"ram_bytes": 3005448}
+			}, {
+				"after_block": 70,
+				"resources":{
+				"balance": "8.0000 PXBTS", 
+				"net_weight": "300.0000 BEOS",
+				"cpu_weight": "300.0000 BEOS",
+				"ram_bytes": 3005448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "300.0000 BEOS",
+				"cpu_weight": "300.0000 BEOS",
+				"ram_bytes": 3005448}
+			}
+		}, {
+			"user": "beos.tst.aad",
+			"after_block": [{
+				"after_block": 15,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 35,
+				"resources":{
+				"balance": "",
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1005448}
+			}, {
+				"after_block": 45,
+				"resources":{
+				"balance": "",
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1005448}
+			}, {
+				"after_block": 70,
+				"resources":{
+				"balance": "",
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1005448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1005448}
+			}
+		}]
+	}, {
+		"name": "[2.2] Basic operations test",
+		"scenario_blocks": 50,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  40, [25, 30, 5, 2000000],
+					[25, 30, 5, 1000000],
+					[50, 60, 10, 200000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 5,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aae",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 10,
+			"authorized_by": "beos.tst.aae",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aae",
+				"bts_to": "any_account",
+				"quantity": "1.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "overdrawn balance during withdraw"
+			}
+		}, {
+			"start_block": 15,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aae",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 20,
+			"authorized_by": "beos.tst.aae",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aae",
+				"bts_to": "any_account",
+				"quantity": "1.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "transaction net usage is too high: 128 > 0"
+			}
+		}, {
+			"start_block": 40,
+			"authorized_by": "beos.tst.aae",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aae",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 45,
+			"authorized_by": "beos.tst.aae",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aae",
+				"bts_to": "any_account",
+				"quantity": "1.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "overdrawn balance during withdraw"
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.aae",
+			"after_block": [{
+				"after_block": 20,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 35,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 2005448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 2005448}
+			}
+		}]
+	}, {
+		"name": "[2.3] Basic operations test",
+		"scenario_blocks": 100,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  40, [20, 60, 40, 4000000],
+					[40, 80, 40, 2000000],
+					[50, 60, 10, 200000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 5,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aaf",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 5,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aag",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 10,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aaf",
+				"quantity": "11.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 25,
+			"authorized_by": "beos.tst.aaf",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aaf",
+				"bts_to": "any_account",
+				"quantity": "1.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 30,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aag",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 50,
+			"authorized_by": "beos.tst.aag",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aag",
+				"bts_to": "any_account",
+				"quantity": "1.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "transaction net usage is too high: 128 > 0"
+			}
+		}, {
+			"start_block": 90,
+			"authorized_by": "beos.tst.aaf",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aaf",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 90,
+			"authorized_by": "beos.tst.aag",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aag",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.aaf",
+			"after_block": [{
+				"after_block": 15,
+				"resources":{
+				"balance": "11.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 35,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 85,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "300.0000 BEOS",
+				"cpu_weight": "300.0000 BEOS",
+				"ram_bytes": 2005448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "300.0000 BEOS",
+				"cpu_weight": "300.0000 BEOS",
+				"ram_bytes": 2005448}
+			}
+		}, {
+			"user": "beos.tst.aag",
+			"after_block": [{
+				"after_block": 15,
+				"resources":{
+				"balance": "",
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 35,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 85,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 2005448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 2005448}
+			}
+		}]
+	}, {
+		"name": "[2.4] Basic operation test",
+		"scenario_blocks": 60,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  40, [20, 35, 15, 2000000],
+					[20, 35, 15, 1000000],
+					[50, 90, 10, 200000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 5,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aan",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 5,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aao",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 10,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aan",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 25,
+			"authorized_by": "beos.tst.aan",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.aan",
+				"to": "beos.tst.aao",
+				"quantity": "10.0000 PXBTS", 
+				"memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 30,
+			"authorized_by": "beos.tst.aao",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.aao",
+				"to": "beos.tst.aan",
+				"quantity": "10.0000 PXBTS", 
+				"memo": "any_memo"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "transaction net usage is too high: 136 > 0"
+			}
+		}, {
+			"start_block": 40,
+			"authorized_by": "beos.tst.aao",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.aao",
+				"to": "beos.tst.aan",
+				"quantity": "10.0000 PXBTS", 
+				"memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 50,
+			"authorized_by": "beos.tst.aan",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aan",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.aan",
+			"after_block": [{
+				"after_block": 15,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 30,
+				"resources":{
+				"balance": "",
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1005448}
+			}, {
+				"after_block": 45,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1005448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1005448}
+			}
+		}, {
+			"user": "beos.tst.aao",
+			"after_block": [{
+				"after_block": 15,
+				"resources":{
+				"balance": "",
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 30,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 45,
+				"resources":{
+				"balance": "",
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1005448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1005448}
+			}
+		}]
+	}, {
+		"name": "[2.5] Vote test",
+		"scenario_blocks": 50,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  10, [15, 20, 5, 2000000],
+					[15, 20, 5, 1000000],
+					[45, 50, 5, 1000000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 5,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aah",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 5,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aai",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 10,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aah",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 25,
+			"authorized_by": "beos.tst.aah",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+				"producer": "beos.tst.aah",
+				"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+				"url": "test.html",
+				"location": 0
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 25,
+			"authorized_by": "beos.tst.aai",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+				"producer": "beos.tst.aai",
+				"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+				"url": "test.html",
+				"location": 0
+			},
+			"expected_result": {
+				"status": false,
+				"message": "transaction net usage is too high: 152 > 0"
+			}
+		}, {
+			"start_block": 45,
+			"authorized_by": "beos.tst.aah",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aah",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.aah",
+			"after_block": [{
+				"after_block": 21,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 2005448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 2005448}
+			}
+		}]
+	}, {
+		"name": "[2.10] Vote test",
+		"scenario_blocks": 70,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  10, [15, 20, 5, 2000000],
+					[15, 20, 5, 1000000],
+					[45, 50, 5, 1000000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 5,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aaj",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 5,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aak",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 5,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aam",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 10,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aaj",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 10,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aak",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 25,
+			"authorized_by": "beos.tst.aaj",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+				"producer": "beos.tst.aaj",
+				"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+				"url": "test.html",
+				"location": 0
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 30,
+			"authorized_by": "beos.tst.aak",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.aak",
+				"proxy": "",
+				"producers": ["beos.tst.aaj"]
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 30,
+			"authorized_by": "beos.tst.aam",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.aam",
+				"proxy": "",
+				"producers": ["beos.tst.aaj"]
+			},
+			"expected_result": {
+				"status": false,
+				"message": "user must stake before they can vote"
+			}
+		}, {
+			"start_block": 35,
+			"authorized_by": "beos.tst.aaj",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.aaj",
+				"proxy": "",
+				"producers": ["beos.tst.aak"]
+			},
+			"expected_result": {
+				"status": false,
+				"message": "producer is not registered"
+			}
+		}, {
+			"start_block": 38,
+			"authorized_by": "beos.tst.aaj",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.aaj",
+				"proxy": "",
+				"producers": ["beos.tst.aaj"]
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 60,
+			"authorized_by": "beos.tst.aaj",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aaj",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 60,
+			"authorized_by": "beos.tst.aak",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aak",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.aaj",
+			"after_block": [{
+				"after_block": 35,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1005448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1005448}
+			}
+		}, {
+			"user": "beos.tst.aak",
+			"after_block": [{
+				"after_block": 35,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1005448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 1005448}
+			}
+		}, {
+			"user": "beos.tst.aam",
+			"after_block": [{
+				"after_block": 35,
+				"resources":{
+				"balance": "",
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}
+		}]
+	}, {
+		"name": "[1.1] Basic operations test",
+		"scenario_blocks": 100,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  40, [50, 60, 10, 8000000],
+					[50, 60, 5, 5000000],
+					[50, 90, 10, 200000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 20,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aap",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 25,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aap",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 30,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aaq",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 35,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aaq",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 41,
+			"authorized_by": "beos.tst.aap",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.aap",
+				"to": "beos.tst.aaq",
+				"quantity": "1.0000 PXBTS", 
+				"memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "transaction net usage is too high: 128 > 0"
+			}
+		}, {
+			"start_block": 50,
+			"authorized_by": "beos.tst.aap",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.aap",
+				"to": "beos.tst.aaq",
+				"quantity": "5.0000 PXBTS", 
+				"memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 54,
+			"authorized_by": "beos.tst.aap",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.aap",
+				"to": "beos.tst.aaq",
+				"quantity": "1.0000 PXBTS", 
+				"memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "no balance object found"
+			}
+		}, {
+			"start_block": 65,
+			"authorized_by": "beos.tst.aaq",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.aaq",
+				"to": "beos.tst.aap",
+				"quantity": "10.0000 PXBTS", 
+				"memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 75,
+			"authorized_by": "beos.tst.aap",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.aap",
+				"to": "beos.tst.aaq",
+				"quantity": "10.0000 PXBTS", 
+				"memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 90,
+			"authorized_by": "beos.tst.aaq",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aaq",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.aap",
+			"after_block": [{
+				"after_block": 40,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 50,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 2505448}
+			}, {
+				"after_block": 53,
+				"resources":{
+				"balance": "",
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 2505448}
+			}, {
+				"after_block": 55,
+				"resources":{
+				"balance": "",
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 2505448}
+			}, {
+				"after_block": 60,
+				"resources":{
+				"balance": "",
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 2505448}
+			}, {
+				"after_block": 70,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 2505448}
+			}, {
+				"after_block": 80,
+				"resources":{
+				"balance": "",
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 2505448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 2505448}
+			}
+		}, {
+			"user": "beos.tst.aaq",
+			"after_block": [{
+				"after_block": 40,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 50,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 2505448}
+			}, {
+				"after_block": 52,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 2505448}
+			}, {
+				"after_block": 54,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 7505448}
+			}, {
+				"after_block": 60,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "600.0000 BEOS",
+				"cpu_weight": "600.0000 BEOS",
+				"ram_bytes": 12505448}
+			}, {
+				"after_block": 70,
+				"resources":{
+				"balance": "",
+				"net_weight": "600.0000 BEOS",
+				"cpu_weight": "600.0000 BEOS",
+				"ram_bytes": 12505448}
+			}, {
+				"after_block": 80,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "600.0000 BEOS",
+				"cpu_weight": "600.0000 BEOS",
+				"ram_bytes": 12505448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "600.0000 BEOS",
+				"cpu_weight": "600.0000 BEOS",
+				"ram_bytes": 12505448}
+			}
+		}]
+	}, {
+		"name": "[1.2] Basic operations test",
+		"scenario_blocks": 50,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  140, [20, 25, 10, 1000000],
+					[20, 25, 10, 5000000],
+					[30, 40, 10, 200000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 10,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aar",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 15,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aar",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 45,
+			"authorized_by": "beos.tst.aar",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aar",
+				"bts_to": "any_account",
+				"quantity": "5.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.aar",
+			"after_block": [{
+				"after_block": 20,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "50.0000 BEOS",
+				"cpu_weight": "50.0000 BEOS",
+				"ram_bytes": 5005448}
+			}, {
+				"after_block": 25,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "50.0000 BEOS",
+				"cpu_weight": "50.0000 BEOS",
+				"ram_bytes": 5005448}
+			}, {
+				"after_block": 30,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "50.0000 BEOS",
+				"cpu_weight": "50.0000 BEOS",
+				"ram_bytes": 5005448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "50.0000 BEOS",
+				"cpu_weight": "50.0000 BEOS",
+				"ram_bytes": 5005448}
+			}
+		}]
+	}, {
+		"name": "[1.3] Basic operations test",
+		"scenario_blocks": 50,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  20, [15, 25, 10, 1000000],
+					[15, 25, 10, 5000000],
+					[10090, 11000, 10, 200000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 5,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aas",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 10,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aas",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 20,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aas",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"expected_result": {
+				"status": false,
+				"message": "Cannot create account named beos.tst.aas, as that name is already taken"
+			}
+		}, {
+			"start_block": 25,
+			"authorized_by": "beos.tst.aas",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.aas",
+				"to": "beos.tst.aas",
+				"quantity": "5.0000 PXBTS", 
+				"memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "cannot transfer to self"
+			}
+		}, {
+			"start_block": 27,
+			"authorized_by": "beos.tst.aas",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.aas",
+				"to": "beos.tst.aat",
+				"quantity": "5.0000 PXBTS", 
+				"memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "to account does not exist"
+			}
+		}, {
+			"start_block": 29,
+			"authorized_by": "beos.tst.aat",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.aat",
+				"to": "beos.tst.aas",
+				"quantity": "5.0000 PXBTS", 
+				"memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 31,
+			"authorized_by": "beos.tst.aat",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.aat",
+				"to": "beos.tst.aat",
+				"quantity": "5.0000 PXBTS", 
+				"memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 40,
+			"authorized_by": "beos.tst.aas",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aas",
+				"bts_to": "any_account",
+				"quantity": "5.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.aas",
+			"after_block": [{
+				"after_block": 10,
+				"resources":{
+				"balance": "",
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 18,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "50.0000 BEOS",
+				"cpu_weight": "50.0000 BEOS",
+				"ram_bytes": 5005448}
+			}, {
+				"after_block": 25,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 10005448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 10005448}
+			}
+		}]
+	}, {
+		"name": "[1.4] Basic operations test",
+		"scenario_blocks": 40,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  10, [15, 30, 5, 8000000],
+					[15, 30, 5, 5000000],
+					[100, 105, 5, 200000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 5,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aau",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 10,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aau",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 12,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aav",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 14,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aau",
+				"quantity": "0.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "must issue positive quantity"
+			}
+		}, {
+			"start_block": 16,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aau",
+				"quantity": "-1.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "must issue positive quantity"
+			}
+		}, {
+			"start_block": 18,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aav",
+				"quantity": "-1.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "must issue positive quantity"
+			}
+		}, {
+			"start_block": 25,
+			"authorized_by": "beos.tst.aau",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aau",
+				"bts_to": "any_account",
+				"quantity": "-20.0000 PXBTS", 
+				"original_memo": "memo"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "must withdraw positive quantity"
+			}
+		}, {
+			"start_block": 30,
+			"authorized_by": "beos.tst.aau",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aau",
+				"bts_to": "any_account",
+				"quantity": "20.0000 PXBTS", 
+				"original_memo": "memo"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "overdrawn balance during withdraw"
+			}
+		}, {
+			"start_block": 35,
+			"authorized_by": "beos.tst.aau",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aau",
+				"bts_to": "any_account",
+				"quantity": "5.0000 PXBTS", 
+				"original_memo": "memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.aau",
+			"after_block": [{
+				"after_block": 12,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 20,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "800.0000 BEOS",
+				"cpu_weight": "800.0000 BEOS",
+				"ram_bytes": 10005448}
+			}, {
+				"after_block": 32,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "1600.0000 BEOS",
+				"cpu_weight": "1600.0000 BEOS",
+				"ram_bytes": 20005448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "1600.0000 BEOS",
+				"cpu_weight": "1600.0000 BEOS",
+				"ram_bytes": 20005448}
+			}
+		}]
+	}, {
+		"name": "[1.5] Basic operations test",
+		"scenario_blocks": 40,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  10, [17, 21, 5, 8000000],
+					[15, 18, 5, 5000000],
+					[100, 105, 5, 200000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 5,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aax",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 8,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aay",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 10,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aax",
+				"quantity": "0.00001 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "symbol precision mismatch"
+			}
+		}, {
+			"start_block": 12,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aax",
+				"quantity": "0.0001 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 25,
+			"authorized_by": "beos.tst.aax",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.aax",
+				"to": "beos.tst.aay",
+				"quantity": "0.00001 PXBTS", 
+				"memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "symbol precision mismatch"
+			}
+		}, {
+			"start_block": 30,
+			"authorized_by": "beos.tst.aax",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.aax",
+				"to": "beos.tst.aay",
+				"quantity": "-0.00001 PXBTS", 
+				"memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "must transfer positive quantity"
+			}
+		}, {
+			"start_block": 35,
+			"authorized_by": "beos.tst.aax",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.aax",
+				"to": "beos.tst.aay",
+				"quantity": "-0.00001 PXBTS", 
+				"memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "must transfer positive quantity"
+			}
+		}, {
+			"start_block": 37,
+			"authorized_by": "beos.tst.aax",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aax",
+				"bts_to": "any_account",
+				"quantity": "0.0001 PXBTS", 
+				"original_memo": "memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.aax",
+			"after_block": [{
+				"after_block": 22,
+				"resources":{
+				"balance": "0.0001 PXBTS", 
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}
+		}]
+	}, {
+		"name": "[1.6] Vote test",
+		"scenario_blocks": 50,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  10, [15, 20, 5, 8000000],
+					[15, 20, 5, 5000000],
+					[100, 105, 5, 200000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 5,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aaz",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 5,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.aba",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 10,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aaz",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 10,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.aba",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 15,
+			"authorized_by": "beos.tst.aba",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.aba",
+				"proxy": "",
+				"producers": ["beos.tst.aaz"]
+			},
+			"expected_result": {
+				"status": false,
+				"message": "producer is not registered"
+			}
+		}, {
+			"start_block": 16,
+			"authorized_by": "beos.tst.aba",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.aba",
+				"proxy": "",
+				"producers": ["beos.tst.aba"]
+			},
+			"expected_result": {
+				"status": false,
+				"message": "producer is not registered"
+			}
+		}, {
+			"start_block": 16,
+			"authorized_by": "beos.tst.aba",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.aba",
+				"proxy": "",
+				"producers": ["beos.tst.abb"]
+			},
+			"expected_result": {
+				"status": false,
+				"message": "producer is not registered"
+			}
+		}, {
+			"start_block": 18,
+			"authorized_by": "beos.tst.aaz",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+				"producer": "beos.tst.aaz",
+				"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+				"url": "test.html",
+				"location": "0"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 21,
+			"authorized_by": "beos.tst.aaz",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+				"producer": "beos.tst.aaz",
+				"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+				"url": "test2.html",
+				"location": "0"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 24,
+			"authorized_by": "beos.tst.abb",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.abb",
+				"proxy": "",
+				"producers": ["beos.tst.aaz"]
+			},
+			"expected_result": {
+				"status": false,
+				"message": "producer is not registered"
+			}
+		}, {
+			"start_block": 25,
+			"authorized_by": "beos.tst.aba",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.aba",
+				"proxy": "",
+				"producers": ["beos.tst.aaz"]
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 30,
+			"authorized_by": "beos.tst.aba",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+				"producer": "beos.tst.aba",
+				"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+				"url": "test3.html",
+				"location": "0"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 33,
+			"authorized_by": "beos.tst.aba",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.aba",
+				"proxy": "",
+				"producers": ["beos.tst.aaz"]
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 33,
+			"authorized_by": "beos.tst.aba",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.aba",
+				"proxy": "",
+				"producers": ["beos.tst.abb"]
+			},
+			"expected_result": {
+				"status": false,
+				"message": "producer is not registered"
+			}
+		}, {
+			"start_block": 35,
+			"authorized_by": "beos.tst.aba",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.aba",
+				"to": "beos.tst.aaz",
+				"quantity": "6.0000 PXBTS", 
+				"memo": "any_memo"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "overdrawn balance"
+			}
+		}, {
+			"start_block": 37,
+			"authorized_by": "beos.tst.aba",
+			"code": "eosio.token",
+			"action": "transfer",
+			"args": {
+				"from": "beos.tst.aba",
+				"to": "beos.tst.aaz",
+				"quantity": "5.0000 PXBTS", 
+				"memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 40,
+			"authorized_by": "beos.tst.aba",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.aba",
+				"proxy": "",
+				"producers": ["beos.tst.aaz"]
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 45,
+			"authorized_by": "beos.tst.aaz",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.aaz",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", 
+				"original_memo": "memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.aaz",
+			"after_block": [{
+				"after_block": 18,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 2505448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}
+		}, {
+			"user": "beos.tst.aba",
+			"after_block": [{
+				"after_block": 18,
+				"resources":{
+				"balance": "5.0000 PXBTS", 
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 2505448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}
+		}]
+	}, {
+		"name": "[3.1] Vote test",
+		"scenario_blocks": 30,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  1, [10, 20, 10, 8000000],
+					[10, 18, 4, 5000000],
+					[250, 290, 10, 200000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 2,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abc",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 2,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abd",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 4,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.abc",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 4,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.abd",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 6,
+			"authorized_by": "beos.tst.abc",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+				"producer": "beos.tst.abc",
+				"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+				"url": "http://fake.html",
+				"location": 0
+			},
+			"expected_result": {
+				"status": false,
+				"message": "transaction net usage is too high: 160 > 0"
+			}
+		}, {
+			"start_block": 7,
+			"authorized_by": "beos.tst.abd",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.abd",
+				"proxy": "",
+				"producers": ["beos.tst.abd"]
+			},
+			"expected_result": {
+				"status": false,
+				"message": "user must stake before they can vote"
+			}
+		}, {
+			"start_block": 11,
+			"authorized_by": "beos.tst.abc",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+				"producer": "beos.tst.abc",
+				"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+				"url": "http://fake.html",
+				"location": 0
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 12,
+			"authorized_by": "beos.tst.abd",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+				"producer": "beos.tst.abd",
+				"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+				"url": "http://fake.html",
+				"location": 0
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 15,
+			"authorized_by": "beos.tst.abd",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.abd",
+				"proxy": "",
+				"producers": ["beos.tst.abc"]
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 15,
+			"authorized_by": "beos.tst.abc",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.abc",
+				"proxy": "",
+				"producers": ["beos.tst.abd"]
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 20,
+			"authorized_by": "beos.tst.abc",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abc",
+				"bts_to": "any_account",
+				"quantity": "5.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 20,
+			"authorized_by": "beos.tst.abd",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abd",
+				"bts_to": "any_account",
+				"quantity": "5.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.abc",
+			"after_block": [],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 7505448}
+			}
+		}, {
+			"user": "beos.tst.abd",
+			"after_block": [],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 7505448}
+			}
+		}]
+	}, {
+		"name": "[1.7] Issues done by other normal user",
+		"scenario_blocks": 110,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  10, [25, 34, 5, 8000000],
+					[25, 34, 5, 5000000],
+					[90, 98, 10, 200000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abe",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abf",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abh",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 5,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abe",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 5,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abh",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 10,
+			"authorized_by": "beos.tst.abe",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abe",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "missing authority of beos.gateway"
+			}
+		}, {
+			"start_block": 15,
+			"authorized_by": "beos.tst.abe",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abf",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "missing authority of beos.gateway"
+			}
+		}, {
+			"start_block": 20,
+			"authorized_by": "beos.tst.abf",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abe",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "missing authority of beos.gateway"
+			}
+		}, {
+			"start_block": 24,
+			"authorized_by": "beos.tst.abf",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abf",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "missing authority of beos.gateway"
+			}
+		}, {
+			"start_block": 38,
+			"authorized_by": "beos.tst.abh",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+				"producer": "beos.tst.abh",
+				"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+				"url": "test.html",
+				"location": 0
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 60,
+			"authorized_by": "beos.tst.abe",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abe",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "missing authority of beos.gateway"
+			}
+		}, {
+			"start_block": 65,
+			"authorized_by": "beos.tst.abe",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abf",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "missing authority of beos.gateway"
+			}
+		}, {
+			"start_block": 70,
+			"authorized_by": "beos.tst.abf",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abe",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "missing authority of beos.gateway"
+			}
+		}, {
+			"start_block": 75,
+			"authorized_by": "beos.tst.abh",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abe",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "missing authority of beos.gateway"
+			}
+		}, {
+			"start_block": 80,
+			"authorized_by": "beos.tst.abh",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abf",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "missing authority of beos.gateway"
+			}
+		}, {
+			"start_block": 85,
+			"authorized_by": "beos.tst.abe",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abh",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "missing authority of beos.gateway"
+			}
+		}, {
+			"start_block": 90,
+			"authorized_by": "beos.tst.abf",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abh",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "missing authority of beos.gateway"
+			}
+		}, {
+			"start_block": 95,
+			"authorized_by": "beos.tst.abh",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abh",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "missing authority of beos.gateway"
+			}
+		}, {
+			"start_block": 100,
+			"authorized_by": "beos.tst.abe",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abe",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			}
+		}, {
+			"start_block": 100,
+			"authorized_by": "beos.tst.abh",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abh",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.abe",
+			"after_block": [{
+				"after_block": 8,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 13,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 23,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 63,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}, {
+				"after_block": 73,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}, {
+				"after_block": 78,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}
+		}, {
+			"user": "beos.tst.abf",
+			"after_block": [{
+				"after_block": 8,
+				"resources":{
+				"balance": "",
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 18,
+				"resources":{
+				"balance": "",
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 28,
+				"resources":{
+				"balance": "",
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 68,
+				"resources":{
+				"balance": "",
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 83,
+				"resources":{
+				"balance": "",
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}
+		}, {
+			"user": "beos.tst.abh",
+			"after_block": [{
+				"after_block": 88,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}, {
+				"after_block": 93,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}, {
+				"after_block": 98,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}
+		}]
+	}, {
+		"name": "[1.8] Withdraw done by other normal user",
+		"scenario_blocks": 110,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  10, [25, 34, 5, 8000000],
+					[25, 34, 5, 5000000],
+					[90, 98, 10, 200000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abi",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abj",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abk",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 5,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abi",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 5,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abk",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 10,
+			"authorized_by": "beos.tst.abi",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abi",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "transaction net usage is too high: 128 > 0"
+			}
+		}, {
+			"start_block": 15,
+			"authorized_by": "beos.tst.abi",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abj",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "missing authority of beos.tst.abj"
+			}
+		}, {
+			"start_block": 20,
+			"authorized_by": "beos.tst.abj",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abi",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "missing authority of beos.tst.abi"
+			}
+		}, {
+			"start_block": 24,
+			"authorized_by": "beos.tst.abj",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abj",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "overdrawn balance during withdraw"
+			}
+		}, {
+			"start_block": 38,
+			"authorized_by": "beos.tst.abk",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+				"producer": "beos.tst.abk",
+				"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+				"url": "test.html",
+				"location": 0
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 60,
+			"authorized_by": "beos.tst.abi",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abj",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "missing authority of beos.tst.abj"
+			}
+		}, {
+			"start_block": 65,
+			"authorized_by": "beos.tst.abj",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abi",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "missing authority of beos.tst.abi"
+			}
+		}, {
+			"start_block": 70,
+			"authorized_by": "beos.tst.abk",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abi",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "missing authority of beos.tst.abi"
+			}
+		}, {
+			"start_block": 75,
+			"authorized_by": "beos.tst.abk",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abj",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "missing authority of beos.tst.abj"
+			}
+		}, {
+			"start_block": 80,
+			"authorized_by": "beos.tst.abi",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abk",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "missing authority of beos.tst.abk"
+			}
+		}, {
+			"start_block": 85,
+			"authorized_by": "beos.tst.abj",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abk",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": false,
+				"message": "missing authority of beos.tst.abk"
+			}
+		}, {
+			"start_block": 100,
+			"authorized_by": "beos.tst.abi",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abi",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			}
+		}, {
+			"start_block": 100,
+			"authorized_by": "beos.tst.abk",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abk",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.abi",
+			"after_block": [{
+				"after_block": 8,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 13,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 23,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 68,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}, {
+				"after_block": 73,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}
+		}, {
+			"user": "beos.tst.abj",
+			"after_block": [{
+				"after_block": 8,
+				"resources":{
+				"balance": "",
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 18,
+				"resources":{
+				"balance": "",
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 28,
+				"resources":{
+				"balance": "",
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 63,
+				"resources":{
+				"balance": "",
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 78,
+				"resources":{
+				"balance": "",
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}
+		}, {
+			"user": "beos.tst.abk",
+			"after_block": [{
+				"after_block": 8,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}, {
+				"after_block": 83,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}, {
+				"after_block": 88,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}
+		}]
+	}, {
+		"name": "[2.6] Buy and sell ram tests",
+		"scenario_blocks": 35,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  10, [10, 15, 5, 4000000],
+					[10, 15, 5, 2000000],
+					[10, 30, 10, 2000000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abl",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abm",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 5,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.abl",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 5,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.abm",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 20,
+			"authorized_by": "beos.tst.abl",
+			"code": "eosio",
+			"action": "sellram",
+			"args": {
+				"account": "beos.tst.abl",
+				"bytes": "1000000"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 20,
+			"authorized_by": "beos.tst.abm",
+			"code": "eosio",
+			"action": "sellram",
+			"args": {
+				"account": "beos.tst.abm",
+				"bytes": "3000000"
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 25,
+			"authorized_by": "beos.tst.abl",
+			"code": "eosio",
+			"action": "buyram",
+			"args": {
+				"payer": "beos.tst.abl",
+				"receiver": "beos.tst.abl",
+				"quant": "0.0100 BEOS"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 30,
+			"authorized_by": "beos.tst.abl",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abl",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 30,
+			"authorized_by": "beos.tst.abm",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abm",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.abl",
+			"after_block": [{
+				"after_block": 16,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 2005448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 1005499}
+			}
+		}, {
+			"user": "beos.tst.abm",
+			"after_block": [{
+				"after_block": 16,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 2005448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "200.0000 BEOS",
+				"cpu_weight": "200.0000 BEOS",
+				"ram_bytes": 2005448}
+			}
+		}]
+	}, {
+		"name": "[2.7] Buy and sell ram tests",
+		"scenario_blocks": 55,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  10, [10, 11, 5, 2000000],
+					[15, 25, 5, 1000000],
+					[10, 30, 10, 2000000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abn",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 5,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.abn",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 10,
+			"authorized_by": "beos.tst.abn",
+			"code": "eosio",
+			"action": "sellram",
+			"args": {
+				"account": "beos.tst.abn",
+				"bytes": "1000000"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "RAM shouldn't be liquid during distribution period"
+			}
+		}, {
+			"start_block": 20,
+			"authorized_by": "beos.tst.abn",
+			"code": "eosio",
+			"action": "sellram",
+			"args": {
+				"account": "beos.tst.abn",
+				"bytes": "1000000"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "RAM shouldn't be liquid during distribution period"
+			}
+		}, {
+			"start_block": 30,
+			"authorized_by": "beos.tst.abn",
+			"code": "eosio",
+			"action": "sellram",
+			"args": {
+				"account": "beos.tst.abn",
+				"bytes": "2000000"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 35,
+			"authorized_by": "beos.tst.abn",
+			"code": "eosio",
+			"action": "buyrambytes",
+			"args": {
+				"payer": "beos.tst.abn",
+				"receiver": "beos.tst.abn",
+				"bytes": "8000000"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "overdrawn balance"
+			}
+		}, {
+			"start_block": 35,
+			"authorized_by": "beos.tst.abn",
+			"code": "eosio",
+			"action": "sellram",
+			"args": {
+				"account": "beos.tst.abn",
+				"bytes": "100000000"
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 40,
+			"authorized_by": "beos.tst.abn",
+			"code": "eosio",
+			"action": "buyrambytes",
+			"args": {
+				"payer": "beos.tst.abn",
+				"receiver": "beos.tst.abn",
+				"bytes": "1000000"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 45,
+			"authorized_by": "beos.tst.abn",
+			"code": "eosio",
+			"action": "buyrambytes",
+			"args": {
+				"payer": "beos.tst.abn",
+				"receiver": "beos.tst.abn",
+				"bytes": "2000000"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "overdrawn balance"
+			}
+		}, {
+			"start_block": 50,
+			"authorized_by": "beos.tst.abn",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abn",
+				"bts_to": "any_account",
+				"quantity": "10.0000 PXBTS", 
+				"original_memo": "any_memo"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.abn",
+			"after_block": [{
+				"after_block": 27,
+				"resources":{
+				"balance": "10.0000 PXBTS", 
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 3005448}
+			}],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "100.0000 BEOS",
+				"cpu_weight": "100.0000 BEOS",
+				"ram_bytes": 2005447}
+			}
+		}]
+	}, {
+		"name": "[6.1] Undelegatebw - after distribution period - to self, without voting.",
+		"scenario_blocks": 40,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  1, [10, 30, 5, 8000000],
+					[10, 20, 5, 5000000],
+					[250, 290, 10, 200000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abo",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 3,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abo",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 32,
+			"authorized_by": "beos.tst.abo",
+			"code": "eosio",
+			"action": "undelegatebw",
+			"args": {
+				"from": "beos.tst.abo",
+				"receiver": "beos.tst.abo",
+				"unstake_net_quantity": "1.0000 BEOS",
+				"unstake_cpu_quantity": "1.0000 BEOS"
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 35,
+			"authorized_by": "beos.tst.abo",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abo",
+				"bts_to": "any_account",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.abo",
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "2000.0000 BEOS",
+				"cpu_weight": "2000.0000 BEOS",
+				"ram_bytes": 15005448}
+			},
+			"after_block": []
+		}]
+	}, {
+		"name": "[6.2] Undelegatebw - after distribution period - to self, with voting.",
+		"scenario_blocks": 40,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  1, [10, 30, 5, 8000000],
+					[10, 20, 5, 5000000],
+					[250, 290, 10, 200000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abp",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 3,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abp",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 16,
+			"authorized_by": "beos.tst.abp",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+				"producer": "beos.tst.abp",
+				"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+				"url": "test3.html",
+				"location": "0"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 15,
+			"authorized_by": "beos.tst.abp",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.abp",
+				"proxy": "",
+				"producers": ["beos.tst.abp"]
+			},
+			"expected_result": {
+				"status": false,
+				"message": "producer is not registered"
+			}
+		}, {
+			"start_block": 35,
+			"authorized_by": "beos.tst.abp",
+			"code": "eosio",
+			"action": "undelegatebw",
+			"args": {
+				"from": "beos.tst.abp",
+				"receiver": "beos.tst.abp",
+				"unstake_net_quantity": "1.0000 BEOS",
+				"unstake_cpu_quantity": "1.0000 BEOS"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "cannot undelegate bandwidth until the chain is activated (at least 15% of all tokens participate in voting)"
+			}
+		}, {
+			"start_block": 38,
+			"authorized_by": "beos.tst.abp",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abp",
+				"bts_to": "any_account",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.abp",
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "2000.0000 BEOS",
+				"cpu_weight": "2000.0000 BEOS",
+				"ram_bytes": 15005448}
+			},
+			"after_block": []
+		}]
+	}, {
+		"name": "[6.3] Undelegatebw - after distribution period - to other, without voting.",
+		"scenario_blocks": 40,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  1, [10, 30, 5, 8000000],
+					[10, 20, 5, 5000000],
+					[250, 290, 10, 200000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abs",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abq",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 3,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abs",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 3,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abq",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 35,
+			"authorized_by": "beos.tst.abs",
+			"code": "eosio",
+			"action": "undelegatebw",
+			"args": {
+				"from": "beos.tst.abs",
+				"receiver": "beos.tst.abq",
+				"unstake_net_quantity": "1.0000 BEOS",
+				"unstake_cpu_quantity": "1.0000 BEOS"
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 37,
+			"authorized_by": "beos.tst.abq",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abq",
+				"bts_to": "any_account",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			}
+		}, {
+			"start_block": 37,
+			"authorized_by": "beos.tst.abs",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abs",
+				"bts_to": "any_account",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.abs",
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "1000.0000 BEOS",
+				"cpu_weight": "1000.0000 BEOS",
+				"ram_bytes": 7505448}
+			},
+			"after_block": []
+		}, {
+			"user": "beos.tst.abq",
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "1000.0000 BEOS",
+				"cpu_weight": "1000.0000 BEOS",
+				"ram_bytes": 7505448}
+			},
+			"after_block": []
+		}]
+	}, {
+		"name": "[6.4] Undelegatebw - after distribution period - to other, with voting.",
+		"scenario_blocks": 40,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  1, [10, 30, 5, 8000000],
+					[10, 20, 5, 5000000],
+					[250, 290, 10, 200000]
+				]
+			}
+		},
+		"actions": [{
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abt",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abu",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 3,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abt",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 3,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abu",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 16,
+			"authorized_by": "beos.tst.abt",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+				"producer": "beos.tst.abt",
+				"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+				"url": "test3.html",
+				"location": "0"
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 15,
+			"authorized_by": "beos.tst.abt",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.abt",
+				"proxy": "",
+				"producers": ["beos.tst.abt"]
+			},
+			"expected_result": {
+				"status": false,
+				"message": "producer is not registered"
+			}
+		}, {
+			"start_block": 15,
+			"authorized_by": "beos.tst.abu",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.abu",
+				"proxy": "",
+				"producers": ["beos.tst.abt"]
+			},
+			"expected_result": {
+				"status": false,
+				"message": "producer is not registered"
+			}
+		}, {
+			"start_block": 35,
+			"authorized_by": "beos.tst.abt",
+			"code": "eosio",
+			"action": "undelegatebw",
+			"args": {
+				"from": "beos.tst.abt",
+				"receiver": "beos.tst.abu",
+				"unstake_net_quantity": "1.0000 BEOS",
+				"unstake_cpu_quantity": "1.0000 BEOS"
+			},
+			"expected_result": {
+				"status": false,
+				"message": "cannot undelegate bandwidth until the chain is activated (at least 15% of all tokens participate in voting)"
+			}
+		}, {
+			"start_block": 37,
+			"authorized_by": "beos.tst.abt",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abt",
+				"bts_to": "any_account",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			}
+		}, {
+			"start_block": 37,
+			"authorized_by": "beos.tst.abu",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abu",
+				"bts_to": "any_account",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.abt",
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "1000.0000 BEOS",
+				"cpu_weight": "1000.0000 BEOS",
+				"ram_bytes": 7505448}
+			},
+			"after_block": []
+		}, {
+			"user": "beos.tst.abu",
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "1000.0000 BEOS",
+				"cpu_weight": "1000.0000 BEOS",
+				"ram_bytes": 7505448}
+			},
+			"after_block": []
+		}]
+	},{
+		"name": "[2.9] Great all-in-one test",
+		"scenario_blocks": 160,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  80, [20, 140, 40, 40000000], [20, 140, 40, 20000000], [10, 30, 10, 2000000]]
+			}
+		},
+		"actions": [{
+			"start_block": 1,
+			"action":"newaccount_pattern",
+			"name":"beos.tst.acg",
+			"owner_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 1,
+			"action":"newaccount_pattern",
+			"name":"beos.tst.acr",
+			"owner_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 1,
+			"action":"newaccount_pattern",
+			"name":"beos.tst.act",
+			"owner_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 1,
+			"action":"newaccount_pattern",
+			"name":"beos.tst.acu",
+			"owner_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 1,
+			"action":"newaccount_pattern",
+			"name":"beos.tst.acv",
+			"owner_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 1,
+			"action":"newaccount_pattern",
+			"name":"beos.tst.acw",
+			"owner_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 1,
+			"action":"newaccount_pattern",
+			"name":"beos.tst.acx",
+			"owner_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 1,
+			"action":"newaccount_pattern",
+			"name":"beos.tst.acy",
+			"owner_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 1,
+			"action":"newaccount_pattern",
+			"name":"beos.tst.acz",
+			"owner_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 1,
+			"action":"newaccount_pattern",
+			"name":"beos.tst.ach",
+			"owner_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 5,
+			"authorized_by":"beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.acg",
+				"quantity": "30.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 5,
+			"authorized_by":"beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.acr",
+				"quantity": "15.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 5,
+			"authorized_by":"beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.act",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 5,
+			"authorized_by":"beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.acu",
+				"quantity": "10.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 5,
+			"authorized_by":"beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.acv",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 5,
+			"authorized_by":"beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.acw",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 5,
+			"authorized_by":"beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.acx",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 5,
+			"authorized_by":"beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"from": "beos.gateway",
+				"to": "beos.tst.acy",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {"status":true, "message":""}
+		},{
+			"start_block": 10,
+			"authorized_by":"beos.tst.acr",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+					"producer": "beos.tst.acr",
+					"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+					"url": "test.html",
+					"location": "0"
+			},
+			"expected_result": {"status": false, "message": "transaction net usage is too high: 152 > 0"}
+	},{
+		"start_block": 15,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "beos.tst.acr",
+			"quantity": "5.0000 PXBTS", "memo": ""
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 15,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "beos.tst.acv",
+			"quantity": "5.0000 PXBTS", "memo": ""
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 15,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "beos.tst.acz",
+			"quantity": "5.0000 PXBTS", "memo": ""
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 15,
+		"authorized_by": "beos.tst.act",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "beos.tst.act",
+			"to": "beos.tst.ach",
+			"quantity": "5.0000 PXBTS", 
+			"memo":"Free muunies"
+		},
+		"expected_result": {"status":false,"message":"transaction net usage is too high: 144 > 0"}
+	},{
+		"start_block": 15,
+		"authorized_by": "beos.tst.acx",
+		"code": "eosio",
+		"action": "sellram",
+		"args": {
+			"account": "beos.tst.acx",
+			"bytes": "2000"
+		},
+		"expected_result": {"status":false,"message":"RAM shouldn't be liquid during distribution period"}
+	},{
+		"start_block": 15,
+		"authorized_by": "beos.tst.acw",
+		"code": "eosio",
+		"action": "delegatebw",
+		"args": 
+		{
+			"from": "beos.tst.acw",
+			"receiver": "beos.tst.acw",
+			"stake_net_quantity": "5.0000 BEOS",
+			"stake_cpu_quantity": "5.0000 BEOS",
+			"transfer": false
+		},
+		"expected_result": {"status": false, "message": "no balance object found"}
+	},{
+		"start_block": 25,
+		"action":"newaccount_pattern",
+		"name":"beos.tst.aci",
+		"owner_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+		"activ_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 25,
+		"action":"newaccount_pattern",
+		"name":"beos.tst.acj",
+		"owner_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+		"activ_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 25,
+		"action":"newaccount_pattern",
+		"name":"beos.tst.ack",
+		"owner_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+		"activ_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 30,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "beos.tst.acg",
+			"quantity": "30.0000 PXBTS", "memo": ""
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 30,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "beos.tst.act",
+			"quantity": "10.0000 PXBTS", "memo": ""
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 30,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "beos.tst.acx",
+			"quantity": "15.0000 PXBTS", "memo": ""
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 30,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "beos.tst.ach",
+			"quantity": "5.0000 PXBTS", "memo": ""
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 30,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "beos.tst.aci",
+			"quantity": "40.0000 PXBTS", "memo": ""
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 35,
+		"authorized_by": "beos.tst.acu",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "beos.tst.acu",
+			"to": "beos.tst.acw",
+			"quantity": "10.0000 PXBTS", 
+			"memo":"From 4 to 6"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 40,
+		"authorized_by": "beos.tst.acx",
+		"code": "eosio",
+		"action": "undelegatebw",
+		"args": 
+		{
+			"from": "beos.tst.acx",
+			"receiver": "beos.tst.acx",
+			"unstake_net_quantity": "50.0000 BEOS",
+			"unstake_cpu_quantity": "50.0000 BEOS"
+		},
+		"expected_result": {"status": false, "message": ""}
+	},{
+		"start_block": 40,
+		"authorized_by":"beos.tst.acg",
+		"code": "eosio",
+		"action": "regproducer",
+		"args": {
+				"producer": "beos.tst.acg",
+				"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+				"url": "test.html",
+				"location": "0"
+		},
+		"expected_result": {"status": true, "message": ""}
+	},{
+		"start_block": 45,
+		"authorized_by": "beos.tst.acv",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "beos.tst.acv",
+			"to": "beos.tst.aci",
+			"quantity": "30.0000 PXBTS", 
+			"memo":"From 5 to 11"
+		},
+		"expected_result": {"status":false, "message":"overdrawn balance"}
+	},{
+		"start_block": 45,
+		"authorized_by": "beos.tst.acr",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "beos.tst.acr",
+			"to": "beos.tst.act",
+			"quantity": "5.0000 PXBTS", 
+			"memo":"From 2 to 3"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 50,
+		"authorized_by": "beos.tst.act",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "beos.tst.act",
+			"to": "beos.tst.acr",
+			"quantity": "5.0000 PXBTS", 
+			"memo":"From 3 to 2"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 50,
+		"authorized_by": "beos.tst.acz",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "beos.tst.acz",
+			"to": "beos.tst.acy",
+			"quantity": "5.0000 PXBTS", 
+			"memo":"From 9 to 8"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 65,
+		"action":"newaccount_pattern",
+		"name":"beos.tst.acl",
+		"owner_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+		"activ_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 65,
+		"action":"newaccount_pattern",
+		"name":"beos.tst.acm",
+		"owner_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+		"activ_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 65,
+		"action":"newaccount_pattern",
+		"name":"beos.tst.acn",
+		"owner_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+		"activ_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 65,
+		"action":"newaccount_pattern",
+		"name":"beos.tst.aco",
+		"owner_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+		"activ_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 65,
+		"action":"newaccount_pattern",
+		"name":"beos.tst.acp",
+		"owner_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+		"activ_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 65,
+		"action":"newaccount_pattern",
+		"name":"beos.tst.acq",
+		"owner_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+		"activ_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 65,
+		"action":"newaccount_pattern",
+		"name":"beos.tst.acs",
+		"owner_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+		"activ_pub":"EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by": "beos.tst.acw",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "beos.tst.acw",
+			"bts_to": "any_account",
+			"quantity": "15.0000 PXBTS", 
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "beos.tst.ach",
+			"quantity": "45.0000 PXBTS", "memo": ""
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "beos.tst.acg",
+			"quantity": "40.0000 PXBTS", "memo": ""
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "beos.tst.acr",
+			"quantity": "10.0000 PXBTS", "memo": ""
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "beos.tst.aci",
+			"quantity": "40.0000 PXBTS", "memo": ""
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "beos.tst.acj",
+			"quantity": "10.0000 PXBTS", "memo": ""
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "beos.tst.acl",
+			"quantity": "20.0000 PXBTS", "memo": ""
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "beos.tst.acm",
+			"quantity": "10.0000 PXBTS", "memo": ""
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "beos.tst.acn",
+			"quantity": "10.0000 PXBTS", "memo": ""
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "beos.tst.aco",
+			"quantity": "10.0000 PXBTS", "memo": ""
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "beos.tst.acp",
+			"quantity": "10.0000 PXBTS", "memo": ""
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 70,
+		"authorized_by":"beos.gateway",
+		"code": "beos.gateway",
+		"action": "issue",
+		"args": {
+			"from": "beos.gateway",
+			"to": "beos.tst.acq",
+			"quantity": "10.0000 PXBTS", "memo": ""
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 75,
+		"authorized_by": "beos.tst.acv",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "beos.tst.acv",
+			"to": "beos.tst.acq",
+			"quantity": "10.0000 PXBTS", 
+			"memo":"From 5 to 19"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 75,
+		"authorized_by": "beos.tst.act",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "beos.tst.act",
+			"to": "beos.tst.aci",
+			"quantity": "10.0000 PXBTS", 
+			"memo":"From 5 to 11"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 75,
+		"authorized_by": "beos.tst.acx",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "beos.tst.acx",
+			"to": "beos.tst.aci",
+			"quantity": "10.0000 PXBTS", 
+			"memo":"From 7 to 11"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 80,
+		"authorized_by": "beos.tst.acr",
+		"code": "eosio",
+		"action": "regproducer",
+		"args": {
+			"producer": "beos.tst.acr",
+			"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"url": "test.html",
+			"location": 0
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	},{
+		"start_block": 80,
+		"authorized_by": "beos.tst.acz",
+		"code": "eosio",
+		"action": "regproducer",
+		"args": {
+			"producer": "beos.tst.acz",
+			"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"url": "test.html",
+			"location": 0
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	},{
+		"start_block": 80,
+		"authorized_by": "beos.tst.acu",
+		"code": "eosio",
+		"action": "regproducer",
+		"args": {
+			"producer": "beos.tst.acu",
+			"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"url": "test.html",
+			"location": 0
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	}, {
+		"start_block": 85,
+		"authorized_by": "beos.tst.ach",
+		"code": "eosio",
+		"action": "voteproducer",
+		"args": {
+			"voter": "beos.tst.ach",
+			"proxy": "",
+			"producers": ["beos.tst.acg"]
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	}, {
+		"start_block": 85,
+		"authorized_by": "beos.tst.acg",
+		"code": "eosio",
+		"action": "voteproducer",
+		"args": {
+			"voter": "beos.tst.acg",
+			"proxy": "",
+			"producers": ["beos.tst.acg"]
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	}, {
+		"start_block": 85,
+		"authorized_by": "beos.tst.aci",
+		"code": "eosio",
+		"action": "voteproducer",
+		"args": {
+			"voter": "beos.tst.aci",
+			"proxy": "",
+			"producers": ["beos.tst.acu"]
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	}, {
+		"start_block": 85,
+		"authorized_by": "beos.tst.act",
+		"code": "eosio",
+		"action": "voteproducer",
+		"args": {
+			"voter": "beos.tst.act",
+			"proxy": "",
+			"producers": ["beos.tst.acr"]
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	}, {
+		"start_block": 85,
+		"authorized_by": "beos.tst.acv",
+		"code": "eosio",
+		"action": "voteproducer",
+		"args": {
+			"voter": "beos.tst.acv",
+			"proxy": "",
+			"producers": ["beos.tst.acz"]
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	}, {
+		"start_block": 85,
+		"authorized_by": "beos.tst.acw",
+		"code": "eosio",
+		"action": "voteproducer",
+		"args": {
+			"voter": "beos.tst.acw",
+			"proxy": "",
+			"producers": ["beos.tst.acz"]
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	},{
+		"start_block": 105,
+		"authorized_by": "beos.tst.acr",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "beos.tst.acr",
+			"bts_to": "any_account",
+			"quantity": "30.0000 PXBTS", 
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 105,
+		"authorized_by": "beos.tst.act",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "beos.tst.act",
+			"bts_to": "any_account",
+			"quantity": "10.0000 PXBTS", 
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 105,
+		"authorized_by": "beos.tst.acx",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "beos.tst.acx",
+			"bts_to": "any_account",
+			"quantity": "10.0000 PXBTS", 
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 105,
+		"authorized_by": "beos.tst.acy",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "beos.tst.acy",
+			"bts_to": "any_account",
+			"quantity": "10.0000 PXBTS", 
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 105,
+		"authorized_by": "beos.tst.ach",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "beos.tst.ach",
+			"bts_to": "any_account",
+			"quantity": "30.0000 PXBTS", 
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 105,
+		"authorized_by": "beos.tst.aci",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "beos.tst.aci",
+			"bts_to": "any_account",
+			"quantity": "100.0000 PXBTS", 
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 105,
+		"authorized_by": "beos.tst.acl",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "beos.tst.acl",
+			"bts_to": "any_account",
+			"quantity": "10.0000 PXBTS", 
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 110,
+		"authorized_by":"beos.tst.acq",
+		"code": "eosio",
+		"action": "regproducer",
+		"args": {
+				"producer": "beos.tst.acq",
+				"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+				"url": "test.html",
+				"location": "0"
+		},
+		"expected_result": {"status": true, "message": ""}
+	}, {
+		"start_block": 115,
+		"authorized_by": "beos.tst.acm",
+		"code": "eosio",
+		"action": "voteproducer",
+		"args": {
+			"voter": "beos.tst.acm",
+			"proxy": "",
+			"producers": ["beos.tst.acq"]
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	}, {
+		"start_block": 115,
+		"authorized_by": "beos.tst.acn",
+		"code": "eosio",
+		"action": "voteproducer",
+		"args": {
+			"voter": "beos.tst.acn",
+			"proxy": "",
+			"producers": ["beos.tst.acq"]
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	}, {
+		"start_block": 115,
+		"authorized_by": "beos.tst.aco",
+		"code": "eosio",
+		"action": "voteproducer",
+		"args": {
+			"voter": "beos.tst.aco",
+			"proxy": "",
+			"producers": ["beos.tst.acq"]
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	}, {
+		"start_block": 115,
+		"authorized_by": "beos.tst.acp",
+		"code": "eosio",
+		"action": "voteproducer",
+		"args": {
+			"voter": "beos.tst.acp",
+			"proxy": "",
+			"producers": ["beos.tst.acq"]
+		},
+		"expected_result": {
+			"status": true,
+			"message": ""
+		}
+	},{
+		"start_block": 120,
+		"authorized_by": "beos.tst.acq",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "beos.tst.acq",
+			"to": "beos.tst.acj",
+			"quantity": "20.0000 PXBTS", 
+			"memo":"From 19 to 12"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 120,
+		"authorized_by": "beos.tst.ach",
+		"code": "eosio.token",
+		"action": "transfer",
+		"args": {
+			"from": "beos.tst.ach",
+			"to": "beos.tst.acg",
+			"quantity": "10.0000 PXBTS", 
+			"memo":"From 10 to 1"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 145,
+		"authorized_by": "beos.tst.acg",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "beos.tst.acg",
+			"bts_to": "any_account",
+			"quantity": "110.0000 PXBTS", 
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 145,
+		"authorized_by": "beos.tst.ach",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "beos.tst.ach",
+			"bts_to": "any_account",
+			"quantity": "10.0000 PXBTS", 
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 145,
+		"authorized_by": "beos.tst.acj",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "beos.tst.acj",
+			"bts_to": "any_account",
+			"quantity": "30.0000 PXBTS", 
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 145,
+		"authorized_by": "beos.tst.acl",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "beos.tst.acl",
+			"bts_to": "any_account",
+			"quantity": "10.0000 PXBTS", 
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 145,
+		"authorized_by": "beos.tst.acm",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "beos.tst.acm",
+			"bts_to": "any_account",
+			"quantity": "10.0000 PXBTS", 
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 145,
+		"authorized_by": "beos.tst.acn",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "beos.tst.acn",
+			"bts_to": "any_account",
+			"quantity": "10.0000 PXBTS", 
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 145,
+		"authorized_by": "beos.tst.aco",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "beos.tst.aco",
+			"bts_to": "any_account",
+			"quantity": "10.0000 PXBTS", 
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	},{
+		"start_block": 145,
+		"authorized_by": "beos.tst.acp",
+		"code": "beos.gateway",
+		"action": "withdraw",
+		"args": {
+			"from": "beos.tst.acp",
+			"bts_to": "any_account",
+			"quantity": "10.0000 PXBTS", 
+			"original_memo": "any_memo"
+		},
+		"expected_result": {"status":true, "message":""}
+	}],
+		"expected_results": [
+			{
+				"user":"beos.tst.acg",
+				"after_block":[{
+					"after_block":23,
+					"resources": {
+						"balance": "30.0000 PXBTS", 
+						"net_weight": "600.0000 BEOS",
+						"cpu_weight": "600.0000 BEOS",
+						"ram_bytes" : 6005448
+					}
+				},{
+					"after_block":55,
+					"resources": {
+						"balance": "60.0000 PXBTS", 
+						"net_weight": "600.0000 BEOS",
+						"cpu_weight": "600.0000 BEOS",
+						"ram_bytes" : 6005448
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "100.0000 PXBTS", 
+						"net_weight": "1200.0000 BEOS",
+						"cpu_weight": "1200.0000 BEOS",
+						"ram_bytes" : 12005448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "110.0000 PXBTS", 
+						"net_weight": "1700.0000 BEOS",
+						"cpu_weight": "1700.0000 BEOS",
+						"ram_bytes" : 17005448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "2800.0000 BEOS",
+						"cpu_weight": "2800.0000 BEOS",
+						"ram_bytes" : 28005448
+					}
+				}
+			},{
+				"user":"beos.tst.acr",
+				"after_block":[{
+					"after_block":23,
+					"resources": {
+						"balance": "20.0000 PXBTS", 
+						"net_weight": "400.0000 BEOS",
+						"cpu_weight": "400.0000 BEOS",
+						"ram_bytes" : 4005448
+					}
+				},{
+					"after_block":55,
+					"resources": {
+						"balance": "20.0000 PXBTS", 
+						"net_weight": "400.0000 BEOS",
+						"cpu_weight": "400.0000 BEOS",
+						"ram_bytes" : 4005448	
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "30.0000 PXBTS", 
+						"net_weight": "600.0000 BEOS",
+						"cpu_weight": "600.0000 BEOS",
+						"ram_bytes" : 6005448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "750.0000 BEOS",
+						"cpu_weight": "750.0000 BEOS",
+						"ram_bytes" : 7505448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "750.0000 BEOS",
+						"cpu_weight": "750.0000 BEOS",
+						"ram_bytes" : 7505448
+					}
+				}
+			},{
+				"user":"beos.tst.act",
+				"after_block":[{
+					"after_block":23,
+					"resources": {
+						"balance": "10.0000 PXBTS", 
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448
+					}
+				},{
+					"after_block":55,
+					"resources": {
+						"balance": "20.0000 PXBTS", 
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "10.0000 PXBTS", 
+						"net_weight": "400.0000 BEOS",
+						"cpu_weight": "400.0000 BEOS",
+						"ram_bytes" : 4005448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "450.0000 BEOS",
+						"cpu_weight": "450.0000 BEOS",
+						"ram_bytes" : 4505448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "450.0000 BEOS",
+						"cpu_weight": "450.0000 BEOS",
+						"ram_bytes" : 4505448
+					}
+				}
+			},{
+				"user":"beos.tst.acu",
+				"after_block":[{
+					"after_block":23,
+					"resources": {
+						"balance": "10.0000 PXBTS", 
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448
+					}
+				},{
+					"after_block":55,
+					"resources": {
+						"balance": "",
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "",
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448	
+					}
+				}
+			},{
+				"user":"beos.tst.acv",
+				"after_block":[{
+					"after_block":23,
+					"resources": {
+						"balance": "10.0000 PXBTS", 
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448
+					}
+				},{
+					"after_block":55,
+					"resources": {
+						"balance": "10.0000 PXBTS", 
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "",
+						"net_weight": "300.0000 BEOS",
+						"cpu_weight": "300.0000 BEOS",
+						"ram_bytes" : 3005448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "300.0000 BEOS",
+						"cpu_weight": "300.0000 BEOS",
+						"ram_bytes" : 3005448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "300.0000 BEOS",
+						"cpu_weight": "300.0000 BEOS",
+						"ram_bytes" : 3005448
+					}
+				}
+			},{
+				"user":"beos.tst.acw",
+				"after_block":[{
+					"after_block":23,
+					"resources": {
+						"balance": "5.0000 PXBTS", 
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448	
+					}
+				},{
+					"after_block":55,
+					"resources": {
+						"balance": "15.0000 PXBTS", 
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448	
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "",
+						"net_weight": "250.0000 BEOS",
+						"cpu_weight": "250.0000 BEOS",
+						"ram_bytes" : 2505448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "250.0000 BEOS",
+						"cpu_weight": "250.0000 BEOS",
+						"ram_bytes" : 2505448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "250.0000 BEOS",
+						"cpu_weight": "250.0000 BEOS",
+						"ram_bytes" : 2505448
+					}
+				}
+			},{
+				"user":"beos.tst.acx",
+				"after_block":[{
+					"after_block":23,
+					"resources": {
+						"balance": "5.0000 PXBTS", 
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				},{
+					"after_block":55,
+					"resources": {
+						"balance": "20.0000 PXBTS", 
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "10.0000 PXBTS", 
+						"net_weight": "300.0000 BEOS",
+						"cpu_weight": "300.0000 BEOS",
+						"ram_bytes" : 3005448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "350.0000 BEOS",
+						"cpu_weight": "350.0000 BEOS",
+						"ram_bytes" : 3505448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "350.0000 BEOS",
+						"cpu_weight": "350.0000 BEOS",
+						"ram_bytes" : 3505448
+					}
+				}
+			},{
+				"user":"beos.tst.acy",
+				"after_block":[{
+					"after_block":23,
+					"resources": {
+						"balance": "5.0000 PXBTS", 
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				},{
+					"after_block":55,
+					"resources": {
+						"balance": "10.0000 PXBTS", 
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448							
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "10.0000 PXBTS", 
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "250.0000 BEOS",
+						"cpu_weight": "250.0000 BEOS",
+						"ram_bytes" : 2505448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "250.0000 BEOS",
+						"cpu_weight": "250.0000 BEOS",
+						"ram_bytes" : 2505448
+					}
+				}
+			},{
+				"user":"beos.tst.acz",
+				"after_block":[{
+					"after_block":23,
+					"resources": {
+						"balance": "5.0000 PXBTS", 
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				},{
+					"after_block":55,
+					"resources": {
+						"balance": "",
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "",
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				}
+			},{
+				"user":"beos.tst.ach",
+				"after_block":[{
+					"after_block":23,
+					"resources": {
+						"balance": "",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":55,
+					"resources": {
+						"balance": "5.0000 PXBTS", 
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448	
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "50.0000 PXBTS", 
+						"net_weight": "50.0000 BEOS",
+						"cpu_weight": "50.0000 BEOS",
+						"ram_bytes" : 505448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "10.0000 PXBTS", 
+						"net_weight": "300.0000 BEOS",
+						"cpu_weight": "300.0000 BEOS",
+						"ram_bytes" : 3005448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "400.0000 BEOS",
+						"cpu_weight": "400.0000 BEOS",
+						"ram_bytes" : 4005448
+					}
+				}
+			},{
+				"user":"beos.tst.aci",
+				"after_block":[{
+					"after_block":55,
+					"resources": {
+						"balance": "40.0000 PXBTS", 
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "100.0000 PXBTS", 
+						"net_weight": "400.0000 BEOS",
+						"cpu_weight": "400.0000 BEOS",
+						"ram_bytes" : 4005448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "900.0000 BEOS",
+						"cpu_weight": "900.0000 BEOS",
+						"ram_bytes" : 9005448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "900.0000 BEOS",
+						"cpu_weight": "900.0000 BEOS",
+						"ram_bytes" : 9005448
+					}
+				}
+			},{
+				"user":"beos.tst.acj",
+				"after_block":[{
+					"after_block":55,
+					"resources": {
+						"balance": "",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "10.0000 PXBTS", 
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "30.0000 PXBTS", 
+						"net_weight": "50.0000 BEOS",
+						"cpu_weight": "50.0000 BEOS",
+						"ram_bytes" : 505448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "350.0000 BEOS",
+						"cpu_weight": "350.0000 BEOS",
+						"ram_bytes" : 3505448
+					}
+				}
+			},{
+				"user":"beos.tst.ack",
+				"after_block":[{
+					"after_block":55,
+					"resources": {
+						"balance": "",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":90,
+					"resources": {
+						"balance": "",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				}
+			},{
+				"user":"beos.tst.acl",
+				"after_block":[{
+					"after_block":90,
+					"resources": {
+						"balance": "20.0000 PXBTS", 
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "10.0000 PXBTS", 
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "200.0000 BEOS",
+						"cpu_weight": "200.0000 BEOS",
+						"ram_bytes" : 2005448
+					}
+				}
+			},{
+				"user":"beos.tst.acm",
+				"after_block":[{
+					"after_block":90,
+					"resources": {
+						"balance": "10.0000 PXBTS", 
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "10.0000 PXBTS", 
+						"net_weight": "50.0000 BEOS",
+						"cpu_weight": "50.0000 BEOS",
+						"ram_bytes" : 505448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "150.0000 BEOS",
+						"cpu_weight": "150.0000 BEOS",
+						"ram_bytes" : 1505448
+					}
+				}
+			},{
+				"user":"beos.tst.acn",
+				"after_block":[{
+					"after_block":90,
+					"resources": {
+						"balance": "10.0000 PXBTS", 
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "10.0000 PXBTS", 
+						"net_weight": "50.0000 BEOS",
+						"cpu_weight": "50.0000 BEOS",
+						"ram_bytes" : 505448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "150.0000 BEOS",
+						"cpu_weight": "150.0000 BEOS",
+						"ram_bytes" : 1505448
+					}
+				}
+			},{
+				"user":"beos.tst.aco",
+				"after_block":[{
+					"after_block":90,
+					"resources": {
+						"balance": "10.0000 PXBTS", 
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "10.0000 PXBTS", 
+						"net_weight": "50.0000 BEOS",
+						"cpu_weight": "50.0000 BEOS",
+						"ram_bytes" : 505448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "150.0000 BEOS",
+						"cpu_weight": "150.0000 BEOS",
+						"ram_bytes" : 1505448
+					}
+				}
+			},{
+				"user":"beos.tst.acp",
+				"after_block":[{
+					"after_block":90,
+					"resources": {
+						"balance": "10.0000 PXBTS", 
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "10.0000 PXBTS", 
+						"net_weight": "50.0000 BEOS",
+						"cpu_weight": "50.0000 BEOS",
+						"ram_bytes" : 505448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "150.0000 BEOS",
+						"cpu_weight": "150.0000 BEOS",
+						"ram_bytes" : 1505448
+					}
+				}
+			},{
+				"user":"beos.tst.acq",
+				"after_block":[{
+					"after_block":90,
+					"resources": {
+						"balance": "20.0000 PXBTS", 
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "100.0000 BEOS",
+						"cpu_weight": "100.0000 BEOS",
+						"ram_bytes" : 1005448
+					}
+				}
+			},{
+				"user":"beos.tst.acs",
+				"after_block":[{
+					"after_block":90,
+					"resources": {
+						"balance": "",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				},{
+					"after_block":130,
+					"resources": {
+						"balance": "",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				}],
+				"at_end": {
+					"resources": {
+						"balance": "",
+						"net_weight": "0.0000 BEOS",
+						"cpu_weight": "0.0000 BEOS",
+						"ram_bytes" : 5448
+					}
+				}
+			}
+		]
+	},{
+		"name": "[1.9] Vote after voting time",
+		"scenario_blocks": 60,
+		"params": {
+			"authorized_by": "beos.init",
+			"code": "beos.init",
+			"action": "changeparams",
+			"args": {
+				"new_params": ["0.0000 PXBTS",  20, [10, 20, 10, 8000000],[10, 20, 10, 5000000],[250, 290, 10, 200000]]
+			}
+		},
+		"actions": [{
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abv",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abw",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 1,
+			"action": "newaccount_pattern",
+			"name": "beos.tst.abx",
+			"owner_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+			"activ_pub": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ"
+		}, {
+			"start_block": 3,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abv",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {"status": true,	"message": ""}
+		}, {
+			"start_block": 3,
+			"authorized_by": "beos.gateway",
+			"code": "beos.gateway",
+			"action": "issue",
+			"args": {
+				"memo":"",
+				"to": "beos.tst.abx",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {"status": true,	"message": ""}
+		}, {
+			"start_block": 6,
+			"authorized_by": "beos.tst.abx",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+				"producer": "beos.tst.abx",
+				"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+				"url": "test.html",
+				"location": 0
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 8,
+			"authorized_by": "beos.tst.abv",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+				"producer": "beos.tst.abx",
+				"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+				"url": "test.html",
+				"location": 0
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 25,
+			"authorized_by": "beos.tst.abv",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+				"producer": "beos.tst.abx",
+				"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+				"url": "test.html",
+				"location": 0
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 28,
+			"authorized_by": "beos.tst.abx",
+			"code": "eosio",
+			"action": "regproducer",
+			"args": {
+				"producer": "beos.tst.abx",
+				"producer_key": "EOS8MMXWcN4ghjD9MBpL3Py1pSYuk32PkUvGrtLCzJF2PV6hpNxEZ",
+				"url": "test.html",
+				"location": 0
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 32,
+			"authorized_by": "beos.tst.abw",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.abw",
+				"proxy": "",
+				"producers": ["beos.tst.abx"]
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 36,
+			"authorized_by": "beos.tst.abv",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.abv",
+				"proxy": "",
+				"producers": ["beos.tst.abx"]
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 40,
+			"authorized_by": "beos.tst.abx",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.abx",
+				"proxy": "",
+				"producers": ["beos.tst.abx"]
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 40,
+			"authorized_by": "beos.tst.abx",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.abx",
+				"proxy": "",
+				"producers": ["beos.tst.abv"]
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 45,
+			"authorized_by": "beos.tst.abx",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.abx",
+				"proxy": "",
+				"producers": ["beos.tst.abw"]
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 45,
+			"authorized_by": "beos.tst.abw",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.abw",
+				"proxy": "",
+				"producers": ["beos.tst.abw"]
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 45,
+			"authorized_by": "beos.tst.abv",
+			"code": "eosio",
+			"action": "voteproducer",
+			"args": {
+				"voter": "beos.tst.abv",
+				"proxy": "",
+				"producers": ["beos.tst.abv"]
+			},
+			"expected_result": {
+				"status": false,
+				"message": ""
+			}
+		}, {
+			"start_block": 50,
+			"authorized_by": "beos.tst.abv",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abv",
+				"bts_to": "any_account",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}, {
+			"start_block": 50,
+			"authorized_by": "beos.tst.abx",
+			"code": "beos.gateway",
+			"action": "withdraw",
+			"args": {
+				"from": "beos.tst.abx",
+				"bts_to": "any_account",
+				"quantity": "5.0000 PXBTS", "memo": ""
+			},
+			"expected_result": {
+				"status": true,
+				"message": ""
+			}
+		}],
+		"expected_results": [{
+			"user": "beos.tst.abv",
+			"after_block": [],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}
+		},{
+			"user": "beos.tst.abw",
+			"after_block": [],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "0.0000 BEOS",
+				"cpu_weight": "0.0000 BEOS",
+				"ram_bytes": 5448}
+			}
+		},{
+			"user": "beos.tst.abx",
+			"after_block": [],
+			"at_end": {
+				"resources":{
+				"balance": "",
+				"net_weight": "400.0000 BEOS",
+				"cpu_weight": "400.0000 BEOS",
+				"ram_bytes": 5005448}
+			}
+		}]
+	}
+]
+}
