@@ -81,7 +81,33 @@ void producer_information::add_producer( const fc::variant& v )
    gathered_producers.emplace( owner, obj );
 }
 
-std::vector<fc::variant> producer_information::get_producers( bool is_internal, const fc::microseconds& abi_serializer_max_time, bool shorten_abi_errors, bool json, const std::string& lower_bound, uint32_t limit, double& total_producer_vote_weight, std::string& more )
+std::vector<fc::variant> producer_information::get_producers( const fc::microseconds& abi_serializer_max_time )
+{
+   vector<fc::variant> result;
+   vector<char> data;
+
+   refresh();
+
+   const auto& kv_index = _db.get_index<key_value_index, by_scope_primary>();
+
+   /*
+      'table_id' can be null. See 'bootseq_tests/bootseq_test'
+   */
+   if( table_id )
+   {
+      auto itr = kv_index.lower_bound( boost::make_tuple( table_id->id ) );
+      while( itr != kv_index.end() && itr->t_id == table_id->id )
+      {
+         eosio::chain::table_helper::copy_inline_row( *itr, data);
+         result.emplace_back( abis.binary_to_variant( "producer_info", data, abi_serializer_max_time, true/*shorten_abi_errors*/ ) );
+         ++itr;
+      }
+   }
+
+   return result;
+}
+
+std::vector<fc::variant> producer_information::get_producers( const fc::microseconds& abi_serializer_max_time, bool shorten_abi_errors, bool json, const std::string& lower_bound, uint32_t limit, double& total_producer_vote_weight, std::string& more )
 {
    total_producer_vote_weight = 0;
    more = "";
@@ -92,25 +118,6 @@ std::vector<fc::variant> producer_information::get_producers( bool is_internal, 
    refresh();
 
    const auto& kv_index = _db.get_index<key_value_index, by_scope_primary>();
-
-   if( is_internal )
-   {
-      /*
-         'table_id' can be null. See 'bootseq_tests/bootseq_test'
-      */
-      if( table_id )
-      {
-         auto itr = kv_index.lower_bound( boost::make_tuple( table_id->id ) );
-         while( itr != kv_index.end() && itr->t_id == table_id->id )
-         {
-            eosio::chain::table_helper::copy_inline_row( *itr, data);
-            result.emplace_back( abis.binary_to_variant( "producer_info", data, abi_serializer_max_time, shorten_abi_errors ) );
-            ++itr;
-         }
-      }
-
-      return result;
-   }
 
    const auto lower = name{lower_bound};
    static const uint8_t secondary_index_num = 0;
@@ -150,10 +157,6 @@ std::vector<fc::variant> producer_information::get_producers( bool is_internal, 
    total_producer_vote_weight = eosio::chain::table_helper::get_global_row( _db, abi, abis, abi_serializer_max_time, shorten_abi_errors)["total_producer_vote_weight"].as_double();
 
    return result;
-}
-
-wasm_data_writer::wasm_data_writer()
-{
 }
 
 wasm_data_writer::res_pair wasm_data_writer::get( const account_name& owner )
