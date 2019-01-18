@@ -57,6 +57,8 @@ class producer_information
       void get_actual_producer( const account_name& acnt, producer_info_index::iterator& found );
       void add_producer( const fc::variant& v );
 
+      std::vector<fc::variant> get_producers( const fc::microseconds& abi_serializer_max_time );
+
    public:
 
       producer_information( const controller& c, const chainbase::database& d );
@@ -72,7 +74,7 @@ class producer_information
          call( found, found != gathered_producers.end() );
       }
 
-      std::vector<fc::variant> get_producers( bool is_internal, const fc::microseconds& abi_serializer_max_time, bool shorten_abi_errors, bool json, const std::string& lower_bound, uint32_t limit, double& total_producer_vote_weight, std::string& more );
+      std::vector<fc::variant> get_producers( const fc::microseconds& abi_serializer_max_time, bool shorten_abi_errors, bool json, const std::string& lower_bound, uint32_t limit, double& total_producer_vote_weight, std::string& more );
 };
 
 class wasm_data_writer
@@ -94,8 +96,6 @@ class wasm_data_writer
       res_pair get( const account_name& owner );
 
    public:
-
-      wasm_data_writer();
 
       uint32_t get_size() const { return idx; };
 

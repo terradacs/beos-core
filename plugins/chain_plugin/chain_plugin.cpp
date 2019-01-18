@@ -1261,7 +1261,7 @@ read_only::get_producers_result read_only::get_producers( const read_only::get_p
    read_only::get_producers_result result;
 
    producer_information prods( db, db.db() );
-   result.rows = prods.get_producers( false/*is_internal*/, abi_serializer_max_time, shorten_abi_errors, p.json, p.lower_bound, p.limit, result.total_producer_vote_weight, result.more );
+   result.rows = prods.get_producers( abi_serializer_max_time, shorten_abi_errors, p.json, p.lower_bound, p.limit, result.total_producer_vote_weight, result.more );
 
    return result;
 }
