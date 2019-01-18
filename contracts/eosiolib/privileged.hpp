@@ -18,7 +18,7 @@ namespace eosio {
     *
     * @brief Tunable blockchain configuration that can be changed via consensus
     */
-   struct blockchain_parameters {
+   struct blockchain_parameters_basic {
 
       uint64_t max_block_net_usage;
 
@@ -41,8 +41,6 @@ namespace eosio {
       uint32_t max_block_cpu_usage;
 
       uint32_t target_block_cpu_usage_pct;
-
-      uint32_t max_transaction_cpu_usage;
 
       uint32_t min_transaction_cpu_usage;
 
@@ -95,16 +93,25 @@ namespace eosio {
       uint16_t max_authority_depth;
 
 
-      EOSLIB_SERIALIZE( blockchain_parameters,
+      EOSLIB_SERIALIZE( blockchain_parameters_basic,
                         (max_block_net_usage)(target_block_net_usage_pct)
                         (max_transaction_net_usage)(base_per_transaction_net_usage)(net_usage_leeway)
                         (context_free_discount_net_usage_num)(context_free_discount_net_usage_den)
 
                         (max_block_cpu_usage)(target_block_cpu_usage_pct)
-                        (max_transaction_cpu_usage)(min_transaction_cpu_usage)
+                        (min_transaction_cpu_usage)
 
                         (max_transaction_lifetime)(deferred_trx_expiration_window)(max_transaction_delay)
                         (max_inline_action_size)(max_inline_action_depth)(max_authority_depth)
+      )
+   };
+
+   struct blockchain_parameters : public blockchain_parameters_basic {
+
+      uint32_t max_transaction_cpu_usage;
+
+      EOSLIB_SERIALIZE_DERIVED( blockchain_parameters, eosio::blockchain_parameters_basic,
+                        (max_transaction_cpu_usage)
       )
    };
 
