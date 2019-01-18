@@ -8,7 +8,7 @@
 
 namespace eosio { namespace chain {
 
-   void chain_config::validate()const {
+   void chain_config_basic::validate( uint32_t _max_transaction_cpu_usage )const {
       EOS_ASSERT( target_block_net_usage_pct <= config::percent_100, action_validate_exception,
                   "target block net usage percentage cannot exceed 100%" );
       EOS_ASSERT( target_block_net_usage_pct >= config::percent_1/10, action_validate_exception,
@@ -20,8 +20,6 @@ namespace eosio { namespace chain {
 
       EOS_ASSERT( max_transaction_net_usage < max_block_net_usage, action_validate_exception,
                   "max transaction net usage must be less than max block net usage" );
-      EOS_ASSERT( max_transaction_cpu_usage < max_block_cpu_usage, action_validate_exception,
-                  "max transaction cpu usage must be less than max block cpu usage" );
 
       EOS_ASSERT( base_per_transaction_net_usage < max_transaction_net_usage, action_validate_exception,
                   "base net usage per transaction must be less than the max transaction net usage" );
@@ -34,13 +32,27 @@ namespace eosio { namespace chain {
       EOS_ASSERT( context_free_discount_net_usage_num <= context_free_discount_net_usage_den, action_validate_exception,
                   "net usage discount ratio for context free data cannot exceed 1" );
 
-      EOS_ASSERT( min_transaction_cpu_usage <= max_transaction_cpu_usage, action_validate_exception,
+      EOS_ASSERT( min_transaction_cpu_usage <= _max_transaction_cpu_usage, action_validate_exception,
                   "min transaction cpu usage cannot exceed max transaction cpu usage" );
-      EOS_ASSERT( max_transaction_cpu_usage < (max_block_cpu_usage - min_transaction_cpu_usage), action_validate_exception,
+      EOS_ASSERT( _max_transaction_cpu_usage < (max_block_cpu_usage - min_transaction_cpu_usage), action_validate_exception,
                   "max transaction cpu usage must be at less than the difference between the max block cpu usage and the min transaction cpu usage" );
 
       EOS_ASSERT( 1 <= max_authority_depth, action_validate_exception,
                   "max authority depth should be at least 1" );
 }
+
+   void chain_config::validate()const {
+
+      chain_config_basic::validate( max_transaction_cpu_usage );
+
+      EOS_ASSERT( max_transaction_cpu_usage < max_block_cpu_usage, action_validate_exception,
+                  "max transaction cpu usage must be less than max block cpu usage" );
+}
+
+   void chain_config::assign( const chain_config_basic& _config, uint32_t _max_transaction_cpu_usage ) {
+
+      *( static_cast< chain_config_basic* >( this ) ) = _config;
+      max_transaction_cpu_usage = _max_transaction_cpu_usage;
+   }
 
 } } // namespace eosio::chain
