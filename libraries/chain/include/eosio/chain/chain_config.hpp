@@ -16,7 +16,7 @@ namespace eosio { namespace chain {
  * their preference for each of the parameters in this object, and the blockchain runs according to the median of the
  * values specified by the producers.
  */
-struct chain_config {
+struct chain_config_basic {
    uint64_t   max_block_net_usage;                 ///< the maxiumum net usage in instructions for a block
    uint32_t   target_block_net_usage_pct;          ///< the target percent (1% == 100, 100%= 10,000) of maximum net usage; exceeding this triggers congestion handling
    uint32_t   max_transaction_net_usage;           ///< the maximum objectively measured net usage that the chain will allow regardless of account limits
@@ -27,7 +27,6 @@ struct chain_config {
 
    uint32_t   max_block_cpu_usage;                 ///< the maxiumum billable cpu usage (in microseconds) for a block
    uint32_t   target_block_cpu_usage_pct;          ///< the target percent (1% == 100, 100%= 10,000) of maximum cpu usage; exceeding this triggers congestion handling
-   uint32_t   max_transaction_cpu_usage;           ///< the maximum billable cpu usage (in microseconds) that the chain will allow regardless of account limits
    uint32_t   min_transaction_cpu_usage;           ///< the minimum billable cpu usage (in microseconds) that the chain requires
 
    uint32_t   max_transaction_lifetime;            ///< the maximum number of seconds that an input transaction's expiration can be ahead of the time of the block in which it is first included
@@ -37,7 +36,14 @@ struct chain_config {
    uint16_t   max_inline_action_depth;             ///< recursion depth limit on sending inline actions
    uint16_t   max_authority_depth;                 ///< recursion depth limit for checking if an authority is satisfied
 
+   void validate( uint32_t _max_transaction_cpu_usage )const;
+};
+
+struct chain_config : public chain_config_basic {
+   uint32_t   max_transaction_cpu_usage;           ///< the maximum billable cpu usage (in microseconds) that the chain will allow regardless of account limits
+
    void validate()const;
+   void assign( const chain_config_basic& _config, uint32_t _max_transaction_cpu_usage );
 
    template<typename Stream>
    friend Stream& operator << ( Stream& out, const chain_config& c ) {
@@ -67,15 +73,17 @@ inline bool operator!=(const chain_config& a, const chain_config& b) { return !(
 
 } } // namespace eosio::chain
 
-FC_REFLECT(eosio::chain::chain_config,
+FC_REFLECT(eosio::chain::chain_config_basic,
            (max_block_net_usage)(target_block_net_usage_pct)
            (max_transaction_net_usage)(base_per_transaction_net_usage)(net_usage_leeway)
            (context_free_discount_net_usage_num)(context_free_discount_net_usage_den)
 
            (max_block_cpu_usage)(target_block_cpu_usage_pct)
-           (max_transaction_cpu_usage)(min_transaction_cpu_usage)
+           (min_transaction_cpu_usage)
 
            (max_transaction_lifetime)(deferred_trx_expiration_window)(max_transaction_delay)
            (max_inline_action_size)(max_inline_action_depth)(max_authority_depth)
 
 )
+
+FC_REFLECT_DERIVED(eosio::chain::chain_config, (eosio::chain::chain_config_basic), (max_transaction_cpu_usage))

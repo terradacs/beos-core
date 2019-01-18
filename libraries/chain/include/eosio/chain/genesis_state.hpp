@@ -22,7 +22,7 @@ struct genesis_state {
    static const string gateway_root_key;
    static const string distribution_root_key;
 
-   chain_config   initial_configuration = {
+   chain_config_basic  initial_configuration = {
       .max_block_net_usage                  = config::default_max_block_net_usage,
       .target_block_net_usage_pct           = config::default_target_block_net_usage_pct,
       .max_transaction_net_usage            = config::default_max_transaction_net_usage,
@@ -33,7 +33,6 @@ struct genesis_state {
 
       .max_block_cpu_usage                  = config::default_max_block_cpu_usage,
       .target_block_cpu_usage_pct           = config::default_target_block_cpu_usage_pct,
-      .max_transaction_cpu_usage            = config::default_max_transaction_cpu_usage,
       .min_transaction_cpu_usage            = config::default_min_transaction_cpu_usage,
 
       .max_transaction_lifetime             = config::default_max_trx_lifetime,
