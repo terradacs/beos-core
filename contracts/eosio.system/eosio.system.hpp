@@ -56,6 +56,7 @@ namespace eosiosystem {
       uint64_t             thresh_activated_stake_time = 0;
       uint16_t             last_producer_schedule_size = 0;
       double               total_producer_vote_weight = 0; /// the sum of all producer votes
+      uint32_t             total_producers = 0;
       block_timestamp      last_name_close;
 
       // explicit serialization macro is not necessary, used here only to improve compilation time
@@ -63,7 +64,7 @@ namespace eosiosystem {
                                 (max_ram_size)(total_ram_bytes_reserved)(total_ram_stake)
                                 (last_producer_schedule_update)(last_pervote_bucket_fill)
                                 (pervote_bucket)(perblock_bucket)(total_unpaid_blocks)(total_activated_stake)(thresh_activated_stake_time)
-                                (last_producer_schedule_size)(total_producer_vote_weight)(last_name_close) )
+                                (last_producer_schedule_size)(total_producer_vote_weight)(total_producers)(last_name_close) )
    };
 
    struct producer_info {
@@ -99,38 +100,39 @@ namespace eosiosystem {
    class immutable_system_contract : public native
       {
       protected:
-         producers_table _producers;
 
-         inline std::vector<block_producer_voting_info> prepare_producer_infos(const producers_table& producers) const
-            {
-            std::vector<block_producer_voting_info> storage;
-            for(const auto& p : producers)
-               {
-               block_producer_voting_info bpi;
-               bpi.owner_account_name = p.owner;
-               bpi.total_votes = p.total_votes;
-               bpi.is_active = p.is_active;
-               storage.emplace_back(std::move(bpi));
-               }
+         producers_table         _producers;
 
-            return storage;
-            }
+         global_state_singleton  _global;
+         eosio_global_state      _gstate;
+
+         inline std::vector<block_producer_voting_info> prepare_producer_infos( uint32_t total_producers ) const
+         {
+            return std::vector<block_producer_voting_info>( total_producers );
+         }
 
       public:
-         immutable_system_contract(account_name s) : native(s), _producers(_self, _self) {}
+         immutable_system_contract(account_name s)
+         : native(s), _producers(_self, _self), _global(_self,_self) {}
 
-         inline std::vector<block_producer_voting_info> prepare_data_for_voting_update() const
+         std::vector<block_producer_voting_info> prepare_data_for_voting_update()
+         {
+            uint32_t total_producers = 0;
+
+            if( _global.exists() )
             {
-               return prepare_producer_infos(_producers);
+               _gstate = _global.get();
+               total_producers = _gstate.total_producers;
             }
+
+            return prepare_producer_infos( total_producers );
+         }
 
       };
 
    class system_contract : public immutable_system_contract {
       private:
-         global_state_singleton _global;
 
-         eosio_global_state     _gstate;
          rammarket              _rammarket;
 
          int64_t                _min_activated_stake = std::numeric_limits<int64_t>::max();

@@ -10,8 +10,11 @@
 #include <eosio/chain/resource_limits.hpp>
 #include <eosio/chain/account_object.hpp>
 #include <eosio/chain/global_property_object.hpp>
+#include <eosio/chain/dbg_timer.hpp>
 #include <boost/container/flat_set.hpp>
 #include <boost/scope_exit.hpp>
+
+//#define CAVEMEN_TIME_DEBUG
 
 //#define CAVEMEN_DEBUG
 #ifdef CAVEMEN_DEBUG
@@ -85,6 +88,10 @@ void apply_context::exec_one( action_trace& trace )
    trace.act = act;
    trace.context_free = context_free;
 
+   #ifdef CAVEMEN_TIME_DEBUG
+      dbg_timer _dbg_timer( "apply_context::exec_one: receiver: %s, action.account: %s, action.name: %s", receiver.to_string().c_str(), act.account.to_string().c_str(), act.name.to_string().c_str() );
+   #endif
+
    DBG("apply_context::exec_one: receiver: %s, action.account: %s, action.name: %s",
       receiver.to_string().c_str(), act.account.to_string().c_str(), act.name.to_string().c_str());
    DBG("apply_context::exec_one: first_authorizor: %s", trx_context.trx.first_authorizor().to_string().c_str());
@@ -116,6 +123,13 @@ void apply_context::exec_one( action_trace& trace )
          }
       } FC_RETHROW_EXCEPTIONS( warn, "pending console output: ${console}", ("console", _pending_console_output.str()) )
    } catch( fc::exception& e ) {
+
+      #ifdef CAVEMEN_TIME_DEBUG
+         _dbg_timer.write("apply_context::exec_one exception: receiver: %s, action.account: %s, action.name: %s, name: %s, what: %s",
+                     receiver.to_string().c_str(), act.account.to_string().c_str(), act.name.to_string().c_str(), e.name(), e.what() );
+         _dbg_timer.end();
+      #endif
+
       DBG("apply_context::exec_one exception: receiver: %s, action.account: %s, action.name: %s, name: %s, what: %s",
          receiver.to_string().c_str(), act.account.to_string().c_str(), act.name.to_string().c_str(),
          e.name(), e.what() );
@@ -145,6 +159,10 @@ void apply_context::exec_one( action_trace& trace )
    if ( control.contracts_console() ) {
       print_debug(receiver, trace);
    }
+
+   #ifdef CAVEMEN_TIME_DEBUG
+      _dbg_timer.end();
+   #endif
 }
 
 void apply_context::finalize_trace( action_trace& trace, const fc::time_point& start )
@@ -158,14 +176,14 @@ void apply_context::finalize_trace( action_trace& trace, const fc::time_point& s
    trace.elapsed = fc::time_point::now() - start;
 }
 
-void apply_context::reward_stake( const account_name& account, int64_t val, const voting_manager::producer_info_index& _producers)
+void apply_context::reward_stake( const account_name& account, int64_t val)
 {
    int64_t stake_net = val / 2;
    int64_t stake_cpu = val - stake_net;
 
    change_distribution_resource_limits( account, 0, stake_net, stake_cpu );
    
-   control.get_mutable_voting_manager().update_voting_power(account, val, _producers);
+   control.get_mutable_voting_manager().update_voting_power(account, val);
 }
 
 void apply_context::reward_ram( const account_name& account, int64_t val )
@@ -174,12 +192,25 @@ void apply_context::reward_ram( const account_name& account, int64_t val )
 }
 
 void apply_context::reward_all( uint64_t beos_to_distribute, uint64_t beos_to_distribute_trustee, uint64_t ram_to_distribute,
-      uint64_t ram_to_distribute_trustee, const asset* proxyArray, size_t proxyArrayLen, const voting_manager::producer_info_index& _producers ) {
+   uint64_t ram_to_distribute_trustee, const asset* proxyArray, size_t proxyArrayLen, block_producer_voting_info* start_producers, uint32_t* size )
+{
+   EOS_ASSERT( size != nullptr, transaction_exception, "size of producers must exist" );
+
+   control.get_mutable_voting_manager().prepare_producers( start_producers, *size );
+
+   reward_all( beos_to_distribute, beos_to_distribute_trustee, ram_to_distribute,
+               ram_to_distribute_trustee, proxyArray, proxyArrayLen );
+
+   *size = control.get_mutable_voting_manager().get_new_producers_size();
+}
+
+void apply_context::reward_all( uint64_t beos_to_distribute, uint64_t beos_to_distribute_trustee, uint64_t ram_to_distribute,
+      uint64_t ram_to_distribute_trustee, const asset* proxyArray, size_t proxyArrayLen ) {
    const auto& accounts_index = db.template get_index<account_index, by_id>();
 
    // trustee is always rewarded with full given value
    if ( beos_to_distribute_trustee > 0 )
-      reward_stake( N(beos.trustee), beos_to_distribute_trustee, _producers );
+      reward_stake( N(beos.trustee), beos_to_distribute_trustee );
    if ( ram_to_distribute_trustee > 0 )
       reward_ram( N(beos.trustee), ram_to_distribute_trustee );
 
@@ -260,7 +291,7 @@ void apply_context::reward_all( uint64_t beos_to_distribute, uint64_t beos_to_di
          if ( beos_reward > 0 ) {
             DBG("apply_context::reward_all: rewarding %s with beos %li",name.to_string().c_str(),beos_reward);
             actual_beos_reward_sum += beos_reward;
-            reward_stake( name, beos_reward, _producers );
+            reward_stake( name, beos_reward );
          }
       }
       if ( ram_to_distribute > 0 && current_ram_bytes >= 0 ) {

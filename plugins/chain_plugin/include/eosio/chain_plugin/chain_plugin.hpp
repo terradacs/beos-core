@@ -15,6 +15,7 @@
 #include <eosio/chain/abi_serializer.hpp>
 #include <eosio/chain/plugin_interface.hpp>
 #include <eosio/chain/types.hpp>
+#include <eosio/chain/table_helper.hpp>
 
 #include <boost/container/flat_set.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
@@ -72,7 +73,6 @@ class read_only {
    bool  shorten_abi_errors = true;
 
 public:
-   static const string KEYi64;
 
    read_only(const controller& db, const fc::microseconds& abi_serializer_max_time)
       : db(db), abi_serializer_max_time(abi_serializer_max_time) {}
@@ -359,11 +359,6 @@ public:
 
    get_scheduled_transactions_result get_scheduled_transactions( const get_scheduled_transactions_params& params ) const;
 
-   static void copy_inline_row(const chain::key_value_object& obj, vector<char>& data) {
-      data.resize( obj.value.size() );
-      memcpy( data.data(), obj.value.data(), obj.value.size() );
-   }
-
    template<typename Function>
    void walk_key_value_table(const name& code, const name& scope, const name& table, Function f) const
    {
@@ -454,7 +449,7 @@ public:
 
             const auto* itr2 = d.find<chain::key_value_object, chain::by_scope_primary>(boost::make_tuple(t_id->id, itr->primary_key));
             if (itr2 == nullptr) continue;
-            copy_inline_row(*itr2, data);
+            eosio::chain::table_helper::copy_inline_row(*itr2, data);
 
             if (p.json) {
                result.rows.emplace_back( abis.binary_to_variant( abis.get_table_type(p.table), data, abi_serializer_max_time, shorten_abi_errors ) );
@@ -515,7 +510,7 @@ public:
          unsigned int count = 0;
          auto itr = lower;
          for (; itr != upper; ++itr) {
-            copy_inline_row(*itr, data);
+            eosio::chain::table_helper::copy_inline_row(*itr, data);
 
             if (p.json) {
                result.rows.emplace_back( abis.binary_to_variant( abis.get_table_type(p.table), data, abi_serializer_max_time, shorten_abi_errors ) );

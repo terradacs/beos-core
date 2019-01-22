@@ -15,7 +15,7 @@ struct block_producer_voting_info;
    /**
     *  Defined in distribution_api
     */
-   void reward_all(uint64_t, uint64_t, uint64_t, uint64_t, const void*, int, block_producer_voting_info*, int);
+   void reward_all(uint64_t, uint64_t, uint64_t, uint64_t, const void*, int, block_producer_voting_info*, int, uint32_t*, int);
    void reward_done();
 
 #ifdef __cplusplus

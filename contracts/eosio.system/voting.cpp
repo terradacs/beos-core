@@ -34,31 +34,18 @@ namespace eosiosystem {
    inline void update_producers_table(const std::vector<block_producer_voting_info>& producer_infos,
       producers_table& producers)
       {
-        auto itr = producers.begin();
         auto itr_end = producers.end();
-
-        if( itr == itr_end )
-          return;
-
-        auto found_producer = itr;
 
         for(const auto& pi : producer_infos)
         {
+         if( pi.owner == 0 )
+            break;
 
-         if( itr != itr_end && pi.owner_account_name == itr->owner )
-         {
-          found_producer = itr;
-         }
-         else
-         {
-          found_producer = producers.find(pi.owner_account_name);
-          itr = found_producer;
-         }
+         auto found = producers.find( pi.owner );
 
-         if( found_producer != itr_end )
+         if( found != itr_end )
          {
-          ++itr;
-          producers.modify(found_producer, 0, [&pi](auto& p)
+          producers.modify( found, 0, [&pi](auto& p)
           {
             p.total_votes = pi.total_votes;
             p.is_active = pi.is_active;
@@ -108,6 +95,10 @@ namespace eosiosystem {
                info.url           = url;
                info.location      = location;
          });
+         
+         ++_gstate.total_producers;
+         _global.set( _gstate, _self );
+
       }
    }
 
@@ -202,7 +193,7 @@ namespace eosiosystem {
          }
       }
 
-      auto producer_infos = prepare_producer_infos(_producers);
+      auto producer_infos = prepare_producer_infos( _gstate.total_producers );
 
       ::update_votes(voter_name, proxy, producers.data(), producers.size(), voting, producer_infos.data(), producer_infos.size());
 
@@ -223,7 +214,7 @@ namespace eosiosystem {
    void system_contract::regproxy( const account_name proxy, bool isproxy ) {
       require_auth( proxy );
 
-      auto producer_infos = prepare_producer_infos(_producers);
+      auto producer_infos = prepare_producer_infos( _gstate.total_producers );
 
       ::register_voting_proxy(proxy, isproxy, producer_infos.data(), producer_infos.size());
 
@@ -234,7 +225,7 @@ namespace eosiosystem {
 
    void system_contract::update_voting_power(const account_name from, int64_t stake_delta)
       {
-      auto producer_infos = prepare_producer_infos(_producers);
+      auto producer_infos = prepare_producer_infos( _gstate.total_producers );
 
       ::update_voting_power(from, stake_delta, producer_infos.data(), producer_infos.size());
 

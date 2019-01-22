@@ -991,8 +991,6 @@ void chain_plugin::handle_db_exhaustion() {
 
 namespace chain_apis {
 
-const string read_only::KEYi64 = "i64";
-
 read_only::get_info_results read_only::get_info(const read_only::get_info_params&) const {
    const auto& rm = db.get_resource_limits_manager();
    return {
@@ -1088,26 +1086,8 @@ uint64_t convert_to_type(const string& str, const string& desc) {
    return value;
 }
 
-abi_def get_abi( const controller& db, const name& account ) {
-   const auto &d = db.db();
-   const account_object *code_accnt = d.find<account_object, by_name>(account);
-   EOS_ASSERT(code_accnt != nullptr, chain::account_query_exception, "Fail to retrieve account for ${account}", ("account", account) );
-   abi_def abi;
-   abi_serializer::to_abi(code_accnt->abi, abi);
-   return abi;
-}
-
-string get_table_type( const abi_def& abi, const name& table_name ) {
-   for( const auto& t : abi.tables ) {
-      if( t.name == table_name ){
-         return t.index_type;
-      }
-   }
-   EOS_ASSERT( false, chain::contract_table_query_exception, "Table ${table} is not specified in the ABI", ("table",table_name) );
-}
-
 read_only::get_table_rows_result read_only::get_table_rows( const read_only::get_table_rows_params& p )const {
-   const abi_def abi = eosio::chain_apis::get_abi( db, p.code );
+   const abi_def abi = eosio::chain::table_helper::get_abi( db, p.code );
 
    name system_account(config::system_account_name);
    if(p.code == system_account && p.scope == system_account.to_string())
@@ -1123,8 +1103,8 @@ read_only::get_table_rows_result read_only::get_table_rows( const read_only::get
    auto table_with_index = get_table_index_name( p, primary );
    if( primary ) {
       EOS_ASSERT( p.table == table_with_index, chain::contract_table_query_exception, "Invalid table name ${t}", ( "t", p.table ));
-      auto table_type = get_table_type( abi, p.table );
-      if( table_type == KEYi64 || p.key_type == "i64" || p.key_type == "name" ) {
+      auto table_type = eosio::chain::table_helper::get_table_type( abi, p.table );
+      if( table_type == eosio::chain::table_helper::KEYi64 || p.key_type == "i64" || p.key_type == "name" ) {
          return get_table_rows_ex<key_value_index>(p,abi);
       }
       EOS_ASSERT( false, chain::contract_table_query_exception,  "Invalid table type ${type}", ("type",table_type)("abi",abi));
@@ -1219,8 +1199,8 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
 
 vector<asset> read_only::get_currency_balance( const read_only::get_currency_balance_params& p )const {
 
-   const abi_def abi = eosio::chain_apis::get_abi( db, p.code );
-   auto table_type = get_table_type( abi, "accounts" );
+   const abi_def abi = eosio::chain::table_helper::get_abi( db, p.code );
+   auto table_type = eosio::chain::table_helper::get_table_type( abi, "accounts" );
 
    vector<asset> results;
    walk_key_value_table(p.code, p.account, N(accounts), [&](const key_value_object& obj){
@@ -1246,8 +1226,8 @@ vector<asset> read_only::get_currency_balance( const read_only::get_currency_bal
 fc::variant read_only::get_currency_stats( const read_only::get_currency_stats_params& p )const {
    fc::mutable_variant_object results;
 
-   const abi_def abi = eosio::chain_apis::get_abi( db, p.code );
-   auto table_type = get_table_type( abi, "stat" );
+   const abi_def abi = eosio::chain::table_helper::get_abi( db, p.code );
+   auto table_type = eosio::chain::table_helper::get_table_type( abi, "stat" );
 
    auto collector = [&](const key_value_object& obj) {
       EOS_ASSERT(obj.value.size() >= sizeof(read_only::get_currency_stats_result), chain::asset_type_exception,
@@ -1276,76 +1256,13 @@ fc::variant read_only::get_currency_stats( const read_only::get_currency_stats_p
    return results;
 }
 
-// TODO: move this and similar functions to a header. Copied from wasm_interface.cpp.
-// TODO: fix strict aliasing violation
-static float64_t to_softfloat64( double d ) {
-   return *reinterpret_cast<float64_t*>(&d);
-}
-
-fc::variant get_global_row( const database& db, const abi_def& abi, const abi_serializer& abis, const fc::microseconds& abi_serializer_max_time_ms, bool shorten_abi_errors ) {
-   const auto table_type = get_table_type(abi, N(global));
-   EOS_ASSERT(table_type == read_only::KEYi64, chain::contract_table_query_exception, "Invalid table type ${type} for table global", ("type",table_type));
-
-   const auto* const table_id = db.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple(config::system_account_name, config::system_account_name, N(global)));
-   EOS_ASSERT(table_id, chain::contract_table_query_exception, "Missing table global");
-
-   const auto& kv_index = db.get_index<key_value_index, by_scope_primary>();
-   const auto it = kv_index.find(boost::make_tuple(table_id->id, N(global)));
-   EOS_ASSERT(it != kv_index.end(), chain::contract_table_query_exception, "Missing row in table global");
-
-   vector<char> data;
-   read_only::copy_inline_row(*it, data);
-   return abis.binary_to_variant(abis.get_table_type(N(global)), data, abi_serializer_max_time_ms, shorten_abi_errors );
-}
-
 read_only::get_producers_result read_only::get_producers( const read_only::get_producers_params& p ) const {
-   const abi_def abi = eosio::chain_apis::get_abi(db, config::system_account_name);
-   const auto table_type = get_table_type(abi, N(producers));
-   const abi_serializer abis{ abi, abi_serializer_max_time };
-   EOS_ASSERT(table_type == KEYi64, chain::contract_table_query_exception, "Invalid table type ${type} for table producers", ("type",table_type));
-
-   const auto& d = db.db();
-   const auto lower = name{p.lower_bound};
-
-   static const uint8_t secondary_index_num = 0;
-   const auto* const table_id = d.find<chain::table_id_object, chain::by_code_scope_table>(
-           boost::make_tuple(config::system_account_name, config::system_account_name, N(producers)));
-   const auto* const secondary_table_id = d.find<chain::table_id_object, chain::by_code_scope_table>(
-           boost::make_tuple(config::system_account_name, config::system_account_name, N(producers) | secondary_index_num));
-   EOS_ASSERT(table_id && secondary_table_id, chain::contract_table_query_exception, "Missing producers table");
-
-   const auto& kv_index = d.get_index<key_value_index, by_scope_primary>();
-   const auto& secondary_index = d.get_index<index_double_index>().indices();
-   const auto& secondary_index_by_primary = secondary_index.get<by_primary>();
-   const auto& secondary_index_by_secondary = secondary_index.get<by_secondary>();
 
    read_only::get_producers_result result;
-   const auto stopTime = fc::time_point::now() + fc::microseconds(1000 * 10); // 10ms
-   vector<char> data;
 
-   auto it = [&]{
-      if(lower.value == 0)
-         return secondary_index_by_secondary.lower_bound(
-            boost::make_tuple(secondary_table_id->id, to_softfloat64(std::numeric_limits<double>::lowest()), 0));
-      else
-         return secondary_index.project<by_secondary>(
-            secondary_index_by_primary.lower_bound(
-               boost::make_tuple(secondary_table_id->id, lower.value)));
-   }();
+   producer_information prods( db, db.db() );
+   result.rows = prods.get_producers( abi_serializer_max_time, shorten_abi_errors, p.json, p.lower_bound, p.limit, result.total_producer_vote_weight, result.more );
 
-   for( ; it != secondary_index_by_secondary.end() && it->t_id == secondary_table_id->id; ++it ) {
-      if (result.rows.size() >= p.limit || fc::time_point::now() > stopTime) {
-         result.more = name{it->primary_key}.to_string();
-         break;
-      }
-      copy_inline_row(*kv_index.find(boost::make_tuple(table_id->id, it->primary_key)), data);
-      if (p.json)
-         result.rows.emplace_back( abis.binary_to_variant( abis.get_table_type(N(producers)), data, abi_serializer_max_time, shorten_abi_errors ) );
-      else
-         result.rows.emplace_back(fc::variant(data));
-   }
-
-   result.total_producer_vote_weight = get_global_row(d, abi, abis, abi_serializer_max_time, shorten_abi_errors)["total_producer_vote_weight"].as_double();
    return result;
 }
 
@@ -1748,7 +1665,7 @@ read_only::get_account_results read_only::get_account( const get_account_params&
          auto it = idx.find(boost::make_tuple( t_id->id, params.account_name ));
          if ( it != idx.end() ) {
             vector<char> data;
-            copy_inline_row(*it, data);
+            eosio::chain::table_helper::copy_inline_row(*it, data);
             result.self_delegated_bandwidth = abis.binary_to_variant( "delegated_bandwidth", data, abi_serializer_max_time, shorten_abi_errors );
          }
       }
@@ -1774,7 +1691,7 @@ read_only::get_account_results read_only::get_account( const get_account_params&
          auto it = idx.find(boost::make_tuple( t_id->id, params.account_name ));
          if ( it != idx.end() ) {
             vector<char> data;
-            copy_inline_row(*it, data);
+            eosio::chain::table_helper::copy_inline_row(*it, data);
             result.refund_request = abis.binary_to_variant( "refund_request", data, abi_serializer_max_time, shorten_abi_errors );
          }
       }
