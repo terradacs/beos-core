@@ -643,9 +643,9 @@ struct controller_impl {
         bs.block_id = head->id;
       });
 
-      conf.genesis.initial_configuration.validate();
+      conf.genesis.initial_configuration.validate( config::default_max_transaction_cpu_usage );
       db.create<global_property_object>([&](auto& gpo ){
-        gpo.configuration = conf.genesis.initial_configuration;
+        gpo.configuration.assign( conf.genesis.initial_configuration, config::default_max_transaction_cpu_usage );
       });
       db.create<dynamic_global_property_object>([](auto&){});
 

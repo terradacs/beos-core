@@ -28,7 +28,6 @@ read -d '' genesis << EOF
     "context_free_discount_net_usage_den": 100,
     "max_block_cpu_usage": 200000,
     "target_block_cpu_usage_pct": 1000,
-    "max_transaction_cpu_usage": 150000,
     "min_transaction_cpu_usage": 100,
     "max_transaction_lifetime": 3600,
     "deferred_trx_expiration_window": 600,
