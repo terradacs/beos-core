@@ -13,48 +13,27 @@ from cmdlineparser import parser
 
 test_args = []
 
-def omit_dir(_dir):
-  print(_dir)
-  if "beos_test_utils" in _dir or \
-     "cd_scripts" in _dir:
-    return True
-  else:
-    return False
-
 def check_subdirs(_dir):
   error = False
-  for root, subdirs, _ in os.walk(_dir):
-    if omit_dir(root):
-      continue
-    tests = sorted(glob.glob(root+"/*.py"))
+  tests = sorted(glob.glob(_dir+"/*.py"))
+  if tests:
     for test in tests:
       root_error = run_script(test)
       if root_error:
         error = root_error
-    for subdir in subdirs:
-      if omit_dir(subdir):
-        continue
-      sub_error = check_subdirs(subdir)
-      if sub_error:
-        error = sub_error
   return error
 
 
 def run_script(_test, _multiplier = 1, _interpreter = None ):
   try:
     interpreter = _interpreter if _interpreter else "python3"
-    actual_args = test_args.split()
-    for index, arg in enumerate(actual_args) :
-      if arg == "--scenario-multiplier":
-        actual_args[index+1] = str(_multiplier)
-    actual_args = " ".join(actual_args)
-    ret_code = subprocess.call(interpreter + " " + _test + " " + actual_args, shell=True)
+    ret_code = subprocess.call(interpreter + " " + _test + " " + test_args, shell=True)
     if ret_code == 0:
       return False
     else:
       return True
   except Exception as _ex:
-    print("Exception {0}".format(str(_ex)))
+    print("Exception occures in run_script `{0}`".format(str(_ex)))
     return True
 
 
@@ -69,12 +48,11 @@ if __name__ == "__main__":
     error = True
     if os.path.isfile(args.scenarios):
       error = run_script(args.scenarios)
-      if error:
-        error = error
     elif os.path.isdir(args.scenarios):
       error = check_subdirs(args.scenarios)
 
   except Exception as _ex:
+    print("Exception occured `{0}`.".format(str(_ex)))
     error = True
     
   if error:

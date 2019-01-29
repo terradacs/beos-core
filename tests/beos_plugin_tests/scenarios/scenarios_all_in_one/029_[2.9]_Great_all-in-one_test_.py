@@ -7,16 +7,12 @@ import sys
 import time
 import datetime 
 
+currentdir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(os.path.dirname(currentdir)))
+from beos_test_utils.beos_utils_pack import init, ActionResult, ResourceResult, VotersResult
+
 if __name__ == "__main__":
-	currentdir = os.path.dirname(os.path.abspath(__file__))
-	sys.path.append(os.path.dirname(os.path.dirname(currentdir)))
-	from beos_test_utils.logger        import add_handler
-	from beos_test_utils.beosnode      import BEOSNode
-	from beos_test_utils.summarizer    import *
-	from beos_test_utils.cmdlineparser import parser
-	args = parser.parse_args()
-	node = BEOSNode(args.nodeos_ip, args.nodeos_port, args.keosd_ip,
-		args.keosd_port, args.master_wallet_name, args.path_to_cleos, args.path_to_keosd, int(args.scenario_multiplier))
+	node, summary, args, log = init(__file__)
 
 	key_acr = node.utils.create_key() 
 	key_acg = node.utils.create_key()
@@ -24,19 +20,36 @@ if __name__ == "__main__":
 	key_acz = node.utils.create_key()
 	key_acu = node.utils.create_key()
 	key_acq = node.utils.create_key()
-
 	node.add_producer_to_config("beos.tst.acr", key_acr)
 	node.add_producer_to_config("beos.tst.acg", key_acg)
 	node.add_producer_to_config("beos.tst.acz", key_acz)
 	node.add_producer_to_config("beos.tst.acu", key_acu)
 	node.add_producer_to_config("beos.tst.acq", key_acq)
 
-	node.run_node(currentdir+r"/node/[2.9]-Great-all-in-one-test/", currentdir+r"/logs/[2.9]-Great-all-in-one-test/")
-	summary = Summarizer(currentdir+r"/[2.9]-Great-all-in-one-test")
+	node.run_node()
 
-	add_handler(currentdir+r"/logs/[2.9]-Great-all-in-one-test/[2.9]-Great-all-in-one-test")
 	#Changeparams
-	node.changeparams(["0.0000 PXBTS"], 160, [40,0,280,80,40000000], [40,0,280,80,20000000], 3000000)
+	#node.changeparams(["0.0000 PXBTS"], 160, [40,0,280,80,40000000], [40,0,280,80,20000000], 3000000)
+	newparams = {
+		"beos" : {
+			"starting_block" : 40,
+			"next_block" : 0, 
+			"ending_block" : 280,
+			"block_interval" : 80, 
+			"trustee_reward" : 40000000
+		},
+		"ram" : {
+			"starting_block" : 40,
+			"next_block" : 0, 
+			"ending_block" : 280,
+			"block_interval" : 80, 
+			"trustee_reward" : 20000000 
+		},
+		"proxy_assets" : [ "0.0000 PXBTS"],
+		"ram_leftover" : 3000000,
+		"starting_block_for_initial_witness_election":160
+	}
+	node.changeparams(newparams)
 	
 	#Actions
 	summary.action_status(node.create_account("beos.tst.acg", _activ_key=key_acg, _owner_key=key_acg) )

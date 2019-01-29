@@ -1,6 +1,9 @@
 import os
 import datetime
 import threading
+import collections
+
+from inspect import getframeinfo, stack
 
 from beos_test_utils.logger import log
 
@@ -58,12 +61,15 @@ class ActionResult(Result):
         if self.result["status"] == _to_compare["status"]:
             same_status = True
         try:
-            msg = self.result["message"][0]["message"]
+            if "message" in self.result:
+                msg = self.result["message"][0]["message"]
         except Exception:
-            msg = ""
+            msg = self.result["message"]
         if _to_compare["message"]:
             if _to_compare["message"].lower() in msg.lower()    \
             or msg.lower()  in _to_compare["message"].lower()  :
+                print("msg.lower()", msg.lower())
+                print("_to_compare[\"message\"]",_to_compare["message"])
                 same_message = True
         else:
             same_message = True
@@ -172,6 +178,7 @@ class Summarizer(object):
         
         self.block_summaries  = {}
         self.action_summaries = []
+        self.equal_summaries = []
 
 
     def prepare_summary_files(self, _scenario_name):
@@ -208,6 +215,20 @@ class Summarizer(object):
             self.block_summaries[_user]=[{"block":block, "resources":total_resources, "voter":voter_info, "expected":_expected_result}]
 
 
+    def equal(self, _expected_result, _actual_result, _debug_str=None):
+        try:
+            caller = getframeinfo(stack()[1][0])
+            Equal = collections.namedtuple('Equal', ('expected', 'actual', 'line', 'debug'))
+            if _debug_str:
+                debug_info = _debug_str
+            else:
+                debug_info = None
+        
+            self.equal_summaries.append(Equal(_expected_result, _actual_result, caller.lineno, debug_info))
+        except Exception as _ex:
+            log.exception("Exception `{0}` occurres while equal call.".format(str(_ex)))
+
+
     def action_status_summary(self):
         error = False
         self.summary.writelines("[ACTIONS SUMMARY]\n")
@@ -239,6 +260,25 @@ class Summarizer(object):
         return error
 
 
+    def equal_summary(self):
+        error = False
+        self.summary.writelines("[EQUAL SUMMARY]\n")
+        self.summary.writelines("-"*30+'\n')
+        for equal in self.equal_summaries:
+            if equal.expected == equal.actual:
+                if equal.debug:
+                    self.summary.writelines("[OK] Conditions `{0}` result `{1}` from line `{2}` is as expected `{3}`.\n".format(equal.debug, equal.actual,equal.line, equal.expected))
+                else:
+                    self.summary.writelines("[OK] Conditions result `{0}` from line `{1}` is as expected `{2}`.\n".format(equal.actual, equal.line, equal.expected))
+            else:
+                error = True
+                if equal.debug:
+                    self.summary.writelines("[ERROR] Conditions `{0}` result `{1}` from line `{2}` is not as expected `{3}`.\n".format(equal.debug, equal.actual ,equal.line, equal.expected))
+                else:
+                    self.summary.writelines("[ERROR] Conditions result `{0}` from line `{1}` is not as expected `{2}`.\n".format( equal.actual, equal.line, equal.expected))
+        return error
+
+
     def add_scenario_status_to_summary_file(self, _error):
         try:
             with open(self.scenarios_status_file,"a+") as sf:
@@ -250,7 +290,7 @@ class Summarizer(object):
                 log_status = "| {0}".format("ERROR" if _error else "OK")
                 sf.writelines(self.scenario_name + (max_scenario_name-len(self.scenario_name))*' ' + log_status + '\n')
         except Exception as _ex:
-            log.error("Exception `%s` while adding scenarios status to summary file."%str(_ex))
+            log.exception("Exception `%s` while adding scenarios status to summary file."%str(_ex))
             exit(1)
 
 
@@ -259,6 +299,7 @@ class Summarizer(object):
             self.summary.writelines("[SCENARIO] {0}\n".format(self.scenario_name))
             self.summary.writelines("-"*30+'\n')
             error_action      = self.action_status_summary()
-            error_user_block = self.user_block_summary()
-            self.add_scenario_status_to_summary_file(error_action or error_user_block )
+            error_user_block  = self.user_block_summary()
+            error_equal       = self.equal_summary()
+            self.add_scenario_status_to_summary_file(error_action or error_user_block or error_equal )
             return error_action or error_user_block 
