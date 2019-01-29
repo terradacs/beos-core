@@ -157,30 +157,31 @@ def kill_process(pid_file_name, proc_name, ip_address, port):
     if os.path.exists(pid_file_name):
         os.remove(pid_file_name)
 
-def clone_nodeos( _path_to_clone_to, _clone_index, _name, _additional_producers = None):
+def clone_nodeos( _path_to_clone_to, _clone_index, _name, _additional_producers = None, _clear_data_dir = False):
     config_ini = "config.ini"
     p2p_listen_endpoint = "p2p-listen-endpoint"
     http_server_address = "http-server-address"
     working_dir = "{0}{1}-{2}/".format("${NODEOS_WORKING_DIR}", "${START_NODE_INDEX}", "eosio")
     copied_working_dir  = "{0}/{1}-{2}/".format(_path_to_clone_to, _clone_index, _name)
-    if os.path.exists(copied_working_dir):
+    if os.path.exists(copied_working_dir) and _clear_data_dir:
         clear = "rm -rf {0}".format(copied_working_dir)
         subprocess.call(clear, shell=True)
-    copy = "cp -rf {0} {1}".format(working_dir, copied_working_dir)
-    subprocess.call(copy, shell=True)
-    with fileinput.FileInput(copied_working_dir + '/' + config_ini, inplace=True) as config:
-        for line in config:
-            if p2p_listen_endpoint in line or http_server_address in line:
-                port = re.findall(":[0-9]+", line)
-                if port:
-                    if p2p_listen_endpoint in line:
-                        print(line.replace(port[0][1:], str(int(port[0][1:])+_clone_index)), end='') 
-                    else:
-                        print(line.replace(port[0][1:], str(_clone_index)), end='')
+    if not os.path.exists(copied_working_dir):
+        copy = "cp -rf {0} {1}".format(working_dir, copied_working_dir)
+        subprocess.call(copy, shell=True)
+        with fileinput.FileInput(copied_working_dir + '/' + config_ini, inplace=True) as config:
+            for line in config:
+                if p2p_listen_endpoint in line or http_server_address in line:
+                    port = re.findall(":[0-9]+", line)
+                    if port:
+                        if p2p_listen_endpoint in line:
+                            print(line.replace(port[0][1:], str(int(port[0][1:])+_clone_index)), end='') 
+                        else:
+                            print(line.replace(port[0][1:], str(_clone_index)), end='')
+                    else :
+                        print(line, end='')
                 else :
-                   print(line, end='')
-            else :
-                print(line, end='')
+                    print(line, end='')
     if _additional_producers:
         with open(copied_working_dir + '/' + config_ini, "a") as config:
             for prod, key in _additional_producers.items():
