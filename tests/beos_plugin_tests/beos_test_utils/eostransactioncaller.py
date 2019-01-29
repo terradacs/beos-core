@@ -27,7 +27,7 @@ class EOSTransactionCaller(EOSCallerBase):
             response = requests.post(url, json=command)
             return response.json()
         except Exception as _ex:
-            log.error("Exception `%s` occures during get_account"%str(_ex))        
+            log.exception("Exception `%s` occures during get_account"%str(_ex))        
 
 
     def import_private_key(self, _private_key):
@@ -39,7 +39,7 @@ class EOSTransactionCaller(EOSCallerBase):
             resspone = requests.post(url, data=data)
             return resspone.text[1:-1]
         except Exception as _ex:
-            log.error("Exception `%s` occures during get_account"%str(_ex))
+            log.exception("Exception `%s` occures during get_account"%str(_ex))
 
 
     def create_key(self):
@@ -49,7 +49,7 @@ class EOSTransactionCaller(EOSCallerBase):
             resspone = requests.post(url, data=data)
             return resspone.text[1:-1]
         except Exception as _ex:
-            log.error("Exception `%s` occures during get_account"%str(_ex))
+            log.exception("Exception `%s` occures during get_account"%str(_ex))
 
 
     def get_currency_balance(self, _account_name, _symbol, ):
@@ -67,7 +67,7 @@ class EOSTransactionCaller(EOSCallerBase):
             log.info("Get currency balance %s"%response_json)
             return response_json
         except Exception as _ex:
-            log.error("Exception `%s` occures during get_currency_balance"%str(_ex))            
+            log.exception("Exception `%s` occures during get_currency_balance"%str(_ex))            
 
 
     def get_public_keys(self):
@@ -83,7 +83,7 @@ class EOSTransactionCaller(EOSCallerBase):
                 av.append(temp)
             return av
         except Exception as _ex:
-            log.error("Exception `%s` occures during get_currency_balance"%str(_ex))            
+            log.exception("Exception `%s` occures during get_currency_balance"%str(_ex))            
 
 
     def prepare_action(self, _action, _binargs, _prepared_actions):
@@ -102,7 +102,7 @@ class EOSTransactionCaller(EOSCallerBase):
             needed_data = { "binargs": response_json["binargs"]}
             return needed_data
         except Exception as _ex:
-            log.error("Exception `%s` occures during abi_to_json_bin"%str(_ex))
+            log.exception("Exception `%s` occures during abi_to_json_bin"%str(_ex))
 
  
     def get_info(self):
@@ -111,7 +111,7 @@ class EOSTransactionCaller(EOSCallerBase):
             response_json = response.json()
             return response_json
         except Exception as _ex:
-            log.error("Exception `%s` occures during get_info"%str(_ex))
+            log.exception("Exception `%s` occures during get_info"%str(_ex))
 
 
  
@@ -123,7 +123,7 @@ class EOSTransactionCaller(EOSCallerBase):
             needed_data = { "timestamp":response_json["timestamp"], "block_num":response_json["block_num"], "ref_block_prefix":response_json["ref_block_prefix"] }
             return needed_data
         except Exception as _ex:
-            log.error("Exception `%s` occures during get_block"%str(_ex))            
+            log.exception("Exception `%s` occures during get_block"%str(_ex))            
 
  
     def get_required_keys(self, _action, _binargs, _last_block_info, _keys):
@@ -148,7 +148,7 @@ class EOSTransactionCaller(EOSCallerBase):
             needed_data = { "required_keys":response_json["required_keys"] }
             return needed_data
         except Exception as _ex:
-            log.error("Exception `%s` occures during get_required_keys"%str(_ex))
+            log.exception("Exception `%s` occures during get_required_keys"%str(_ex))
 
  
     def sign_transaction(self, _action, _binargs, _last_block_id, _last_block_info, _required_key):
@@ -165,7 +165,7 @@ class EOSTransactionCaller(EOSCallerBase):
             response = requests.post(self.keosd_url+'/v1/wallet/sign_transaction', json=data)
             return response.json()
         except Exception as _ex:
-            log.error("Exception `%s` occures during sign_transaction"%str(_ex))
+            log.exception("Exception `%s` occures during sign_transaction"%str(_ex))
 
  
     def push_transaction(self, _action, _binargs, _signed_transaction):
@@ -185,7 +185,7 @@ class EOSTransactionCaller(EOSCallerBase):
             response = requests.post(self.nodeos_url+'/v1/chain/push_transaction', data=json.dumps(data))
             return response.json()
         except Exception as _ex:
-            log.error("Exception `%s` occures during push_transaction"%str(_ex))
+            log.exception("Exception `%s` occures during push_transaction"%str(_ex))
 
 
     def prepare_and_push_transaction(self, _actions):
@@ -215,10 +215,10 @@ class EOSTransactionCaller(EOSCallerBase):
                     log.error("[ACTION][ERROR] failed to push action `%s` to block"%(actions))
                     return ActionResult(False, transaction_status["error"]["details"], transaction_status, actions)
             except Exception as _ex:
-                log.error("Exception `%s` occures during prepare_and_push_transaction"%str(_ex))
+                log.exception("Exception `%s` occures during prepare_and_push_transaction"%str(_ex))
                 log.error("[ACTION][ERROR] failed to push action `%s` to block"%(actions))
                 return ActionResult(False, "", "", actions)
         except Exception as _ex:
-            log.error("Exception `%s` occures during prepare_and_push_transaction"%str(_ex))
+            log.exception("Exception `%s` occures during prepare_and_push_transaction"%str(_ex))
             log.error("[ACTION][ERROR] failed to push action `%s` to block"%(actions))
             return ActionResult(False, "", "", actions)

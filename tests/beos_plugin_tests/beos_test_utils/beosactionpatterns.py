@@ -1,3 +1,5 @@
+import json
+
 
 class ActionException(Exception):
     def __init__(self, message):
@@ -53,26 +55,24 @@ class ChangeparamsInitAction(ActionBase):
             "action":"changeparams",
             "authorized_by": _authorized_by if _authorized_by else "beos.init",
             "args":{
-                "new_params":[ _start_election ]
+                "new_params":{ "starting_block_for_initial_witness_election":_start_election["starting_block_for_initial_witness_election"] }
             }
         }
 
 
 class ChangeparamsDistributionAction(ActionBase): 
     def __init__(self, _asset , _beos_data, _ram_data, _ram_leftover, _authorized_by = None, _code = None):
-        assert(isinstance(_beos_data, list) and len(_beos_data) == 5)
-        assert(isinstance(_ram_data, list) and len(_ram_data) == 5)
         self.action = {
             "code": _code if _code else "beos.distrib",
             "action":"changeparams",
             "authorized_by": _authorized_by if _authorized_by else "beos.distrib",
             "args":{
-                "new_params":[
-                    _beos_data,
-                    _ram_data,
-                    _asset, 
-                    _ram_leftover
-                ]
+                "new_params": {
+                    "beos":_beos_data["beos"],
+                    "ram":_ram_data["ram"],
+                    "proxy_assets":_asset["proxy_assets"], 
+                    "ram_leftover":_ram_leftover["ram_leftover"]
+                }
             }
         }
 

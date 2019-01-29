@@ -223,7 +223,6 @@ foreach(scenario_dir ${Scenarios})
   --master-wallet-name ${MASTER_WALLET_NAME}
   --scenarios ${CMAKE_BINARY_DIR}/tests/beos_plugin_tests/scenarios/${scenario_dir}
   --path-to-cleos ${CMAKE_BINARY_DIR}/build/programs/cleos/
-  --path-to-keosd ${CMAKE_BINARY_DIR}/build/programs/keosd/
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
   set_tests_properties( ${test_name} PROPERTIES LABELS beos_tests DEPENDS start_keosd_for_scenarios)
   set_property(TEST stop_keosd_for_scenarios APPEND PROPERTY DEPENDS ${test_name})
@@ -253,6 +252,7 @@ set_tests_properties(test09_vote_actions_test PROPERTIES LABELS beos_tests DEPEN
 
 
 set_tests_properties(stop_nodeos_keosd_via_run_py PROPERTIES LABELS beos_tests DEPENDS start_nodeos_keosd_via_run_py)
+set_property(TEST stop_nodeos_keosd_via_run_py APPEND PROPERTY DEPENDS eos_voter_rpc_tests)
 set_property(TEST stop_nodeos_keosd_via_run_py APPEND PROPERTY DEPENDS test04_account_creation_and_get_account_deploy)
 set_property(TEST stop_nodeos_keosd_via_run_py APPEND PROPERTY DEPENDS test05_account_creation_with_delegate_ram)
 set_property(TEST stop_nodeos_keosd_via_run_py APPEND PROPERTY DEPENDS test06_account_creation_and_account_validator_deploy)

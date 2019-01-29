@@ -65,7 +65,7 @@ class TestScenarios(object):
                     time.sleep(0.25)
                 self.blockNumber = 0
         except Exception as _ex:
-            log.error("Exception `%s` while getting block id."%(str(_ex)))
+            log.exception("Exception `%s` while getting block id."%(str(_ex)))
             self.stop_scenarios()
             exit(1)
 
@@ -75,7 +75,7 @@ class TestScenarios(object):
             with open(self.scenarios_file) as scenarios:
                 self.scenarios = json.load(scenarios)["scenarios"]
         except Exception as _ex:
-            log.error("Exception `%s` while loading scenarios "%str(_ex))
+            log.exception("Exception `%s` while loading scenarios "%str(_ex))
             self.stop_scenarios()
             exit(1)
 
@@ -140,7 +140,7 @@ class TestScenarios(object):
             self.eos_rpc.clear_actions_call_summary()
             return error
         except Exception as _ex:
-            log.error("Exception `%s` while getting scenarios action calls summary"%str(_ex))
+            log.exception("Exception `%s` while getting scenarios action calls summary"%str(_ex))
             self.stop_scenarios()
             exit(1)
 
@@ -188,7 +188,7 @@ class TestScenarios(object):
             _file.writelines("###################################\n")
             return error
         except Exception as _ex:
-            log.error("Exception `%s` while getting scenarios end summary"%str(_ex))
+            log.exception("Exception `%s` while getting scenarios end summary"%str(_ex))
             self.stop_scenarios()
             exit(1)  
 
@@ -228,7 +228,7 @@ class TestScenarios(object):
             self.after_block_result.clear()
             return error
         except Exception as _ex:
-            log.error("Exception `%s` while getting scenarios after block summary"%str(_ex))
+            log.exception("Exception `%s` while getting scenarios after block summary"%str(_ex))
             self.stop_scenarios()
             exit(1)
 
@@ -250,7 +250,7 @@ class TestScenarios(object):
                     self.scenarios_status_summary[scenario_name] = True
                     return False
         except Exception as _ex:
-            log.error("Exception `%s` while getting scenarios summary"%str(_ex))
+            log.exception("Exception `%s` while getting scenarios summary"%str(_ex))
             self.stop_scenarios()
             exit(1)
 
@@ -266,7 +266,7 @@ class TestScenarios(object):
                     log_status = "| {0}".format("OK" if status else "ERROR")
                     sf.writelines(scenario + (max_scenario_name-len(scenario))*' ' + log_status + '\n')
         except Exception as _ex:
-            log.error("Exception `%s` while adding scenarios status to summary file."%str(_ex))
+            log.exception("Exception `%s` while adding scenarios status to summary file."%str(_ex))
             self.stop_scenarios()
             exit(1)
 
@@ -315,7 +315,7 @@ class TestScenarios(object):
                 })
             self.eos_rpc.prepare_and_push_transaction(params)
         except Exception as _ex:
-            log.error("Exception `%s` while setting scenarios params"%str(_ex))
+            log.exception("Exception `%s` while setting scenarios params"%str(_ex))
             self.stop_scenarios()
             exit(1)
 
@@ -325,7 +325,7 @@ class TestScenarios(object):
             self.set_scenario_params()
             return self.execute_scenatio_actions()
         except Exception as _ex:
-            log.error("Exception `%s` while making scenarios actions"%str(_ex))
+            log.exception("Exception `%s` while making scenarios actions"%str(_ex))
             self.stop_scenarios()
             exit(1)
 
@@ -336,7 +336,7 @@ class TestScenarios(object):
             self.askForBlockNumber.clear()
             self.eos_rpc.clear_action_flag()
         except Exception as _ex:
-            log.error("Exception `%s` while stoping scenarios"%str(_ex))
+            log.exception("Exception `%s` while stoping scenarios"%str(_ex))
             exit(1)
 
 
@@ -367,7 +367,7 @@ class TestScenarios(object):
                                 else:
                                     self.after_block_result[user] = [result]
         except Exception as _ex:
-            log.error("Exception `%s` while checking user status after block"%str(_ex))
+            log.exception("Exception `%s` while checking user status after block"%str(_ex))
             self.stop_scenarios()
             exit(1)
 
@@ -396,7 +396,7 @@ class TestScenarios(object):
                 log.info("There are no actions.")
                 exit(0)
         except Exception as _ex:
-            log.error("Exception `%s` while executing scenarios actions"%str(_ex))
+            log.exception("Exception `%s` while executing scenarios actions"%str(_ex))
             self.stop_scenarios()
             exit(1)
 
@@ -425,7 +425,7 @@ class TestScenarios(object):
                 if not inserted:
                     self.actions.append(many_actions)
         except Exception as _ex:
-            log.error("Exception `%s` while preparing actions."%str(_ex))
+            log.exception("Exception `%s` while preparing actions."%str(_ex))
             self.stop_scenarios()
             exit(1)
 
@@ -447,7 +447,7 @@ class TestScenarios(object):
                     for key, value in self.after_block.items():
                         self.after_block[key] = sorted(value, key=lambda k:k['after_block'])
         except Exception as _ex:
-            log.error("Exception `%s` while preparing after blocks."%str(_ex))
+            log.exception("Exception `%s` while preparing after blocks."%str(_ex))
             self.stop_scenarios()
             exit(1)
 
@@ -460,7 +460,7 @@ class TestScenarios(object):
             self.prepare_actions()
             self.prepare_after_block()
         except Exception as _ex:
-            log.error("Exception `%s` while preparing scenario data"%str(_ex))
+            log.exception("Exception `%s` while preparing scenario data"%str(_ex))
             self.stop_scenarios()
             exit(1)
 
@@ -488,6 +488,6 @@ class TestScenarios(object):
 
             self.eos_rpc.prepare_and_push_transaction(params)
         except Exception as _ex:
-            log.error("Exception `%s` while restoring node original data"%str(_ex))
+            log.exception("Exception `%s` while restoring node original data"%str(_ex))
             self.stop_scenarios()
             exit(1)
