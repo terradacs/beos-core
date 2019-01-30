@@ -1,18 +1,6 @@
 #!/bin/bash
+
 cd ~/ci/beos-core/$CI_ENVIRONMENT_SLUG/$CI_COMMIT_REF_NAME
-
-clean_existing_images()
-{
-    docker rmi registry.gitlab.syncad.com/blocktrades/docker/beos-testnet/keosd:$BEOS_VERSION_TAG -f
-    docker rmi registry.gitlab.syncad.com/blocktrades/docker/beos-testnet/keosd:$BEOS_REVISION -f
-    docker rmi registry.gitlab.syncad.com/blocktrades/docker/beos-testnet/keosd:latest -f
-    docker rmi registry.gitlab.syncad.com/blocktrades/docker/beos-testnet/nodeos:$BEOS_VERSION_TAG -f
-    docker rmi registry.gitlab.syncad.com/blocktrades/docker/beos-testnet/nodeos:$BEOS_REVISION -f
-    docker rmi registry.gitlab.syncad.com/blocktrades/docker/beos-testnet/nodeos:latest -f
-}
-
-# Clean existing latest images and others matching the new tags 
-clean_existing_images
 
 if [ -z "$BEOS_REVISION" ]
 then
@@ -29,6 +17,16 @@ echo "Variable 'BEOS_REVISION' ->" $BEOS_REVISION
 echo "Variable 'BEOS_VERSION_TAG' ->" $BEOS_VERSION_TAG
 echo "Variable 'P2P_PEER_ADDRESS' ->" $P2P_PEER_ADDRESS
 echo "Variable 'BEOS_DOCKER_LATEST' ->" $BEOS_DOCKER_LATEST
+
+clean_existing_images()
+{
+    docker rmi registry.gitlab.syncad.com/blocktrades/docker/beos-testnet/keosd:$BEOS_VERSION_TAG -f
+    docker rmi registry.gitlab.syncad.com/blocktrades/docker/beos-testnet/keosd:$BEOS_REVISION -f
+    docker rmi registry.gitlab.syncad.com/blocktrades/docker/beos-testnet/keosd:latest -f
+    docker rmi registry.gitlab.syncad.com/blocktrades/docker/beos-testnet/nodeos:$BEOS_VERSION_TAG -f
+    docker rmi registry.gitlab.syncad.com/blocktrades/docker/beos-testnet/nodeos:$BEOS_REVISION -f
+    docker rmi registry.gitlab.syncad.com/blocktrades/docker/beos-testnet/nodeos:latest -f
+}
 
 cd cd-scripts
 
@@ -67,6 +65,10 @@ cd ..
 
 ls -al node
 ls -al wallet
+
+# Clean existing latest images and others matching the new tags 
+clean_existing_images
+
 
 cd node
 
