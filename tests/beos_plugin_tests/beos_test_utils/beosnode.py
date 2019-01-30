@@ -217,6 +217,12 @@ class BEOSNode(object):
         except Exception as _ex:
             log.exception("Exception `{0}` occures during `{1}` action.".format(str(_ex), "regproducer"))
 
+    def unregprod(self, _producer, _authorized_by = None):
+        try:
+            unregprod = patterns.UnregprodAction( _producer, _authorized_by=_authorized_by)
+            return self.make_action_call(unregprod.make_action())
+        except Exception as _ex:
+            log.exception("Exception `{0}` occures during `{1}` action.".format(str(_ex), "unregprod"))
 
     def sellram(self, _account, _bytes, _authorized_by = None):
         try:
