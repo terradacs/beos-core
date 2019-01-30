@@ -17,7 +17,7 @@ class EOSCleosCaller(EOSCallerBase):
         super(EOSCleosCaller, self).__init__(_node_ip, _node_port, _keosd_ip, _keosd_port, _wallet_name)
 
         self.path_to_cleos = _path_to_cleos
-        if self.path_to_cleos.endswith('/'):
+        if self.path_to_cleos != None and self.path_to_cleos.endswith('/'):
             self.path_to_cleos = self.path_to_cleos+"cleos"
 
     def make_call(self, _parameters):
