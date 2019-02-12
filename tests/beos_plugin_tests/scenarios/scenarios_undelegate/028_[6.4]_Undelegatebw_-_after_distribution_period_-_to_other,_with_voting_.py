@@ -14,11 +14,11 @@ from beos_test_utils.beos_utils_pack import init, ActionResult, ResourceResult, 
 if __name__ == "__main__":
 	try:
 		node, summary, args, log = init(__file__)
-		accounts    = node.create_accounts(1, "5.0000 PXBTS")
-		producers = node.create_producers(1, "5.0000 PXBTS")
+		accounts    = node.create_accounts(1, "5.0000 BTS")
+		producers = node.create_producers(1, "5.0000 BTS")
 		node.run_node()	
 		#Changeparams
-		#node.changeparams(["0.0000 PXBTS"], 1, [10,0,30,5,8000000], [10,0,20,5,5000000], 3000000)
+		#node.changeparams(["0.0000 BTS"], 1, [10,0,30,5,8000000], [10,0,20,5,5000000], 3000000)
 		newparams = {
 			"beos" : {
 				"starting_block" : 10,
@@ -34,7 +34,7 @@ if __name__ == "__main__":
 				"block_interval" : 5, 
 				"trustee_reward" : 5000000 
 			},
-			"proxy_assets" : [ "0.0000 PXBTS"],
+			"proxy_assets" : [ "0.0000 BTS"],
 			"ram_leftover" : 3000000,
 			"starting_block_for_initial_witness_election":1
 		}
@@ -48,8 +48,8 @@ if __name__ == "__main__":
 		summary.action_status(node.regproducer(_producer=producers[0].name,_producer_key=producers[0].akey,_url="test3.html",_location="0") )
 		node.wait_till_block(35)
 		summary.action_status(node.undelegatebw(_from=producers[0].name,_receiver=accounts[0].name,_unstake_net_quantity="1.0000 BEOS",_unstake_cpu_quantity="1.0000 BEOS"), ActionResult(False, "cannot undelegate bandwidth until the chain is activated (at least 15% of all tokens participate in voting)") )
-		summary.action_status(node.withdraw(_from=producers[0].name,_bts_to="any_account",_quantity="5.0000 PXBTS",_memo="") )
-		summary.action_status(node.withdraw(_from=accounts[0].name,_bts_to="any_account",_quantity="5.0000 PXBTS",_memo="") )
+		summary.action_status(node.withdraw(_from=producers[0].name,_bts_to="any_account",_quantity="5.0000 BTS",_memo="") )
+		summary.action_status(node.withdraw(_from=accounts[0].name,_bts_to="any_account",_quantity="5.0000 BTS",_memo="") )
 		
 		#At end
 		summary.user_block_status(node, producers[0].name, ResourceResult(_balance="",_net_weight="917804007.8448 BEOS",_cpu_weight="917804007.8450 BEOS",_ram_bytes=15996155448))

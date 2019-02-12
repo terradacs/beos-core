@@ -365,7 +365,7 @@ DISABLE_WASM_TESTS = "true"
 
 ##############      configuration data for contracts/accounts     ###############
 #################################################################################
-PROXY_ASSET_NAME = "PXBTS"
+PROXY_ASSET_NAME = "BTS"
 PROXY_ASSET_PRECISION = 4 # 10^4
 # maximum amount that will ever be allowed to be issued (must cover all BTS)
 PROXY_TOTAL_SUPPLY = "10000000000.0000" # as string to preserve zeros (they establish precision)

@@ -13,7 +13,7 @@ if __name__ == "__main__":
 	try:
 		node, summary, args, log = init(__file__)
 
-		acc = node.create_accounts(1,"10.0000 PXBTS")
+		acc = node.create_accounts(1,"10.0000 BTS")
 		node.run_node()
 		dict1 = {"key1":"key1"}
 		dict2 = {"key1":"key1"}
@@ -35,15 +35,15 @@ if __name__ == "__main__":
 		summary.equal(1, 2-1, "2-1")
 
 		rpc = node.get_url_caller()
-		data = {"account":acc[0].name,"symbol":"PXBTS", "code":"eosio.token"}
+		data = {"account":acc[0].name,"symbol":"BTS", "code":"eosio.token"}
 		res = rpc.chain.get_currency_balance(data)
 		log.info("res {0}".format(res))
 
-		summary.equal(True, "10.0000 PXBTS" == res[0], "\"10.0000 PXBTS\" == res[0]")
-		summary.equal(True, "10.0000 PXBTS" == res[0])
+		summary.equal(True, "10.0000 BTS" == res[0], "\"10.0000 BTS\" == res[0]")
+		summary.equal(True, "10.0000 BTS" == res[0])
 
-		#summary.equal(False, "10.0000 PXBTS" == res[0], "\"10.0000 PXBTS\" == res[0]")
-		#summary.equal(False, "10.0000 PXBTS" == res[0])
+		#summary.equal(False, "10.0000 BTS" == res[0], "\"10.0000 BTS\" == res[0]")
+		#summary.equal(False, "10.0000 BTS" == res[0])
 
 	except Exception as _ex:
 		log.exception("Exception `{0}` occures while executing `{1}` tests.".format(str(_ex), __file__))

@@ -14,10 +14,10 @@ from beos_test_utils.beos_utils_pack import init, ActionResult, ResourceResult, 
 if __name__ == "__main__":
 	try:
 		node, summary, args, log = init(__file__)
-		accounts = node.create_accounts(2, "20.0000 PXBTS")
+		accounts = node.create_accounts(2, "20.0000 BTS")
 		node.run_node()	
 		#Changeparams
-		#node.changeparams(["0.0000 PXBTS"], 190, [55,0,60,5,8000000], [55,0,60,5,5000000], 3000000)
+		#node.changeparams(["0.0000 BTS"], 190, [55,0,60,5,8000000], [55,0,60,5,5000000], 3000000)
 		newparams = {
 			"beos" : {
 				"starting_block" : 55,
@@ -33,21 +33,21 @@ if __name__ == "__main__":
 				"block_interval" : 5, 
 				"trustee_reward" : 5000000 
 			},
-			"proxy_assets" : [ "0.0000 PXBTS"],
+			"proxy_assets" : [ "0.0000 BTS"],
 			"ram_leftover" : 3000000,
 			"starting_block_for_initial_witness_election":190
 		}
 		node.changeparams(newparams)
 		
 		#Actions
-		summary.action_status(node.transfer(_from=accounts[0].name,_to=accounts[1].name,_quantity="20.0000 PXBTS",_memo=" internal transfer 0"), ActionResult(False, "transaction net usage is too high") )
+		summary.action_status(node.transfer(_from=accounts[0].name,_to=accounts[1].name,_quantity="20.0000 BTS",_memo=" internal transfer 0"), ActionResult(False, "transaction net usage is too high") )
 		node.wait_till_block(55)
-		summary.action_status(node.transfer(_from=accounts[0].name,_to=accounts[1].name,_quantity="20.0000 PXBTS",_memo=" internal transfer 1") )
+		summary.action_status(node.transfer(_from=accounts[0].name,_to=accounts[1].name,_quantity="20.0000 BTS",_memo=" internal transfer 1") )
 		node.wait_till_block(62)
-		summary.action_status(node.transfer(_from=accounts[1].name,_to=accounts[0].name,_quantity="20.0000 PXBTS",_memo=" internal transfer 2") )
-		summary.action_status(node.withdraw(_from=accounts[0].name,_bts_to="any_account",_quantity="20.0000 PXBTS",_memo="") )
-		summary.action_status(node.withdraw(_from=accounts[1].name,_bts_to="any_account",_quantity="20.0000 PXBTS",_memo="") )
-		summary.action_status(node.transfer(_from=accounts[0].name,_to=accounts[1].name,_quantity="20.0000 PXBTS",_memo=" internal transfer 3"), ActionResult(False, "no balance object found") )
+		summary.action_status(node.transfer(_from=accounts[1].name,_to=accounts[0].name,_quantity="20.0000 BTS",_memo=" internal transfer 2") )
+		summary.action_status(node.withdraw(_from=accounts[0].name,_bts_to="any_account",_quantity="20.0000 BTS",_memo="") )
+		summary.action_status(node.withdraw(_from=accounts[1].name,_bts_to="any_account",_quantity="20.0000 BTS",_memo="") )
+		summary.action_status(node.transfer(_from=accounts[0].name,_to=accounts[1].name,_quantity="20.0000 BTS",_memo=" internal transfer 3"), ActionResult(False, "no balance object found") )
 		
 		#At end
 		summary.user_block_status(node, accounts[0].name, ResourceResult(_balance="",_net_weight="458902003.9224 BEOS",_cpu_weight="458902003.9225 BEOS",_ram_bytes=7998080448))

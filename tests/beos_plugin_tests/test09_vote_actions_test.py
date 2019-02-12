@@ -74,9 +74,9 @@ def validateAccount(_name, _isValid):
     return True
 
 def validateIssue(_name, _isValid):
-  data = {"account": _name, "code": "eosio.token", "symbol": "PXBTS"}
+  data = {"account": _name, "code": "eosio.token", "symbol": "BTS"}
   res = askServer(data, 'chain/get_currency_balance')
-  if res[0] != '1.0000 PXBTS':
+  if res[0] != '1.0000 BTS':
     return False
   else:
     return True
@@ -160,7 +160,7 @@ def makeManyAccounts(accounts_number):
 
 def fillAccountsWithBeos(proxy_value):
   for x in range(len(accounts_names)):
-    run(args.cleos +' --url http://%s:%s push action beos.gateway issue \'[ "%s", "%s PXBTS", "MEMO" ]\' -p beos.gateway ' % (args.nodeos_ip, args.nodeos_port, accounts_names[x], proxy_value ) )
+    run(args.cleos +' --url http://%s:%s push action beos.gateway issue \'[ "%s", "%s BTS", "MEMO" ]\' -p beos.gateway ' % (args.nodeos_ip, args.nodeos_port, accounts_names[x], proxy_value ) )
     if not validateIssue(accounts_names[x], True ):
       return False
   return True
@@ -172,7 +172,7 @@ def changeParams(block):
     end = start + 1 # number of rewards: 1
     interval = 10
 
-    params_str = '[ [ [ %i, %i, %i, %i, 0 ],[ %i, %i, %i, %i, 0 ], ["0.0000 PXBTS"], 10000 ] ]' % ( start, start, end, interval, start, start, end, interval )
+    params_str = '[ [ [ %i, %i, %i, %i, 0 ],[ %i, %i, %i, %i, 0 ], ["0.0000 BTS"], 10000 ] ]' % ( start, start, end, interval, start, start, end, interval )
     run(args.cleos +' --url http://%s:%s push action beos.distrib changeparams \'%s\' -p beos.distrib ' % (args.nodeos_ip, args.nodeos_port, params_str ) )  
   except Exception as _ex:
     print('[ERROR] in changeParams', _ex)
@@ -312,7 +312,7 @@ if __name__ == "__main__":
 
   try:
     stepStartWallet()
-    print(datetime.datetime.now(), '[ACTION] create account and make issues with PXBTS to them')
+    print(datetime.datetime.now(), '[ACTION] create account and make issues with BTS to them')
     if makeManyAccounts(accounts_number):
       print('[OK] Create accounts - test passed')
     else:

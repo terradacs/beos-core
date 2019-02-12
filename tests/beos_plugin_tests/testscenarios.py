@@ -233,7 +233,7 @@ class TestScenarios(object):
             exit(1)
 
 
-    def get_scenario_summary(self, _symbol="PXBTS"):
+    def get_scenario_summary(self, _symbol="BTS"):
         try:
             self.askForBlockNumber.clear()
             with open(self.summary_file,"a+") as sf:
@@ -290,7 +290,7 @@ class TestScenarios(object):
                     "code":"beos.init",
                     "action":"changeparams",
                     "args":{
-                        "new_params":["0.0000 PXBTS", scenario_params["starting_block_for_initial_witness_election"]+nr]
+                        "new_params":["0.0000 BTS", scenario_params["starting_block_for_initial_witness_election"]+nr]
                     }
                 })
             params.append({
@@ -340,7 +340,7 @@ class TestScenarios(object):
             exit(1)
 
 
-    def check_user_status_after_block(self, _symbol="PXBTS"):
+    def check_user_status_after_block(self, _symbol="BTS"):
         try:
             while self.runScenarios.is_set():
                 while self.askForBlockNumber.is_set():
@@ -474,7 +474,7 @@ class TestScenarios(object):
                     "code":"beos.init",
                     "action":"changeparams",
                     "args":{
-                        "new_params":["0.0000 PXBTS", _starting_block_for_initial_witness_election]
+                        "new_params":["0.0000 BTS", _starting_block_for_initial_witness_election]
                     }
                 })
             params.append({

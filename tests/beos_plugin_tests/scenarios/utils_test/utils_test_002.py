@@ -14,7 +14,7 @@ if __name__ == "__main__":
 		nr_of_accounts = 5
 		node, summary, args, log = init(__file__)
 		node.run_node()
-		acc = node.create_producers(nr_of_accounts,"10.0000 PXBTS")
+		acc = node.create_producers(nr_of_accounts,"10.0000 BTS")
 		node.stop_node()
 		names = []
 		for ac in acc:

@@ -31,7 +31,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.aaa",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     }
                 }
             ],
@@ -40,7 +40,7 @@
                     "user": "beos.tst.aaa",
                     "at_end": {
                         "resources": {
-                            "balance": "5.0000 PXBTS",
+                            "balance": "5.0000 BTS",
                             "net_weight": "2000.0000 BEOS",
                             "cpu_weight": "2000.0000 BEOS",
                             "ram_bytes": 15005448
@@ -50,7 +50,7 @@
                         {
                             "after_block": 8,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -59,7 +59,7 @@
                         {
                             "after_block": 11,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "400.0000 BEOS",
                                 "cpu_weight": "400.0000 BEOS",
                                 "ram_bytes": 5005448
@@ -68,7 +68,7 @@
                         {
                             "after_block": 16,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "800.0000 BEOS",
                                 "cpu_weight": "800.0000 BEOS",
                                 "ram_bytes": 10005448
@@ -77,7 +77,7 @@
                         {
                             "after_block": 21,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "1200.0000 BEOS",
                                 "cpu_weight": "1200.0000 BEOS",
                                 "ram_bytes": 15005448
@@ -118,7 +118,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.aal",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -133,7 +133,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.aal",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -148,7 +148,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.aal",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -163,7 +163,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.aal",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -176,7 +176,7 @@
                     "user": "beos.tst.aal",
                     "at_end": {
                         "resources": {
-                            "balance": "20.0000 PXBTS",
+                            "balance": "20.0000 BTS",
                             "net_weight": "2000.0000 BEOS",
                             "cpu_weight": "2000.0000 BEOS",
                             "ram_bytes": 15005448
@@ -186,7 +186,7 @@
                         {
                             "after_block": 7,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -195,7 +195,7 @@
                         {
                             "after_block": 12,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "400.0000 BEOS",
                                 "cpu_weight": "400.0000 BEOS",
                                 "ram_bytes": 5005448
@@ -204,7 +204,7 @@
                         {
                             "after_block": 17,
                             "resources": {
-                                "balance": "15.0000 PXBTS",
+                                "balance": "15.0000 BTS",
                                 "net_weight": "800.0000 BEOS",
                                 "cpu_weight": "800.0000 BEOS",
                                 "ram_bytes": 10005448
@@ -213,7 +213,7 @@
                         {
                             "after_block": 22,
                             "resources": {
-                                "balance": "20.0000 PXBTS",
+                                "balance": "20.0000 BTS",
                                 "net_weight": "1200.0000 BEOS",
                                 "cpu_weight": "1200.0000 BEOS",
                                 "ram_bytes": 15005448
@@ -261,7 +261,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.aaw",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     }
                 },
                 {
@@ -272,7 +272,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.aaw",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     }
                 },
                 {
@@ -283,7 +283,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abg",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     }
                 },
                 {
@@ -294,7 +294,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.aaw",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     }
                 },
                 {
@@ -305,7 +305,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abg",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     }
                 },
                 {
@@ -316,7 +316,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.aaw",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     }
                 },
                 {
@@ -327,7 +327,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abg",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     }
                 }
             ],
@@ -336,7 +336,7 @@
                     "user": "beos.tst.aaw",
                     "at_end": {
                         "resources": {
-                            "balance": "20.0000 PXBTS",
+                            "balance": "20.0000 BTS",
                             "net_weight": "1363.8094 BEOS",
                             "cpu_weight": "1363.8097 BEOS",
                             "ram_bytes": 11672114
@@ -346,7 +346,7 @@
                         {
                             "after_block": 11,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "400.0000 BEOS",
                                 "cpu_weight": "400.0000 BEOS",
                                 "ram_bytes": 5005448
@@ -355,7 +355,7 @@
                         {
                             "after_block": 20,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "666.6666 BEOS",
                                 "cpu_weight": "666.6667 BEOS",
                                 "ram_bytes": 11672114
@@ -364,7 +364,7 @@
                         {
                             "after_block": 30,
                             "resources": {
-                                "balance": "15.0000 PXBTS",
+                                "balance": "15.0000 BTS",
                                 "net_weight": "906.6666 BEOS",
                                 "cpu_weight": "906.6667 BEOS",
                                 "ram_bytes": 11672114
@@ -373,7 +373,7 @@
                         {
                             "after_block": 40,
                             "resources": {
-                                "balance": "20.0000 PXBTS",
+                                "balance": "20.0000 BTS",
                                 "net_weight": "1135.2380 BEOS",
                                 "cpu_weight": "1135.2382 BEOS",
                                 "ram_bytes": 11672114
@@ -382,7 +382,7 @@
                         {
                             "after_block": 51,
                             "resources": {
-                                "balance": "20.0000 PXBTS",
+                                "balance": "20.0000 BTS",
                                 "net_weight": "1363.8094 BEOS",
                                 "cpu_weight": "1363.8097 BEOS",
                                 "ram_bytes": 11672114
@@ -394,7 +394,7 @@
                     "user": "beos.tst.abg",
                     "at_end": {
                         "resources": {
-                            "balance": "15.0000 PXBTS",
+                            "balance": "15.0000 BTS",
                             "net_weight": "636.1903 BEOS",
                             "cpu_weight": "636.1906 BEOS",
                             "ram_bytes": 3338782
@@ -413,7 +413,7 @@
                         {
                             "after_block": 21,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "133.3333 BEOS",
                                 "cpu_weight": "133.3334 BEOS",
                                 "ram_bytes": 3338782
@@ -422,7 +422,7 @@
                         {
                             "after_block": 31,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "293.3333 BEOS",
                                 "cpu_weight": "293.3334 BEOS",
                                 "ram_bytes": 3338782
@@ -431,7 +431,7 @@
                         {
                             "after_block": 41,
                             "resources": {
-                                "balance": "15.0000 PXBTS",
+                                "balance": "15.0000 BTS",
                                 "net_weight": "464.7618 BEOS",
                                 "cpu_weight": "464.7620 BEOS",
                                 "ram_bytes": 3338782
@@ -440,7 +440,7 @@
                         {
                             "after_block": 51,
                             "resources": {
-                                "balance": "15.0000 PXBTS",
+                                "balance": "15.0000 BTS",
                                 "net_weight": "636.1903 BEOS",
                                 "cpu_weight": "636.1906 BEOS",
                                 "ram_bytes": 3338782
@@ -488,7 +488,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abr",
-                        "quantity": "20.0000 PXBTS"
+                        "quantity": "20.0000 BTS"
                     }
                 },
                 {
@@ -499,7 +499,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.aby",
-                        "quantity": "20.0000 PXBTS"
+                        "quantity": "20.0000 BTS"
                     }
                 }
             ],
@@ -508,7 +508,7 @@
                     "user": "beos.tst.abr",
                     "at_end": {
                         "resources": {
-                            "balance": "20.0000 PXBTS",
+                            "balance": "20.0000 BTS",
                             "net_weight": "0.0000 BEOS",
                             "cpu_weight": "0.0000 BEOS",
                             "ram_bytes": 5448
@@ -520,7 +520,7 @@
                     "user": "beos.tst.aby",
                     "at_end": {
                         "resources": {
-                            "balance": "20.0000 PXBTS",
+                            "balance": "20.0000 BTS",
                             "net_weight": "0.0000 BEOS",
                             "cpu_weight": "0.0000 BEOS",
                             "ram_bytes": 5448
@@ -568,7 +568,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.acb",
-                        "quantity": "20.0000 PXBTS"
+                        "quantity": "20.0000 BTS"
                     }
                 },
                 {
@@ -579,7 +579,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.acd",
-                        "quantity": "20.0000 PXBTS"
+                        "quantity": "20.0000 BTS"
                     }
                 }
             ],
@@ -588,7 +588,7 @@
                     "user": "beos.tst.acb",
                     "at_end": {
                         "resources": {
-                            "balance": "20.0000 PXBTS",
+                            "balance": "20.0000 BTS",
                             "net_weight": "0.0000 BEOS",
                             "cpu_weight": "0.0000 BEOS",
                             "ram_bytes": 5448
@@ -600,7 +600,7 @@
                     "user": "beos.tst.acd",
                     "at_end": {
                         "resources": {
-                            "balance": "20.0000 PXBTS",
+                            "balance": "20.0000 BTS",
                             "net_weight": "0.0000 BEOS",
                             "cpu_weight": "0.0000 BEOS",
                             "ram_bytes": 5448
@@ -611,7 +611,7 @@
             ]
         },
         {
-            "name": "[5.6] Withdraw of PXBTS attempt with BEOS inside distribution period.",
+            "name": "[5.6] Withdraw of BTS attempt with BEOS inside distribution period.",
             "scenario_blocks": 60,
             "params": {
                 "starting_block_for_initial_witness_election": 10,
@@ -662,7 +662,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abs",
-                        "quantity": "20.0000 PXBTS"
+                        "quantity": "20.0000 BTS"
                     }
                 },
                 {
@@ -673,7 +673,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abz",
-                        "quantity": "20.0000 PXBTS"
+                        "quantity": "20.0000 BTS"
                     }
                 },
                 {
@@ -684,7 +684,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.acc",
-                        "quantity": "20.0000 PXBTS"
+                        "quantity": "20.0000 BTS"
                     }
                 },
                 {
@@ -695,7 +695,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.ace",
-                        "quantity": "20.0000 PXBTS"
+                        "quantity": "20.0000 BTS"
                     }
                 },
                 {
@@ -706,7 +706,7 @@
                     "args": {
                         "from": "beos.tst.abs",
                         "bts_to": "any_account",
-                        "quantity": "20.0000 PXBTS",
+                        "quantity": "20.0000 BTS",
                         "memo": ""
                     }
                 },
@@ -718,7 +718,7 @@
                     "args": {
                         "from": "beos.tst.abz",
                         "bts_to": "any_account",
-                        "quantity": "20.0000 PXBTS",
+                        "quantity": "20.0000 BTS",
                         "memo": ""
                     }
                 },
@@ -730,7 +730,7 @@
                     "args": {
                         "from": "beos.tst.acc",
                         "bts_to": "any_account",
-                        "quantity": "20.0000 PXBTS",
+                        "quantity": "20.0000 BTS",
                         "memo": ""
                     }
                 },
@@ -742,7 +742,7 @@
                     "args": {
                         "from": "beos.tst.ace",
                         "bts_to": "any_account",
-                        "quantity": "20.0000 PXBTS",
+                        "quantity": "20.0000 BTS",
                         "memo": ""
                     }
                 }
@@ -811,7 +811,7 @@
                         {
                             "after_block": 17,
                             "resources": {
-                                "balance": "20.0000 PXBTS",
+                                "balance": "20.0000 BTS",
                                 "net_weight": "100.0000 BEOS",
                                 "cpu_weight": "100.0000 BEOS",
                                 "ram_bytes": 1255448
@@ -860,7 +860,7 @@
                         {
                             "after_block": 17,
                             "resources": {
-                                "balance": "20.0000 PXBTS",
+                                "balance": "20.0000 BTS",
                                 "net_weight": "100.0000 BEOS",
                                 "cpu_weight": "100.0000 BEOS",
                                 "ram_bytes": 1255448
@@ -869,7 +869,7 @@
                         {
                             "after_block": 28,
                             "resources": {
-                                "balance": "20.0000 PXBTS",
+                                "balance": "20.0000 BTS",
                                 "net_weight": "233.3333 BEOS",
                                 "cpu_weight": "233.3334 BEOS",
                                 "ram_bytes": 2922115
@@ -909,7 +909,7 @@
                         {
                             "after_block": 17,
                             "resources": {
-                                "balance": "20.0000 PXBTS",
+                                "balance": "20.0000 BTS",
                                 "net_weight": "100.0000 BEOS",
                                 "cpu_weight": "100.0000 BEOS",
                                 "ram_bytes": 1255448
@@ -918,7 +918,7 @@
                         {
                             "after_block": 27,
                             "resources": {
-                                "balance": "20.0000 PXBTS",
+                                "balance": "20.0000 BTS",
                                 "net_weight": "233.3333 BEOS",
                                 "cpu_weight": "233.3334 BEOS",
                                 "ram_bytes": 2922115
@@ -927,7 +927,7 @@
                         {
                             "after_block": 37,
                             "resources": {
-                                "balance": "20.0000 PXBTS",
+                                "balance": "20.0000 BTS",
                                 "net_weight": "433.3333 BEOS",
                                 "cpu_weight": "433.3334 BEOS",
                                 "ram_bytes": 5422115
@@ -984,7 +984,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abt",
-                        "quantity": "20.0000 PXBTS"
+                        "quantity": "20.0000 BTS"
                     }
                 },
                 {
@@ -995,7 +995,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.aca",
-                        "quantity": "20.0000 PXBTS"
+                        "quantity": "20.0000 BTS"
                     }
                 },
                 {
@@ -1087,7 +1087,7 @@
                     "user": "beos.tst.abt",
                     "at_end": {
                         "resources": {
-                            "balance": "20.0000 PXBTS",
+                            "balance": "20.0000 BTS",
                             "net_weight": "100.0000 BEOS",
                             "cpu_weight": "100.0000 BEOS",
                             "ram_bytes": 1245448
@@ -1099,7 +1099,7 @@
                     "user": "beos.tst.aca",
                     "at_end": {
                         "resources": {
-                            "balance": "20.0000 PXBTS",
+                            "balance": "20.0000 BTS",
                             "net_weight": "233.3333 BEOS",
                             "cpu_weight": "233.3334 BEOS",
                             "ram_bytes": 2922115
@@ -1147,7 +1147,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.acf",
-                        "quantity": "20.0000 PXBTS"
+                        "quantity": "20.0000 BTS"
                     }
                 },
                 {
@@ -1158,7 +1158,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.aab",
-                        "quantity": "20.0000 PXBTS"
+                        "quantity": "20.0000 BTS"
                     }
                 },
                 {
@@ -1169,7 +1169,7 @@
                     "args": {
                         "from": "beos.tst.acf",
                         "to": "beos.tst.aab",
-                        "quantity": "20.0000 PXBTS",
+                        "quantity": "20.0000 BTS",
                         "memo": " internal transfer 0"
                     },
                     "expected_result": {
@@ -1185,7 +1185,7 @@
                     "args": {
                         "from": "beos.tst.acf",
                         "to": "beos.tst.aab",
-                        "quantity": "20.0000 PXBTS",
+                        "quantity": "20.0000 BTS",
                         "memo": " internal transfer 1"
                     }
                 },
@@ -1197,7 +1197,7 @@
                     "args": {
                         "from": "beos.tst.aab",
                         "to": "beos.tst.acf",
-                        "quantity": "20.0000 PXBTS",
+                        "quantity": "20.0000 BTS",
                         "memo": " internal transfer 2"
                     }
                 },
@@ -1209,7 +1209,7 @@
                     "args": {
                         "from": "beos.tst.acf",
                         "bts_to": "any_account",
-                        "quantity": "20.0000 PXBTS",
+                        "quantity": "20.0000 BTS",
                         "memo": ""
                     }
                 },
@@ -1221,7 +1221,7 @@
                     "args": {
                         "from": "beos.tst.aab",
                         "bts_to": "any_account",
-                        "quantity": "20.0000 PXBTS",
+                        "quantity": "20.0000 BTS",
                         "memo": ""
                     }
                 },
@@ -1233,7 +1233,7 @@
                     "args": {
                         "from": "beos.tst.acf",
                         "to": "beos.tst.aab",
-                        "quantity": "20.0000 PXBTS",
+                        "quantity": "20.0000 BTS",
                         "memo": " internal transfer 3"
                     },
                     "expected_result": {
@@ -1308,7 +1308,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aac",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -1324,7 +1324,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aad",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -1339,7 +1339,7 @@
                     "args": {
                         "from": "beos.tst.aac",
                         "bts_to": "any_account",
-                        "quantity": "1.0000 PXBTS",
+                        "quantity": "1.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -1355,7 +1355,7 @@
                     "args": {
                         "from": "beos.tst.aac",
                         "bts_to": "any_account",
-                        "quantity": "1.0000 PXBTS",
+                        "quantity": "1.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -1371,7 +1371,7 @@
                     "args": {
                         "from": "beos.tst.aad",
                         "bts_to": "any_account",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -1388,7 +1388,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aad",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -1403,7 +1403,7 @@
                     "args": {
                         "from": "beos.tst.aad",
                         "bts_to": "any_account",
-                        "quantity": "1.0000 PXBTS",
+                        "quantity": "1.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -1419,7 +1419,7 @@
                     "args": {
                         "from": "beos.tst.aad",
                         "bts_to": "any_account",
-                        "quantity": "40.0000 PXBTS",
+                        "quantity": "40.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -1435,7 +1435,7 @@
                     "args": {
                         "from": "beos.tst.aad",
                         "to": "beos.tst.aac",
-                        "quantity": "4.0000 PXBTS",
+                        "quantity": "4.0000 BTS",
                         "memo": "any_memo"
                     },
                     "expected_result": {
@@ -1451,7 +1451,7 @@
                     "args": {
                         "from": "beos.tst.aad",
                         "bts_to": "any_account",
-                        "quantity": "1.0000 PXBTS",
+                        "quantity": "1.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -1467,7 +1467,7 @@
                     "args": {
                         "from": "beos.tst.aac",
                         "bts_to": "any_account",
-                        "quantity": "2.0000 PXBTS",
+                        "quantity": "2.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -1484,7 +1484,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aad",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -1499,7 +1499,7 @@
                     "args": {
                         "from": "beos.tst.aad",
                         "bts_to": "any_account",
-                        "quantity": "1.0000 PXBTS",
+                        "quantity": "1.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -1515,7 +1515,7 @@
                     "args": {
                         "from": "beos.tst.aac",
                         "bts_to": "any_account",
-                        "quantity": "6.0000 PXBTS",
+                        "quantity": "6.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -1531,7 +1531,7 @@
                     "args": {
                         "from": "beos.tst.aad",
                         "bts_to": "any_account",
-                        "quantity": "4.0000 PXBTS",
+                        "quantity": "4.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -1547,7 +1547,7 @@
                         {
                             "after_block": 15,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -1556,7 +1556,7 @@
                         {
                             "after_block": 35,
                             "resources": {
-                                "balance": "4.0000 PXBTS",
+                                "balance": "4.0000 BTS",
                                 "net_weight": "100.0000 BEOS",
                                 "cpu_weight": "100.0000 BEOS",
                                 "ram_bytes": 1005448
@@ -1565,7 +1565,7 @@
                         {
                             "after_block": 45,
                             "resources": {
-                                "balance": "4.0000 PXBTS",
+                                "balance": "4.0000 BTS",
                                 "net_weight": "300.0000 BEOS",
                                 "cpu_weight": "300.0000 BEOS",
                                 "ram_bytes": 3005448
@@ -1574,7 +1574,7 @@
                         {
                             "after_block": 70,
                             "resources": {
-                                "balance": "8.0000 PXBTS",
+                                "balance": "8.0000 BTS",
                                 "net_weight": "300.0000 BEOS",
                                 "cpu_weight": "300.0000 BEOS",
                                 "ram_bytes": 3005448
@@ -1596,7 +1596,7 @@
                         {
                             "after_block": 15,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -1672,7 +1672,7 @@
                     "args": {
                         "from": "beos.tst.aae",
                         "bts_to": "any_account",
-                        "quantity": "1.0000 PXBTS",
+                        "quantity": "1.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -1689,7 +1689,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aae",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -1704,7 +1704,7 @@
                     "args": {
                         "from": "beos.tst.aae",
                         "bts_to": "any_account",
-                        "quantity": "1.0000 PXBTS",
+                        "quantity": "1.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -1720,7 +1720,7 @@
                     "args": {
                         "from": "beos.tst.aae",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -1736,7 +1736,7 @@
                     "args": {
                         "from": "beos.tst.aae",
                         "bts_to": "any_account",
-                        "quantity": "1.0000 PXBTS",
+                        "quantity": "1.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -1752,7 +1752,7 @@
                         {
                             "after_block": 20,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -1761,7 +1761,7 @@
                         {
                             "after_block": 35,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "200.0000 BEOS",
                                 "cpu_weight": "200.0000 BEOS",
                                 "ram_bytes": 2005448
@@ -1818,7 +1818,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aaf",
-                        "quantity": "11.0000 PXBTS"
+                        "quantity": "11.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -1833,7 +1833,7 @@
                     "args": {
                         "from": "beos.tst.aaf",
                         "bts_to": "any_account",
-                        "quantity": "1.0000 PXBTS",
+                        "quantity": "1.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -1850,7 +1850,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aag",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -1865,7 +1865,7 @@
                     "args": {
                         "from": "beos.tst.aag",
                         "bts_to": "any_account",
-                        "quantity": "1.0000 PXBTS",
+                        "quantity": "1.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -1881,7 +1881,7 @@
                     "args": {
                         "from": "beos.tst.aaf",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -1897,7 +1897,7 @@
                     "args": {
                         "from": "beos.tst.aag",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -1913,7 +1913,7 @@
                         {
                             "after_block": 15,
                             "resources": {
-                                "balance": "11.0000 PXBTS",
+                                "balance": "11.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -1922,7 +1922,7 @@
                         {
                             "after_block": 35,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "200.0000 BEOS",
                                 "cpu_weight": "200.0000 BEOS",
                                 "ram_bytes": 5448
@@ -1931,7 +1931,7 @@
                         {
                             "after_block": 85,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "300.0000 BEOS",
                                 "cpu_weight": "300.0000 BEOS",
                                 "ram_bytes": 2005448
@@ -1962,7 +1962,7 @@
                         {
                             "after_block": 35,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -1971,7 +1971,7 @@
                         {
                             "after_block": 85,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "100.0000 BEOS",
                                 "cpu_weight": "100.0000 BEOS",
                                 "ram_bytes": 2005448
@@ -2028,7 +2028,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aan",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -2043,7 +2043,7 @@
                     "args": {
                         "from": "beos.tst.aan",
                         "to": "beos.tst.aao",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": "any_memo"
                     },
                     "expected_result": {
@@ -2059,7 +2059,7 @@
                     "args": {
                         "from": "beos.tst.aao",
                         "to": "beos.tst.aan",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": "any_memo"
                     },
                     "expected_result": {
@@ -2075,7 +2075,7 @@
                     "args": {
                         "from": "beos.tst.aao",
                         "to": "beos.tst.aan",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": "any_memo"
                     },
                     "expected_result": {
@@ -2091,7 +2091,7 @@
                     "args": {
                         "from": "beos.tst.aan",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -2107,7 +2107,7 @@
                         {
                             "after_block": 15,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -2125,7 +2125,7 @@
                         {
                             "after_block": 45,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "100.0000 BEOS",
                                 "cpu_weight": "100.0000 BEOS",
                                 "ram_bytes": 1005448
@@ -2156,7 +2156,7 @@
                         {
                             "after_block": 30,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -2230,7 +2230,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aah",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -2277,7 +2277,7 @@
                     "args": {
                         "from": "beos.tst.aah",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -2293,7 +2293,7 @@
                         {
                             "after_block": 21,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "200.0000 BEOS",
                                 "cpu_weight": "200.0000 BEOS",
                                 "ram_bytes": 2005448
@@ -2369,7 +2369,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aaj",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -2385,7 +2385,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aak",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -2484,7 +2484,7 @@
                     "args": {
                         "from": "beos.tst.aaj",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -2500,7 +2500,7 @@
                     "args": {
                         "from": "beos.tst.aak",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -2516,7 +2516,7 @@
                         {
                             "after_block": 35,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "100.0000 BEOS",
                                 "cpu_weight": "100.0000 BEOS",
                                 "ram_bytes": 1005448
@@ -2538,7 +2538,7 @@
                         {
                             "after_block": 35,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "100.0000 BEOS",
                                 "cpu_weight": "100.0000 BEOS",
                                 "ram_bytes": 1005448
@@ -2610,7 +2610,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aap",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -2633,7 +2633,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aaq",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -2648,7 +2648,7 @@
                     "args": {
                         "from": "beos.tst.aap",
                         "to": "beos.tst.aaq",
-                        "quantity": "1.0000 PXBTS",
+                        "quantity": "1.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -2664,7 +2664,7 @@
                     "args": {
                         "from": "beos.tst.aap",
                         "to": "beos.tst.aaq",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -2680,7 +2680,7 @@
                     "args": {
                         "from": "beos.tst.aap",
                         "to": "beos.tst.aaq",
-                        "quantity": "1.0000 PXBTS",
+                        "quantity": "1.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -2696,7 +2696,7 @@
                     "args": {
                         "from": "beos.tst.aaq",
                         "to": "beos.tst.aap",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -2712,7 +2712,7 @@
                     "args": {
                         "from": "beos.tst.aap",
                         "to": "beos.tst.aaq",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -2728,7 +2728,7 @@
                     "args": {
                         "from": "beos.tst.aaq",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -2744,7 +2744,7 @@
                         {
                             "after_block": 40,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -2753,7 +2753,7 @@
                         {
                             "after_block": 50,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "200.0000 BEOS",
                                 "cpu_weight": "200.0000 BEOS",
                                 "ram_bytes": 2505448
@@ -2789,7 +2789,7 @@
                         {
                             "after_block": 70,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "200.0000 BEOS",
                                 "cpu_weight": "200.0000 BEOS",
                                 "ram_bytes": 2505448
@@ -2820,7 +2820,7 @@
                         {
                             "after_block": 40,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -2829,7 +2829,7 @@
                         {
                             "after_block": 50,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "200.0000 BEOS",
                                 "cpu_weight": "200.0000 BEOS",
                                 "ram_bytes": 2505448
@@ -2838,7 +2838,7 @@
                         {
                             "after_block": 52,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "200.0000 BEOS",
                                 "cpu_weight": "200.0000 BEOS",
                                 "ram_bytes": 2505448
@@ -2847,7 +2847,7 @@
                         {
                             "after_block": 54,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "200.0000 BEOS",
                                 "cpu_weight": "200.0000 BEOS",
                                 "ram_bytes": 7505448
@@ -2856,7 +2856,7 @@
                         {
                             "after_block": 60,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "600.0000 BEOS",
                                 "cpu_weight": "600.0000 BEOS",
                                 "ram_bytes": 12505448
@@ -2874,7 +2874,7 @@
                         {
                             "after_block": 80,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "600.0000 BEOS",
                                 "cpu_weight": "600.0000 BEOS",
                                 "ram_bytes": 12505448
@@ -2924,7 +2924,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aar",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -2939,7 +2939,7 @@
                     "args": {
                         "from": "beos.tst.aar",
                         "bts_to": "any_account",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -2955,7 +2955,7 @@
                         {
                             "after_block": 20,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "50.0000 BEOS",
                                 "cpu_weight": "50.0000 BEOS",
                                 "ram_bytes": 5005448
@@ -2964,7 +2964,7 @@
                         {
                             "after_block": 25,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "50.0000 BEOS",
                                 "cpu_weight": "50.0000 BEOS",
                                 "ram_bytes": 5005448
@@ -2973,7 +2973,7 @@
                         {
                             "after_block": 30,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "50.0000 BEOS",
                                 "cpu_weight": "50.0000 BEOS",
                                 "ram_bytes": 5005448
@@ -3027,7 +3027,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aas",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -3053,7 +3053,7 @@
                     "args": {
                         "from": "beos.tst.aas",
                         "to": "beos.tst.aas",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -3069,7 +3069,7 @@
                     "args": {
                         "from": "beos.tst.aas",
                         "to": "beos.tst.aat",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -3085,7 +3085,7 @@
                     "args": {
                         "from": "beos.tst.aat",
                         "to": "beos.tst.aas",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -3101,7 +3101,7 @@
                     "args": {
                         "from": "beos.tst.aat",
                         "to": "beos.tst.aat",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -3117,7 +3117,7 @@
                     "args": {
                         "from": "beos.tst.aas",
                         "bts_to": "any_account",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -3142,7 +3142,7 @@
                         {
                             "after_block": 18,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "50.0000 BEOS",
                                 "cpu_weight": "50.0000 BEOS",
                                 "ram_bytes": 5005448
@@ -3151,7 +3151,7 @@
                         {
                             "after_block": 25,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "100.0000 BEOS",
                                 "cpu_weight": "100.0000 BEOS",
                                 "ram_bytes": 10005448
@@ -3201,7 +3201,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aau",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -3217,7 +3217,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aav",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": false,
@@ -3233,7 +3233,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aau",
-                        "quantity": "0.0000 PXBTS"
+                        "quantity": "0.0000 BTS"
                     },
                     "expected_result": {
                         "status": false,
@@ -3249,7 +3249,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aau",
-                        "quantity": "-1.0000 PXBTS"
+                        "quantity": "-1.0000 BTS"
                     },
                     "expected_result": {
                         "status": false,
@@ -3265,7 +3265,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aav",
-                        "quantity": "-1.0000 PXBTS"
+                        "quantity": "-1.0000 BTS"
                     },
                     "expected_result": {
                         "status": false,
@@ -3280,7 +3280,7 @@
                     "args": {
                         "from": "beos.tst.aau",
                         "bts_to": "any_account",
-                        "quantity": "-20.0000 PXBTS",
+                        "quantity": "-20.0000 BTS",
                         "original_memo": "memo"
                     },
                     "expected_result": {
@@ -3296,7 +3296,7 @@
                     "args": {
                         "from": "beos.tst.aau",
                         "bts_to": "any_account",
-                        "quantity": "20.0000 PXBTS",
+                        "quantity": "20.0000 BTS",
                         "original_memo": "memo"
                     },
                     "expected_result": {
@@ -3312,7 +3312,7 @@
                     "args": {
                         "from": "beos.tst.aau",
                         "bts_to": "any_account",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "original_memo": "memo"
                     },
                     "expected_result": {
@@ -3328,7 +3328,7 @@
                         {
                             "after_block": 12,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -3337,7 +3337,7 @@
                         {
                             "after_block": 20,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "800.0000 BEOS",
                                 "cpu_weight": "800.0000 BEOS",
                                 "ram_bytes": 10005448
@@ -3346,7 +3346,7 @@
                         {
                             "after_block": 32,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "1600.0000 BEOS",
                                 "cpu_weight": "1600.0000 BEOS",
                                 "ram_bytes": 20005448
@@ -3403,7 +3403,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aax",
-                        "quantity": "0.00001 PXBTS"
+                        "quantity": "0.00001 BTS"
                     },
                     "expected_result": {
                         "status": false,
@@ -3419,7 +3419,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aax",
-                        "quantity": "0.0001 PXBTS"
+                        "quantity": "0.0001 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -3434,7 +3434,7 @@
                     "args": {
                         "from": "beos.tst.aax",
                         "to": "beos.tst.aay",
-                        "quantity": "0.00001 PXBTS",
+                        "quantity": "0.00001 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -3450,7 +3450,7 @@
                     "args": {
                         "from": "beos.tst.aax",
                         "to": "beos.tst.aay",
-                        "quantity": "-0.00001 PXBTS",
+                        "quantity": "-0.00001 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -3466,7 +3466,7 @@
                     "args": {
                         "from": "beos.tst.aax",
                         "to": "beos.tst.aay",
-                        "quantity": "-0.00001 PXBTS",
+                        "quantity": "-0.00001 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -3482,7 +3482,7 @@
                     "args": {
                         "from": "beos.tst.aax",
                         "bts_to": "any_account",
-                        "quantity": "0.0001 PXBTS",
+                        "quantity": "0.0001 BTS",
                         "original_memo": "memo"
                     },
                     "expected_result": {
@@ -3498,7 +3498,7 @@
                         {
                             "after_block": 22,
                             "resources": {
-                                "balance": "0.0001 PXBTS",
+                                "balance": "0.0001 BTS",
                                 "net_weight": "400.0000 BEOS",
                                 "cpu_weight": "400.0000 BEOS",
                                 "ram_bytes": 5005448
@@ -3555,7 +3555,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aaz",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -3571,7 +3571,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.aba",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -3753,7 +3753,7 @@
                     "args": {
                         "from": "beos.tst.aba",
                         "to": "beos.tst.aaz",
-                        "quantity": "6.0000 PXBTS",
+                        "quantity": "6.0000 BTS",
                         "memo": "any_memo"
                     },
                     "expected_result": {
@@ -3769,7 +3769,7 @@
                     "args": {
                         "from": "beos.tst.aba",
                         "to": "beos.tst.aaz",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": "any_memo"
                     },
                     "expected_result": {
@@ -3802,7 +3802,7 @@
                     "args": {
                         "from": "beos.tst.aaz",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "memo"
                     },
                     "expected_result": {
@@ -3818,7 +3818,7 @@
                         {
                             "after_block": 18,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "200.0000 BEOS",
                                 "cpu_weight": "200.0000 BEOS",
                                 "ram_bytes": 2505448
@@ -3840,7 +3840,7 @@
                         {
                             "after_block": 18,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "200.0000 BEOS",
                                 "cpu_weight": "200.0000 BEOS",
                                 "ram_bytes": 2505448
@@ -3897,7 +3897,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.abc",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -3913,7 +3913,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.abd",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -4027,7 +4027,7 @@
                     "args": {
                         "from": "beos.tst.abc",
                         "bts_to": "any_account",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -4043,7 +4043,7 @@
                     "args": {
                         "from": "beos.tst.abd",
                         "bts_to": "any_account",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -4124,7 +4124,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abe",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -4139,7 +4139,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abh",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -4154,7 +4154,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abe",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": false,
@@ -4169,7 +4169,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abf",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": false,
@@ -4184,7 +4184,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abe",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": false,
@@ -4199,7 +4199,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abf",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": false,
@@ -4230,7 +4230,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abe",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": false,
@@ -4245,7 +4245,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abf",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": false,
@@ -4260,7 +4260,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abe",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": false,
@@ -4275,7 +4275,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abe",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": false,
@@ -4290,7 +4290,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abf",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": false,
@@ -4305,7 +4305,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abh",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": false,
@@ -4320,7 +4320,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abh",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": false,
@@ -4335,7 +4335,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abh",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": false,
@@ -4350,7 +4350,7 @@
                     "args": {
                         "from": "beos.tst.abe",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     }
                 },
@@ -4362,7 +4362,7 @@
                     "args": {
                         "from": "beos.tst.abh",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     }
                 }
@@ -4374,7 +4374,7 @@
                         {
                             "after_block": 8,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -4383,7 +4383,7 @@
                         {
                             "after_block": 13,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -4392,7 +4392,7 @@
                         {
                             "after_block": 23,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -4401,7 +4401,7 @@
                         {
                             "after_block": 63,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "400.0000 BEOS",
                                 "cpu_weight": "400.0000 BEOS",
                                 "ram_bytes": 5005448
@@ -4410,7 +4410,7 @@
                         {
                             "after_block": 73,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "400.0000 BEOS",
                                 "cpu_weight": "400.0000 BEOS",
                                 "ram_bytes": 5005448
@@ -4419,7 +4419,7 @@
                         {
                             "after_block": 78,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "400.0000 BEOS",
                                 "cpu_weight": "400.0000 BEOS",
                                 "ram_bytes": 5005448
@@ -4499,7 +4499,7 @@
                         {
                             "after_block": 88,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "400.0000 BEOS",
                                 "cpu_weight": "400.0000 BEOS",
                                 "ram_bytes": 5005448
@@ -4508,7 +4508,7 @@
                         {
                             "after_block": 93,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "400.0000 BEOS",
                                 "cpu_weight": "400.0000 BEOS",
                                 "ram_bytes": 5005448
@@ -4517,7 +4517,7 @@
                         {
                             "after_block": 98,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "400.0000 BEOS",
                                 "cpu_weight": "400.0000 BEOS",
                                 "ram_bytes": 5005448
@@ -4580,7 +4580,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abi",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -4595,7 +4595,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abk",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -4610,7 +4610,7 @@
                     "args": {
                         "from": "beos.tst.abi",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -4626,7 +4626,7 @@
                     "args": {
                         "from": "beos.tst.abj",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -4642,7 +4642,7 @@
                     "args": {
                         "from": "beos.tst.abi",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -4658,7 +4658,7 @@
                     "args": {
                         "from": "beos.tst.abj",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -4690,7 +4690,7 @@
                     "args": {
                         "from": "beos.tst.abj",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -4706,7 +4706,7 @@
                     "args": {
                         "from": "beos.tst.abi",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -4722,7 +4722,7 @@
                     "args": {
                         "from": "beos.tst.abi",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -4738,7 +4738,7 @@
                     "args": {
                         "from": "beos.tst.abj",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -4754,7 +4754,7 @@
                     "args": {
                         "from": "beos.tst.abk",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -4770,7 +4770,7 @@
                     "args": {
                         "from": "beos.tst.abk",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -4786,7 +4786,7 @@
                     "args": {
                         "from": "beos.tst.abi",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     }
                 },
@@ -4798,7 +4798,7 @@
                     "args": {
                         "from": "beos.tst.abk",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     }
                 }
@@ -4810,7 +4810,7 @@
                         {
                             "after_block": 8,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -4819,7 +4819,7 @@
                         {
                             "after_block": 13,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -4828,7 +4828,7 @@
                         {
                             "after_block": 23,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -4837,7 +4837,7 @@
                         {
                             "after_block": 68,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "400.0000 BEOS",
                                 "cpu_weight": "400.0000 BEOS",
                                 "ram_bytes": 5005448
@@ -4846,7 +4846,7 @@
                         {
                             "after_block": 73,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "400.0000 BEOS",
                                 "cpu_weight": "400.0000 BEOS",
                                 "ram_bytes": 5005448
@@ -4926,7 +4926,7 @@
                         {
                             "after_block": 8,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -4935,7 +4935,7 @@
                         {
                             "after_block": 83,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "400.0000 BEOS",
                                 "cpu_weight": "400.0000 BEOS",
                                 "ram_bytes": 5005448
@@ -4944,7 +4944,7 @@
                         {
                             "after_block": 88,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "400.0000 BEOS",
                                 "cpu_weight": "400.0000 BEOS",
                                 "ram_bytes": 5005448
@@ -5009,7 +5009,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.abl",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -5025,7 +5025,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.abm",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -5083,7 +5083,7 @@
                     "args": {
                         "from": "beos.tst.abl",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -5099,7 +5099,7 @@
                     "args": {
                         "from": "beos.tst.abm",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -5115,7 +5115,7 @@
                         {
                             "after_block": 16,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "200.0000 BEOS",
                                 "cpu_weight": "200.0000 BEOS",
                                 "ram_bytes": 2005448
@@ -5137,7 +5137,7 @@
                         {
                             "after_block": 16,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "200.0000 BEOS",
                                 "cpu_weight": "200.0000 BEOS",
                                 "ram_bytes": 2005448
@@ -5191,7 +5191,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.abn",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -5307,7 +5307,7 @@
                     "args": {
                         "from": "beos.tst.abn",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -5323,7 +5323,7 @@
                         {
                             "after_block": 27,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "100.0000 BEOS",
                                 "cpu_weight": "100.0000 BEOS",
                                 "ram_bytes": 3005448
@@ -5372,7 +5372,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abo",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -5403,7 +5403,7 @@
                     "args": {
                         "from": "beos.tst.abo",
                         "bts_to": "any_account",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": ""
                     }
                 }
@@ -5454,7 +5454,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abp",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -5518,7 +5518,7 @@
                     "args": {
                         "from": "beos.tst.abp",
                         "bts_to": "any_account",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": ""
                     }
                 }
@@ -5576,7 +5576,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abs",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -5591,7 +5591,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abq",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -5622,7 +5622,7 @@
                     "args": {
                         "from": "beos.tst.abq",
                         "bts_to": "any_account",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": ""
                     }
                 },
@@ -5634,7 +5634,7 @@
                     "args": {
                         "from": "beos.tst.abs",
                         "bts_to": "any_account",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": ""
                     }
                 }
@@ -5704,7 +5704,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abt",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -5719,7 +5719,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abu",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -5800,7 +5800,7 @@
                     "args": {
                         "from": "beos.tst.abt",
                         "bts_to": "any_account",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": ""
                     }
                 },
@@ -5812,7 +5812,7 @@
                     "args": {
                         "from": "beos.tst.abu",
                         "bts_to": "any_account",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": ""
                     }
                 }
@@ -5979,7 +5979,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.acg",
-                        "quantity": "30.0000 PXBTS"
+                        "quantity": "30.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -5995,7 +5995,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.acr",
-                        "quantity": "15.0000 PXBTS"
+                        "quantity": "15.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -6011,7 +6011,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.act",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -6027,7 +6027,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.acu",
-                        "quantity": "10.0000 PXBTS"
+                        "quantity": "10.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -6043,7 +6043,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.acv",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -6059,7 +6059,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.acw",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -6075,7 +6075,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.acx",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -6091,7 +6091,7 @@
                         "memo": "",
                         "from": "beos.gateway",
                         "to": "beos.tst.acy",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -6122,7 +6122,7 @@
                     "args": {
                         "from": "beos.gateway",
                         "to": "beos.tst.acr",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -6138,7 +6138,7 @@
                     "args": {
                         "from": "beos.gateway",
                         "to": "beos.tst.acv",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -6154,7 +6154,7 @@
                     "args": {
                         "from": "beos.gateway",
                         "to": "beos.tst.acz",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -6170,7 +6170,7 @@
                     "args": {
                         "from": "beos.tst.act",
                         "to": "beos.tst.ach",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": "Free muunies"
                     },
                     "expected_result": {
@@ -6250,7 +6250,7 @@
                     "args": {
                         "from": "beos.gateway",
                         "to": "beos.tst.acg",
-                        "quantity": "30.0000 PXBTS",
+                        "quantity": "30.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -6266,7 +6266,7 @@
                     "args": {
                         "from": "beos.gateway",
                         "to": "beos.tst.act",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -6282,7 +6282,7 @@
                     "args": {
                         "from": "beos.gateway",
                         "to": "beos.tst.acx",
-                        "quantity": "15.0000 PXBTS",
+                        "quantity": "15.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -6298,7 +6298,7 @@
                     "args": {
                         "from": "beos.gateway",
                         "to": "beos.tst.ach",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -6314,7 +6314,7 @@
                     "args": {
                         "from": "beos.gateway",
                         "to": "beos.tst.aci",
-                        "quantity": "40.0000 PXBTS",
+                        "quantity": "40.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -6330,7 +6330,7 @@
                     "args": {
                         "from": "beos.tst.acu",
                         "to": "beos.tst.acw",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": "From 4 to 6"
                     },
                     "expected_result": {
@@ -6378,7 +6378,7 @@
                     "args": {
                         "from": "beos.tst.acv",
                         "to": "beos.tst.aci",
-                        "quantity": "30.0000 PXBTS",
+                        "quantity": "30.0000 BTS",
                         "memo": "From 5 to 11"
                     },
                     "expected_result": {
@@ -6394,7 +6394,7 @@
                     "args": {
                         "from": "beos.tst.acr",
                         "to": "beos.tst.act",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": "From 2 to 3"
                     },
                     "expected_result": {
@@ -6410,7 +6410,7 @@
                     "args": {
                         "from": "beos.tst.act",
                         "to": "beos.tst.acr",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": "From 3 to 2"
                     },
                     "expected_result": {
@@ -6426,7 +6426,7 @@
                     "args": {
                         "from": "beos.tst.acz",
                         "to": "beos.tst.acy",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": "From 9 to 8"
                     },
                     "expected_result": {
@@ -6519,7 +6519,7 @@
                     "args": {
                         "from": "beos.tst.acw",
                         "bts_to": "any_account",
-                        "quantity": "15.0000 PXBTS",
+                        "quantity": "15.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -6535,7 +6535,7 @@
                     "args": {
                         "from": "beos.gateway",
                         "to": "beos.tst.ach",
-                        "quantity": "45.0000 PXBTS",
+                        "quantity": "45.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -6551,7 +6551,7 @@
                     "args": {
                         "from": "beos.gateway",
                         "to": "beos.tst.acg",
-                        "quantity": "40.0000 PXBTS",
+                        "quantity": "40.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -6567,7 +6567,7 @@
                     "args": {
                         "from": "beos.gateway",
                         "to": "beos.tst.acr",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -6583,7 +6583,7 @@
                     "args": {
                         "from": "beos.gateway",
                         "to": "beos.tst.aci",
-                        "quantity": "40.0000 PXBTS",
+                        "quantity": "40.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -6599,7 +6599,7 @@
                     "args": {
                         "from": "beos.gateway",
                         "to": "beos.tst.acj",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -6615,7 +6615,7 @@
                     "args": {
                         "from": "beos.gateway",
                         "to": "beos.tst.acl",
-                        "quantity": "20.0000 PXBTS",
+                        "quantity": "20.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -6631,7 +6631,7 @@
                     "args": {
                         "from": "beos.gateway",
                         "to": "beos.tst.acm",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -6647,7 +6647,7 @@
                     "args": {
                         "from": "beos.gateway",
                         "to": "beos.tst.acn",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -6663,7 +6663,7 @@
                     "args": {
                         "from": "beos.gateway",
                         "to": "beos.tst.aco",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -6679,7 +6679,7 @@
                     "args": {
                         "from": "beos.gateway",
                         "to": "beos.tst.acp",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -6695,7 +6695,7 @@
                     "args": {
                         "from": "beos.gateway",
                         "to": "beos.tst.acq",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -6711,7 +6711,7 @@
                     "args": {
                         "from": "beos.tst.acv",
                         "to": "beos.tst.acq",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": "From 5 to 19"
                     },
                     "expected_result": {
@@ -6727,7 +6727,7 @@
                     "args": {
                         "from": "beos.tst.act",
                         "to": "beos.tst.aci",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": "From 5 to 11"
                     },
                     "expected_result": {
@@ -6743,7 +6743,7 @@
                     "args": {
                         "from": "beos.tst.acx",
                         "to": "beos.tst.aci",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": "From 7 to 11"
                     },
                     "expected_result": {
@@ -6909,7 +6909,7 @@
                     "args": {
                         "from": "beos.tst.acr",
                         "bts_to": "any_account",
-                        "quantity": "30.0000 PXBTS",
+                        "quantity": "30.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -6925,7 +6925,7 @@
                     "args": {
                         "from": "beos.tst.act",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -6941,7 +6941,7 @@
                     "args": {
                         "from": "beos.tst.acx",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -6957,7 +6957,7 @@
                     "args": {
                         "from": "beos.tst.acy",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -6973,7 +6973,7 @@
                     "args": {
                         "from": "beos.tst.ach",
                         "bts_to": "any_account",
-                        "quantity": "30.0000 PXBTS",
+                        "quantity": "30.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -6989,7 +6989,7 @@
                     "args": {
                         "from": "beos.tst.aci",
                         "bts_to": "any_account",
-                        "quantity": "100.0000 PXBTS",
+                        "quantity": "100.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -7005,7 +7005,7 @@
                     "args": {
                         "from": "beos.tst.acl",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -7105,7 +7105,7 @@
                     "args": {
                         "from": "beos.tst.acq",
                         "to": "beos.tst.acj",
-                        "quantity": "20.0000 PXBTS",
+                        "quantity": "20.0000 BTS",
                         "memo": "From 19 to 12"
                     },
                     "expected_result": {
@@ -7121,7 +7121,7 @@
                     "args": {
                         "from": "beos.tst.ach",
                         "to": "beos.tst.acg",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "memo": "From 10 to 1"
                     },
                     "expected_result": {
@@ -7137,7 +7137,7 @@
                     "args": {
                         "from": "beos.tst.acg",
                         "bts_to": "any_account",
-                        "quantity": "110.0000 PXBTS",
+                        "quantity": "110.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -7153,7 +7153,7 @@
                     "args": {
                         "from": "beos.tst.ach",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -7169,7 +7169,7 @@
                     "args": {
                         "from": "beos.tst.acj",
                         "bts_to": "any_account",
-                        "quantity": "30.0000 PXBTS",
+                        "quantity": "30.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -7185,7 +7185,7 @@
                     "args": {
                         "from": "beos.tst.acl",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -7201,7 +7201,7 @@
                     "args": {
                         "from": "beos.tst.acm",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -7217,7 +7217,7 @@
                     "args": {
                         "from": "beos.tst.acn",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -7233,7 +7233,7 @@
                     "args": {
                         "from": "beos.tst.aco",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -7249,7 +7249,7 @@
                     "args": {
                         "from": "beos.tst.acp",
                         "bts_to": "any_account",
-                        "quantity": "10.0000 PXBTS",
+                        "quantity": "10.0000 BTS",
                         "original_memo": "any_memo"
                     },
                     "expected_result": {
@@ -7265,7 +7265,7 @@
                         {
                             "after_block": 23,
                             "resources": {
-                                "balance": "30.0000 PXBTS",
+                                "balance": "30.0000 BTS",
                                 "net_weight": "600.0000 BEOS",
                                 "cpu_weight": "600.0000 BEOS",
                                 "ram_bytes": 6005448
@@ -7274,7 +7274,7 @@
                         {
                             "after_block": 55,
                             "resources": {
-                                "balance": "60.0000 PXBTS",
+                                "balance": "60.0000 BTS",
                                 "net_weight": "600.0000 BEOS",
                                 "cpu_weight": "600.0000 BEOS",
                                 "ram_bytes": 6005448
@@ -7283,7 +7283,7 @@
                         {
                             "after_block": 90,
                             "resources": {
-                                "balance": "100.0000 PXBTS",
+                                "balance": "100.0000 BTS",
                                 "net_weight": "1200.0000 BEOS",
                                 "cpu_weight": "1200.0000 BEOS",
                                 "ram_bytes": 12005448
@@ -7292,7 +7292,7 @@
                         {
                             "after_block": 130,
                             "resources": {
-                                "balance": "110.0000 PXBTS",
+                                "balance": "110.0000 BTS",
                                 "net_weight": "1700.0000 BEOS",
                                 "cpu_weight": "1700.0000 BEOS",
                                 "ram_bytes": 17005448
@@ -7314,7 +7314,7 @@
                         {
                             "after_block": 23,
                             "resources": {
-                                "balance": "20.0000 PXBTS",
+                                "balance": "20.0000 BTS",
                                 "net_weight": "400.0000 BEOS",
                                 "cpu_weight": "400.0000 BEOS",
                                 "ram_bytes": 4005448
@@ -7323,7 +7323,7 @@
                         {
                             "after_block": 55,
                             "resources": {
-                                "balance": "20.0000 PXBTS",
+                                "balance": "20.0000 BTS",
                                 "net_weight": "400.0000 BEOS",
                                 "cpu_weight": "400.0000 BEOS",
                                 "ram_bytes": 4005448
@@ -7332,7 +7332,7 @@
                         {
                             "after_block": 90,
                             "resources": {
-                                "balance": "30.0000 PXBTS",
+                                "balance": "30.0000 BTS",
                                 "net_weight": "600.0000 BEOS",
                                 "cpu_weight": "600.0000 BEOS",
                                 "ram_bytes": 6005448
@@ -7363,7 +7363,7 @@
                         {
                             "after_block": 23,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "200.0000 BEOS",
                                 "cpu_weight": "200.0000 BEOS",
                                 "ram_bytes": 2005448
@@ -7372,7 +7372,7 @@
                         {
                             "after_block": 55,
                             "resources": {
-                                "balance": "20.0000 PXBTS",
+                                "balance": "20.0000 BTS",
                                 "net_weight": "200.0000 BEOS",
                                 "cpu_weight": "200.0000 BEOS",
                                 "ram_bytes": 2005448
@@ -7381,7 +7381,7 @@
                         {
                             "after_block": 90,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "400.0000 BEOS",
                                 "cpu_weight": "400.0000 BEOS",
                                 "ram_bytes": 4005448
@@ -7412,7 +7412,7 @@
                         {
                             "after_block": 23,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "200.0000 BEOS",
                                 "cpu_weight": "200.0000 BEOS",
                                 "ram_bytes": 2005448
@@ -7461,7 +7461,7 @@
                         {
                             "after_block": 23,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "200.0000 BEOS",
                                 "cpu_weight": "200.0000 BEOS",
                                 "ram_bytes": 2005448
@@ -7470,7 +7470,7 @@
                         {
                             "after_block": 55,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "200.0000 BEOS",
                                 "cpu_weight": "200.0000 BEOS",
                                 "ram_bytes": 2005448
@@ -7510,7 +7510,7 @@
                         {
                             "after_block": 23,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "100.0000 BEOS",
                                 "cpu_weight": "100.0000 BEOS",
                                 "ram_bytes": 1005448
@@ -7519,7 +7519,7 @@
                         {
                             "after_block": 55,
                             "resources": {
-                                "balance": "15.0000 PXBTS",
+                                "balance": "15.0000 BTS",
                                 "net_weight": "100.0000 BEOS",
                                 "cpu_weight": "100.0000 BEOS",
                                 "ram_bytes": 1005448
@@ -7559,7 +7559,7 @@
                         {
                             "after_block": 23,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "100.0000 BEOS",
                                 "cpu_weight": "100.0000 BEOS",
                                 "ram_bytes": 1005448
@@ -7568,7 +7568,7 @@
                         {
                             "after_block": 55,
                             "resources": {
-                                "balance": "20.0000 PXBTS",
+                                "balance": "20.0000 BTS",
                                 "net_weight": "100.0000 BEOS",
                                 "cpu_weight": "100.0000 BEOS",
                                 "ram_bytes": 1005448
@@ -7577,7 +7577,7 @@
                         {
                             "after_block": 90,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "300.0000 BEOS",
                                 "cpu_weight": "300.0000 BEOS",
                                 "ram_bytes": 3005448
@@ -7608,7 +7608,7 @@
                         {
                             "after_block": 23,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "100.0000 BEOS",
                                 "cpu_weight": "100.0000 BEOS",
                                 "ram_bytes": 1005448
@@ -7617,7 +7617,7 @@
                         {
                             "after_block": 55,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "100.0000 BEOS",
                                 "cpu_weight": "100.0000 BEOS",
                                 "ram_bytes": 1005448
@@ -7626,7 +7626,7 @@
                         {
                             "after_block": 90,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "200.0000 BEOS",
                                 "cpu_weight": "200.0000 BEOS",
                                 "ram_bytes": 2005448
@@ -7657,7 +7657,7 @@
                         {
                             "after_block": 23,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "100.0000 BEOS",
                                 "cpu_weight": "100.0000 BEOS",
                                 "ram_bytes": 1005448
@@ -7715,7 +7715,7 @@
                         {
                             "after_block": 55,
                             "resources": {
-                                "balance": "5.0000 PXBTS",
+                                "balance": "5.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -7724,7 +7724,7 @@
                         {
                             "after_block": 90,
                             "resources": {
-                                "balance": "50.0000 PXBTS",
+                                "balance": "50.0000 BTS",
                                 "net_weight": "50.0000 BEOS",
                                 "cpu_weight": "50.0000 BEOS",
                                 "ram_bytes": 505448
@@ -7733,7 +7733,7 @@
                         {
                             "after_block": 130,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "300.0000 BEOS",
                                 "cpu_weight": "300.0000 BEOS",
                                 "ram_bytes": 3005448
@@ -7755,7 +7755,7 @@
                         {
                             "after_block": 55,
                             "resources": {
-                                "balance": "40.0000 PXBTS",
+                                "balance": "40.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -7764,7 +7764,7 @@
                         {
                             "after_block": 90,
                             "resources": {
-                                "balance": "100.0000 PXBTS",
+                                "balance": "100.0000 BTS",
                                 "net_weight": "400.0000 BEOS",
                                 "cpu_weight": "400.0000 BEOS",
                                 "ram_bytes": 4005448
@@ -7804,7 +7804,7 @@
                         {
                             "after_block": 90,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -7813,7 +7813,7 @@
                         {
                             "after_block": 130,
                             "resources": {
-                                "balance": "30.0000 PXBTS",
+                                "balance": "30.0000 BTS",
                                 "net_weight": "50.0000 BEOS",
                                 "cpu_weight": "50.0000 BEOS",
                                 "ram_bytes": 505448
@@ -7875,7 +7875,7 @@
                         {
                             "after_block": 90,
                             "resources": {
-                                "balance": "20.0000 PXBTS",
+                                "balance": "20.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -7884,7 +7884,7 @@
                         {
                             "after_block": 130,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "100.0000 BEOS",
                                 "cpu_weight": "100.0000 BEOS",
                                 "ram_bytes": 1005448
@@ -7906,7 +7906,7 @@
                         {
                             "after_block": 90,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -7915,7 +7915,7 @@
                         {
                             "after_block": 130,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "50.0000 BEOS",
                                 "cpu_weight": "50.0000 BEOS",
                                 "ram_bytes": 505448
@@ -7937,7 +7937,7 @@
                         {
                             "after_block": 90,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -7946,7 +7946,7 @@
                         {
                             "after_block": 130,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "50.0000 BEOS",
                                 "cpu_weight": "50.0000 BEOS",
                                 "ram_bytes": 505448
@@ -7968,7 +7968,7 @@
                         {
                             "after_block": 90,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -7977,7 +7977,7 @@
                         {
                             "after_block": 130,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "50.0000 BEOS",
                                 "cpu_weight": "50.0000 BEOS",
                                 "ram_bytes": 505448
@@ -7999,7 +7999,7 @@
                         {
                             "after_block": 90,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -8008,7 +8008,7 @@
                         {
                             "after_block": 130,
                             "resources": {
-                                "balance": "10.0000 PXBTS",
+                                "balance": "10.0000 BTS",
                                 "net_weight": "50.0000 BEOS",
                                 "cpu_weight": "50.0000 BEOS",
                                 "ram_bytes": 505448
@@ -8030,7 +8030,7 @@
                         {
                             "after_block": 90,
                             "resources": {
-                                "balance": "20.0000 PXBTS",
+                                "balance": "20.0000 BTS",
                                 "net_weight": "0.0000 BEOS",
                                 "cpu_weight": "0.0000 BEOS",
                                 "ram_bytes": 5448
@@ -8133,7 +8133,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abv",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -8148,7 +8148,7 @@
                     "args": {
                         "memo": "",
                         "to": "beos.tst.abx",
-                        "quantity": "5.0000 PXBTS"
+                        "quantity": "5.0000 BTS"
                     },
                     "expected_result": {
                         "status": true,
@@ -8346,7 +8346,7 @@
                     "args": {
                         "from": "beos.tst.abv",
                         "bts_to": "any_account",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {
@@ -8362,7 +8362,7 @@
                     "args": {
                         "from": "beos.tst.abx",
                         "bts_to": "any_account",
-                        "quantity": "5.0000 PXBTS",
+                        "quantity": "5.0000 BTS",
                         "memo": ""
                     },
                     "expected_result": {

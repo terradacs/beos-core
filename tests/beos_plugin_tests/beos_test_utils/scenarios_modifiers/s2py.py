@@ -72,7 +72,7 @@ parser.add_argument('--counter-prefix', help ="Set how many leading `0` should b
 parser.add_argument('--scenarios-to-transform', help="Set name of file with scenarios [default=scenarions_to_transfer.json]", default="scenarions_to_transfer.json" )
 
 def add_changeparams(_params):
-    node_asset           = "[\"{0}\"]".format("0.0000 PXBTS")
+    node_asset           = "[\"{0}\"]".format("0.0000 BTS")
     node_witnes_election = "{0}".format(_params["starting_block_for_initial_witness_election"]) 
     node_beos = "[{0},{1},{2},{3},{4}]".format(_params["starting_block_for_beos_distribution"],
                                                0,

@@ -201,7 +201,7 @@ class Summarizer(object):
             self.action_summaries.append([_action,  ActionResult(True, "") ])
 
 
-    def user_block_status(self, _node, _user, _expected_result, _symbol = "PXBTS"):
+    def user_block_status(self, _node, _user, _expected_result, _symbol = "BTS"):
         block   = _node.utils.get_info()["head_block_num"]
         result  = _node.utils.get_account(_user)
         balance = _node.utils.get_currency_balance(_user, _symbol)

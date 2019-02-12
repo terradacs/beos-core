@@ -18,7 +18,7 @@ if __name__ == "__main__":
 		node.run_node()
 
 		#Changeparams
-		#node.changeparams(["0.0000 PXBTS"], 20, [10,0,20,10,8000000], [10,0,20,10,5000000], 3000000)
+		#node.changeparams(["0.0000 BTS"], 20, [10,0,20,10,8000000], [10,0,20,10,5000000], 3000000)
 		newparams = {
 			"beos" : {
 				"starting_block" : 10,
@@ -34,15 +34,15 @@ if __name__ == "__main__":
 				"block_interval" : 10, 
 				"trustee_reward" : 5000000 
 			},
-			"proxy_assets" : [ "0.0000 PXBTS"],
+			"proxy_assets" : [ "0.0000 BTS"],
 			"ram_leftover" : 3000000,
 			"starting_block_for_initial_witness_election":20
 		}
 		node.changeparams(newparams)
 		
 		#Actions
-		summary.action_status(node.issue(_to=producers[0].name,_quantity="5.0000 PXBTS",_memo="",_from="beos.gateway") )
-		summary.action_status(node.issue(_to=producers[2].name,_quantity="5.0000 PXBTS",_memo="",_from="beos.gateway") )
+		summary.action_status(node.issue(_to=producers[0].name,_quantity="5.0000 BTS",_memo="",_from="beos.gateway") )
+		summary.action_status(node.issue(_to=producers[2].name,_quantity="5.0000 BTS",_memo="",_from="beos.gateway") )
 		summary.action_status(node.regproducer(_producer=producers[2].name,_producer_key=producers[2].akey,_url="test0.html",_location=0), ActionResult(False, "") )
 		summary.action_status(node.regproducer(_producer=producers[2].name,_producer_key=producers[2].akey,_url="test1.html",_location=0), ActionResult(False, "") )
 		node.wait_till_block(25)
@@ -55,8 +55,8 @@ if __name__ == "__main__":
 		summary.action_status(node.voteproducer(_voter=producers[2].name,_proxy="",_producers=[producers[1].name]), ActionResult(False, "") )
 		summary.action_status(node.voteproducer(_voter=producers[1].name,_proxy="",_producers=[producers[1].name]), ActionResult(False, "") )
 		summary.action_status(node.voteproducer(_voter=producers[0].name,_proxy="",_producers=[producers[0].name]), ActionResult(False, "") )
-		summary.action_status(node.withdraw(_from=producers[0].name,_bts_to="any_account",_quantity="5.0000 PXBTS",_memo="") )
-		summary.action_status(node.withdraw(_from=producers[2].name,_bts_to="any_account",_quantity="5.0000 PXBTS",_memo="") )
+		summary.action_status(node.withdraw(_from=producers[0].name,_bts_to="any_account",_quantity="5.0000 BTS",_memo="") )
+		summary.action_status(node.withdraw(_from=producers[2].name,_bts_to="any_account",_quantity="5.0000 BTS",_memo="") )
 		
 		#At end
 		summary.user_block_status(node, producers[0].name, ResourceResult(_balance="",_net_weight="917804007.8448 BEOS",_cpu_weight="917804007.8450 BEOS",_ram_bytes=15996155448))
