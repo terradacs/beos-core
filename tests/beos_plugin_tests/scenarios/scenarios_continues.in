@@ -28,14 +28,14 @@
 			"args": {
 				"memo":"",
 				"to": "${user_1}",
-				"quantity": "5.0000 PXBTS"
+				"quantity": "5.0000 BTS"
 			}
 		}],
 		"expected_results": [{
 			"user": "${user_1}",
 			"at_end": {
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "2000.0000 BEOS",
 				"cpu_weight": "2000.0000 BEOS",
 				"ram_bytes": 15005448}
@@ -43,28 +43,28 @@
 			"after_block": [{
 				"after_block": 8,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
 			}, {
 				"after_block": 11,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "400.0000 BEOS",
 				"cpu_weight": "400.0000 BEOS",
 				"ram_bytes": 5005448}
 			}, {
 				"after_block": 16,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "800.0000 BEOS",
 				"cpu_weight": "800.0000 BEOS",
 				"ram_bytes": 10005448}
 			}, {
 				"after_block": 21,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "1200.0000 BEOS",
 				"cpu_weight": "1200.0000 BEOS",
 				"ram_bytes": 15005448}
@@ -99,7 +99,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_2}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -113,7 +113,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_2}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -127,7 +127,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_2}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -141,7 +141,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_2}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -152,7 +152,7 @@
 			"user": "${user_2}",
 			"at_end": {
 				"resources":{
-				"balance": "20.0000 PXBTS", 
+				"balance": "20.0000 BTS", 
 				"net_weight": "2000.0000 BEOS",
 				"cpu_weight": "2000.0000 BEOS",
 				"ram_bytes": 15005448}
@@ -160,28 +160,28 @@
 			"after_block": [{
 				"after_block": 7,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
 			}, {
 				"after_block": 12,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "400.0000 BEOS",
 				"cpu_weight": "400.0000 BEOS",
 				"ram_bytes": 5005448}
 			}, {
 				"after_block": 17,
 				"resources":{
-				"balance": "15.0000 PXBTS", 
+				"balance": "15.0000 BTS", 
 				"net_weight": "800.0000 BEOS",
 				"cpu_weight": "800.0000 BEOS",
 				"ram_bytes": 10005448}
 			}, {
 				"after_block": 22,
 				"resources":{
-				"balance": "20.0000 PXBTS", 
+				"balance": "20.0000 BTS", 
 				"net_weight": "1200.0000 BEOS",
 				"cpu_weight": "1200.0000 BEOS",
 				"ram_bytes": 15005448}
@@ -195,7 +195,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  140, [10, 50, 10, 8000000],
+				"new_params": ["0.0000 BTS",  140, [10, 50, 10, 8000000],
 					[10, 20, 5, 5000000],
 					[10, 50, 10, 200000]
 				]
@@ -221,7 +221,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_3}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			}
 		}, {
 			"start_block": 12,
@@ -231,7 +231,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_3}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			}
 		}, {
 			"start_block": 12,
@@ -241,7 +241,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_4}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			}
 		}, {
 			"start_block": 22,
@@ -251,7 +251,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_3}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			}
 		}, {
 			"start_block": 22,
@@ -261,7 +261,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_4}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			}
 		}, {
 			"start_block": 32,
@@ -271,7 +271,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_3}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			}
 		}, {
 			"start_block": 32,
@@ -281,14 +281,14 @@
 			"args": {
 				"memo":"",
 				"to": "${user_4}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			}
 		}],
 		"expected_results": [{
 			"user": "${user_3}",
 			"at_end": {
 				"resources":{
-				"balance": "20.0000 PXBTS", 
+				"balance": "20.0000 BTS", 
 				"net_weight": "1363.8094 BEOS",
 				"cpu_weight": "1363.8097 BEOS",
 				"ram_bytes": 11672114}
@@ -296,35 +296,35 @@
 			"after_block": [{
 				"after_block": 11,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "400.0000 BEOS",
 				"cpu_weight": "400.0000 BEOS",
 				"ram_bytes": 5005448}
 			}, {
 				"after_block": 20,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "666.6666 BEOS",
 				"cpu_weight": "666.6667 BEOS",
 				"ram_bytes": 11672114}
 			}, {
 				"after_block": 30,
 				"resources":{
-				"balance": "15.0000 PXBTS", 
+				"balance": "15.0000 BTS", 
 				"net_weight": "906.6666 BEOS",
 				"cpu_weight": "906.6667 BEOS",
 				"ram_bytes": 11672114}
 			}, {
 				"after_block": 40,
 				"resources":{
-				"balance": "20.0000 PXBTS", 
+				"balance": "20.0000 BTS", 
 				"net_weight": "1135.2380 BEOS",
 				"cpu_weight": "1135.2382 BEOS",
 				"ram_bytes": 11672114}
 			}, {
 				"after_block": 51,
 				"resources":{
-				"balance": "20.0000 PXBTS", 
+				"balance": "20.0000 BTS", 
 				"net_weight": "1363.8094 BEOS",
 				"cpu_weight": "1363.8097 BEOS",
 				"ram_bytes": 11672114}
@@ -333,7 +333,7 @@
 			"user": "${user_4}",
 			"at_end": {
 				"resources":{
-				"balance": "15.0000 PXBTS", 
+				"balance": "15.0000 BTS", 
 				"net_weight": "636.1903 BEOS",
 				"cpu_weight": "636.1906 BEOS",
 				"ram_bytes": 3338782}
@@ -348,28 +348,28 @@
 			}, {
 				"after_block": 21,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "133.3333 BEOS",
 				"cpu_weight": "133.3334 BEOS",
 				"ram_bytes": 3338782}
 			}, {
 				"after_block": 31,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "293.3333 BEOS",
 				"cpu_weight": "293.3334 BEOS",
 				"ram_bytes": 3338782}
 			}, {
 				"after_block": 41,
 				"resources":{
-				"balance": "15.0000 PXBTS", 
+				"balance": "15.0000 BTS", 
 				"net_weight": "464.7618 BEOS",
 				"cpu_weight": "464.7620 BEOS",
 				"ram_bytes": 3338782}
 			}, {
 				"after_block": 51,
 				"resources":{
-				"balance": "15.0000 PXBTS", 
+				"balance": "15.0000 BTS", 
 				"net_weight": "636.1903 BEOS",
 				"cpu_weight": "636.1906 BEOS",
 				"ram_bytes": 3338782}
@@ -383,7 +383,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  410, [1000, 1001, 10, 8000000],
+				"new_params": ["0.0000 BTS",  410, [1000, 1001, 10, 8000000],
 					[1000, 1001, 4, 5000000],
 					[1000, 1001, 10, 200000]
 				]
@@ -409,7 +409,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_5}",
-				"quantity": "20.0000 PXBTS", "memo": ""
+				"quantity": "20.0000 BTS", "memo": ""
 			}
 		}, {
 			"start_block": 3,
@@ -419,14 +419,14 @@
 			"args": {
 				"memo":"",
 				"to": "${user_6}",
-				"quantity": "20.0000 PXBTS", "memo": ""
+				"quantity": "20.0000 BTS", "memo": ""
 			}
 		}],
 		"expected_results": [{
 			"user": "${user_5}",
 			"at_end": {
 				"resources":{
-				"balance": "20.0000 PXBTS", 
+				"balance": "20.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
@@ -436,7 +436,7 @@
 			"user": "${user_6}",
 			"at_end": {
 				"resources":{
-				"balance": "20.0000 PXBTS", 
+				"balance": "20.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
@@ -451,7 +451,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  420, [50, 51, 10, 8000000],
+				"new_params": ["0.0000 BTS",  420, [50, 51, 10, 8000000],
 					[50, 51, 4, 5000000],
 					[50, 51, 10, 200000]
 				]
@@ -477,7 +477,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_7}",
-				"quantity": "20.0000 PXBTS", "memo": ""
+				"quantity": "20.0000 BTS", "memo": ""
 			}
 		}, {
 			"start_block": 4,
@@ -487,14 +487,14 @@
 			"args": {
 				"memo":"",
 				"to": "${user_8}",
-				"quantity": "20.0000 PXBTS", "memo": ""
+				"quantity": "20.0000 BTS", "memo": ""
 			}
 		}],
 		"expected_results": [{
 			"user": "${user_7}",
 			"at_end": {
 				"resources":{
-				"balance": "20.0000 PXBTS", 
+				"balance": "20.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
@@ -504,7 +504,7 @@
 			"user": "${user_8}",
 			"at_end": {
 				"resources":{
-				"balance": "20.0000 PXBTS", 
+				"balance": "20.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
@@ -512,14 +512,14 @@
 			"after_block": []
 		}]
 	}, {
-		"name": "[5.6] Withdraw of PXBTS attempt with BEOS inside distribution period.",
+		"name": "[5.6] Withdraw of BTS attempt with BEOS inside distribution period.",
 		"scenario_blocks": 60,
 		"params": {
 			"authorized_by": "beos.init",
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  10, [10, 50, 10, 8000000],
+				"new_params": ["0.0000 BTS",  10, [10, 50, 10, 8000000],
 					[10, 50, 10, 5000000],
 					[10, 50, 10, 2000000]
 				]
@@ -557,7 +557,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_50}",
-				"quantity": "20.0000 PXBTS"
+				"quantity": "20.0000 BTS"
 			}
 		},{
 			"start_block": 6,
@@ -567,7 +567,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_60}",
-				"quantity": "20.0000 PXBTS"
+				"quantity": "20.0000 BTS"
 			}
 		},{
 			"start_block": 6,
@@ -577,7 +577,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_70}",
-				"quantity": "20.0000 PXBTS"
+				"quantity": "20.0000 BTS"
 			}
 		},{
 			"start_block": 6,
@@ -587,7 +587,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_80}",
-				"quantity": "20.0000 PXBTS"
+				"quantity": "20.0000 BTS"
 			}
 		},{
 			"start_block": 15,
@@ -597,7 +597,7 @@
 			"args": {
 				"from": "${user_50}",
 				"bts_to": "any_account",
-				"quantity": "20.0000 PXBTS", "memo": ""
+				"quantity": "20.0000 BTS", "memo": ""
 			}
 		}, {
 			"start_block": 25,
@@ -607,7 +607,7 @@
 			"args": {
 				"from": "${user_60}",
 				"bts_to": "any_account",
-				"quantity": "20.0000 PXBTS", "memo": ""
+				"quantity": "20.0000 BTS", "memo": ""
 			}
 		}, {
 			"start_block": 35,
@@ -617,7 +617,7 @@
 			"args": {
 				"from": "${user_70}",
 				"bts_to": "any_account",
-				"quantity": "20.0000 PXBTS", "memo": ""
+				"quantity": "20.0000 BTS", "memo": ""
 			}
 		}, {
 			"start_block": 45,
@@ -627,7 +627,7 @@
 			"args": {
 				"from": "${user_80}",
 				"bts_to": "any_account",
-				"quantity": "20.0000 PXBTS", "memo": ""
+				"quantity": "20.0000 BTS", "memo": ""
 			}
 		}],
 		"expected_results": [{
@@ -680,7 +680,7 @@
 			"after_block": [{
 				"after_block": 17,
 				"resources":{
-				"balance": "20.0000 PXBTS", 
+				"balance": "20.0000 BTS", 
 				"net_weight": "100.0000 BEOS",
 				"cpu_weight": "100.0000 BEOS",
 				"ram_bytes": 1255448}
@@ -718,14 +718,14 @@
 			"after_block": [{
 				"after_block": 17,
 				"resources":{
-				"balance": "20.0000 PXBTS", 
+				"balance": "20.0000 BTS", 
 				"net_weight": "100.0000 BEOS",
 				"cpu_weight": "100.0000 BEOS",
 				"ram_bytes": 1255448}
 			}, {
 				"after_block": 28,
 				"resources":{
-				"balance": "20.0000 PXBTS", 
+				"balance": "20.0000 BTS", 
 				"net_weight": "233.3333 BEOS",
 				"cpu_weight": "233.3334 BEOS",
 				"ram_bytes": 2922115}
@@ -756,21 +756,21 @@
 			"after_block": [{
 				"after_block": 17,
 				"resources":{
-				"balance": "20.0000 PXBTS", 
+				"balance": "20.0000 BTS", 
 				"net_weight": "100.0000 BEOS",
 				"cpu_weight": "100.0000 BEOS",
 				"ram_bytes": 1255448}
 			}, {
 				"after_block": 27,
 				"resources":{
-				"balance": "20.0000 PXBTS", 
+				"balance": "20.0000 BTS", 
 				"net_weight": "233.3333 BEOS",
 				"cpu_weight": "233.3334 BEOS",
 				"ram_bytes": 2922115}
 			}, {
 				"after_block": 37,
 				"resources":{
-				"balance": "20.0000 PXBTS", 
+				"balance": "20.0000 BTS", 
 				"net_weight": "433.3333 BEOS",
 				"cpu_weight": "433.3334 BEOS",
 				"ram_bytes": 5422115}
@@ -791,7 +791,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  420, [10, 30, 10, 8000000],
+				"new_params": ["0.0000 BTS",  420, [10, 30, 10, 8000000],
 					[10, 30, 10, 5000000],
 					[10, 30, 10, 2000000]
 				]
@@ -817,7 +817,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_51}",
-				"quantity": "20.0000 PXBTS"
+				"quantity": "20.0000 BTS"
 			}
 		},{
 			"start_block": 4,
@@ -827,7 +827,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_61}",
-				"quantity": "20.0000 PXBTS"
+				"quantity": "20.0000 BTS"
 			}
 		},{
 			"start_block": 6,
@@ -911,7 +911,7 @@
 			"user": "${user_51}",
 			"at_end": {
 				"resources":{
-				"balance": "20.0000 PXBTS",
+				"balance": "20.0000 BTS",
 				"net_weight": "100.0000 BEOS",
 				"cpu_weight": "100.0000 BEOS",
 				"ram_bytes": 1245448}
@@ -921,7 +921,7 @@
 			"user": "${user_61}",
 			"at_end": {
 				"resources":{
-				"balance": "20.0000 PXBTS",
+				"balance": "20.0000 BTS",
 				"net_weight": "233.3333 BEOS",
 				"cpu_weight": "233.3334 BEOS",
 				"ram_bytes": 2922115}
@@ -936,7 +936,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  190, [55, 60, 5, 8000000],
+				"new_params": ["0.0000 BTS",  190, [55, 60, 5, 8000000],
 					[55, 60, 5, 5000000],
 					[55, 60, 5, 2000000]
 				]
@@ -962,7 +962,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_9}",
-				"quantity": "20.0000 PXBTS", "memo": ""
+				"quantity": "20.0000 BTS", "memo": ""
 			}
 		}, {
 			"start_block": 42,
@@ -972,7 +972,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_10}",
-				"quantity": "20.0000 PXBTS", "memo": ""
+				"quantity": "20.0000 BTS", "memo": ""
 			}
 		}, {
 			"start_block": 50,
@@ -982,7 +982,7 @@
 			"args": {
 				"from": "${user_9}",
 				"to": "${user_10}",
-				"quantity": "20.0000 PXBTS", 
+				"quantity": "20.0000 BTS", 
 				"memo": " internal transfer 0"
 			},
 			"expected_result": {
@@ -997,7 +997,7 @@
 			"args": {
 				"from": "${user_9}",
 				"to": "${user_10}",
-				"quantity": "20.0000 PXBTS", 
+				"quantity": "20.0000 BTS", 
 				"memo": " internal transfer 1"
 			}
 		}, {
@@ -1008,7 +1008,7 @@
 			"args": {
 				"from": "${user_10}",
 				"to": "${user_9}",
-				"quantity": "20.0000 PXBTS", 
+				"quantity": "20.0000 BTS", 
 				"memo": " internal transfer 2"
 			}
 		}, {
@@ -1019,7 +1019,7 @@
 			"args": {
 				"from": "${user_9}",
 				"bts_to": "any_account",
-				"quantity": "20.0000 PXBTS", "memo": ""
+				"quantity": "20.0000 BTS", "memo": ""
 			}
 		}, {
 			"start_block": 65,
@@ -1029,7 +1029,7 @@
 			"args": {
 				"from": "${user_10}",
 				"bts_to": "any_account",
-				"quantity": "20.0000 PXBTS", "memo": ""
+				"quantity": "20.0000 BTS", "memo": ""
 			}
 		}, {
 			"start_block": 70,
@@ -1039,7 +1039,7 @@
 			"args": {
 				"from": "${user_9}",
 				"to": "${user_10}",
-				"quantity": "20.0000 PXBTS", 
+				"quantity": "20.0000 BTS", 
 				"memo": " internal transfer 3"
 			},
 			"expected_result": {
@@ -1076,7 +1076,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  40, [20, 40, 20, 4000000],
+				"new_params": ["0.0000 BTS",  40, [20, 40, 20, 4000000],
 					[20, 40, 20, 2000000],
 					[450, 460, 10, 200000]
 				]
@@ -1103,7 +1103,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_11}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -1118,7 +1118,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_12}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -1132,7 +1132,7 @@
 			"args": {
 				"from": "${user_11}",
 				"bts_to": "any_account",
-				"quantity": "1.0000 PXBTS", 
+				"quantity": "1.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -1147,7 +1147,7 @@
 			"args": {
 				"from": "${user_11}",
 				"bts_to": "any_account",
-				"quantity": "1.0000 PXBTS", 
+				"quantity": "1.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -1162,7 +1162,7 @@
 			"args": {
 				"from": "${user_12}",
 				"bts_to": "any_account",
-				"quantity": "5.0000 PXBTS", 
+				"quantity": "5.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -1178,7 +1178,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_12}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -1192,7 +1192,7 @@
 			"args": {
 				"from": "${user_12}",
 				"bts_to": "any_account",
-				"quantity": "1.0000 PXBTS", 
+				"quantity": "1.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -1207,7 +1207,7 @@
 			"args": {
 				"from": "${user_12}",
 				"bts_to": "any_account",
-				"quantity": "40.0000 PXBTS", 
+				"quantity": "40.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -1222,7 +1222,7 @@
 			"args": {
 				"from": "${user_12}",
 				"to": "${user_11}",
-				"quantity": "4.0000 PXBTS", 
+				"quantity": "4.0000 BTS", 
 				"memo": "any_memo"
 			},
 			"expected_result": {
@@ -1237,7 +1237,7 @@
 			"args": {
 				"from": "${user_12}",
 				"bts_to": "any_account",
-				"quantity": "1.0000 PXBTS", 
+				"quantity": "1.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -1252,7 +1252,7 @@
 			"args": {
 				"from": "${user_11}",
 				"bts_to": "any_account",
-				"quantity": "2.0000 PXBTS", 
+				"quantity": "2.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -1268,7 +1268,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_12}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -1282,7 +1282,7 @@
 			"args": {
 				"from": "${user_12}",
 				"bts_to": "any_account",
-				"quantity": "1.0000 PXBTS", 
+				"quantity": "1.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -1297,7 +1297,7 @@
 			"args": {
 				"from": "${user_11}",
 				"bts_to": "any_account",
-				"quantity": "6.0000 PXBTS", 
+				"quantity": "6.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -1312,7 +1312,7 @@
 			"args": {
 				"from": "${user_12}",
 				"bts_to": "any_account",
-				"quantity": "4.0000 PXBTS", 
+				"quantity": "4.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -1325,28 +1325,28 @@
 			"after_block": [{
 				"after_block": 15,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
 			}, {
 				"after_block": 35,
 				"resources":{
-				"balance": "4.0000 PXBTS", 
+				"balance": "4.0000 BTS", 
 				"net_weight": "100.0000 BEOS",
 				"cpu_weight": "100.0000 BEOS",
 				"ram_bytes": 1005448}
 			}, {
 				"after_block": 45,
 				"resources":{
-				"balance": "4.0000 PXBTS", 
+				"balance": "4.0000 BTS", 
 				"net_weight": "300.0000 BEOS",
 				"cpu_weight": "300.0000 BEOS",
 				"ram_bytes": 3005448}
 			}, {
 				"after_block": 70,
 				"resources":{
-				"balance": "8.0000 PXBTS", 
+				"balance": "8.0000 BTS", 
 				"net_weight": "300.0000 BEOS",
 				"cpu_weight": "300.0000 BEOS",
 				"ram_bytes": 3005448}
@@ -1363,7 +1363,7 @@
 			"after_block": [{
 				"after_block": 15,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
@@ -1405,7 +1405,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  40, [25, 30, 5, 2000000],
+				"new_params": ["0.0000 BTS",  40, [25, 30, 5, 2000000],
 					[25, 30, 5, 1000000],
 					[50, 60, 10, 200000]
 				]
@@ -1425,7 +1425,7 @@
 			"args": {
 				"from": "${user_13}",
 				"bts_to": "any_account",
-				"quantity": "1.0000 PXBTS", 
+				"quantity": "1.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -1441,7 +1441,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_13}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -1455,7 +1455,7 @@
 			"args": {
 				"from": "${user_13}",
 				"bts_to": "any_account",
-				"quantity": "1.0000 PXBTS", 
+				"quantity": "1.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -1470,7 +1470,7 @@
 			"args": {
 				"from": "${user_13}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", 
+				"quantity": "10.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -1485,7 +1485,7 @@
 			"args": {
 				"from": "${user_13}",
 				"bts_to": "any_account",
-				"quantity": "1.0000 PXBTS", 
+				"quantity": "1.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -1498,14 +1498,14 @@
 			"after_block": [{
 				"after_block": 20,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
 			}, {
 				"after_block": 35,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "200.0000 BEOS",
 				"cpu_weight": "200.0000 BEOS",
 				"ram_bytes": 2005448}
@@ -1526,7 +1526,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  40, [20, 60, 40, 4000000],
+				"new_params": ["0.0000 BTS",  40, [20, 60, 40, 4000000],
 					[40, 80, 40, 2000000],
 					[50, 60, 10, 200000]
 				]
@@ -1553,7 +1553,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_14}",
-				"quantity": "11.0000 PXBTS", "memo": ""
+				"quantity": "11.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -1567,7 +1567,7 @@
 			"args": {
 				"from": "${user_14}",
 				"bts_to": "any_account",
-				"quantity": "1.0000 PXBTS", 
+				"quantity": "1.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -1583,7 +1583,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_15}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -1597,7 +1597,7 @@
 			"args": {
 				"from": "${user_15}",
 				"bts_to": "any_account",
-				"quantity": "1.0000 PXBTS", 
+				"quantity": "1.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -1612,7 +1612,7 @@
 			"args": {
 				"from": "${user_14}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", 
+				"quantity": "10.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -1627,7 +1627,7 @@
 			"args": {
 				"from": "${user_15}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", 
+				"quantity": "10.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -1640,21 +1640,21 @@
 			"after_block": [{
 				"after_block": 15,
 				"resources":{
-				"balance": "11.0000 PXBTS", 
+				"balance": "11.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
 			}, {
 				"after_block": 35,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "200.0000 BEOS",
 				"cpu_weight": "200.0000 BEOS",
 				"ram_bytes": 5448}
 			}, {
 				"after_block": 85,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "300.0000 BEOS",
 				"cpu_weight": "300.0000 BEOS",
 				"ram_bytes": 2005448}
@@ -1678,14 +1678,14 @@
 			}, {
 				"after_block": 35,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
 			}, {
 				"after_block": 85,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "100.0000 BEOS",
 				"cpu_weight": "100.0000 BEOS",
 				"ram_bytes": 2005448}
@@ -1706,7 +1706,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  40, [20, 35, 15, 2000000],
+				"new_params": ["0.0000 BTS",  40, [20, 35, 15, 2000000],
 					[20, 35, 15, 1000000],
 					[50, 90, 10, 200000]
 				]
@@ -1733,7 +1733,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_21}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -1747,7 +1747,7 @@
 			"args": {
 				"from": "${user_21}",
 				"to": "${user_22}",
-				"quantity": "10.0000 PXBTS", 
+				"quantity": "10.0000 BTS", 
 				"memo": "any_memo"
 			},
 			"expected_result": {
@@ -1762,7 +1762,7 @@
 			"args": {
 				"from": "${user_22}",
 				"to": "${user_21}",
-				"quantity": "10.0000 PXBTS", 
+				"quantity": "10.0000 BTS", 
 				"memo": "any_memo"
 			},
 			"expected_result": {
@@ -1777,7 +1777,7 @@
 			"args": {
 				"from": "${user_22}",
 				"to": "${user_21}",
-				"quantity": "10.0000 PXBTS", 
+				"quantity": "10.0000 BTS", 
 				"memo": "any_memo"
 			},
 			"expected_result": {
@@ -1792,7 +1792,7 @@
 			"args": {
 				"from": "${user_21}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", 
+				"quantity": "10.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -1805,7 +1805,7 @@
 			"after_block": [{
 				"after_block": 15,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
@@ -1819,7 +1819,7 @@
 			}, {
 				"after_block": 45,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "100.0000 BEOS",
 				"cpu_weight": "100.0000 BEOS",
 				"ram_bytes": 1005448}
@@ -1843,7 +1843,7 @@
 			}, {
 				"after_block": 30,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
@@ -1871,7 +1871,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  10, [15, 20, 5, 2000000],
+				"new_params": ["0.0000 BTS",  10, [15, 20, 5, 2000000],
 					[15, 20, 5, 1000000],
 					[45, 50, 5, 1000000]
 				]
@@ -1906,7 +1906,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_16}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -1950,7 +1950,7 @@
 			"args": {
 				"from": "${user_16}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", 
+				"quantity": "10.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -1963,7 +1963,7 @@
 			"after_block": [{
 				"after_block": 21,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "200.0000 BEOS",
 				"cpu_weight": "200.0000 BEOS",
 				"ram_bytes": 2005448}
@@ -1984,7 +1984,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  10, [15, 20, 5, 2000000],
+				"new_params": ["0.0000 BTS",  10, [15, 20, 5, 2000000],
 					[15, 20, 5, 1000000],
 					[45, 50, 5, 1000000]
 				]
@@ -2029,7 +2029,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_18}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -2044,7 +2044,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_19}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -2129,7 +2129,7 @@
 			"args": {
 				"from": "${user_18}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", 
+				"quantity": "10.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -2144,7 +2144,7 @@
 			"args": {
 				"from": "${user_19}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", 
+				"quantity": "10.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -2157,7 +2157,7 @@
 			"after_block": [{
 				"after_block": 35,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "100.0000 BEOS",
 				"cpu_weight": "100.0000 BEOS",
 				"ram_bytes": 1005448}
@@ -2174,7 +2174,7 @@
 			"after_block": [{
 				"after_block": 35,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "100.0000 BEOS",
 				"cpu_weight": "100.0000 BEOS",
 				"ram_bytes": 1005448}
@@ -2212,7 +2212,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  40, [50, 60, 10, 8000000],
+				"new_params": ["0.0000 BTS",  40, [50, 60, 10, 8000000],
 					[50, 60, 5, 5000000],
 					[50, 90, 10, 200000]
 				]
@@ -2233,7 +2233,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_23}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -2254,7 +2254,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_24}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -2268,7 +2268,7 @@
 			"args": {
 				"from": "${user_23}",
 				"to": "${user_24}",
-				"quantity": "1.0000 PXBTS", 
+				"quantity": "1.0000 BTS", 
 				"memo": ""
 			},
 			"expected_result": {
@@ -2283,7 +2283,7 @@
 			"args": {
 				"from": "${user_23}",
 				"to": "${user_24}",
-				"quantity": "5.0000 PXBTS", 
+				"quantity": "5.0000 BTS", 
 				"memo": ""
 			},
 			"expected_result": {
@@ -2298,7 +2298,7 @@
 			"args": {
 				"from": "${user_23}",
 				"to": "${user_24}",
-				"quantity": "1.0000 PXBTS", 
+				"quantity": "1.0000 BTS", 
 				"memo": ""
 			},
 			"expected_result": {
@@ -2313,7 +2313,7 @@
 			"args": {
 				"from": "${user_24}",
 				"to": "${user_23}",
-				"quantity": "10.0000 PXBTS", 
+				"quantity": "10.0000 BTS", 
 				"memo": ""
 			},
 			"expected_result": {
@@ -2328,7 +2328,7 @@
 			"args": {
 				"from": "${user_23}",
 				"to": "${user_24}",
-				"quantity": "10.0000 PXBTS", 
+				"quantity": "10.0000 BTS", 
 				"memo": ""
 			},
 			"expected_result": {
@@ -2343,7 +2343,7 @@
 			"args": {
 				"from": "${user_24}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", 
+				"quantity": "10.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -2356,14 +2356,14 @@
 			"after_block": [{
 				"after_block": 40,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
 			}, {
 				"after_block": 50,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "200.0000 BEOS",
 				"cpu_weight": "200.0000 BEOS",
 				"ram_bytes": 2505448}
@@ -2391,7 +2391,7 @@
 			}, {
 				"after_block": 70,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "200.0000 BEOS",
 				"cpu_weight": "200.0000 BEOS",
 				"ram_bytes": 2505448}
@@ -2415,35 +2415,35 @@
 			"after_block": [{
 				"after_block": 40,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
 			}, {
 				"after_block": 50,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "200.0000 BEOS",
 				"cpu_weight": "200.0000 BEOS",
 				"ram_bytes": 2505448}
 			}, {
 				"after_block": 52,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "200.0000 BEOS",
 				"cpu_weight": "200.0000 BEOS",
 				"ram_bytes": 2505448}
 			}, {
 				"after_block": 54,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "200.0000 BEOS",
 				"cpu_weight": "200.0000 BEOS",
 				"ram_bytes": 7505448}
 			}, {
 				"after_block": 60,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "600.0000 BEOS",
 				"cpu_weight": "600.0000 BEOS",
 				"ram_bytes": 12505448}
@@ -2457,7 +2457,7 @@
 			}, {
 				"after_block": 80,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "600.0000 BEOS",
 				"cpu_weight": "600.0000 BEOS",
 				"ram_bytes": 12505448}
@@ -2478,7 +2478,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  140, [20, 25, 10, 1000000],
+				"new_params": ["0.0000 BTS",  140, [20, 25, 10, 1000000],
 					[20, 25, 10, 5000000],
 					[30, 40, 10, 200000]
 				]
@@ -2499,7 +2499,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_25}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -2513,7 +2513,7 @@
 			"args": {
 				"from": "${user_25}",
 				"bts_to": "any_account",
-				"quantity": "5.0000 PXBTS", 
+				"quantity": "5.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -2526,21 +2526,21 @@
 			"after_block": [{
 				"after_block": 20,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "50.0000 BEOS",
 				"cpu_weight": "50.0000 BEOS",
 				"ram_bytes": 5005448}
 			}, {
 				"after_block": 25,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "50.0000 BEOS",
 				"cpu_weight": "50.0000 BEOS",
 				"ram_bytes": 5005448}
 			}, {
 				"after_block": 30,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "50.0000 BEOS",
 				"cpu_weight": "50.0000 BEOS",
 				"ram_bytes": 5005448}
@@ -2561,7 +2561,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  20, [15, 25, 10, 1000000],
+				"new_params": ["0.0000 BTS",  20, [15, 25, 10, 1000000],
 					[15, 25, 10, 5000000],
 					[10090, 11000, 10, 200000]
 				]
@@ -2586,7 +2586,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_26}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -2610,7 +2610,7 @@
 			"args": {
 				"from": "${user_26}",
 				"to": "${user_26}",
-				"quantity": "5.0000 PXBTS", 
+				"quantity": "5.0000 BTS", 
 				"memo": ""
 			},
 			"expected_result": {
@@ -2625,7 +2625,7 @@
 			"args": {
 				"from": "${user_26}",
 				"to": "${user_27}",
-				"quantity": "5.0000 PXBTS", 
+				"quantity": "5.0000 BTS", 
 				"memo": ""
 			},
 			"expected_result": {
@@ -2640,7 +2640,7 @@
 			"args": {
 				"from": "${user_27}",
 				"to": "${user_26}",
-				"quantity": "5.0000 PXBTS", 
+				"quantity": "5.0000 BTS", 
 				"memo": ""
 			},
 			"expected_result": {
@@ -2655,7 +2655,7 @@
 			"args": {
 				"from": "${user_27}",
 				"to": "${user_27}",
-				"quantity": "5.0000 PXBTS", 
+				"quantity": "5.0000 BTS", 
 				"memo": ""
 			},
 			"expected_result": {
@@ -2670,7 +2670,7 @@
 			"args": {
 				"from": "${user_26}",
 				"bts_to": "any_account",
-				"quantity": "5.0000 PXBTS", 
+				"quantity": "5.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -2690,14 +2690,14 @@
 			}, {
 				"after_block": 18,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "50.0000 BEOS",
 				"cpu_weight": "50.0000 BEOS",
 				"ram_bytes": 5005448}
 			}, {
 				"after_block": 25,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "100.0000 BEOS",
 				"cpu_weight": "100.0000 BEOS",
 				"ram_bytes": 10005448}
@@ -2718,7 +2718,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  10, [15, 30, 5, 8000000],
+				"new_params": ["0.0000 BTS",  10, [15, 30, 5, 8000000],
 					[15, 30, 5, 5000000],
 					[100, 105, 5, 200000]
 				]
@@ -2739,7 +2739,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_28}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -2754,7 +2754,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_29}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -2769,7 +2769,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_28}",
-				"quantity": "0.0000 PXBTS", "memo": ""
+				"quantity": "0.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -2784,7 +2784,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_28}",
-				"quantity": "-1.0000 PXBTS", "memo": ""
+				"quantity": "-1.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -2799,7 +2799,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_29}",
-				"quantity": "-1.0000 PXBTS", "memo": ""
+				"quantity": "-1.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -2813,7 +2813,7 @@
 			"args": {
 				"from": "${user_28}",
 				"bts_to": "any_account",
-				"quantity": "-20.0000 PXBTS", 
+				"quantity": "-20.0000 BTS", 
 				"original_memo": "memo"
 			},
 			"expected_result": {
@@ -2828,7 +2828,7 @@
 			"args": {
 				"from": "${user_28}",
 				"bts_to": "any_account",
-				"quantity": "20.0000 PXBTS", 
+				"quantity": "20.0000 BTS", 
 				"original_memo": "memo"
 			},
 			"expected_result": {
@@ -2843,7 +2843,7 @@
 			"args": {
 				"from": "${user_28}",
 				"bts_to": "any_account",
-				"quantity": "5.0000 PXBTS", 
+				"quantity": "5.0000 BTS", 
 				"original_memo": "memo"
 			},
 			"expected_result": {
@@ -2856,21 +2856,21 @@
 			"after_block": [{
 				"after_block": 12,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
 			}, {
 				"after_block": 20,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "800.0000 BEOS",
 				"cpu_weight": "800.0000 BEOS",
 				"ram_bytes": 10005448}
 			}, {
 				"after_block": 32,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "1600.0000 BEOS",
 				"cpu_weight": "1600.0000 BEOS",
 				"ram_bytes": 20005448}
@@ -2891,7 +2891,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  10, [17, 21, 5, 8000000],
+				"new_params": ["0.0000 BTS",  10, [17, 21, 5, 8000000],
 					[15, 18, 5, 5000000],
 					[100, 105, 5, 200000]
 				]
@@ -2918,7 +2918,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_30}",
-				"quantity": "0.00001 PXBTS", "memo": ""
+				"quantity": "0.00001 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -2933,7 +2933,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_30}",
-				"quantity": "0.0001 PXBTS", "memo": ""
+				"quantity": "0.0001 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -2947,7 +2947,7 @@
 			"args": {
 				"from": "${user_30}",
 				"to": "${user_31}",
-				"quantity": "0.00001 PXBTS", 
+				"quantity": "0.00001 BTS", 
 				"memo": ""
 			},
 			"expected_result": {
@@ -2962,7 +2962,7 @@
 			"args": {
 				"from": "${user_30}",
 				"to": "${user_31}",
-				"quantity": "-0.00001 PXBTS", 
+				"quantity": "-0.00001 BTS", 
 				"memo": ""
 			},
 			"expected_result": {
@@ -2977,7 +2977,7 @@
 			"args": {
 				"from": "${user_30}",
 				"to": "${user_31}",
-				"quantity": "-0.00001 PXBTS", 
+				"quantity": "-0.00001 BTS", 
 				"memo": ""
 			},
 			"expected_result": {
@@ -2992,7 +2992,7 @@
 			"args": {
 				"from": "${user_30}",
 				"bts_to": "any_account",
-				"quantity": "0.0001 PXBTS", 
+				"quantity": "0.0001 BTS", 
 				"original_memo": "memo"
 			},
 			"expected_result": {
@@ -3005,7 +3005,7 @@
 			"after_block": [{
 				"after_block": 22,
 				"resources":{
-				"balance": "0.0001 PXBTS", 
+				"balance": "0.0001 BTS", 
 				"net_weight": "400.0000 BEOS",
 				"cpu_weight": "400.0000 BEOS",
 				"ram_bytes": 5005448}
@@ -3026,7 +3026,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  10, [15, 20, 5, 8000000],
+				"new_params": ["0.0000 BTS",  10, [15, 20, 5, 8000000],
 					[15, 20, 5, 5000000],
 					[100, 105, 5, 200000]
 				]
@@ -3053,7 +3053,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_33}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -3068,7 +3068,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_34}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -3225,7 +3225,7 @@
 			"args": {
 				"from": "${user_34}",
 				"to": "${user_33}",
-				"quantity": "6.0000 PXBTS", 
+				"quantity": "6.0000 BTS", 
 				"memo": "any_memo"
 			},
 			"expected_result": {
@@ -3240,7 +3240,7 @@
 			"args": {
 				"from": "${user_34}",
 				"to": "${user_33}",
-				"quantity": "5.0000 PXBTS", 
+				"quantity": "5.0000 BTS", 
 				"memo": "any_memo"
 			},
 			"expected_result": {
@@ -3269,7 +3269,7 @@
 			"args": {
 				"from": "${user_33}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", 
+				"quantity": "10.0000 BTS", 
 				"original_memo": "memo"
 			},
 			"expected_result": {
@@ -3282,7 +3282,7 @@
 			"after_block": [{
 				"after_block": 18,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "200.0000 BEOS",
 				"cpu_weight": "200.0000 BEOS",
 				"ram_bytes": 2505448}
@@ -3299,7 +3299,7 @@
 			"after_block": [{
 				"after_block": 18,
 				"resources":{
-				"balance": "5.0000 PXBTS", 
+				"balance": "5.0000 BTS", 
 				"net_weight": "200.0000 BEOS",
 				"cpu_weight": "200.0000 BEOS",
 				"ram_bytes": 2505448}
@@ -3320,7 +3320,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  1, [10, 20, 10, 8000000],
+				"new_params": ["0.0000 BTS",  1, [10, 20, 10, 8000000],
 					[10, 18, 4, 5000000],
 					[250, 290, 10, 200000]
 				]
@@ -3347,7 +3347,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_36}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -3362,7 +3362,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_37}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -3463,7 +3463,7 @@
 			"args": {
 				"from": "${user_36}",
 				"bts_to": "any_account",
-				"quantity": "5.0000 PXBTS", 
+				"quantity": "5.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -3478,7 +3478,7 @@
 			"args": {
 				"from": "${user_37}",
 				"bts_to": "any_account",
-				"quantity": "5.0000 PXBTS", 
+				"quantity": "5.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -3515,7 +3515,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  10, [25, 34, 5, 8000000],
+				"new_params": ["0.0000 BTS",  10, [25, 34, 5, 8000000],
 					[25, 34, 5, 5000000],
 					[90, 98, 10, 200000]
 				]
@@ -3547,7 +3547,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_38}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -3561,7 +3561,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_40}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -3575,7 +3575,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_38}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -3589,7 +3589,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_39}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -3603,7 +3603,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_38}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -3617,7 +3617,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_39}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -3646,7 +3646,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_38}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -3660,7 +3660,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_39}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -3674,7 +3674,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_38}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -3688,7 +3688,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_38}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -3702,7 +3702,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_39}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -3716,7 +3716,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_40}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -3730,7 +3730,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_40}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -3744,7 +3744,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_40}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -3758,7 +3758,7 @@
 			"args": {
 				"from": "${user_38}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			}
 		}, {
 			"start_block": 100,
@@ -3768,7 +3768,7 @@
 			"args": {
 				"from": "${user_40}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			}
 		}],
 		"expected_results": [{
@@ -3776,42 +3776,42 @@
 			"after_block": [{
 				"after_block": 8,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
 			}, {
 				"after_block": 13,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
 			}, {
 				"after_block": 23,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
 			}, {
 				"after_block": 63,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "400.0000 BEOS",
 				"cpu_weight": "400.0000 BEOS",
 				"ram_bytes": 5005448}
 			}, {
 				"after_block": 73,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "400.0000 BEOS",
 				"cpu_weight": "400.0000 BEOS",
 				"ram_bytes": 5005448}
 			}, {
 				"after_block": 78,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "400.0000 BEOS",
 				"cpu_weight": "400.0000 BEOS",
 				"ram_bytes": 5005448}
@@ -3873,21 +3873,21 @@
 			"after_block": [{
 				"after_block": 88,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "400.0000 BEOS",
 				"cpu_weight": "400.0000 BEOS",
 				"ram_bytes": 5005448}
 			}, {
 				"after_block": 93,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "400.0000 BEOS",
 				"cpu_weight": "400.0000 BEOS",
 				"ram_bytes": 5005448}
 			}, {
 				"after_block": 98,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "400.0000 BEOS",
 				"cpu_weight": "400.0000 BEOS",
 				"ram_bytes": 5005448}
@@ -3908,7 +3908,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  10, [25, 34, 5, 8000000],
+				"new_params": ["0.0000 BTS",  10, [25, 34, 5, 8000000],
 					[25, 34, 5, 5000000],
 					[90, 98, 10, 200000]
 				]
@@ -3940,7 +3940,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_41}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -3954,7 +3954,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_43}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -3968,7 +3968,7 @@
 			"args": {
 				"from": "${user_41}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -3982,7 +3982,7 @@
 			"args": {
 				"from": "${user_42}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -3996,7 +3996,7 @@
 			"args": {
 				"from": "${user_41}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -4010,7 +4010,7 @@
 			"args": {
 				"from": "${user_42}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -4039,7 +4039,7 @@
 			"args": {
 				"from": "${user_42}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -4053,7 +4053,7 @@
 			"args": {
 				"from": "${user_41}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -4067,7 +4067,7 @@
 			"args": {
 				"from": "${user_41}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -4081,7 +4081,7 @@
 			"args": {
 				"from": "${user_42}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -4095,7 +4095,7 @@
 			"args": {
 				"from": "${user_43}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -4109,7 +4109,7 @@
 			"args": {
 				"from": "${user_43}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": false,
@@ -4123,7 +4123,7 @@
 			"args": {
 				"from": "${user_41}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			}
 		}, {
 			"start_block": 100,
@@ -4133,7 +4133,7 @@
 			"args": {
 				"from": "${user_43}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			}
 		}],
 		"expected_results": [{
@@ -4141,35 +4141,35 @@
 			"after_block": [{
 				"after_block": 8,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
 			}, {
 				"after_block": 13,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
 			}, {
 				"after_block": 23,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
 			}, {
 				"after_block": 68,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "400.0000 BEOS",
 				"cpu_weight": "400.0000 BEOS",
 				"ram_bytes": 5005448}
 			}, {
 				"after_block": 73,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "400.0000 BEOS",
 				"cpu_weight": "400.0000 BEOS",
 				"ram_bytes": 5005448}
@@ -4231,21 +4231,21 @@
 			"after_block": [{
 				"after_block": 8,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "0.0000 BEOS",
 				"cpu_weight": "0.0000 BEOS",
 				"ram_bytes": 5448}
 			}, {
 				"after_block": 83,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "400.0000 BEOS",
 				"cpu_weight": "400.0000 BEOS",
 				"ram_bytes": 5005448}
 			}, {
 				"after_block": 88,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "400.0000 BEOS",
 				"cpu_weight": "400.0000 BEOS",
 				"ram_bytes": 5005448}
@@ -4266,7 +4266,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  10, [10, 15, 5, 4000000],
+				"new_params": ["0.0000 BTS",  10, [10, 15, 5, 4000000],
 					[10, 15, 5, 2000000],
 					[10, 30, 10, 2000000]
 				]
@@ -4301,7 +4301,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_44}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -4316,7 +4316,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_45}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -4370,7 +4370,7 @@
 			"args": {
 				"from": "${user_44}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", 
+				"quantity": "10.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -4385,7 +4385,7 @@
 			"args": {
 				"from": "${user_45}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", 
+				"quantity": "10.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -4398,7 +4398,7 @@
 			"after_block": [{
 				"after_block": 16,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "200.0000 BEOS",
 				"cpu_weight": "200.0000 BEOS",
 				"ram_bytes": 2005448}
@@ -4415,7 +4415,7 @@
 			"after_block": [{
 				"after_block": 16,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "200.0000 BEOS",
 				"cpu_weight": "200.0000 BEOS",
 				"ram_bytes": 2005448}
@@ -4436,7 +4436,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  10, [10, 11, 5, 2000000],
+				"new_params": ["0.0000 BTS",  10, [10, 11, 5, 2000000],
 					[15, 25, 5, 1000000],
 					[10, 30, 10, 2000000]
 				]
@@ -4461,7 +4461,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_46}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -4569,7 +4569,7 @@
 			"args": {
 				"from": "${user_46}",
 				"bts_to": "any_account",
-				"quantity": "10.0000 PXBTS", 
+				"quantity": "10.0000 BTS", 
 				"original_memo": "any_memo"
 			},
 			"expected_result": {
@@ -4582,7 +4582,7 @@
 			"after_block": [{
 				"after_block": 27,
 				"resources":{
-				"balance": "10.0000 PXBTS", 
+				"balance": "10.0000 BTS", 
 				"net_weight": "100.0000 BEOS",
 				"cpu_weight": "100.0000 BEOS",
 				"ram_bytes": 3005448}
@@ -4603,7 +4603,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  1, [10, 30, 5, 8000000],
+				"new_params": ["0.0000 BTS",  1, [10, 30, 5, 8000000],
 					[10, 20, 5, 5000000],
 					[250, 290, 10, 200000]
 				]
@@ -4623,7 +4623,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_47}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -4652,7 +4652,7 @@
 			"args": {
 				"from": "${user_47}",
 				"bts_to": "any_account",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			}
 		}],
 		"expected_results": [{
@@ -4674,7 +4674,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  1, [10, 30, 5, 8000000],
+				"new_params": ["0.0000 BTS",  1, [10, 30, 5, 8000000],
 					[10, 20, 5, 5000000],
 					[250, 290, 10, 200000]
 				]
@@ -4694,7 +4694,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_48}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -4752,7 +4752,7 @@
 			"args": {
 				"from": "${user_48}",
 				"bts_to": "any_account",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			}
 		}],
 		"expected_results": [{
@@ -4774,7 +4774,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  1, [10, 30, 5, 8000000],
+				"new_params": ["0.0000 BTS",  1, [10, 30, 5, 8000000],
 					[10, 20, 5, 5000000],
 					[250, 290, 10, 200000]
 				]
@@ -4800,7 +4800,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_50}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -4814,7 +4814,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_49}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -4843,7 +4843,7 @@
 			"args": {
 				"from": "${user_49}",
 				"bts_to": "any_account",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			}
 		}, {
 			"start_block": 37,
@@ -4853,7 +4853,7 @@
 			"args": {
 				"from": "${user_50}",
 				"bts_to": "any_account",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			}
 		}],
 		"expected_results": [{
@@ -4885,7 +4885,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  1, [10, 30, 5, 8000000],
+				"new_params": ["0.0000 BTS",  1, [10, 30, 5, 8000000],
 					[10, 20, 5, 5000000],
 					[250, 290, 10, 200000]
 				]
@@ -4911,7 +4911,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_51}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -4925,7 +4925,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_52}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -4997,7 +4997,7 @@
 			"args": {
 				"from": "${user_51}",
 				"bts_to": "any_account",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			}
 		}, {
 			"start_block": 37,
@@ -5007,7 +5007,7 @@
 			"args": {
 				"from": "${user_52}",
 				"bts_to": "any_account",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			}
 		}],
 		"expected_results": [{
@@ -5039,7 +5039,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  80, [20, 140, 40, 40000000], [20, 140, 40, 20000000], [10, 30, 10, 2000000]]
+				"new_params": ["0.0000 BTS",  80, [20, 140, 40, 40000000], [20, 140, 40, 20000000], [10, 30, 10, 2000000]]
 			}
 		},
 		"actions": [{
@@ -5121,7 +5121,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_j1}",
-				"quantity": "30.0000 PXBTS", "memo": ""
+				"quantity": "30.0000 BTS", "memo": ""
 			},
 			"expected_result": {"status":true, "message":""}
 		},{
@@ -5133,7 +5133,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_j2}",
-				"quantity": "15.0000 PXBTS", "memo": ""
+				"quantity": "15.0000 BTS", "memo": ""
 			},
 			"expected_result": {"status":true, "message":""}
 		},{
@@ -5145,7 +5145,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_j3}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {"status":true, "message":""}
 		},{
@@ -5157,7 +5157,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_j4}",
-				"quantity": "10.0000 PXBTS", "memo": ""
+				"quantity": "10.0000 BTS", "memo": ""
 			},
 			"expected_result": {"status":true, "message":""}
 		},{
@@ -5169,7 +5169,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_j5}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {"status":true, "message":""}
 		},{
@@ -5181,7 +5181,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_j6}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {"status":true, "message":""}
 		},{
@@ -5193,7 +5193,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_j7}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {"status":true, "message":""}
 		},{
@@ -5205,7 +5205,7 @@
 				"memo":"",
 				"from": "beos.gateway",
 				"to": "${user_j8}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {"status":true, "message":""}
 		},{
@@ -5228,7 +5228,7 @@
 		"args": {
 			"from": "beos.gateway",
 			"to": "${user_j2}",
-			"quantity": "5.0000 PXBTS", "memo": ""
+			"quantity": "5.0000 BTS", "memo": ""
 		},
 		"expected_result": {"status":true, "message":""}
 	},{
@@ -5239,7 +5239,7 @@
 		"args": {
 			"from": "beos.gateway",
 			"to": "${user_j5}",
-			"quantity": "5.0000 PXBTS", "memo": ""
+			"quantity": "5.0000 BTS", "memo": ""
 		},
 		"expected_result": {"status":true, "message":""}
 	},{
@@ -5250,7 +5250,7 @@
 		"args": {
 			"from": "beos.gateway",
 			"to": "${user_j9}",
-			"quantity": "5.0000 PXBTS", "memo": ""
+			"quantity": "5.0000 BTS", "memo": ""
 		},
 		"expected_result": {"status":true, "message":""}
 	},{
@@ -5261,7 +5261,7 @@
 		"args": {
 			"from": "${user_j3}",
 			"to": "${user_j10}",
-			"quantity": "5.0000 PXBTS", 
+			"quantity": "5.0000 BTS", 
 			"memo":"Free muunies"
 		},
 		"expected_result": {"status":false,"message":"transaction net usage is too high: 144 > 0"}
@@ -5318,7 +5318,7 @@
 		"args": {
 			"from": "beos.gateway",
 			"to": "${user_j1}",
-			"quantity": "30.0000 PXBTS", "memo": ""
+			"quantity": "30.0000 BTS", "memo": ""
 		},
 		"expected_result": {"status":true, "message":""}
 	},{
@@ -5329,7 +5329,7 @@
 		"args": {
 			"from": "beos.gateway",
 			"to": "${user_j3}",
-			"quantity": "10.0000 PXBTS", "memo": ""
+			"quantity": "10.0000 BTS", "memo": ""
 		},
 		"expected_result": {"status":true, "message":""}
 	},{
@@ -5340,7 +5340,7 @@
 		"args": {
 			"from": "beos.gateway",
 			"to": "${user_j7}",
-			"quantity": "15.0000 PXBTS", "memo": ""
+			"quantity": "15.0000 BTS", "memo": ""
 		},
 		"expected_result": {"status":true, "message":""}
 	},{
@@ -5351,7 +5351,7 @@
 		"args": {
 			"from": "beos.gateway",
 			"to": "${user_j10}",
-			"quantity": "5.0000 PXBTS", "memo": ""
+			"quantity": "5.0000 BTS", "memo": ""
 		},
 		"expected_result": {"status":true, "message":""}
 	},{
@@ -5362,7 +5362,7 @@
 		"args": {
 			"from": "beos.gateway",
 			"to": "${user_j11}",
-			"quantity": "40.0000 PXBTS", "memo": ""
+			"quantity": "40.0000 BTS", "memo": ""
 		},
 		"expected_result": {"status":true, "message":""}
 	},{
@@ -5373,7 +5373,7 @@
 		"args": {
 			"from": "${user_j4}",
 			"to": "${user_j6}",
-			"quantity": "10.0000 PXBTS", 
+			"quantity": "10.0000 BTS", 
 			"memo":"From 4 to 6"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -5410,7 +5410,7 @@
 		"args": {
 			"from": "${user_j5}",
 			"to": "${user_j11}",
-			"quantity": "30.0000 PXBTS", 
+			"quantity": "30.0000 BTS", 
 			"memo":"From 5 to 11"
 		},
 		"expected_result": {"status":false, "message":"overdrawn balance"}
@@ -5422,7 +5422,7 @@
 		"args": {
 			"from": "${user_j2}",
 			"to": "${user_j3}",
-			"quantity": "5.0000 PXBTS", 
+			"quantity": "5.0000 BTS", 
 			"memo":"From 2 to 3"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -5434,7 +5434,7 @@
 		"args": {
 			"from": "${user_j3}",
 			"to": "${user_j2}",
-			"quantity": "5.0000 PXBTS", 
+			"quantity": "5.0000 BTS", 
 			"memo":"From 3 to 2"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -5446,7 +5446,7 @@
 		"args": {
 			"from": "${user_j9}",
 			"to": "${user_j8}",
-			"quantity": "5.0000 PXBTS", 
+			"quantity": "5.0000 BTS", 
 			"memo":"From 9 to 8"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -5507,7 +5507,7 @@
 		"args": {
 			"from": "${user_j6}",
 			"bts_to": "any_account",
-			"quantity": "15.0000 PXBTS", 
+			"quantity": "15.0000 BTS", 
 			"original_memo": "any_memo"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -5519,7 +5519,7 @@
 		"args": {
 			"from": "beos.gateway",
 			"to": "${user_j10}",
-			"quantity": "45.0000 PXBTS", "memo": ""
+			"quantity": "45.0000 BTS", "memo": ""
 		},
 		"expected_result": {"status":true, "message":""}
 	},{
@@ -5530,7 +5530,7 @@
 		"args": {
 			"from": "beos.gateway",
 			"to": "${user_j1}",
-			"quantity": "40.0000 PXBTS", "memo": ""
+			"quantity": "40.0000 BTS", "memo": ""
 		},
 		"expected_result": {"status":true, "message":""}
 	},{
@@ -5541,7 +5541,7 @@
 		"args": {
 			"from": "beos.gateway",
 			"to": "${user_j2}",
-			"quantity": "10.0000 PXBTS", "memo": ""
+			"quantity": "10.0000 BTS", "memo": ""
 		},
 		"expected_result": {"status":true, "message":""}
 	},{
@@ -5552,7 +5552,7 @@
 		"args": {
 			"from": "beos.gateway",
 			"to": "${user_j11}",
-			"quantity": "40.0000 PXBTS", "memo": ""
+			"quantity": "40.0000 BTS", "memo": ""
 		},
 		"expected_result": {"status":true, "message":""}
 	},{
@@ -5563,7 +5563,7 @@
 		"args": {
 			"from": "beos.gateway",
 			"to": "${user_j12}",
-			"quantity": "10.0000 PXBTS", "memo": ""
+			"quantity": "10.0000 BTS", "memo": ""
 		},
 		"expected_result": {"status":true, "message":""}
 	},{
@@ -5574,7 +5574,7 @@
 		"args": {
 			"from": "beos.gateway",
 			"to": "${user_j14}",
-			"quantity": "20.0000 PXBTS", "memo": ""
+			"quantity": "20.0000 BTS", "memo": ""
 		},
 		"expected_result": {"status":true, "message":""}
 	},{
@@ -5585,7 +5585,7 @@
 		"args": {
 			"from": "beos.gateway",
 			"to": "${user_j15}",
-			"quantity": "10.0000 PXBTS", "memo": ""
+			"quantity": "10.0000 BTS", "memo": ""
 		},
 		"expected_result": {"status":true, "message":""}
 	},{
@@ -5596,7 +5596,7 @@
 		"args": {
 			"from": "beos.gateway",
 			"to": "${user_j16}",
-			"quantity": "10.0000 PXBTS", "memo": ""
+			"quantity": "10.0000 BTS", "memo": ""
 		},
 		"expected_result": {"status":true, "message":""}
 	},{
@@ -5607,7 +5607,7 @@
 		"args": {
 			"from": "beos.gateway",
 			"to": "${user_j17}",
-			"quantity": "10.0000 PXBTS", "memo": ""
+			"quantity": "10.0000 BTS", "memo": ""
 		},
 		"expected_result": {"status":true, "message":""}
 	},{
@@ -5618,7 +5618,7 @@
 		"args": {
 			"from": "beos.gateway",
 			"to": "${user_j18}",
-			"quantity": "10.0000 PXBTS", "memo": ""
+			"quantity": "10.0000 BTS", "memo": ""
 		},
 		"expected_result": {"status":true, "message":""}
 	},{
@@ -5629,7 +5629,7 @@
 		"args": {
 			"from": "beos.gateway",
 			"to": "${user_j19}",
-			"quantity": "10.0000 PXBTS", "memo": ""
+			"quantity": "10.0000 BTS", "memo": ""
 		},
 		"expected_result": {"status":true, "message":""}
 	},{
@@ -5640,7 +5640,7 @@
 		"args": {
 			"from": "${user_j5}",
 			"to": "${user_j19}",
-			"quantity": "10.0000 PXBTS", 
+			"quantity": "10.0000 BTS", 
 			"memo":"From 5 to 19"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -5652,7 +5652,7 @@
 		"args": {
 			"from": "${user_j3}",
 			"to": "${user_j11}",
-			"quantity": "10.0000 PXBTS", 
+			"quantity": "10.0000 BTS", 
 			"memo":"From 5 to 11"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -5664,7 +5664,7 @@
 		"args": {
 			"from": "${user_j7}",
 			"to": "${user_j11}",
-			"quantity": "10.0000 PXBTS", 
+			"quantity": "10.0000 BTS", 
 			"memo":"From 7 to 11"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -5805,7 +5805,7 @@
 		"args": {
 			"from": "${user_j2}",
 			"bts_to": "any_account",
-			"quantity": "30.0000 PXBTS", 
+			"quantity": "30.0000 BTS", 
 			"original_memo": "any_memo"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -5817,7 +5817,7 @@
 		"args": {
 			"from": "${user_j3}",
 			"bts_to": "any_account",
-			"quantity": "10.0000 PXBTS", 
+			"quantity": "10.0000 BTS", 
 			"original_memo": "any_memo"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -5829,7 +5829,7 @@
 		"args": {
 			"from": "${user_j7}",
 			"bts_to": "any_account",
-			"quantity": "10.0000 PXBTS", 
+			"quantity": "10.0000 BTS", 
 			"original_memo": "any_memo"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -5841,7 +5841,7 @@
 		"args": {
 			"from": "${user_j8}",
 			"bts_to": "any_account",
-			"quantity": "10.0000 PXBTS", 
+			"quantity": "10.0000 BTS", 
 			"original_memo": "any_memo"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -5853,7 +5853,7 @@
 		"args": {
 			"from": "${user_j10}",
 			"bts_to": "any_account",
-			"quantity": "30.0000 PXBTS", 
+			"quantity": "30.0000 BTS", 
 			"original_memo": "any_memo"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -5865,7 +5865,7 @@
 		"args": {
 			"from": "${user_j11}",
 			"bts_to": "any_account",
-			"quantity": "100.0000 PXBTS", 
+			"quantity": "100.0000 BTS", 
 			"original_memo": "any_memo"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -5877,7 +5877,7 @@
 		"args": {
 			"from": "${user_j14}",
 			"bts_to": "any_account",
-			"quantity": "10.0000 PXBTS", 
+			"quantity": "10.0000 BTS", 
 			"original_memo": "any_memo"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -5957,7 +5957,7 @@
 		"args": {
 			"from": "${user_j19}",
 			"to": "${user_j12}",
-			"quantity": "20.0000 PXBTS", 
+			"quantity": "20.0000 BTS", 
 			"memo":"From 19 to 12"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -5969,7 +5969,7 @@
 		"args": {
 			"from": "${user_j10}",
 			"to": "${user_j1}",
-			"quantity": "10.0000 PXBTS", 
+			"quantity": "10.0000 BTS", 
 			"memo":"From 10 to 1"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -5981,7 +5981,7 @@
 		"args": {
 			"from": "${user_j1}",
 			"bts_to": "any_account",
-			"quantity": "110.0000 PXBTS", 
+			"quantity": "110.0000 BTS", 
 			"original_memo": "any_memo"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -5993,7 +5993,7 @@
 		"args": {
 			"from": "${user_j10}",
 			"bts_to": "any_account",
-			"quantity": "10.0000 PXBTS", 
+			"quantity": "10.0000 BTS", 
 			"original_memo": "any_memo"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -6005,7 +6005,7 @@
 		"args": {
 			"from": "${user_j12}",
 			"bts_to": "any_account",
-			"quantity": "30.0000 PXBTS", 
+			"quantity": "30.0000 BTS", 
 			"original_memo": "any_memo"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -6017,7 +6017,7 @@
 		"args": {
 			"from": "${user_j14}",
 			"bts_to": "any_account",
-			"quantity": "10.0000 PXBTS", 
+			"quantity": "10.0000 BTS", 
 			"original_memo": "any_memo"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -6029,7 +6029,7 @@
 		"args": {
 			"from": "${user_j15}",
 			"bts_to": "any_account",
-			"quantity": "10.0000 PXBTS", 
+			"quantity": "10.0000 BTS", 
 			"original_memo": "any_memo"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -6041,7 +6041,7 @@
 		"args": {
 			"from": "${user_j16}",
 			"bts_to": "any_account",
-			"quantity": "10.0000 PXBTS", 
+			"quantity": "10.0000 BTS", 
 			"original_memo": "any_memo"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -6053,7 +6053,7 @@
 		"args": {
 			"from": "${user_j17}",
 			"bts_to": "any_account",
-			"quantity": "10.0000 PXBTS", 
+			"quantity": "10.0000 BTS", 
 			"original_memo": "any_memo"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -6065,7 +6065,7 @@
 		"args": {
 			"from": "${user_j18}",
 			"bts_to": "any_account",
-			"quantity": "10.0000 PXBTS", 
+			"quantity": "10.0000 BTS", 
 			"original_memo": "any_memo"
 		},
 		"expected_result": {"status":true, "message":""}
@@ -6076,7 +6076,7 @@
 				"after_block":[{
 					"after_block":23,
 					"resources": {
-						"balance": "30.0000 PXBTS", 
+						"balance": "30.0000 BTS", 
 						"net_weight": "600.0000 BEOS",
 						"cpu_weight": "600.0000 BEOS",
 						"ram_bytes" : 6005448
@@ -6084,7 +6084,7 @@
 				},{
 					"after_block":55,
 					"resources": {
-						"balance": "60.0000 PXBTS", 
+						"balance": "60.0000 BTS", 
 						"net_weight": "600.0000 BEOS",
 						"cpu_weight": "600.0000 BEOS",
 						"ram_bytes" : 6005448
@@ -6092,7 +6092,7 @@
 				},{
 					"after_block":90,
 					"resources": {
-						"balance": "100.0000 PXBTS", 
+						"balance": "100.0000 BTS", 
 						"net_weight": "1200.0000 BEOS",
 						"cpu_weight": "1200.0000 BEOS",
 						"ram_bytes" : 12005448
@@ -6100,7 +6100,7 @@
 				},{
 					"after_block":130,
 					"resources": {
-						"balance": "110.0000 PXBTS", 
+						"balance": "110.0000 BTS", 
 						"net_weight": "1700.0000 BEOS",
 						"cpu_weight": "1700.0000 BEOS",
 						"ram_bytes" : 17005448
@@ -6119,7 +6119,7 @@
 				"after_block":[{
 					"after_block":23,
 					"resources": {
-						"balance": "20.0000 PXBTS", 
+						"balance": "20.0000 BTS", 
 						"net_weight": "400.0000 BEOS",
 						"cpu_weight": "400.0000 BEOS",
 						"ram_bytes" : 4005448
@@ -6127,7 +6127,7 @@
 				},{
 					"after_block":55,
 					"resources": {
-						"balance": "20.0000 PXBTS", 
+						"balance": "20.0000 BTS", 
 						"net_weight": "400.0000 BEOS",
 						"cpu_weight": "400.0000 BEOS",
 						"ram_bytes" : 4005448	
@@ -6135,7 +6135,7 @@
 				},{
 					"after_block":90,
 					"resources": {
-						"balance": "30.0000 PXBTS", 
+						"balance": "30.0000 BTS", 
 						"net_weight": "600.0000 BEOS",
 						"cpu_weight": "600.0000 BEOS",
 						"ram_bytes" : 6005448
@@ -6162,7 +6162,7 @@
 				"after_block":[{
 					"after_block":23,
 					"resources": {
-						"balance": "10.0000 PXBTS", 
+						"balance": "10.0000 BTS", 
 						"net_weight": "200.0000 BEOS",
 						"cpu_weight": "200.0000 BEOS",
 						"ram_bytes" : 2005448
@@ -6170,7 +6170,7 @@
 				},{
 					"after_block":55,
 					"resources": {
-						"balance": "20.0000 PXBTS", 
+						"balance": "20.0000 BTS", 
 						"net_weight": "200.0000 BEOS",
 						"cpu_weight": "200.0000 BEOS",
 						"ram_bytes" : 2005448
@@ -6178,7 +6178,7 @@
 				},{
 					"after_block":90,
 					"resources": {
-						"balance": "10.0000 PXBTS", 
+						"balance": "10.0000 BTS", 
 						"net_weight": "400.0000 BEOS",
 						"cpu_weight": "400.0000 BEOS",
 						"ram_bytes" : 4005448
@@ -6205,7 +6205,7 @@
 				"after_block":[{
 					"after_block":23,
 					"resources": {
-						"balance": "10.0000 PXBTS", 
+						"balance": "10.0000 BTS", 
 						"net_weight": "200.0000 BEOS",
 						"cpu_weight": "200.0000 BEOS",
 						"ram_bytes" : 2005448
@@ -6248,7 +6248,7 @@
 				"after_block":[{
 					"after_block":23,
 					"resources": {
-						"balance": "10.0000 PXBTS", 
+						"balance": "10.0000 BTS", 
 						"net_weight": "200.0000 BEOS",
 						"cpu_weight": "200.0000 BEOS",
 						"ram_bytes" : 2005448
@@ -6256,7 +6256,7 @@
 				},{
 					"after_block":55,
 					"resources": {
-						"balance": "10.0000 PXBTS", 
+						"balance": "10.0000 BTS", 
 						"net_weight": "200.0000 BEOS",
 						"cpu_weight": "200.0000 BEOS",
 						"ram_bytes" : 2005448
@@ -6291,7 +6291,7 @@
 				"after_block":[{
 					"after_block":23,
 					"resources": {
-						"balance": "5.0000 PXBTS", 
+						"balance": "5.0000 BTS", 
 						"net_weight": "100.0000 BEOS",
 						"cpu_weight": "100.0000 BEOS",
 						"ram_bytes" : 1005448	
@@ -6299,7 +6299,7 @@
 				},{
 					"after_block":55,
 					"resources": {
-						"balance": "15.0000 PXBTS", 
+						"balance": "15.0000 BTS", 
 						"net_weight": "100.0000 BEOS",
 						"cpu_weight": "100.0000 BEOS",
 						"ram_bytes" : 1005448	
@@ -6334,7 +6334,7 @@
 				"after_block":[{
 					"after_block":23,
 					"resources": {
-						"balance": "5.0000 PXBTS", 
+						"balance": "5.0000 BTS", 
 						"net_weight": "100.0000 BEOS",
 						"cpu_weight": "100.0000 BEOS",
 						"ram_bytes" : 1005448
@@ -6342,7 +6342,7 @@
 				},{
 					"after_block":55,
 					"resources": {
-						"balance": "20.0000 PXBTS", 
+						"balance": "20.0000 BTS", 
 						"net_weight": "100.0000 BEOS",
 						"cpu_weight": "100.0000 BEOS",
 						"ram_bytes" : 1005448
@@ -6350,7 +6350,7 @@
 				},{
 					"after_block":90,
 					"resources": {
-						"balance": "10.0000 PXBTS", 
+						"balance": "10.0000 BTS", 
 						"net_weight": "300.0000 BEOS",
 						"cpu_weight": "300.0000 BEOS",
 						"ram_bytes" : 3005448
@@ -6377,7 +6377,7 @@
 				"after_block":[{
 					"after_block":23,
 					"resources": {
-						"balance": "5.0000 PXBTS", 
+						"balance": "5.0000 BTS", 
 						"net_weight": "100.0000 BEOS",
 						"cpu_weight": "100.0000 BEOS",
 						"ram_bytes" : 1005448
@@ -6385,7 +6385,7 @@
 				},{
 					"after_block":55,
 					"resources": {
-						"balance": "10.0000 PXBTS", 
+						"balance": "10.0000 BTS", 
 						"net_weight": "100.0000 BEOS",
 						"cpu_weight": "100.0000 BEOS",
 						"ram_bytes" : 1005448							
@@ -6393,7 +6393,7 @@
 				},{
 					"after_block":90,
 					"resources": {
-						"balance": "10.0000 PXBTS", 
+						"balance": "10.0000 BTS", 
 						"net_weight": "200.0000 BEOS",
 						"cpu_weight": "200.0000 BEOS",
 						"ram_bytes" : 2005448
@@ -6420,7 +6420,7 @@
 				"after_block":[{
 					"after_block":23,
 					"resources": {
-						"balance": "5.0000 PXBTS", 
+						"balance": "5.0000 BTS", 
 						"net_weight": "100.0000 BEOS",
 						"cpu_weight": "100.0000 BEOS",
 						"ram_bytes" : 1005448
@@ -6471,7 +6471,7 @@
 				},{
 					"after_block":55,
 					"resources": {
-						"balance": "5.0000 PXBTS", 
+						"balance": "5.0000 BTS", 
 						"net_weight": "0.0000 BEOS",
 						"cpu_weight": "0.0000 BEOS",
 						"ram_bytes" : 5448	
@@ -6479,7 +6479,7 @@
 				},{
 					"after_block":90,
 					"resources": {
-						"balance": "50.0000 PXBTS", 
+						"balance": "50.0000 BTS", 
 						"net_weight": "50.0000 BEOS",
 						"cpu_weight": "50.0000 BEOS",
 						"ram_bytes" : 505448
@@ -6487,7 +6487,7 @@
 				},{
 					"after_block":130,
 					"resources": {
-						"balance": "10.0000 PXBTS", 
+						"balance": "10.0000 BTS", 
 						"net_weight": "300.0000 BEOS",
 						"cpu_weight": "300.0000 BEOS",
 						"ram_bytes" : 3005448
@@ -6506,7 +6506,7 @@
 				"after_block":[{
 					"after_block":55,
 					"resources": {
-						"balance": "40.0000 PXBTS", 
+						"balance": "40.0000 BTS", 
 						"net_weight": "0.0000 BEOS",
 						"cpu_weight": "0.0000 BEOS",
 						"ram_bytes" : 5448
@@ -6514,7 +6514,7 @@
 				},{
 					"after_block":90,
 					"resources": {
-						"balance": "100.0000 PXBTS", 
+						"balance": "100.0000 BTS", 
 						"net_weight": "400.0000 BEOS",
 						"cpu_weight": "400.0000 BEOS",
 						"ram_bytes" : 4005448
@@ -6550,7 +6550,7 @@
 				},{
 					"after_block":90,
 					"resources": {
-						"balance": "10.0000 PXBTS", 
+						"balance": "10.0000 BTS", 
 						"net_weight": "0.0000 BEOS",
 						"cpu_weight": "0.0000 BEOS",
 						"ram_bytes" : 5448
@@ -6558,7 +6558,7 @@
 				},{
 					"after_block":130,
 					"resources": {
-						"balance": "30.0000 PXBTS", 
+						"balance": "30.0000 BTS", 
 						"net_weight": "50.0000 BEOS",
 						"cpu_weight": "50.0000 BEOS",
 						"ram_bytes" : 505448
@@ -6612,7 +6612,7 @@
 				"after_block":[{
 					"after_block":90,
 					"resources": {
-						"balance": "20.0000 PXBTS", 
+						"balance": "20.0000 BTS", 
 						"net_weight": "0.0000 BEOS",
 						"cpu_weight": "0.0000 BEOS",
 						"ram_bytes" : 5448
@@ -6620,7 +6620,7 @@
 				},{
 					"after_block":130,
 					"resources": {
-						"balance": "10.0000 PXBTS", 
+						"balance": "10.0000 BTS", 
 						"net_weight": "100.0000 BEOS",
 						"cpu_weight": "100.0000 BEOS",
 						"ram_bytes" : 1005448
@@ -6639,7 +6639,7 @@
 				"after_block":[{
 					"after_block":90,
 					"resources": {
-						"balance": "10.0000 PXBTS", 
+						"balance": "10.0000 BTS", 
 						"net_weight": "0.0000 BEOS",
 						"cpu_weight": "0.0000 BEOS",
 						"ram_bytes" : 5448
@@ -6647,7 +6647,7 @@
 				},{
 					"after_block":130,
 					"resources": {
-						"balance": "10.0000 PXBTS", 
+						"balance": "10.0000 BTS", 
 						"net_weight": "50.0000 BEOS",
 						"cpu_weight": "50.0000 BEOS",
 						"ram_bytes" : 505448
@@ -6666,7 +6666,7 @@
 				"after_block":[{
 					"after_block":90,
 					"resources": {
-						"balance": "10.0000 PXBTS", 
+						"balance": "10.0000 BTS", 
 						"net_weight": "0.0000 BEOS",
 						"cpu_weight": "0.0000 BEOS",
 						"ram_bytes" : 5448
@@ -6674,7 +6674,7 @@
 				},{
 					"after_block":130,
 					"resources": {
-						"balance": "10.0000 PXBTS", 
+						"balance": "10.0000 BTS", 
 						"net_weight": "50.0000 BEOS",
 						"cpu_weight": "50.0000 BEOS",
 						"ram_bytes" : 505448
@@ -6693,7 +6693,7 @@
 				"after_block":[{
 					"after_block":90,
 					"resources": {
-						"balance": "10.0000 PXBTS", 
+						"balance": "10.0000 BTS", 
 						"net_weight": "0.0000 BEOS",
 						"cpu_weight": "0.0000 BEOS",
 						"ram_bytes" : 5448
@@ -6701,7 +6701,7 @@
 				},{
 					"after_block":130,
 					"resources": {
-						"balance": "10.0000 PXBTS", 
+						"balance": "10.0000 BTS", 
 						"net_weight": "50.0000 BEOS",
 						"cpu_weight": "50.0000 BEOS",
 						"ram_bytes" : 505448
@@ -6720,7 +6720,7 @@
 				"after_block":[{
 					"after_block":90,
 					"resources": {
-						"balance": "10.0000 PXBTS", 
+						"balance": "10.0000 BTS", 
 						"net_weight": "0.0000 BEOS",
 						"cpu_weight": "0.0000 BEOS",
 						"ram_bytes" : 5448
@@ -6728,7 +6728,7 @@
 				},{
 					"after_block":130,
 					"resources": {
-						"balance": "10.0000 PXBTS", 
+						"balance": "10.0000 BTS", 
 						"net_weight": "50.0000 BEOS",
 						"cpu_weight": "50.0000 BEOS",
 						"ram_bytes" : 505448
@@ -6747,7 +6747,7 @@
 				"after_block":[{
 					"after_block":90,
 					"resources": {
-						"balance": "20.0000 PXBTS", 
+						"balance": "20.0000 BTS", 
 						"net_weight": "0.0000 BEOS",
 						"cpu_weight": "0.0000 BEOS",
 						"ram_bytes" : 5448
@@ -6806,7 +6806,7 @@
 			"code": "beos.init",
 			"action": "changeparams",
 			"args": {
-				"new_params": ["0.0000 PXBTS",  20, [10, 20, 10, 8000000],[10, 20, 10, 5000000],[250, 290, 10, 200000]]
+				"new_params": ["0.0000 BTS",  20, [10, 20, 10, 8000000],[10, 20, 10, 5000000],[250, 290, 10, 200000]]
 			}
 		},
 		"actions": [{
@@ -6835,7 +6835,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_53}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {"status": true,	"message": ""}
 		}, {
@@ -6846,7 +6846,7 @@
 			"args": {
 				"memo":"",
 				"to": "${user_55}",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {"status": true,	"message": ""}
 		}, {
@@ -7015,7 +7015,7 @@
 			"args": {
 				"from": "${user_53}",
 				"bts_to": "any_account",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,
@@ -7029,7 +7029,7 @@
 			"args": {
 				"from": "${user_55}",
 				"bts_to": "any_account",
-				"quantity": "5.0000 PXBTS", "memo": ""
+				"quantity": "5.0000 BTS", "memo": ""
 			},
 			"expected_result": {
 				"status": true,

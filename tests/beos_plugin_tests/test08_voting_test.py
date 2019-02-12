@@ -74,7 +74,7 @@ def changeParams( block ) :
 
   print(colors.BLUE + "===== Setting change params =====")
 
-  params_str = '[ [ [ %i, %i, %i, %i, 1000000 ],[ 10000000, 10000000, 10000005, 20, 0 ], ["0.0000 PXBTS"], 10000 ] ]' % ( start, start, end, interval )
+  params_str = '[ [ [ %i, %i, %i, %i, 1000000 ],[ 10000000, 10000000, 10000005, 20, 0 ], ["0.0000 BTS"], 10000 ] ]' % ( start, start, end, interval )
   run(args.cleos +' --url http://%s:%s push action beos.distrib changeparams \'%s\' -p beos.distrib ' % (args.nodeos_ip, args.nodeos_port, params_str ) )
 
   return start, end
@@ -124,7 +124,7 @@ def validateAccount(_name, _isValid):
     return True
 
 def validateBalance(_user):
-  data = {"code": "eosio.token", "account": _user, "symbol": "PXBTS"}
+  data = {"code": "eosio.token", "account": _user, "symbol": "BTS"}
   res = askServer(data, 'chain/get_currency_balance')
   return res
 
@@ -187,7 +187,7 @@ def createAccount():
 def giveIssue():
   number = random.randint(0, len(users_without_balance) - 1)
   user = users_without_balance[number]
-  amount = "5.0000 PXBTS"
+  amount = "5.0000 BTS"
 
   print(colors.BLUE + "===== Giving issue to account: %s =====" % ( user ) + colors.ENDC)
 

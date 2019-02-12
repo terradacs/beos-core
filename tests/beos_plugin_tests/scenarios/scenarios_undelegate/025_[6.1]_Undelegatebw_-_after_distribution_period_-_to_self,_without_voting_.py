@@ -14,10 +14,10 @@ from beos_test_utils.beos_utils_pack import init, ActionResult, ResourceResult, 
 if __name__ == "__main__":
 	try:
 		node, summary, args, log = init(__file__)
-		accounts = node.create_accounts(1, "5.0000 PXBTS")
+		accounts = node.create_accounts(1, "5.0000 BTS")
 		node.run_node()	
 		#Changeparams
-		#node.changeparams(["0.0000 PXBTS"], 1, [10,0,30,5,8000000], [10,0,20,5,5000000], 3000000)
+		#node.changeparams(["0.0000 BTS"], 1, [10,0,30,5,8000000], [10,0,20,5,5000000], 3000000)
 		newparams = {
 			"beos" : {
 				"starting_block" : 10,
@@ -33,7 +33,7 @@ if __name__ == "__main__":
 				"block_interval" : 5, 
 				"trustee_reward" : 5000000 
 			},
-			"proxy_assets" : [ "0.0000 PXBTS"],
+			"proxy_assets" : [ "0.0000 BTS"],
 			"ram_leftover" : 3000000,
 			"starting_block_for_initial_witness_election":1
 		}
@@ -42,7 +42,7 @@ if __name__ == "__main__":
 		#Actions
 		node.wait_till_block(32)
 		summary.action_status(node.undelegatebw(_from=accounts[0].name,_receiver=accounts[0].name,_unstake_net_quantity="1.0000 BEOS",_unstake_cpu_quantity="1.0000 BEOS"), ActionResult(False, "") )
-		summary.action_status(node.withdraw(_from=accounts[0].name,_bts_to="any_account",_quantity="5.0000 PXBTS",_memo="") )
+		summary.action_status(node.withdraw(_from=accounts[0].name,_bts_to="any_account",_quantity="5.0000 BTS",_memo="") )
 		
 		#At end
 		summary.user_block_status(node, accounts[0].name, ResourceResult(_balance="",_net_weight="1835608015.6896 BEOS",_cpu_weight="1835608015.6900 BEOS",_ram_bytes=31992305448))

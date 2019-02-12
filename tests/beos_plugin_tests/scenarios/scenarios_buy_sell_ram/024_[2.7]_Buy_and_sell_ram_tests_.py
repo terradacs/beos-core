@@ -14,11 +14,11 @@ from beos_test_utils.beos_utils_pack import init, ActionResult, ResourceResult, 
 if __name__ == "__main__":
 	try:
 		node, summary, args, log = init(__file__)
-		accounts = node.create_accounts(1, "10.0000 PXBTS")
+		accounts = node.create_accounts(1, "10.0000 BTS")
 		node.run_node()
 		
 		#Changeparams
-		#node.changeparams(["0.0000 PXBTS"], 10, [10,0,11,5,2000000], [15,0,25,5,1000000], 3000000)
+		#node.changeparams(["0.0000 BTS"], 10, [10,0,11,5,2000000], [15,0,25,5,1000000], 3000000)
 		newparams = {
 			"beos" : {
 				"starting_block" : 10,
@@ -34,7 +34,7 @@ if __name__ == "__main__":
 				"block_interval" : 5, 
 				"trustee_reward" : 1000000 
 			},
-			"proxy_assets" : [ "0.0000 PXBTS"],
+			"proxy_assets" : [ "0.0000 BTS"],
 			"ram_leftover" : 3000000,
 			"starting_block_for_initial_witness_election":10
 		}
@@ -46,13 +46,13 @@ if __name__ == "__main__":
 		node.wait_till_block(20)
 		summary.action_status(node.sellram(_account=accounts[0].name,_bytes="1000000"), ActionResult(False, "RAM shouldn't be liquid during distribution period") )
 		node.wait_till_block(27)
-		summary.user_block_status(node, accounts[0].name, ResourceResult(_balance="10.0000 PXBTS",_net_weight="1835608315.6898 BEOS",_cpu_weight="1835608315.6898 BEOS",_ram_bytes=31996305448))
+		summary.user_block_status(node, accounts[0].name, ResourceResult(_balance="10.0000 BTS",_net_weight="1835608315.6898 BEOS",_cpu_weight="1835608315.6898 BEOS",_ram_bytes=31996305448))
 		summary.action_status(node.sellram(_account=accounts[0].name,_bytes="2000000") )
 		summary.action_status(node.buyrambytes(_payer=accounts[0].name,_receiver=accounts[0].name,_bytes="8000000"), ActionResult(False, "overdrawn balance") )
 		summary.action_status(node.sellram(_account=accounts[0].name,_bytes="100000000") )
 		summary.action_status(node.buyrambytes(_payer=accounts[0].name,_receiver=accounts[0].name,_bytes="1000000") )
 		summary.action_status(node.buyrambytes(_payer=accounts[0].name,_receiver=accounts[0].name,_bytes="2000000") )
-		summary.action_status(node.withdraw(_from=accounts[0].name,_bts_to="any_account",_quantity="10.0000 PXBTS",_memo="_memo") )
+		summary.action_status(node.withdraw(_from=accounts[0].name,_bts_to="any_account",_quantity="10.0000 BTS",_memo="_memo") )
 		
 		#At end
 		summary.user_block_status(node, accounts[0].name, ResourceResult(_balance="",_net_weight="1835608315.6898 BEOS",_cpu_weight="1835608315.6898 BEOS",_ram_bytes=31897305448))

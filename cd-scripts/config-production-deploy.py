@@ -230,7 +230,7 @@ DISTRIBUTION_PARAMS = {
     "block_interval" : 1 * 600,
     "trustee_reward" : 0 # no ram for trustee as reward
   },
-  "proxy_assets" : [ "0.0000 PXBTS", "0.0000 PXBRNP" ],
+  "proxy_assets" : [ "0.0000 BTS", "0.0000 BROWNIE" ],
   "ram_leftover" : DISTRIB_RAM_LEFTOVER,
 }
 
@@ -238,15 +238,15 @@ GATEWAY_PARAMS = {
   "proxy_assets" :
   [
      {
-        "proxy_asset" : "10000000000.0000 PXBTS", # maximum amount that will ever be allowed to be issued (must cover all BTS)
+        "proxy_asset" : "10000000000.0000 BTS", # maximum amount that will ever be allowed to be issued (must cover all BTS)
         "description" : "bts"
      },
      {
-        "proxy_asset" : "10000000000.0000 PXBRNP", # maximum amount that will ever be allowed to be issued (must cover all Brownie.PTS)
+        "proxy_asset" : "10000000000.0000 BROWNIE", # maximum amount that will ever be allowed to be issued (must cover all Brownie.PTS)
         "description" : "brownie.pts"
      },
      {
-        "proxy_asset" : "10000000000.0000 PXEOS", # maximum amount that will ever be allowed to be issued (must cover all EOS)
+        "proxy_asset" : "10000000000.0000 EOS", # maximum amount that will ever be allowed to be issued (must cover all EOS)
         "description" : "eos"
      }
   ]

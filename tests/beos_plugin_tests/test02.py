@@ -270,7 +270,7 @@ parser.add_argument('--contracts-dir', metavar='', help="Path to contracts direc
 parser.add_argument('--nodes-dir', metavar='', help="Path to nodes directory", default='./nodes/')
 parser.add_argument('--genesis', metavar='', help="Path to genesis.json", default="./genesis.json")
 parser.add_argument('--wallet-dir', metavar='', help="Path to wallet directory", default='./wallet/')
-parser.add_argument('--symbol', metavar='', help="The eosio.system symbol", default='PXBTS')
+parser.add_argument('--symbol', metavar='', help="The eosio.system symbol", default='BTS')
 parser.add_argument('--symbol-core', metavar='', help="The eosio.system symbol-core", default='BEOS')
 parser.add_argument('--port', metavar='', help="Port", default='8888')
 parser.add_argument('--beos-config', metavar='', help="Config file for BEOS system", default='beos.config.ini')

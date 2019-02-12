@@ -14,7 +14,7 @@ from beos_test_utils.beos_utils_pack import init, ActionResult, ResourceResult, 
 if __name__ == "__main__":
 	try:
 		node, summary, args, log = init(__file__)
-		accounts = node.create_accounts(2,"20.0000 PXBTS")
+		accounts = node.create_accounts(2,"20.0000 BTS")
 		node.run_node()	
 		#Changeparams
 		newparams = {
@@ -32,19 +32,19 @@ if __name__ == "__main__":
 				"block_interval" : 4, 
 				"trustee_reward" : 5000000 
 			},
-			"proxy_assets" : [ "0.0000 PXBTS"],
+			"proxy_assets" : [ "0.0000 BTS"],
 			"ram_leftover" : 3000000,
 			"starting_block_for_initial_witness_election":410
 		}
 
 		node.changeparams(newparams)
-		#node.changeparams(["0.0000 PXBTS"], 410, [1000,0,1001,10,8000000], [1000,0,1001,4,5000000], 3000000)
+		#node.changeparams(["0.0000 BTS"], 410, [1000,0,1001,10,8000000], [1000,0,1001,4,5000000], 3000000)
 		
 		#Actions
 		
 		#At end
-		summary.user_block_status(node, accounts[0].name, ResourceResult(_balance="20.0000 PXBTS",_net_weight="0.0000 BEOS",_cpu_weight="0.0000 BEOS",_ram_bytes=5448))
-		summary.user_block_status(node, accounts[1].name, ResourceResult(_balance="20.0000 PXBTS",_net_weight="0.0000 BEOS",_cpu_weight="0.0000 BEOS",_ram_bytes=5448))
+		summary.user_block_status(node, accounts[0].name, ResourceResult(_balance="20.0000 BTS",_net_weight="0.0000 BEOS",_cpu_weight="0.0000 BEOS",_ram_bytes=5448))
+		summary.user_block_status(node, accounts[1].name, ResourceResult(_balance="20.0000 BTS",_net_weight="0.0000 BEOS",_cpu_weight="0.0000 BEOS",_ram_bytes=5448))
 	except Exception as _ex:
 		log.exception("Exception `{0}` occures while executing `{1}` tests.".format(str(_ex), __file__))
 	finally:

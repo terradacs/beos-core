@@ -14,7 +14,7 @@ from beos_test_utils.beos_utils_pack import init, ActionResult, ResourceResult, 
 if __name__ == "__main__":
 	try:
 		node, summary, args, log = init(__file__)
-		accounts = node.create_accounts(1, "5.0000 PXBTS")
+		accounts = node.create_accounts(1, "5.0000 BTS")
 		tester = accounts[0].name
 
 		node.run_node()
@@ -34,7 +34,7 @@ if __name__ == "__main__":
 				"block_interval" : 4, 
 				"trustee_reward" : 0 
 			},
-			"proxy_assets" : [ "0.0000 PXBTS"],
+			"proxy_assets" : [ "0.0000 BTS"],
 			"ram_leftover" : 300000,
 			"starting_block_for_initial_witness_election":10
 		}
@@ -42,16 +42,16 @@ if __name__ == "__main__":
 		node.changeparams(newparams)
 		
 		#Actions
-		summary.user_block_status(node, tester, ResourceResult(_balance="5.0000 PXBTS",_net_weight="0.0000 BEOS",_cpu_weight="0.0000 BEOS",_ram_bytes=5448))
+		summary.user_block_status(node, tester, ResourceResult(_balance="5.0000 BTS",_net_weight="0.0000 BEOS",_cpu_weight="0.0000 BEOS",_ram_bytes=5448))
 		node.wait_till_block(11)
-		summary.user_block_status(node, tester, ResourceResult(_balance="5.0000 PXBTS",_net_weight="367121673.1379 BEOS",_cpu_weight="367121673.1380 BEOS",_ram_bytes=10666672114))
+		summary.user_block_status(node, tester, ResourceResult(_balance="5.0000 BTS",_net_weight="367121673.1379 BEOS",_cpu_weight="367121673.1380 BEOS",_ram_bytes=10666672114))
 		node.wait_till_block(16)
-		summary.user_block_status(node, tester, ResourceResult(_balance="5.0000 PXBTS",_net_weight="734243346.2758 BEOS",_cpu_weight="734243346.2760 BEOS",_ram_bytes=21333338781))
+		summary.user_block_status(node, tester, ResourceResult(_balance="5.0000 BTS",_net_weight="734243346.2758 BEOS",_cpu_weight="734243346.2760 BEOS",_ram_bytes=21333338781))
 		node.wait_till_block(21)
-		summary.user_block_status(node, tester, ResourceResult(_balance="5.0000 PXBTS",_net_weight="1101365019.4137 BEOS",_cpu_weight="1101365019.4140 BEOS",_ram_bytes=32000005448))
+		summary.user_block_status(node, tester, ResourceResult(_balance="5.0000 BTS",_net_weight="1101365019.4137 BEOS",_cpu_weight="1101365019.4140 BEOS",_ram_bytes=32000005448))
 		
 		#At end
-		summary.user_block_status(node, tester, ResourceResult(_balance="5.0000 PXBTS",_net_weight="1101365019.4137 BEOS",_cpu_weight="1101365019.4140 BEOS",_ram_bytes=32000005448))
+		summary.user_block_status(node, tester, ResourceResult(_balance="5.0000 BTS",_net_weight="1101365019.4137 BEOS",_cpu_weight="1101365019.4140 BEOS",_ram_bytes=32000005448))
 	except Exception as _ex:
 		log.exception("Exception `{0}` occures while executing `{1}` tests.".format(str(_ex), __file__))
 	finally:
