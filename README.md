@@ -1,8 +1,12 @@
-# EOSIO - The Most Powerful Infrastructure for Decentralized Applications
+# BitShares EOS (BEOS) - Business-Oriented Smart Contract Platform
+Copyright 2019 TERRADACS LTD, all rights reserved.
+BEOS Software is a derivative work of the EOSIO software copyrighted by TERRADACS LTD.
+Usage of this software requires a license from TERRADACS LTD.
 
 [![Build status](https://badge.buildkite.com/370fe5c79410f7d695e4e34c500b4e86e3ac021c6b1f739e20.svg?branch=master)](https://buildkite.com/EOSIO/eosio)
 
-Welcome to the EOSIO source code repository! This software enables businesses to rapidly build and deploy high-performance and high-security blockchain-based applications.
+Welcome to the BEOS source code repository! This software enables businesses to rapidly build and deploy high-performance and high-security blockchain-based applications.
+BEOS is a fork of the EOSIO source code.
 
 Some of the groundbreaking features of EOSIO include:
 
