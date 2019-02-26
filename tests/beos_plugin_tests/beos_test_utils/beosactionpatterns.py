@@ -156,6 +156,16 @@ class RegproducerAction(ActionBase):
             }
         }
 
+class UnregprodAction(ActionBase):
+    def __init__(self, _producer, _authorized_by = None, _code = None):
+        self.action = {
+            "code": _code if _code else "eosio",
+            "action": "unregprod",
+            "authorized_by": _authorized_by if _authorized_by else _producer,
+            "args": {
+                    "producer": _producer
+            }
+        }
 
 class SellramAction(ActionBase):
     def __init__(self, _account, _bytes, _authorized_by = None, _code = None):
