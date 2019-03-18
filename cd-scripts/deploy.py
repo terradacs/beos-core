@@ -379,6 +379,8 @@ def initialize_beos():
 
         eosio_actions.set_contract("eosio.token", config.CONTRACTS_DIR + "/eosio.token", "eosio.token")
 
+        eosio_actions.set_contract("eosio.msig", config.CONTRACTS_DIR + "/eosio.msig", "eosio.msig")
+
         eosio_actions.push_action("eosio.token", "create", '[ "eosio", "{0}"]'.format(config.CORE_TOTAL_SUPPLY), "eosio.token")
         for asset in config.GATEWAY_PARAMS["proxy_assets"]:
             eosio_actions.push_action("eosio.token", "create", '[ "beos.gateway", "{0}"]'.format(asset["proxy_asset"]), "eosio.token")
