@@ -210,19 +210,19 @@ endif()
 message( STATUS "Using '${CORE_SYMBOL_NAME}' as CORE symbol name" )
 
 if ("${EOSIO_ROOT_KEY}" STREQUAL "")
-   set(EOSIO_ROOT_KEY "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV")
+  set(EOSIO_ROOT_KEY "EOS7dZz5ZM1GRRvpZisYV5dDp7LnmzeBooXrtHWgm6RD1YQP1YDJS")
 endif()
 
 message( STATUS "Using '${EOSIO_ROOT_KEY}' as public key for 'eosio' account" )
 
 if ("${GATEWAY_ROOT_KEY}" STREQUAL "")
-   message(FATAL_ERROR "GATEWAY_ROOT_KEY must be specified")
+  set(GATEWAY_ROOT_KEY "EOS7XNXYgECD7ewQ2xdL1DSsgLZiXf5DcisU24VukPK5iR5zSJV7B")
 endif()
 
 message( STATUS "Using '${GATEWAY_ROOT_KEY}' as public key for 'beos.gateway' account" )
 
 if ("${DISTRIBUTION_ROOT_KEY}" STREQUAL "")
-   message(FATAL_ERROR "DISTRIBUTION_ROOT_KEY must be specified")
+  set(DISTRIBUTION_ROOT_KEY "EOS6rBAw2VNCi3tP5GfpZm1Bp1xtT2jeY5pzpRNCTfLS4x16eGVo1")
 endif()
 
 message( STATUS "Using '${DISTRIBUTION_ROOT_KEY}' as public key for 'beos.distrib' account" )
@@ -259,19 +259,19 @@ install(FILES ${CMAKE_BINARY_DIR}/modules/eosio-config.cmake DESTINATION ${CMAKE
 configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/EosioTester.cmake.in ${CMAKE_BINARY_DIR}/modules/EosioTester.cmake @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/modules/EosioTester.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/eosio)
 
-configure_file(${CMAKE_SOURCE_DIR}/LICENSE 
+configure_file(${CMAKE_SOURCE_DIR}/LICENSE
                ${CMAKE_BINARY_DIR}/licenses/eosio/LICENSE COPYONLY)
-configure_file(${CMAKE_SOURCE_DIR}/libraries/wabt/LICENSE 
+configure_file(${CMAKE_SOURCE_DIR}/libraries/wabt/LICENSE
                ${CMAKE_BINARY_DIR}/licenses/eosio/LICENSE.wabt COPYONLY)
-configure_file(${CMAKE_SOURCE_DIR}/libraries/softfloat/COPYING.txt 
+configure_file(${CMAKE_SOURCE_DIR}/libraries/softfloat/COPYING.txt
                ${CMAKE_BINARY_DIR}/licenses/eosio/LICENSE.softfloat COPYONLY)
-configure_file(${CMAKE_SOURCE_DIR}/libraries/wasm-jit/LICENSE 
+configure_file(${CMAKE_SOURCE_DIR}/libraries/wasm-jit/LICENSE
                ${CMAKE_BINARY_DIR}/licenses/eosio/LICENSE.wavm COPYONLY)
-configure_file(${CMAKE_SOURCE_DIR}/libraries/fc/secp256k1/upstream/COPYING 
+configure_file(${CMAKE_SOURCE_DIR}/libraries/fc/secp256k1/upstream/COPYING
                ${CMAKE_BINARY_DIR}/licenses/eosio/LICENSE.secp256k1 COPYONLY)
-configure_file(${CMAKE_SOURCE_DIR}/libraries/fc/src/network/LICENSE.go 
+configure_file(${CMAKE_SOURCE_DIR}/libraries/fc/src/network/LICENSE.go
                ${CMAKE_BINARY_DIR}/licenses/eosio/LICENSE.go COPYONLY)
-configure_file(${CMAKE_SOURCE_DIR}/externals/binaryen/LICENSE 
+configure_file(${CMAKE_SOURCE_DIR}/externals/binaryen/LICENSE
                ${CMAKE_BINARY_DIR}/licenses/eosio/LICENSE.binaryen COPYONLY)
 
 install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/eosio/)
@@ -290,11 +290,11 @@ if ("${STARTING_BLOCK_FOR_INITIAL_WITNESS_ELECTION}" STREQUAL "")
 endif()
 
 if ("${DISTRIBUTION_PARAMS}" STREQUAL "")
-    message(FATAL_ERROR "missing distribution parameter settings - define DISTRIBUTION_PARAMS json argument for changeparams")
+  #message(FATAL_ERROR "missing distribution parameter settings - define DISTRIBUTION_PARAMS json argument for changeparams")
 endif()
 
 if ("${GATEWAY_PARAMS}" STREQUAL "")
-    message(FATAL_ERROR "missing gateway parameter settings - define GATEWAY_PARAMS json argument for changeparams")
+  #message(FATAL_ERROR "missing gateway parameter settings - define GATEWAY_PARAMS json argument for changeparams")
 endif()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/contracts/eosio.init/eosio.init.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/contracts/eosio.init/eosio.init.hpp)
