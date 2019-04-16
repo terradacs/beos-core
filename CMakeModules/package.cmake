@@ -1,8 +1,8 @@
-set(VENDOR "block.one")
-set(PROJECT_NAME "eosio")
-set(DESC "Software for the EOS.IO network")
-set(URL "https://github.com/eosio/eos")
-set(EMAIL "support@block.one")
+set(VENDOR "TerraDacs")
+set(PROJECT_NAME "beos-core")
+set(DESC "Software for the BEOS network")
+set(URL "https://github.com/terradacs/beos-core")
+set(EMAIL "info@terradacs.com")
 
 configure_file(${CMAKE_SOURCE_DIR}/scripts/generate_package.sh.in ${CMAKE_BINARY_DIR}/packages/generate_package.sh @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/generate_bottle.sh ${CMAKE_BINARY_DIR}/packages/generate_bottle.sh COPYONLY)
