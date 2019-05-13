@@ -41,6 +41,8 @@ add_library( eosio_chain
               voting_performance.cpp
               table_helper.cpp
 
+              jurisdiction_objects.cpp
+
              webassembly/wavm.cpp
              webassembly/wabt.cpp
 

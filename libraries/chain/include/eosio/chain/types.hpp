@@ -193,8 +193,7 @@ namespace eosio { namespace chain {
    using int128_t            = __int128;
    using uint128_t           = unsigned __int128;
    using bytes               = vector<char>;
-
-
+   using code_jurisdiction   = uint16_t;
    /**
     *  Extentions are prefixed with type and are a buffer that can be
     *  interpreted by code that is aware and ignored by unaware code.
