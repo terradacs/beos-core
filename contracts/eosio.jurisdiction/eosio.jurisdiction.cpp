@@ -37,24 +37,6 @@ namespace eosio {
       auto _found_producer = _producers.find( producer );
       eosio_assert( _found_producer == _producers.end(), "user is not a producer" );
 
-      auto found = producer_jurisdictions.find( producer );
-
-      if( found == producer_jurisdictions.end() )
-      {
-         producer_jurisdictions.emplace( producer, [&]( auto& obj )
-         {
-            obj.producer = producer;
-            obj.jurisdictions = new_jurisdictions;
-         } );
-      }
-      else
-      {
-         producer_jurisdictions.modify( found, 0, [&]( auto& obj )
-         {
-            obj.jurisdictions = new_jurisdictions;
-         } );
-      }
-
       constexpr size_t max_stack_buffer_size = 512;
       size_t size = action_data_size();
       char* buffer = (char*)( max_stack_buffer_size < size ? malloc(size) : alloca(size) );

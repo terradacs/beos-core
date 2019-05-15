@@ -13,13 +13,6 @@
         {"name":"name",         "type":"string"}
       ]
     },{
-      "name": "producer_jurisdiction",
-      "base": "",
-      "fields": [
-        {"name":"producer",         "type":"account_name"},
-        {"name":"jurisdictions",         "type":"code_jurisdiction[]"}
-      ]
-    },{
       "name": "addjurisdict",
       "base": "",
       "fields": [
@@ -49,12 +42,6 @@
   "tables": [{
       "name": "infojurisdic",
       "type": "info_jurisdiction",
-      "index_type": "i64",
-      "key_names": [ "owner" ],
-      "key_types": [ "uint64" ]
-    },{
-      "name": "prodjurisdic",
-      "type": "producer_jurisdiction",
       "index_type": "i64",
       "key_names": [ "owner" ],
       "key_types": [ "uint64" ]
