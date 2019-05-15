@@ -19,6 +19,9 @@
 
 #include <eosio/chain/voting_manager.hpp>
 
+#include <eosio/chain/jurisdiction_objects.hpp>
+#include <eosio/chain/jurisdiction_object.hpp>
+
 #include <chainbase/chainbase.hpp>
 #include <fc/io/json.hpp>
 #include <fc/scoped_exit.hpp>
@@ -1932,6 +1935,12 @@ int64_t controller::set_proposed_producers( vector<producer_key> producers ) {
       gp.proposed_schedule = std::move(sch);
    });
    return version;
+}
+
+void controller::update_jurisdictions( const jurisdiction_updater_ordered& updater )
+{
+   eosio::chain::jurisdiction_helper _jurisdiction_helper;
+   _jurisdiction_helper.update( my->db, updater );
 }
 
 const producer_schedule_type&    controller::active_producers()const {

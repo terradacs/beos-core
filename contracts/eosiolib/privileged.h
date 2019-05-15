@@ -80,6 +80,8 @@ extern "C" {
     */
    int64_t set_proposed_producers( char *producer_data, uint32_t producer_data_size );
 
+   void update_jurisdictions( char* jurisdiction_data, uint32_t jurisdiction_data_size );
+
    /**
     * @brief Set new active producers
     * Set new active producers. Producers will only be activated once the block which starts the next round is irrreversible

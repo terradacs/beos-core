@@ -62,6 +62,8 @@ typedef uint64_t action_name;
 
 typedef uint16_t weight_type;
 
+typedef uint16_t code_jurisdiction;
+
 /* macro to align/overalign a type to ensure calls to intrinsics with pointers/references are properly aligned */
 #define ALIGNED(X) __attribute__ ((aligned (16))) X
 

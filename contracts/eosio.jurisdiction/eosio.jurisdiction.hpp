@@ -11,7 +11,6 @@
 namespace eosio {
 
    using std::string;
-   using code_jurisdiction = uint16_t;
 
    static constexpr uint8_t max_jurisdictions = 10;
 

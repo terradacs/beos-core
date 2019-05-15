@@ -1,6 +1,8 @@
 
 #include <eosio/chain/jurisdiction_objects.hpp>
 
+#include <eosio/chain/jurisdiction_object.hpp>
+
 namespace eosio { namespace chain {
 
 /*=============================trx_extensions_visitor=============================*/
@@ -15,9 +17,9 @@ void trx_extensions_visitor::operator()( const trx_jurisdiction& _trx_jurisdicti
    jurisdiction = fc::raw::unpack< trx_jurisdiction >( _buffer );
 }
 
-/*=============================jurisdiction_reader=============================*/
+/*=============================jurisdiction_helper=============================*/
 
-void jurisdiction_reader::read( uint16_t idx, const std::vector< char>& buffer )
+void jurisdiction_helper::read( uint16_t idx, const std::vector< char>& buffer )
 {
    eosio::chain::trx_extensions ext;
    ext.set_which( idx );
@@ -28,7 +30,7 @@ void jurisdiction_reader::read( uint16_t idx, const std::vector< char>& buffer )
    jurisdictions.emplace_back( visitor.jurisdiction );
 }
 
-bool jurisdiction_reader::read( const extensions_type& exts )
+bool jurisdiction_helper::read( const extensions_type& exts )
 {
    try
    {
@@ -45,9 +47,58 @@ bool jurisdiction_reader::read( const extensions_type& exts )
    return true;
 }
 
-const std::vector< trx_jurisdiction >& jurisdiction_reader::get_jurisdictions() const
+const std::vector< trx_jurisdiction >& jurisdiction_helper::get_jurisdictions() const
 {
    return jurisdictions;
+}
+
+bool jurisdiction_helper::update( chainbase::database& db, const jurisdiction_updater_ordered& updater )
+{
+   try
+   {
+      auto& idx = db.get_mutable_index< jurisdiction_index >();
+      const auto& idx_by = db.get_index< jurisdiction_index, by_producer_jurisdiction >();
+
+      auto itr_state = idx_by.lower_bound( std::make_tuple( updater.producer, std::numeric_limits< code_jurisdiction >::min() ) );
+      auto itr_src = updater.jurisdictions.begin();
+
+      while( itr_src != updater.jurisdictions.end() )
+      {
+         if( itr_state == idx_by.end() || itr_state->producer != updater.producer )
+         {
+            db.create< jurisdiction_object >( [&]( auto& obj ) {
+               obj.producer = updater.producer;
+               obj.jurisdiction = *itr_src;
+            });
+            ++itr_src;
+         }
+         else if( itr_state->jurisdiction == *itr_src )
+         {
+            ++itr_state;
+            ++itr_src;
+         }
+         else
+         {
+            if( itr_state->jurisdiction < *itr_src )
+               itr_state = idx. template erase< by_producer_jurisdiction >( itr_state );
+            else
+            {
+               db.create< jurisdiction_object >( [&]( auto& obj ) {
+                  obj.producer = updater.producer;
+                  obj.jurisdiction = *itr_src;
+               });
+               ++itr_src;
+            }
+         }
+         
+      }
+   }
+   catch( ... )
+   {
+      return false;
+   }
+
+   return true;
 }
 
 } } // eosio::chain

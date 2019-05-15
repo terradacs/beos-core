@@ -1,6 +1,8 @@
 #pragma once
 
 #include <eosio/chain/types.hpp>
+#include <eosio/chain/producer_schedule.hpp>
+
 #include <fc/static_variant.hpp>
 
 namespace eosio { namespace chain {
@@ -25,7 +27,7 @@ struct trx_extensions_visitor
    void operator()( const trx_jurisdiction& _trx_jurisdiction ) const;
 };
 
-class jurisdiction_reader
+class jurisdiction_helper
 {
    private:
 
@@ -37,6 +39,8 @@ class jurisdiction_reader
 
       bool read( const extensions_type& exts );
       const std::vector< trx_jurisdiction >& get_jurisdictions() const;
+
+      bool update( chainbase::database& db, const jurisdiction_updater_ordered& updater );
 };
 
 } }  // eosio::chain

@@ -13,7 +13,7 @@ using namespace eosio::testing;
 using namespace fc;
 
 using eosio::chain::trx_jurisdiction;
-using eosio::chain::jurisdiction_reader;
+using eosio::chain::jurisdiction_helper;
 
 class jurisdiction_tester : public tester
 {
@@ -44,7 +44,7 @@ BOOST_FIXTURE_TEST_CASE( basic_test, jurisdiction_tester ) try {
    any_extension.push_back( std::make_pair( idx, bytes_stream ) );
 
    //Deserializing
-   jurisdiction_reader reader;
+   jurisdiction_helper reader;
    BOOST_REQUIRE_EQUAL( true, reader.read( any_extension ) );
    auto deserialized_data = reader.get_jurisdictions();
 

@@ -79,9 +79,20 @@ namespace eosio { namespace chain {
       return !(a==b);
    }
 
+   struct jurisdiction_updater {
+      account_name                        producer;
+      std::vector< code_jurisdiction >    jurisdictions;
+   };
+
+   struct jurisdiction_updater_ordered {
+      account_name                        producer;
+      std::set< code_jurisdiction >       jurisdictions;
+   };
 
 } } /// eosio::chain
 
 FC_REFLECT( eosio::chain::producer_key, (producer_name)(block_signing_key) )
 FC_REFLECT( eosio::chain::producer_schedule_type, (version)(producers) )
 FC_REFLECT( eosio::chain::shared_producer_schedule_type, (version)(producers) )
+FC_REFLECT( eosio::chain::jurisdiction_updater, (producer)(jurisdictions) )
+FC_REFLECT( eosio::chain::jurisdiction_updater_ordered, (producer)(jurisdictions) )

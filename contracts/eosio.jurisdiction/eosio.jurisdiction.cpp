@@ -26,6 +26,7 @@ namespace eosio {
 
    void jurisdiction::updateprod( account_name producer, std::vector< code_jurisdiction > new_jurisdictions )
    {
+      eosio::print("Entering jurisdiction::updateprod\n");
       require_auth( producer );
 
       eosio_assert( new_jurisdictions.size() >= max_jurisdictions, "number of jurisdictions is greater than allowed" );
@@ -53,6 +54,14 @@ namespace eosio {
             obj.jurisdictions = new_jurisdictions;
          } );
       }
+
+      constexpr size_t max_stack_buffer_size = 512;
+      size_t size = action_data_size();
+      char* buffer = (char*)( max_stack_buffer_size < size ? malloc(size) : alloca(size) );
+      read_action_data( buffer, size );
+      update_jurisdictions( buffer, size );
+
+      eosio::print("Leaving jurisdiction::updateprod\n");
    }
 
 } /// namespace eosio

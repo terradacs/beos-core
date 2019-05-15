@@ -166,4 +166,13 @@ namespace eosio {
 
       EOSLIB_SERIALIZE( producer_key, (producer_name)(block_signing_key) )
    };
+
+   struct jurisdiction_updater {
+
+      account_name                        producer;
+      std::vector< code_jurisdiction >    jurisdictions;
+
+      EOSLIB_SERIALIZE( jurisdiction_updater, (producer)(jurisdictions) )
+   };
+
 }
