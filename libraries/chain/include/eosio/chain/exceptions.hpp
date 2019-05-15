@@ -193,7 +193,8 @@ namespace eosio { namespace chain {
                                     3040013, "Transaction is too big" )
       FC_DECLARE_DERIVED_EXCEPTION( unknown_transaction_compression, transaction_exception,
                                     3040014, "Unknown transaction compression" )
-
+      FC_DECLARE_DERIVED_EXCEPTION( tx_incorrect_location_exception, transaction_exception,
+                                    3040015, "This node can't process your transaction!" )
 
    FC_DECLARE_DERIVED_EXCEPTION( action_validate_exception, chain_exception,
                                  3050000, "Action validate exception" )

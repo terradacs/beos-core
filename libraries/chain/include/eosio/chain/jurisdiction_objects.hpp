@@ -2,6 +2,7 @@
 
 #include <eosio/chain/types.hpp>
 #include <eosio/chain/producer_schedule.hpp>
+#include <eosio/chain/transaction.hpp>
 
 #include <fc/static_variant.hpp>
 
@@ -42,6 +43,8 @@ class jurisdiction_helper
       jurisdictions read( const extensions_type& exts );
 
       bool update( chainbase::database& db, const jurisdiction_updater_ordered& updater );
+
+      bool transaction_jurisdictions_match( const chainbase::database& db, account_name actual_producer, const packed_transaction_ptr& trx );
 };
 
 } }  // eosio::chain

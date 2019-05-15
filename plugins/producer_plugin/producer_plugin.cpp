@@ -9,6 +9,8 @@
 #include <eosio/chain/transaction_object.hpp>
 #include <eosio/chain/snapshot.hpp>
 
+#include <eosio/chain/jurisdiction_objects.hpp>
+
 #include <fc/io/json.hpp>
 #include <fc/smart_ref_impl.hpp>
 #include <fc/scoped_exit.hpp>
@@ -179,6 +181,7 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
       // path to write the snapshots to
       bfs::path _snapshots_dir;
 
+      account_name actual_producer_name;
 
       void on_block( const block_state_ptr& bsp ) {
          if( bsp->header.timestamp <= _last_signed_block_time ) return;
@@ -340,7 +343,7 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
          }
       }
 
-      std::deque<std::tuple<packed_transaction_ptr, bool, next_function<transaction_trace_ptr>>> _pending_incoming_transactions;
+      std::list<std::tuple<packed_transaction_ptr, bool, next_function<transaction_trace_ptr>>> _pending_incoming_transactions;
 
       void on_incoming_transaction_async(const packed_transaction_ptr& trx, bool persist_until_expired, next_function<transaction_trace_ptr> next) {
          chain::controller& chain = app().get_plugin<chain_plugin>().chain();
@@ -388,6 +391,15 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
 
          if( chain.is_known_unexpired_transaction(id) ) {
             send_response(std::static_pointer_cast<fc::exception>(std::make_shared<tx_duplicate>(FC_LOG_MESSAGE(error, "duplicate transaction ${id}", ("id", id)) )));
+            return;
+         }
+
+         jurisdiction_helper jurisdiction_checker;
+         bool match_result = jurisdiction_checker.transaction_jurisdictions_match( chain.db(), actual_producer_name, trx );
+         if( !match_result )
+         {
+            _pending_incoming_transactions.emplace_back(trx, persist_until_expired, next);
+            send_response(std::static_pointer_cast<fc::exception>(std::make_shared<tx_incorrect_location_exception>(FC_LOG_MESSAGE(error, "incorrect location for transaction ${id}", ("id", id)) )));
             return;
          }
 
@@ -1051,6 +1063,7 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
    // Not our turn
    last_block = ((block_timestamp_type(block_time).slot % config::producer_repetitions) == config::producer_repetitions - 1);
    const auto& scheduled_producer = hbs->get_scheduled_producer(block_time);
+   actual_producer_name = scheduled_producer.producer_name;
    auto currrent_watermark_itr = _producer_watermarks.find(scheduled_producer.producer_name);
    auto signature_provider_itr = _signature_providers.find(scheduled_producer.block_signing_key);
    auto irreversible_block_age = get_irreversible_block_age();
@@ -1270,9 +1283,10 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
                   num_processed++;
 
                   // configurable ratio of incoming txns vs deferred txns
-                  while (_incoming_trx_weight >= 1.0 && orig_pending_txn_size && _pending_incoming_transactions.size()) {
-                     auto e = _pending_incoming_transactions.front();
-                     _pending_incoming_transactions.pop_front();
+                  auto itr = _pending_incoming_transactions.begin();
+                  while (_incoming_trx_weight >= 1.0 && orig_pending_txn_size && itr != _pending_incoming_transactions.end()) {
+                     auto e = *itr;
+                     itr = _pending_incoming_transactions.erase( itr );
                      --orig_pending_txn_size;
                      _incoming_trx_weight -= 1.0;
                      on_incoming_transaction_async(std::get<0>(e), std::get<1>(e), std::get<2>(e));
@@ -1334,9 +1348,11 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
 
             if (!_pending_incoming_transactions.empty()) {
                fc_dlog(_log, "Processing ${n} pending transactions");
-               while (orig_pending_txn_size && _pending_incoming_transactions.size()) {
-                  auto e = _pending_incoming_transactions.front();
-                  _pending_incoming_transactions.pop_front();
+               auto itr = _pending_incoming_transactions.begin();
+               while (orig_pending_txn_size && itr != _pending_incoming_transactions.end()) {
+                  auto e = *itr;
+                  auto id = std::get<0>(e)->id();
+                  itr = _pending_incoming_transactions.erase( itr );
                   --orig_pending_txn_size;
                   on_incoming_transaction_async(std::get<0>(e), std::get<1>(e), std::get<2>(e));
                   if (block_time <= fc::time_point::now()) return start_block_result::exhausted;
