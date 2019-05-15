@@ -10,8 +10,6 @@
 
 namespace eosio {
 
-   using std::string;
-
    static constexpr uint8_t max_jurisdictions = 10;
 
    struct info_jurisdiction

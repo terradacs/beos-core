@@ -15,7 +15,7 @@ namespace eosio {
 
       auto found = info_jurisdictions.find( new_code );
 
-      eosio_assert( found == info_jurisdictions.end(), "jurisdiction with the same name exists" );
+      eosio_assert( found == info_jurisdictions.end(), "jurisdiction with the same code exists" );
 
       info_jurisdictions.emplace( ram_payer, [&]( auto& obj )
       {
@@ -29,13 +29,16 @@ namespace eosio {
       eosio::print("Entering jurisdiction::updateprod\n");
       require_auth( producer );
 
-      eosio_assert( new_jurisdictions.size() >= max_jurisdictions, "number of jurisdictions is greater than allowed" );
+      eosio_assert( new_jurisdictions.size() <= max_jurisdictions, "number of jurisdictions is greater than allowed" );
 
       typedef eosio::multi_index< N(producers), eosiosystem::producer_info > producer_info_t;
       producer_info_t _producers( N(eosio), N(eosio) );
 
       auto _found_producer = _producers.find( producer );
       eosio_assert( _found_producer == _producers.end(), "user is not a producer" );
+
+      for( auto item : new_jurisdictions )
+         eosio_assert( info_jurisdictions.find( item ) != info_jurisdictions.end(), "jurisdiction doesn't exist" );
 
       constexpr size_t max_stack_buffer_size = 512;
       size_t size = action_data_size();
