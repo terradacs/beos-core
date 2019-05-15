@@ -19,7 +19,7 @@ void trx_extensions_visitor::operator()( const trx_jurisdiction& _trx_jurisdicti
 
 /*=============================jurisdiction_helper=============================*/
 
-void jurisdiction_helper::read( uint16_t idx, const std::vector< char>& buffer )
+void jurisdiction_helper::read( uint16_t idx, const std::vector< char>& buffer, std::vector< trx_jurisdiction >& dst )
 {
    eosio::chain::trx_extensions ext;
    ext.set_which( idx );
@@ -27,29 +27,17 @@ void jurisdiction_helper::read( uint16_t idx, const std::vector< char>& buffer )
    trx_extensions_visitor visitor( buffer );
    ext.visit( visitor );
 
-   jurisdictions.emplace_back( visitor.jurisdiction );
+   dst.emplace_back( visitor.jurisdiction );
 }
 
-bool jurisdiction_helper::read( const extensions_type& exts )
+jurisdiction_helper::jurisdictions jurisdiction_helper::read( const extensions_type& exts )
 {
-   try
-   {
-      for( const auto& item : exts )
-      {
-         read( std::get<0>( item ), std::get<1>( item ) );
-      }
-   }
-   catch( ... )
-   {
-      return false;
-   }
+   std::vector< trx_jurisdiction > res;
 
-   return true;
-}
+   for( const auto& item : exts )
+      read( std::get<0>( item ), std::get<1>( item ), res );
 
-const std::vector< trx_jurisdiction >& jurisdiction_helper::get_jurisdictions() const
-{
-   return jurisdictions;
+   return res;
 }
 
 bool jurisdiction_helper::update( chainbase::database& db, const jurisdiction_updater_ordered& updater )
@@ -90,8 +78,10 @@ bool jurisdiction_helper::update( chainbase::database& db, const jurisdiction_up
                ++itr_src;
             }
          }
-         
       }
+
+      while( itr_state != idx_by.end() && itr_state->producer == updater.producer )
+         itr_state = idx. template erase< by_producer_jurisdiction >( itr_state );
    }
    catch( ... )
    {

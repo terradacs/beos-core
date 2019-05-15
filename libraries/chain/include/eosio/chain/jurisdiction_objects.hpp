@@ -29,16 +29,17 @@ struct trx_extensions_visitor
 
 class jurisdiction_helper
 {
+   public:
+   
+      using jurisdictions = std::vector< trx_jurisdiction >;
+
    private:
 
-      std::vector< trx_jurisdiction > jurisdictions;
-
-      void read( uint16_t idx, const std::vector< char >& buffer );
+      void read( uint16_t idx, const std::vector< char >& buffer, std::vector< trx_jurisdiction >& dst );
 
    public:
 
-      bool read( const extensions_type& exts );
-      const std::vector< trx_jurisdiction >& get_jurisdictions() const;
+      jurisdictions read( const extensions_type& exts );
 
       bool update( chainbase::database& db, const jurisdiction_updater_ordered& updater );
 };

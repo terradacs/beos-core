@@ -42,7 +42,8 @@ using controller_index_set = index_set<
    block_summary_multi_index,
    transaction_multi_index,
    generated_transaction_multi_index,
-   table_id_multi_index
+   table_id_multi_index,
+   jurisdiction_index
 >;
 
 using contract_database_index_set = index_set<
