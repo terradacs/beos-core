@@ -107,7 +107,7 @@ bool jurisdiction_helper::transaction_jurisdictions_match( const chainbase::data
       {
          for( auto item : item_trx_jurisdiction.jurisdictions )
          {
-            auto found = idx_by.lower_bound( std::make_tuple( actual_producer, item ) );
+            auto found = idx_by.find( std::make_tuple( actual_producer, item ) );
             if( found != idx_by.end() )
                return true;
          }

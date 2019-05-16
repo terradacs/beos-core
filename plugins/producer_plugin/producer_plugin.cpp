@@ -343,7 +343,7 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
          }
       }
 
-      std::list<std::tuple<packed_transaction_ptr, bool, next_function<transaction_trace_ptr>>> _pending_incoming_transactions;
+      std::deque<std::tuple<packed_transaction_ptr, bool, next_function<transaction_trace_ptr>>> _pending_incoming_transactions;
 
       void on_incoming_transaction_async(const packed_transaction_ptr& trx, bool persist_until_expired, next_function<transaction_trace_ptr> next) {
          chain::controller& chain = app().get_plugin<chain_plugin>().chain();
@@ -1283,10 +1283,9 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
                   num_processed++;
 
                   // configurable ratio of incoming txns vs deferred txns
-                  auto itr = _pending_incoming_transactions.begin();
-                  while (_incoming_trx_weight >= 1.0 && orig_pending_txn_size && itr != _pending_incoming_transactions.end()) {
-                     auto e = *itr;
-                     itr = _pending_incoming_transactions.erase( itr );
+                  while (_incoming_trx_weight >= 1.0 && orig_pending_txn_size && _pending_incoming_transactions.size()) {
+                     auto e = _pending_incoming_transactions.front();
+                     _pending_incoming_transactions.pop_front();
                      --orig_pending_txn_size;
                      _incoming_trx_weight -= 1.0;
                      on_incoming_transaction_async(std::get<0>(e), std::get<1>(e), std::get<2>(e));
@@ -1348,11 +1347,9 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
 
             if (!_pending_incoming_transactions.empty()) {
                fc_dlog(_log, "Processing ${n} pending transactions");
-               auto itr = _pending_incoming_transactions.begin();
-               while (orig_pending_txn_size && itr != _pending_incoming_transactions.end()) {
-                  auto e = *itr;
-                  auto id = std::get<0>(e)->id();
-                  itr = _pending_incoming_transactions.erase( itr );
+               while (orig_pending_txn_size && _pending_incoming_transactions.size()) {
+                  auto e = _pending_incoming_transactions.front();
+                  _pending_incoming_transactions.pop_front();
                   --orig_pending_txn_size;
                   on_incoming_transaction_async(std::get<0>(e), std::get<1>(e), std::get<2>(e));
                   if (block_time <= fc::time_point::now()) return start_block_result::exhausted;
