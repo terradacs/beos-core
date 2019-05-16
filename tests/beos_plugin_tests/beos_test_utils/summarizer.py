@@ -178,7 +178,10 @@ class Summarizer(object):
         
         self.block_summaries  = {}
         self.action_summaries = []
-        self.equal_summaries = []
+        self.equal_summaries  = []
+        self.error_action     = False
+        self.error_user_block = False
+        self.error_equal      = False
 
 
     def prepare_summary_files(self, _scenario_name):
@@ -231,51 +234,54 @@ class Summarizer(object):
 
     def action_status_summary(self):
         error = False
-        self.summary.writelines("[ACTIONS SUMMARY]\n")
-        self.summary.writelines("-"*30+'\n')
-        for actions in self.action_summaries:
-            actual   = actions[0]
-            expected = actions[1]
-            if not actual.compare(expected, self.summary):
-                error = True
-        self.summary.writelines("-"*30+'\n')
+        if self.action_summaries:
+            self.summary.writelines("[ACTIONS SUMMARY]\n")
+            self.summary.writelines("-"*30+'\n')
+            for actions in self.action_summaries:
+                actual   = actions[0]
+                expected = actions[1]
+                if not actual.compare(expected, self.summary):
+                    error = True
+            self.summary.writelines("-"*30+'\n')
         return error
 
 
     def user_block_summary(self):
         error = False
-        self.summary.writelines("[USERS BLOCK SUMMARY]\n")
-        for user in self.block_summaries.keys():
+        if self.block_summaries:
+            self.summary.writelines("[USERS BLOCK SUMMARY]\n")
+            for user in self.block_summaries.keys():
+                self.summary.writelines("-"*30+'\n')
+                self.summary.writelines("[SUMMARY FOR USER] {0}\n".format(user))
+                for values in self.block_summaries[user]:
+                    self.summary.writelines("-"*30+'\n')
+                    self.summary.writelines("[AT BLOCK] {0}\n".format(values["block"]))
+                    self.summary.writelines("-"*30+'\n')
+                    expected = values.pop("expected")
+                    actual = expected.parser_node_response(values)
+                    if not actual.compare(expected, self.summary):
+                        error = True
             self.summary.writelines("-"*30+'\n')
-            self.summary.writelines("[SUMMARY FOR USER] {0}\n".format(user))
-            for values in self.block_summaries[user]:
-                self.summary.writelines("-"*30+'\n')
-                self.summary.writelines("[AT BLOCK] {0}\n".format(values["block"]))
-                self.summary.writelines("-"*30+'\n')
-                expected = values.pop("expected")
-                actual = expected.parser_node_response(values)
-                if not actual.compare(expected, self.summary):
-                    error = True
-        self.summary.writelines("-"*30+'\n')
         return error
 
 
     def equal_summary(self):
         error = False
-        self.summary.writelines("[EQUAL SUMMARY]\n")
-        self.summary.writelines("-"*30+'\n')
-        for equal in self.equal_summaries:
-            if equal.expected == equal.actual:
-                if equal.debug:
-                    self.summary.writelines("[OK] Conditions `{0}` result `{1}` from line `{2}` is as expected `{3}`.\n".format(equal.debug, equal.actual,equal.line, equal.expected))
+        if self.equal_summaries:
+            self.summary.writelines("[EQUAL SUMMARY]\n")
+            self.summary.writelines("-"*30+'\n')
+            for equal in self.equal_summaries:
+                if equal.expected == equal.actual:
+                    if equal.debug:
+                        self.summary.writelines("[OK] Conditions `{0}` result `{1}` from line `{2}` is as expected `{3}`.\n".format(equal.debug, equal.actual,equal.line, equal.expected))
+                    else:
+                        self.summary.writelines("[OK] Conditions result `{0}` from line `{1}` is as expected `{2}`.\n".format(equal.actual, equal.line, equal.expected))
                 else:
-                    self.summary.writelines("[OK] Conditions result `{0}` from line `{1}` is as expected `{2}`.\n".format(equal.actual, equal.line, equal.expected))
-            else:
-                error = True
-                if equal.debug:
-                    self.summary.writelines("[ERROR] Conditions `{0}` result `{1}` from line `{2}` is not as expected `{3}`.\n".format(equal.debug, equal.actual ,equal.line, equal.expected))
-                else:
-                    self.summary.writelines("[ERROR] Conditions result `{0}` from line `{1}` is not as expected `{2}`.\n".format( equal.actual, equal.line, equal.expected))
+                    error = True
+                    if equal.debug:
+                        self.summary.writelines("[ERROR] Conditions `{0}` result `{1}` from line `{2}` is not as expected `{3}`.\n".format(equal.debug, equal.actual ,equal.line, equal.expected))
+                    else:
+                        self.summary.writelines("[ERROR] Conditions result `{0}` from line `{1}` is not as expected `{2}`.\n".format( equal.actual, equal.line, equal.expected))
         return error
 
 
@@ -298,8 +304,8 @@ class Summarizer(object):
         with open(self.scenario_summary_file, "a+") as self.summary:
             self.summary.writelines("[SCENARIO] {0}\n".format(self.scenario_name))
             self.summary.writelines("-"*30+'\n')
-            error_action      = self.action_status_summary()
-            error_user_block  = self.user_block_summary()
-            error_equal       = self.equal_summary()
-            self.add_scenario_status_to_summary_file(error_action or error_user_block or error_equal )
-            return error_action or error_user_block 
+            self.error_action      = self.action_status_summary()
+            self.error_user_block  = self.user_block_summary()
+            self.error_equal       = self.equal_summary()
+            self.add_scenario_status_to_summary_file(self.error_action or self.error_user_block or self.error_equal )
+            return self.error_action or self.error_user_block or self.error_equal

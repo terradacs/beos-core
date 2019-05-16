@@ -92,6 +92,7 @@ Options:
 #include <eosio/chain/trace.hpp>
 #include <eosio/chain_plugin/chain_plugin.hpp>
 #include <eosio/chain/contract_types.hpp>
+#include <eosio/chain/jurisdiction_objects.hpp>
 
 #pragma push_macro("N")
 #undef N
@@ -188,6 +189,8 @@ uint32_t tx_max_net_usage = 0;
 
 uint32_t delaysec = 0;
 
+eosio::chain::trx_jurisdiction juris;
+
 vector<string> tx_permission;
 
 eosio::client::http::http_context context;
@@ -220,6 +223,7 @@ void add_standard_transaction_options(CLI::App* cmd, string default_permission =
    cmd->add_option("--max-net-usage", tx_max_net_usage, localized("set an upper limit on the net usage budget, in bytes, for the transaction (defaults to 0 which means no limit)"));
 
    cmd->add_option("--delay-sec", delaysec, localized("set the delay_sec seconds, defaults to 0s"));
+   cmd->add_option("--jurisdictions", juris.jurisdictions, localized("set jurisdictions for the transaction, default is any"));
 }
 
 vector<chain::permission_level> get_account_permissions(const vector<string>& permissions) {
@@ -300,7 +304,7 @@ void sign_transaction(signed_transaction& trx, fc::variant& required_keys, const
 fc::variant push_transaction( signed_transaction& trx, int32_t extra_kcpu = 1000, packed_transaction::compression_type compression = packed_transaction::none ) {
    auto info = get_info();
 
-   if (trx.signatures.size() == 0) { // #5445 can't change txn content if already signed
+   if (trx.signatures.empty()) { // #5445 can't change txn content if already signed
       trx.expiration = info.head_block_time + tx_expiration;
 
       // Set tapos, default to last irreversible block if it's not specified by the user
@@ -321,6 +325,12 @@ fc::variant push_transaction( signed_transaction& trx, int32_t extra_kcpu = 1000
       trx.max_cpu_usage_ms = tx_max_cpu_usage;
       trx.max_net_usage_words = (tx_max_net_usage + 7)/8;
       trx.delay_sec = delaysec;
+      if( !juris.jurisdictions.empty() ) {
+         constexpr int BEOS_JURISDICTION_EXTENSION_CODE           = 0;
+         constexpr int BEOS_TRANSACTION_WITH_JURISDICTION_TIMEOUT = 126;
+         trx.transaction_extensions.push_back({BEOS_JURISDICTION_EXTENSION_CODE, fc::raw::pack( juris.jurisdictions )});
+         trx.expiration = info.head_block_time + fc::seconds(BEOS_TRANSACTION_WITH_JURISDICTION_TIMEOUT);
+      }
    }
 
    if (!tx_skip_sign) {
