@@ -189,11 +189,31 @@ uint32_t tx_max_net_usage = 0;
 
 uint32_t delaysec = 0;
 
+std::string jurisdictions;
 eosio::chain::trx_jurisdiction juris;
 
 vector<string> tx_permission;
 
 eosio::client::http::http_context context;
+
+fc::variant json_from_file_or_string(const string& file_or_str, fc::json::parse_type ptype = fc::json::legacy_parser)
+{
+   regex r("^[ \t]*[\{\[]");
+   if ( !regex_search(file_or_str, r) && fc::is_regular_file(file_or_str) ) {
+      return fc::json::from_file(file_or_str, ptype);
+   } else {
+      return fc::json::from_string(file_or_str, ptype);
+   }
+}
+
+void get_jurisdictions() {
+   if( !jurisdictions.empty() ){
+      auto jj = json_from_file_or_string(jurisdictions);   
+      for( auto j : jj.get_array()) {
+         juris.jurisdictions.push_back(j.as<int>());
+      }
+   }
+}
 
 void add_standard_transaction_options(CLI::App* cmd, string default_permission = "") {
    CLI::callback_t parse_expiration = [](CLI::results_t res) -> bool {
@@ -223,7 +243,7 @@ void add_standard_transaction_options(CLI::App* cmd, string default_permission =
    cmd->add_option("--max-net-usage", tx_max_net_usage, localized("set an upper limit on the net usage budget, in bytes, for the transaction (defaults to 0 which means no limit)"));
 
    cmd->add_option("--delay-sec", delaysec, localized("set the delay_sec seconds, defaults to 0s"));
-   cmd->add_option("--jurisdictions", juris.jurisdictions, localized("set jurisdictions for the transaction, default is any"));
+   cmd->add_option("--jurisdictions", jurisdictions, localized("set jurisdictions for the transaction, default is any"));
 }
 
 vector<chain::permission_level> get_account_permissions(const vector<string>& permissions) {
@@ -325,6 +345,7 @@ fc::variant push_transaction( signed_transaction& trx, int32_t extra_kcpu = 1000
       trx.max_cpu_usage_ms = tx_max_cpu_usage;
       trx.max_net_usage_words = (tx_max_net_usage + 7)/8;
       trx.delay_sec = delaysec;
+      get_jurisdictions();
       if( !juris.jurisdictions.empty() ) {
          constexpr int BEOS_JURISDICTION_EXTENSION_CODE           = 0;
          constexpr int BEOS_TRANSACTION_WITH_JURISDICTION_TIMEOUT = 126;
@@ -421,15 +442,7 @@ fc::variant bin_to_variant( const account_name& account, const action_name& acti
    return abis->binary_to_variant( action_type, action_args, abi_serializer_max_time );
 }
 
-fc::variant json_from_file_or_string(const string& file_or_str, fc::json::parse_type ptype = fc::json::legacy_parser)
-{
-   regex r("^[ \t]*[\{\[]");
-   if ( !regex_search(file_or_str, r) && fc::is_regular_file(file_or_str) ) {
-      return fc::json::from_file(file_or_str, ptype);
-   } else {
-      return fc::json::from_string(file_or_str, ptype);
-   }
-}
+
 
 bytes json_or_file_to_bin( const account_name& account, const action_name& action, const string& data_or_filename ) {
    fc::variant action_args_var;
@@ -740,7 +753,7 @@ struct set_account_permission_subcommand {
             } else {
                parent = name(parentStr);
             }
-
+            
             send_actions({create_updateauth(account, permission, parent, auth)});
          }
       });

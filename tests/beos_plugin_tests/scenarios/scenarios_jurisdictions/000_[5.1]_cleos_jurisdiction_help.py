@@ -15,7 +15,7 @@ if __name__ == "__main__":
 	try:
 		node, summary, args, log = init(__file__)
 
-		look_for = "--jurisdictions UINT ..."
+		look_for = "--jurisdictions TEXT"
 
 		call = ["push", "action", "--help"]
 		result = node.make_cleos_call(call)
@@ -29,6 +29,7 @@ if __name__ == "__main__":
 
 	except Exception as _ex:
 		log.exception("Exception `{0}` occures while executing `{1}` tests.".format(str(_ex), __file__))
+		summary.equal(False, True, "Exception occured durring testing.")
 	finally:
 		summary_status = summary.summarize()
 		exit(summary_status)
