@@ -1938,10 +1938,10 @@ int64_t controller::set_proposed_producers( vector<producer_key> producers ) {
    return version;
 }
 
-void controller::update_jurisdictions( const jurisdiction_updater_ordered& updater )
+bool controller::update_jurisdictions( const jurisdiction_updater_ordered& updater )
 {
    eosio::chain::jurisdiction_helper _jurisdiction_helper;
-   _jurisdiction_helper.update( my->db, updater );
+   return _jurisdiction_helper.update( my->db, updater );
 }
 
 const producer_schedule_type&    controller::active_producers()const {

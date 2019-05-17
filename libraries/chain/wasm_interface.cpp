@@ -1855,7 +1855,7 @@ class jurisdiction_api : public context_aware_api {
 
          updater_ordered.producer = updater.producer;
 
-         context.control.update_jurisdictions( updater_ordered );
+         EOS_ASSERT( context.control.update_jurisdictions( updater_ordered ) == true, wasm_execution_error, "updating jurisdiction failed" );
       }
 };
 
