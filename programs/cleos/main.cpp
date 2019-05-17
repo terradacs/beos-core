@@ -243,7 +243,7 @@ void add_standard_transaction_options(CLI::App* cmd, string default_permission =
    cmd->add_option("--max-net-usage", tx_max_net_usage, localized("set an upper limit on the net usage budget, in bytes, for the transaction (defaults to 0 which means no limit)"));
 
    cmd->add_option("--delay-sec", delaysec, localized("set the delay_sec seconds, defaults to 0s"));
-   cmd->add_option("--jurisdictions", jurisdictions, localized("set jurisdictions for the transaction, default is any"));
+   cmd->add_option("-u,--jurisdictions", jurisdictions, localized("set jurisdictions for the transaction, default is any"));
 }
 
 vector<chain::permission_level> get_account_permissions(const vector<string>& permissions) {

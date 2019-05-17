@@ -15,7 +15,7 @@ if __name__ == "__main__":
 	try:
 		node, summary, args, log = init(__file__)
 
-		look_for = "--jurisdictions TEXT"
+		look_for = "-u,--jurisdictions TEXT"
 
 		call = ["push", "action", "--help"]
 		result = node.make_cleos_call(call)
