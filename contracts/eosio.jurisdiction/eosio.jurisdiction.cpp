@@ -34,9 +34,8 @@ namespace eosio {
       typedef eosio::multi_index< N(producers), eosiosystem::producer_info > producer_info_t;
       producer_info_t _producers( N(eosio), N(eosio) );
 
-      //I don't know if to check presence of producer
-      //auto _found_producer = _producers.find( producer );
-      //eosio_assert( _found_producer != _producers.end(), "user is not a producer" );
+      auto _found_producer = _producers.find( producer );
+      eosio_assert( _found_producer != _producers.end(), "user is not a producer" );
 
       for( auto item : new_jurisdictions )
          eosio_assert( info_jurisdictions.find( item ) != info_jurisdictions.end(), "jurisdiction doesn't exist" );
