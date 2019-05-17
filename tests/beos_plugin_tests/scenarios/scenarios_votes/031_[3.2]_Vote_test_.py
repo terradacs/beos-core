@@ -21,7 +21,7 @@ if __name__ == "__main__":
 		nr_system_producers = 10
 		nr_accounts = 500
 
-		producers = node.create_producers( nr_system_producers, "1.0000 PXBTS" )
+		producers = node.create_producers( nr_system_producers, "1.0000 BTS" )
 		node.run_node()
 
 		#Changeparams
@@ -40,7 +40,7 @@ if __name__ == "__main__":
 				"block_interval" : 5,
 				"trustee_reward" : 0 
 			},
-			"proxy_assets" : [ "0.0000 PXBTS"],
+			"proxy_assets" : [ "0.0000 BTS"],
 			"ram_leftover" : 3000000,
 			"starting_block_for_initial_witness_election":10
 		}

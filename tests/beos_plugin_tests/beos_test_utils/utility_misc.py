@@ -46,7 +46,7 @@ def get_producers_stats( node, log = None ):
 	return nr_prods, nr_voted_prods
 
 def worker_creator( node, summary, items, info, log ):
-	result = node.create_accounts( 1, "1.0000 PXBTS" )
+	result = node.create_accounts( 1, "1.0000 BTS" )
 	for i in result:
 		items.append( i )
 

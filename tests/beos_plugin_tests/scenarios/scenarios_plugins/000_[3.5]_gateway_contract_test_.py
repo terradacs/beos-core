@@ -20,7 +20,7 @@ def check_gateway_table( node ):
 	json = "true"
 
 	cnt = 0
-	asset_patterns = [ "PXBTS", "PXBRNP", "PXEOS" ]
+	asset_patterns = [ "BTS", "BRNP", "EOS" ]
 
 	rpc = node.get_url_caller()
 	data = {"scope":scope, "code":code, "table":table, "json": json}
