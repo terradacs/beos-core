@@ -91,11 +91,11 @@ bool jurisdiction_helper::update( chainbase::database& db, const jurisdiction_up
    return true;
 }
 
-bool jurisdiction_helper::transaction_jurisdictions_match( const chainbase::database& db, account_name actual_producer, const packed_transaction_ptr& trx )
+bool jurisdiction_helper::transaction_jurisdictions_match( const chainbase::database& db, account_name actual_producer, const packed_transaction& trx )
 {
    try
    {
-      auto exts = trx->get_transaction().transaction_extensions;
+      auto exts = trx.get_transaction().transaction_extensions;
       if( exts.empty() )
          return true;
 

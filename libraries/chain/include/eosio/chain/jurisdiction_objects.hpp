@@ -44,7 +44,7 @@ class jurisdiction_helper
 
       bool update( chainbase::database& db, const jurisdiction_updater_ordered& updater );
 
-      bool transaction_jurisdictions_match( const chainbase::database& db, account_name actual_producer, const packed_transaction_ptr& trx );
+      bool transaction_jurisdictions_match( const chainbase::database& db, account_name actual_producer, const packed_transaction& trx );
 };
 
 } }  // eosio::chain
