@@ -88,6 +88,44 @@ BOOST_FIXTURE_TEST_CASE( basic_test, jurisdiction_tester ) try {
 
 BOOST_FIXTURE_TEST_CASE( basic_test_01, jurisdiction_tester ) try {
 
+   using data_type = std::vector< code_jurisdiction >;
+   using buffer = std::vector< char >;
+
+   trx_jurisdiction src;
+
+   const uint16_t idx = 0;
+   std::vector< data_type > v_data_type = { { 5,6,7,8,9 }, { 0,1 }, { 2 }, { 3,4,5 } };
+   std::vector< buffer > buffers;
+
+   //Serializing
+   for( const auto& item : v_data_type )
+   {
+      src.jurisdictions = item;
+      buffers.emplace_back( fc::raw::pack( src ) );
+   }
+
+   //Saving data
+   extensions_type any_extension;
+   for( const auto& item : buffers )
+      any_extension.emplace_back( std::make_pair( idx, item ) );
+
+   //Deserializing
+   jurisdiction_helper reader;
+
+   auto deserialized_data = reader.read( any_extension );
+   BOOST_REQUIRE_EQUAL( v_data_type.size(), deserialized_data.size() );
+
+   uint32_t i = 0;
+   for( auto& item : v_data_type )
+   {
+      data_type dst = deserialized_data[ i++ ].jurisdictions;
+      BOOST_REQUIRE_EQUAL( dst.size(), item.size() );
+      BOOST_REQUIRE_EQUAL( true, std::equal( dst.begin(), dst.end(), item.begin() ) );
+   }
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( basic_test_02, jurisdiction_tester ) try {
+
    chainbase::database &db = const_cast< chainbase::database& > ( control->db() );
    jurisdiction_helper updater;
 
@@ -136,7 +174,7 @@ BOOST_FIXTURE_TEST_CASE( basic_test_01, jurisdiction_tester ) try {
 
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( basic_test_02, jurisdiction_tester ) try {
+BOOST_FIXTURE_TEST_CASE( basic_test_03, jurisdiction_tester ) try {
 
    chainbase::database &db = const_cast< chainbase::database& > ( control->db() );
    jurisdiction_helper updater;
