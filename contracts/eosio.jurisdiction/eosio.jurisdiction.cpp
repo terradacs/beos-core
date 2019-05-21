@@ -9,19 +9,48 @@
 
 namespace eosio {
 
-   void jurisdiction::addjurisdict( account_name ram_payer, code_jurisdiction new_code, std::string new_name )
+   bool jurisdiction::is_unique( const std::string& new_name )
+   {
+      uint64_t _found_val = ::eosio::string_to_name( new_name.c_str() );
+
+      const auto idx = info_jurisdictions.get_index< N(infonamejuri) >();
+      auto found = idx.find( _found_val );
+
+      while( found != idx.end() && _found_val == found->get_key_name() )
+      {
+         if( found->name == new_name )
+            return false;
+         ++found;
+      }
+
+      return true;
+   }
+
+   void jurisdiction::addjurisdict( account_name ram_payer, code_jurisdiction new_code, std::string new_name, std::string new_description )
    {
       require_auth( ram_payer );
 
-      auto found = info_jurisdictions.find( new_code );
+      eosio_assert( new_name.size() < limit_256, "size of name is greater than allowed" );
+      eosio_assert( new_description.size() < limit_256, "size of name is greater than allowed" );
 
-      eosio_assert( found == info_jurisdictions.end(), "jurisdiction with the same code exists" );
+      auto _tolower = []( const char& c ) { return std::tolower( c ); };
+      std::transform( new_name.begin(), new_name.end(), new_name.begin(), _tolower );
+
+      auto found_code = info_jurisdictions.find( new_code );
+      eosio_assert( found_code == info_jurisdictions.end(), "jurisdiction with the same code exists" );
+
+      eosio_assert( is_unique( new_name ), "jurisdiction with the same name exists" );
 
       info_jurisdictions.emplace( ram_payer, [&]( auto& obj )
       {
          obj.code = new_code;
          obj.name = new_name;
+         obj.description = new_description;
       } );
+
+      //Preventing against spamming
+      INLINE_ACTION_SENDER(eosiosystem::system_contract, buyrambytes)( N(eosio), {{ram_payer,N(active)}},
+                                             { ram_payer, N(eosio.saving), jurisdiction_fee } );
    }
 
    void jurisdiction::updateprod( account_name producer, std::vector< code_jurisdiction > new_jurisdictions )
@@ -29,7 +58,7 @@ namespace eosio {
       eosio::print("Entering jurisdiction::updateprod\n");
       require_auth( producer );
 
-      eosio_assert( new_jurisdictions.size() <= max_jurisdictions, "number of jurisdictions is greater than allowed" );
+      eosio_assert( new_jurisdictions.size() < limit_256, "number of jurisdictions is greater than allowed" );
 
       typedef eosio::multi_index< N(producers), eosiosystem::producer_info > producer_info_t;
       producer_info_t _producers( N(eosio), N(eosio) );

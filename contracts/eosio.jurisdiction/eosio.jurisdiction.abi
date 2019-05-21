@@ -13,15 +13,17 @@
       "base": "",
       "fields": [
         {"name":"code",         "type":"code_jurisdiction"},
-        {"name":"name",         "type":"string"}
+        {"name":"name",         "type":"string"},
+        {"name":"description",  "type":"string"}
       ]
     },{
       "name": "addjurisdict",
       "base": "",
       "fields": [
-        {"name":"ram_payer", "type":"account_name"},
-        {"name":"new_code", "type":"code_jurisdiction"},
-        {"name":"new_name", "type":"string"}
+        {"name":"ram_payer",        "type":"account_name"},
+        {"name":"new_code",         "type":"code_jurisdiction"},
+        {"name":"new_name",         "type":"string"},
+        {"name":"new_description",  "type":"string"}
       ]
     },{
       "name": "updateprod",
