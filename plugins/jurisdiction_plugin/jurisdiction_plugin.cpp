@@ -54,13 +54,14 @@ namespace eosio {
       try 
       {
         const auto &idx_by_prod = db.db().get_index<chain::jurisdiction_index, chain::by_producer_jurisdiction>();
-        auto itr_prod_jur = idx_by_prod.find(producer_name.producer_name);
+        auto itr_prod_jur = idx_by_prod.lower_bound(producer_name.producer_name);
 
         ret.producer_name = producer_name.producer_name;
 
-        if (itr_prod_jur != idx_by_prod.end())
+        while (itr_prod_jur != idx_by_prod.end() && itr_prod_jur->producer == producer_name.producer_name)
         {
           ret.jurisdictions.emplace_back(itr_prod_jur->jurisdiction);
+          ++itr_prod_jur;
         }
       } 
       catch (const fc::exception& e) 
