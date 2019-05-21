@@ -51,14 +51,15 @@ namespace eosio {
     read_write::get_producer_jurisdiction_results read_write::get_producer_jurisdiction(const get_producer_jurisdiction_params &producer_name)
     {
       read_write::get_producer_jurisdiction_results ret;
-      using namespace eosio::chain;
       try 
       {
         const auto &idx_by_prod = db.db().get_index<chain::jurisdiction_index, chain::by_producer_jurisdiction>();
         auto itr_prod_jur = idx_by_prod.find(producer_name.producer_name);
+
+        ret.producer_name = producer_name.producer_name;
+
         if (itr_prod_jur != idx_by_prod.end())
         {
-          ret.producer_name = itr_prod_jur->producer;
           ret.jurisdictions.emplace_back(itr_prod_jur->jurisdiction);
         }
       } 
@@ -90,7 +91,6 @@ namespace eosio {
     read_write::get_jurisdictions_results read_write::get_jurisdictions(const get_jurisdictions_params &)
     {
       read_write::get_jurisdictions_results ret;
-      using namespace eosio::chain;
       try 
       {
         const auto &idx_by_prod = db.db().get_index<chain::jurisdiction_index, chain::by_producer_jurisdiction>();
