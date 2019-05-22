@@ -172,7 +172,7 @@ string wallet_url; //to be set to default_wallet_url in main
 bool no_verify = false;
 vector<string> headers;
 
-auto   tx_expiration = fc::seconds(200);
+auto   tx_expiration = fc::seconds(30);
 const fc::microseconds abi_serializer_max_time = fc::seconds(10); // No risk to client side serialization taking a long time
 string tx_ref_block_num_or_id;
 bool   tx_force_unique = false;
@@ -208,8 +208,12 @@ fc::variant json_from_file_or_string(const string& file_or_str, fc::json::parse_
 
 void get_jurisdictions() {
    if( !jurisdictions.empty() ){
-      auto jj = json_from_file_or_string(jurisdictions);   
-      for( auto j : jj.get_array()) {
+      auto jj = json_from_file_or_string(jurisdictions);
+      auto jj_array = jj.get_array();
+      if(jj_array.size() >= 256){
+         throw fc::exception(fc::log_messages{FC_LOG_MESSAGE(error, "Too many jurisdictions given, max value is 255.")});
+      }
+      for( auto j : jj_array) {
          juris.jurisdictions.push_back(j.as<int>());
       }
    }
@@ -243,7 +247,7 @@ void add_standard_transaction_options(CLI::App* cmd, string default_permission =
    cmd->add_option("--max-net-usage", tx_max_net_usage, localized("set an upper limit on the net usage budget, in bytes, for the transaction (defaults to 0 which means no limit)"));
 
    cmd->add_option("--delay-sec", delaysec, localized("set the delay_sec seconds, defaults to 0s"));
-   cmd->add_option("-u,--jurisdictions", jurisdictions, localized("set jurisdictions for the transaction, default is any"));
+   cmd->add_option("-u,--jurisdictions", jurisdictions, localized("set jurisdictions for the transaction [max:255], default is any"));
 }
 
 vector<chain::permission_level> get_account_permissions(const vector<string>& permissions) {
@@ -348,7 +352,7 @@ fc::variant push_transaction( signed_transaction& trx, int32_t extra_kcpu = 1000
       get_jurisdictions();
       if( !juris.jurisdictions.empty() ) {
          constexpr int BEOS_JURISDICTION_EXTENSION_CODE           = 0;
-         constexpr int BEOS_TRANSACTION_WITH_JURISDICTION_TIMEOUT = 126;
+         constexpr int BEOS_TRANSACTION_WITH_JURISDICTION_TIMEOUT = 200;
          trx.transaction_extensions.push_back({BEOS_JURISDICTION_EXTENSION_CODE, fc::raw::pack( juris.jurisdictions )});
          trx.expiration = info.head_block_time + fc::seconds(BEOS_TRANSACTION_WITH_JURISDICTION_TIMEOUT);
       }
