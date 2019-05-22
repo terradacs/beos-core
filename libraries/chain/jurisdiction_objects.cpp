@@ -19,6 +19,35 @@ void trx_extensions_visitor::operator()( const trx_jurisdiction& _trx_jurisdicti
 
 /*=============================jurisdiction_helper=============================*/
 
+bool jurisdiction_helper::check_jurisdictions( const chainbase::database &db, const jurisdiction_updater_ordered& src )
+{
+   const auto& idx = db.get_index< jurisdiction_index, by_producer_jurisdiction >();
+   auto itr = idx.lower_bound( std::make_tuple( src.producer, std::numeric_limits< code_jurisdiction >::min() ) );
+
+   auto jurisdictions = src.jurisdictions;
+
+   if( itr == idx.end() )
+      return jurisdictions.empty();
+
+   bool res = true;
+
+   auto itr_src = jurisdictions.begin();
+
+   while( itr != idx.end() && itr->producer == src.producer )
+   {
+      if( itr->jurisdiction != *itr_src )
+         return false;
+
+      ++itr;
+      ++itr_src;
+   }
+
+   FC_ASSERT( itr == idx.end() || itr->producer != src.producer, "incorrect jurisdictions" );
+   FC_ASSERT( itr_src == jurisdictions.end(), "incorrect jurisdictions" );
+
+   return res;
+}
+
 void jurisdiction_helper::read( uint16_t idx, const std::vector< char>& buffer, std::vector< trx_jurisdiction >& dst )
 {
    eosio::chain::trx_extensions ext;

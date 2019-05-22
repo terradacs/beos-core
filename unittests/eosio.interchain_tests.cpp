@@ -2,6 +2,7 @@
 #include <eosio/testing/tester.hpp>
 #include <eosio/chain/abi_serializer.hpp>
 #include <eosio/chain/resource_limits.hpp>
+#include <eosio/chain/jurisdiction_objects.hpp>
 
 #include <eosio.system/eosio.system.wast.hpp>
 #include <eosio.system/eosio.system.abi.hpp>
@@ -13,6 +14,8 @@
 #include <eosio.gateway/eosio.gateway.abi.hpp>
 #include <eosio.distribution/eosio.distribution.wast.hpp>
 #include <eosio.distribution/eosio.distribution.abi.hpp>
+#include <eosio.jurisdiction/eosio.jurisdiction.wast.hpp>
+#include <eosio.jurisdiction/eosio.jurisdiction.abi.hpp>
 
 #include <Runtime/Runtime.h>
 
@@ -215,6 +218,8 @@ struct actions: public tester
 
 class eosio_interchain_tester : public actions
 {
+  protected:
+
   void prepare_account( account_name account, const char* _wast, const char* _abi, abi_serializer* ser = nullptr )
   {
     produce_blocks( 2 );
@@ -770,6 +775,217 @@ inline uint64_t check_asset_value(uint64_t value)
   }
 
 #define ASSET_STRING(INTEGER, SYMBOL) std::string(std::to_string(check_asset_value(INTEGER)) + ".0000 " + #SYMBOL).c_str()
+
+class beos_jurisdiction_tester : public eosio_init_tester
+{
+   abi_serializer jurisdiction_abi_ser;
+
+   public:
+
+      beos_jurisdiction_tester()
+      {
+         produce_blocks( 2 );
+
+         std::vector< account_name > actors = { N(beos.jurisdi), N(beos.proda), N(beos.prodb), N(beos.prodc) };
+         
+         for( const auto& item : actors )
+         {
+            create_account_with_resources( config::gateway_account_name, item );
+            issue( item, asset::from_string("100.0000 PROXY") );
+         }
+
+         test_global_state tgs;
+
+         tgs.ram.starting_block = 100;
+         tgs.ram.ending_block = 110;
+         tgs.ram.block_interval = 5;
+
+         tgs.beos.starting_block = 100;
+         tgs.beos.ending_block = 110;
+         tgs.beos.block_interval = 5;
+
+         check_change_params( tgs );
+
+         produce_blocks( 120 - control->head_block_num() );
+         BOOST_REQUIRE_EQUAL( control->head_block_num(), 120u );
+
+         set_privileged( N(beos.jurisdi) );
+
+         prepare_account( N(beos.jurisdi), eosio_jurisdiction_wast, eosio_jurisdiction_abi, &jurisdiction_abi_ser );
+
+         for( const auto& item : actors )
+         {
+            if( item != N(beos.jurisdi) )
+            {
+               BOOST_REQUIRE_EQUAL( success(), create_producer( item ) );
+               produce_blocks(1);
+               BOOST_REQUIRE_EQUAL( success(), vote_producer( item, { item } ) );
+               produce_blocks(1);
+            }
+         }
+
+         for( const auto& item : actors )
+            BOOST_REQUIRE_EQUAL( success(), unstake( item, item, asset::from_string("20000000.0000 BEOS"), asset::from_string("20000000.0000 BEOS") ) );
+
+         produce_block( fc::hours(3*24) );
+         produce_blocks(1);
+      }
+
+      transaction_trace_ptr set_privileged( name account ) {
+         auto r = base_tester::push_action(config::system_account_name, N(setpriv), config::system_account_name,  mvo()("account", account)("is_priv", 1));
+         produce_block();
+         return r;
+      }
+
+      fc::variant get_jurisdiction( code_jurisdiction code )
+      {
+         vector<char> data = get_row_by_account( N(beos.jurisdi), N(beos.jurisdi), N(infojurisdic), code );
+         if( data.empty() )
+            return fc::variant();
+         else
+            return jurisdiction_abi_ser.binary_to_variant( "info_jurisdiction", data, abi_serializer_max_time );
+      }
+
+      action_result add_jurisdiction( account_name ram_payer, code_jurisdiction new_code, std::string new_name, std::string new_description )
+      {
+         return push_action(ram_payer, N(addjurisdict), mvo()
+            ("ram_payer",       ram_payer )
+            ("new_code", new_code )
+            ("new_name", new_name )
+            ("new_description", new_description ),
+            jurisdiction_abi_ser,
+            N(beos.jurisdi)
+            );
+      }
+
+      action_result update_jurisdictions( account_name producer, std::vector< code_jurisdiction > new_jurisdictions )
+      {
+         return push_action(producer, N(updateprod), mvo()
+            ("producer",       producer )
+            ("new_jurisdictions", new_jurisdictions ),
+            jurisdiction_abi_ser,
+            N(beos.jurisdi)
+            );
+      }
+};
+
+BOOST_AUTO_TEST_SUITE(eosio_jurisdiction_tests)
+
+BOOST_FIXTURE_TEST_CASE( basic_test_01, beos_jurisdiction_tester ) try {
+
+   auto message_01 = wasm_assert_msg("size of name is greater than allowed");
+   auto message_02 = wasm_assert_msg("size of description is greater than allowed");
+   auto message_03 = wasm_assert_msg("jurisdiction with the same code exists");
+   auto message_04 = wasm_assert_msg("jurisdiction with the same name exists");
+
+   std::string message_56           = "0123456789ABCDEFGHIJ0123456789ABCDEFGHIJ0123456789ABCDEF";
+   std::string message_56_to_lower  = "0123456789abcdefghij0123456789abcdefghij0123456789abcdef";
+   std::string message_100 = "0123456789ABCDEFGHIJ0123456789ABCDEFGHIJ0123456789ABCDEFGHIJ0123456789ABCDEFGHIJ0123456789ABCDEFGHIJ";
+   std::string message_256 = message_100 + message_100 + message_56;
+
+   {
+      BOOST_REQUIRE_EQUAL( success(), add_jurisdiction( N(beos.jurisdi), 1, "POLAND", "EAST EUROPE" ) );
+      auto result = get_jurisdiction( 1 );
+      BOOST_REQUIRE_EQUAL( false, result.is_null() );
+      BOOST_REQUIRE_EQUAL( true, result["code"] == 1 );
+      BOOST_REQUIRE_EQUAL( true, result["name"] == "poland" );
+      BOOST_REQUIRE_EQUAL( true, result["description"] == "EAST EUROPE" );
+   }
+
+   {
+      BOOST_REQUIRE_EQUAL( success(), add_jurisdiction( N(beos.proda), 2, "sweden", "EAST EUROPE" ) );
+      auto result = get_jurisdiction( 2 );
+      BOOST_REQUIRE_EQUAL( false, result.is_null() );
+      BOOST_REQUIRE_EQUAL( true, result["code"] == 2 );
+      BOOST_REQUIRE_EQUAL( true, result["name"] == "sweden" );
+      BOOST_REQUIRE_EQUAL( true, result["description"] == "EAST EUROPE" );
+
+      result = get_jurisdiction( 1 );
+      BOOST_REQUIRE_EQUAL( false, result.is_null() );
+   }
+
+   {
+      BOOST_REQUIRE_EQUAL( message_01, add_jurisdiction( N(beos.proda), 1, message_256, "SOMEWHERE" ) );
+      BOOST_REQUIRE_EQUAL( message_02, add_jurisdiction( N(beos.proda), 1, "Czech Republic", message_256 ) );
+      BOOST_REQUIRE_EQUAL( message_03, add_jurisdiction( N(beos.proda), 1, "Russia", "EAST EUROPE/ASIA" ) );
+      BOOST_REQUIRE_EQUAL( message_04, add_jurisdiction( N(beos.proda), 3, "SWEDEN", "EAST EUROPE/ASIA" ) );
+   }
+
+   {
+      uint16_t start = 10000;
+
+      for( int i = 0; i < 10; ++i )
+         BOOST_REQUIRE_EQUAL( success(), add_jurisdiction( N(beos.prodb), start + i, message_56 + std::to_string( i ), "INFORMATION" ) );
+
+      for( int i = 0; i < 10; ++i )
+      {
+         auto result = get_jurisdiction( start + i );
+         BOOST_REQUIRE_EQUAL( false, result.is_null() );
+         BOOST_REQUIRE_EQUAL( true, result["code"] == start + i );
+         BOOST_REQUIRE_EQUAL( true, result["name"] == message_56_to_lower + std::to_string( i ) );
+         BOOST_REQUIRE_EQUAL( true, result["description"] == "INFORMATION" );
+      }
+   }
+
+   {
+      uint16_t start = 20000;
+
+      for( int i = 0; i < 10; ++i )
+         BOOST_REQUIRE_EQUAL( message_04, add_jurisdiction( N(beos.prodc), start + i, message_56 + std::to_string( i ), "SOMEWHERE" ) );
+   }
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( basic_test_02, beos_jurisdiction_tester ) try {
+
+   jurisdiction_helper updater;
+
+   {
+      jurisdiction_updater_ordered data;
+      data.producer = N(beos.proda);
+      data.jurisdictions = {1};
+      BOOST_REQUIRE_EQUAL( success(), add_jurisdiction( N(beos.jurisdi), 1, "POLAND", "EAST EUROPE" ) );
+      BOOST_REQUIRE_EQUAL( success(), update_jurisdictions( N(beos.proda), {1} ) );
+      BOOST_REQUIRE_EQUAL( true, updater.check_jurisdictions( control->db(), data ) );
+   }
+
+   {
+      jurisdiction_updater_ordered data;
+      data.producer = N(beos.proda);
+      data.jurisdictions = {2,3};
+      BOOST_REQUIRE_EQUAL( success(), add_jurisdiction( N(beos.jurisdi), 2, "RUSSIA", "EAST EUROPE" ) );
+      BOOST_REQUIRE_EQUAL( success(), add_jurisdiction( N(beos.jurisdi), 3, "SWEDEN", "EAST EUROPE" ) );
+      BOOST_REQUIRE_EQUAL( success(), update_jurisdictions( N(beos.proda), {2,3} ) );
+      BOOST_REQUIRE_EQUAL( true, updater.check_jurisdictions( control->db(), data ) );
+   }
+
+   {
+      jurisdiction_updater_ordered data;
+      data.producer = N(beos.proda);
+      data.jurisdictions = {};
+      BOOST_REQUIRE_EQUAL( success(), update_jurisdictions( N(beos.proda), {} ) );
+      BOOST_REQUIRE_EQUAL( true, updater.check_jurisdictions( control->db(), data ) );
+   }
+
+   {
+      jurisdiction_updater_ordered data_01;
+      data_01.producer = N(beos.proda);
+      data_01.jurisdictions = {1,2,3};
+
+      jurisdiction_updater_ordered data_02;
+      data_02.producer = N(beos.prodb);
+      data_02.jurisdictions = {2,3};
+
+      BOOST_REQUIRE_EQUAL( success(), update_jurisdictions( N(beos.proda), {1,2,3} ) );
+      BOOST_REQUIRE_EQUAL( success(), update_jurisdictions( N(beos.prodb), {2,3} ) );
+
+      BOOST_REQUIRE_EQUAL( true, updater.check_jurisdictions( control->db(), data_01 ) );
+      BOOST_REQUIRE_EQUAL( true, updater.check_jurisdictions( control->db(), data_02 ) );
+   }
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(eosio_init_tests)
 

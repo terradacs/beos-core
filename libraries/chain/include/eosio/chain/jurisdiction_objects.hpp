@@ -40,6 +40,8 @@ class jurisdiction_helper
 
    public:
 
+      bool check_jurisdictions( const chainbase::database &db, const jurisdiction_updater_ordered& src );
+
       jurisdictions read( const extensions_type& exts );
 
       bool update( chainbase::database& db, const jurisdiction_updater_ordered& updater );

@@ -31,7 +31,7 @@ namespace eosio {
       require_auth( ram_payer );
 
       eosio_assert( new_name.size() < limit_256, "size of name is greater than allowed" );
-      eosio_assert( new_description.size() < limit_256, "size of name is greater than allowed" );
+      eosio_assert( new_description.size() < limit_256, "size of description is greater than allowed" );
 
       auto _tolower = []( const char& c ) { return std::tolower( c ); };
       std::transform( new_name.begin(), new_name.end(), new_name.begin(), _tolower );
@@ -50,7 +50,7 @@ namespace eosio {
 
       //Preventing against spamming
       INLINE_ACTION_SENDER(eosiosystem::system_contract, buyrambytes)( N(eosio), {{ram_payer,N(active)}},
-                                             { ram_payer, N(eosio.saving), jurisdiction_fee } );
+                                             { ram_payer, N(beos.trustee), jurisdiction_fee } );
    }
 
    void jurisdiction::updateprod( account_name producer, std::vector< code_jurisdiction > new_jurisdictions )
