@@ -89,9 +89,9 @@ namespace eosio {
       return ret;
     }
 
-    read_write::get_jurisdictions_results read_write::get_jurisdictions(const get_jurisdictions_params &)
+    read_write::get_active_jurisdictions_results read_write::get_active_jurisdictions(const get_active_jurisdictions_params &)
     {
-      read_write::get_jurisdictions_results ret;
+      read_write::get_active_jurisdictions_results ret;
       try 
       {
         const auto &idx_by_prod = db.db().get_index<chain::jurisdiction_index, chain::by_producer_jurisdiction>();
@@ -123,6 +123,17 @@ namespace eosio {
         throw fce;
       }
       return ret;
+    }
+
+    chain_apis::read_only::get_table_rows_result read_write::get_all_jurisdictions(const get_all_jurisdictions_params &p)
+    {
+      chain_apis::read_only::get_table_rows_params params;
+      params.json = true;
+      params.scope = p.scope;
+      params.code = p.code;
+      params.table = "infojurisdic";
+
+      return app().find_plugin<chain_plugin>()->get_read_only_api().get_table_rows(params);
     }
   }
 }

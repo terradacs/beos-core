@@ -34,7 +34,8 @@ void jurisdiction_api_plugin::plugin_startup() {
 
    app().get_plugin<http_plugin>().add_api({
       CHAIN_RW_CALL(get_producer_jurisdiction, 200l),
-      CHAIN_RW_CALL(get_jurisdictions, 200l)
+      CHAIN_RW_CALL(get_active_jurisdictions, 200l),
+      CHAIN_RW_CALL(get_all_jurisdictions, 200l)
    });
 }
 
