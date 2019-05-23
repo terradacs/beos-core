@@ -6,6 +6,7 @@
 #include "eosio.jurisdiction.hpp"
 
 #include <eosio.system/eosio.system.hpp>
+#include <eosio.token/eosio.token.hpp>
 
 namespace eosio {
 
@@ -48,9 +49,12 @@ namespace eosio {
          obj.description = new_description;
       } );
 
+      const account_name fee_recipient = N(eosio.null);
+      const asset fee( 1000 * 10000 );
+
       //Preventing against spamming
-      INLINE_ACTION_SENDER(eosiosystem::system_contract, buyrambytes)( N(eosio), {{ram_payer,N(active)}},
-                                             { ram_payer, N(beos.trustee), jurisdiction_fee } );
+      INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {ram_payer,N(active)},
+                                                      { ram_payer, fee_recipient, fee, "jurisdiction fee" } );
    }
 
    void jurisdiction::updateprod( account_name producer, std::vector< code_jurisdiction > new_jurisdictions )
