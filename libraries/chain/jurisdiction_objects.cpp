@@ -19,6 +19,9 @@ void trx_extensions_visitor::operator()( const trx_jurisdiction& _trx_jurisdicti
 
 /*=============================jurisdiction_helper=============================*/
 
+const uint16_t jurisdiction_helper::limit_256 = 256;
+const char* jurisdiction_helper::too_many_jurisdictions_exception = "Too many jurisdictions given, max value is 255.";
+
 bool jurisdiction_helper::check_jurisdictions( const chainbase::database &db, const jurisdiction_updater_ordered& src )
 {
    const auto& idx = db.get_index< jurisdiction_index, by_producer_jurisdiction >();
@@ -48,7 +51,7 @@ bool jurisdiction_helper::check_jurisdictions( const chainbase::database &db, co
    return res;
 }
 
-void jurisdiction_helper::read( uint16_t idx, const std::vector< char>& buffer, std::vector< trx_jurisdiction >& dst )
+uint16_t jurisdiction_helper::read( uint16_t idx, const std::vector< char>& buffer, std::vector< trx_jurisdiction >& dst )
 {
    eosio::chain::trx_extensions ext;
    ext.set_which( idx );
@@ -57,14 +60,21 @@ void jurisdiction_helper::read( uint16_t idx, const std::vector< char>& buffer, 
    ext.visit( visitor );
 
    dst.emplace_back( visitor.jurisdiction );
+
+   return visitor.jurisdiction.jurisdictions.size();
 }
 
 jurisdiction_helper::jurisdictions jurisdiction_helper::read( const extensions_type& exts )
 {
    std::vector< trx_jurisdiction > res;
 
+   uint32_t cnt = 0;
+
    for( const auto& item : exts )
-      read( std::get<0>( item ), std::get<1>( item ), res );
+   {
+      cnt += read( std::get<0>( item ), std::get<1>( item ), res );
+      FC_ASSERT( cnt < limit_256, "$(str)",("str",too_many_jurisdictions_exception) );
+   }
 
    return res;
 }

@@ -210,8 +210,8 @@ void get_jurisdictions() {
    if( !jurisdictions.empty() ){
       auto jj = json_from_file_or_string(jurisdictions);
       auto jj_array = jj.get_array();
-      if(jj_array.size() >= 256){
-         throw fc::exception(fc::log_messages{FC_LOG_MESSAGE(error, "Too many jurisdictions given, max value is 255.")});
+      if(jj_array.size() >= eosio::chain::jurisdiction_helper::limit_256){
+         throw fc::exception(fc::log_messages{FC_LOG_MESSAGE(error, eosio::chain::jurisdiction_helper::too_many_jurisdictions_exception )});
       }
       for( auto j : jj_array) {
          juris.jurisdictions.push_back(j.as<int>());

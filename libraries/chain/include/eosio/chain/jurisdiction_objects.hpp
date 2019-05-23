@@ -32,11 +32,14 @@ class jurisdiction_helper
 {
    public:
    
+      static const uint16_t limit_256;
+      static const char* too_many_jurisdictions_exception;
+
       using jurisdictions = std::vector< trx_jurisdiction >;
 
    private:
 
-      void read( uint16_t idx, const std::vector< char >& buffer, std::vector< trx_jurisdiction >& dst );
+      uint16_t read( uint16_t idx, const std::vector< char >& buffer, std::vector< trx_jurisdiction >& dst );
 
    public:
 
