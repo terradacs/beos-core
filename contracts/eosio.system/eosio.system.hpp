@@ -59,12 +59,16 @@ namespace eosiosystem {
       uint32_t             total_producers = 0;
       block_timestamp      last_name_close;
 
+      account_name         jurisdiction_fee_receiver = N(eosio.null);
+      asset                jurisdiction_fee = asset( 1000 * 10000 );
+
       // explicit serialization macro is not necessary, used here only to improve compilation time
       EOSLIB_SERIALIZE_DERIVED( eosio_global_state, eosio::blockchain_parameters,
                                 (max_ram_size)(total_ram_bytes_reserved)(total_ram_stake)
                                 (last_producer_schedule_update)(last_pervote_bucket_fill)
                                 (pervote_bucket)(perblock_bucket)(total_unpaid_blocks)(total_activated_stake)(thresh_activated_stake_time)
-                                (last_producer_schedule_size)(total_producer_vote_weight)(total_producers)(last_name_close) )
+                                (last_producer_schedule_size)(total_producer_vote_weight)(total_producers)(last_name_close)
+                                (jurisdiction_fee_receiver)(jurisdiction_fee) )
    };
 
    struct producer_info {
@@ -99,6 +103,10 @@ namespace eosiosystem {
 
    class immutable_system_contract : public native
       {
+      public:
+
+         using jurisdiction_info_type = std::pair< account_name, asset >;
+
       protected:
 
          producers_table         _producers;
@@ -128,6 +136,12 @@ namespace eosiosystem {
             return prepare_producer_infos( total_producers );
          }
 
+         jurisdiction_info_type get_jurisdiction_information()
+         {
+            eosio_assert( _global.exists(), "global settings don't exist" );
+            _gstate = _global.get();
+            return std::make_pair( _gstate.jurisdiction_fee_receiver, _gstate.jurisdiction_fee );
+         }
       };
 
    class system_contract : public immutable_system_contract {
