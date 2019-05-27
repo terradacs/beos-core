@@ -38,6 +38,7 @@ void test_producer_api_plugin::plugin_startup() {
 
    app().get_plugin<http_plugin>().add_api({
       CHAIN_RW_CALL(accelerate_time, 200l),
+      CHAIN_RW_CALL(accelerate_mock_time, 200l),
       CHAIN_RW_CALL(accelerate_blocks, 200l)
    });
 }

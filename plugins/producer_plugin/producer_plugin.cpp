@@ -162,6 +162,7 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
 
       mutable bool                                             _acceleration_enabled = false;
       mutable uint64_t                                         _acceleration = 0;
+      mutable uint64_t                                         _mock_acceleration = 0;
       /*
        * HACK ALERT
        * Boost timers can be in a state where a handler has not yet executed but is not abortable.
@@ -292,7 +293,7 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
       void on_incoming_block(const signed_block_ptr& block) {
          fc_dlog(_log, "received incoming block ${id}", ("id", block->id()));
 
-         EOS_ASSERT( block->timestamp < (fc::time_point::now() + fc::seconds(7)), block_from_the_future, "received a block from the future, ignoring it" );
+         EOS_ASSERT( block->timestamp < (fc::time_point::now() + fc::seconds(7) + microseconds( _mock_acceleration ) ), block_from_the_future, "received a block from the future, ignoring it" );
 
 
          chain::controller& chain = app().get_plugin<chain_plugin>().chain();
@@ -468,7 +469,9 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
       start_block_result start_block(bool &last_block);
 
       void accelerate_time( const fc::microseconds& value );
+      void accelerate_mock_time( const fc::microseconds& value );
       void accelerate_blocks( uint32_t value );
+      fc::time_point calculate_accelerated_block_time( const block_timestamp_type& val ) const;
       fc::time_point calculate_pending_block_time() const;
       void schedule_delayed_production_loop(const std::weak_ptr<producer_plugin_impl>& weak_this, const block_timestamp_type& current_block_time);
 };
@@ -940,6 +943,11 @@ void producer_plugin::accelerate_time( const fc::microseconds& value )
   my->accelerate_time( value );
 }
 
+void producer_plugin::accelerate_mock_time( const fc::microseconds& value )
+{
+  my->accelerate_mock_time( value );
+}
+
 void producer_plugin::accelerate_blocks( uint32_t value )
 {
   my->accelerate_blocks( value );
@@ -1010,10 +1018,29 @@ void producer_plugin_impl::accelerate_time( const fc::microseconds& value )
   }
 }
 
+void producer_plugin_impl::accelerate_mock_time( const fc::microseconds& value )
+{
+  if( value.count() > config::block_interval_us )
+    _mock_acceleration += value.count();
+}
+
 void producer_plugin_impl::accelerate_blocks( uint32_t value )
 {
    chain::controller& chain = app().get_plugin<chain_plugin>().chain();
    chain.accelerate_blocks( value );
+}
+
+fc::time_point producer_plugin_impl::calculate_accelerated_block_time( const block_timestamp_type& val ) const
+{
+   auto now = val.to_time_point();
+
+   if( _acceleration_enabled )
+   {
+     _acceleration_enabled = false;
+      now += microseconds( _acceleration );
+   }
+
+   return now;
 }
 
 fc::time_point producer_plugin_impl::calculate_pending_block_time() const {
@@ -1433,7 +1460,7 @@ void producer_plugin_impl::schedule_production_loop() {
       fc_dlog(_log, "Specualtive Block Created; Scheduling Speculative/Production Change");
       EOS_ASSERT( chain.pending_block_state(), missing_pending_block_state, "speculating without pending_block_state" );
       const auto& pbs = chain.pending_block_state();
-      schedule_delayed_production_loop(weak_this, pbs->header.timestamp);
+      schedule_delayed_production_loop(weak_this, calculate_accelerated_block_time( pbs->header.timestamp ) );
    } else {
       fc_dlog(_log, "Speculative Block Created");
    }

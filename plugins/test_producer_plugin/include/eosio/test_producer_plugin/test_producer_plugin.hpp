@@ -31,6 +31,7 @@ namespace test_producer_apis
         std::string type;
       };
 
+      using accelerate_mock_time_params = accelerate_time_params;
      /**
       * RPC request example:
 
@@ -78,6 +79,9 @@ namespace test_producer_apis
 
       producer_plugin* producer_plug = nullptr;
 
+      template< typename CallMethod >
+      accelerate_results accelerate_time_internal( const accelerate_time_params& params, CallMethod method );
+
     public:
 
       read_write( producer_plugin* _producer_plug )
@@ -85,6 +89,7 @@ namespace test_producer_apis
 
 
       accelerate_results accelerate_time( const accelerate_time_params& params );
+      accelerate_results accelerate_mock_time( const accelerate_time_params& params );
       accelerate_results accelerate_blocks( const accelerate_blocks_params& params );
   };
 

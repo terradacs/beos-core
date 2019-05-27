@@ -48,49 +48,69 @@ test_producer_apis::read_write test_producer_plugin::get_read_write_api() const
 
 namespace test_producer_apis
 {
- 
+   template< typename CallMethod >
+   read_write::accelerate_results read_write::accelerate_time_internal( const accelerate_time_params& params, CallMethod method )
+   {
+      try {
+
+         assert( producer_plug );
+
+         fc::microseconds res;
+
+         if( params.type == "s" )
+            res = fc::seconds( params.time );
+         else if( params.type == "m" )
+            res = fc::minutes( params.time );
+         else if( params.type == "h" )
+            res = fc::hours( params.time );
+         else if( params.type == "d" )
+            res = fc::days( params.time );
+         else
+            return accelerate_results( false );
+
+         method( res );
+
+         return accelerate_results( true );
+
+         } catch (const fc::exception& e) {
+            throw e;
+         } catch( const std::exception& e ) {
+            auto fce = fc::exception(
+                  FC_LOG_MESSAGE( info, "Caught std::exception: ${what}", ("what",e.what())),
+                  fc::std_exception_code,
+                  BOOST_CORE_TYPEID(e).name(),
+                  e.what()
+            );
+            throw fce;
+         } catch( ... ) {
+            auto fce = fc::unhandled_exception(
+                  FC_LOG_MESSAGE( info, "Caught unknown exception"),
+                  std::current_exception()
+            );
+            throw fce;
+         }
+
+      return accelerate_results( false );
+   }
+
   read_write::accelerate_results read_write::accelerate_time( const accelerate_time_params& params )
   {
-    try {
+      auto call = [this]( const fc::microseconds& res )
+      {
+         producer_plug->accelerate_time( res );
+      };
 
-      assert( producer_plug );
+      return accelerate_time_internal( params, call );
+  }
 
-      fc::microseconds res;
+  read_write::accelerate_results read_write::accelerate_mock_time( const accelerate_time_params& params )
+  {
+      auto call = [this]( const fc::microseconds& res )
+      {
+         producer_plug->accelerate_mock_time( res );
+      };
 
-      if( params.type == "s" )
-        res = fc::seconds( params.time );
-      else if( params.type == "m" )
-        res = fc::minutes( params.time );
-      else if( params.type == "h" )
-        res = fc::hours( params.time );
-      else if( params.type == "d" )
-        res = fc::days( params.time );
-      else
-        return accelerate_results( false );
-
-      producer_plug->accelerate_time( res );
-
-      return accelerate_results( true );
-
-      } catch (const fc::exception& e) {
-        throw e;
-      } catch( const std::exception& e ) {
-        auto fce = fc::exception(
-            FC_LOG_MESSAGE( info, "Caught std::exception: ${what}", ("what",e.what())),
-            fc::std_exception_code,
-            BOOST_CORE_TYPEID(e).name(),
-            e.what()
-        );
-        throw fce;
-      } catch( ... ) {
-        auto fce = fc::unhandled_exception(
-            FC_LOG_MESSAGE( info, "Caught unknown exception"),
-            std::current_exception()
-        );
-        throw fce;
-      }
-
-    return accelerate_results( false );
+      return accelerate_time_internal( params, call );
   }
 
   read_write::accelerate_results read_write::accelerate_blocks( const accelerate_blocks_params& params )
