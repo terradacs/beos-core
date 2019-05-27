@@ -273,3 +273,5 @@ plugin = eosio::history_plugin
 plugin = eosio::history_api_plugin
 plugin = eosio::test_producer_plugin
 plugin = eosio::test_producer_api_plugin
+plugin = eosio::jurisdiction_plugin
+plugin = eosio::jurisdiction_api_plugin
