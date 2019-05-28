@@ -3,14 +3,13 @@
  *  @copyright defined in eos/LICENSE.txt
  */
 
-#include "eosio.jurisdiction.hpp"
+#include "eosio.system.hpp"
 
-#include <eosio.system/eosio.system.hpp>
 #include <eosio.token/eosio.token.hpp>
 
-namespace eosio {
+namespace eosiosystem {
 
-   bool jurisdiction::is_unique( const std::string& new_name )
+   bool system_contract::is_unique( const std::string& new_name )
    {
       uint64_t _found_val = ::eosio::string_to_name( new_name.c_str() );
 
@@ -27,7 +26,7 @@ namespace eosio {
       return true;
    }
 
-   void jurisdiction::addjurisdict( account_name ram_payer, code_jurisdiction new_code, std::string new_name, std::string new_description )
+   void system_contract::addjurisdict( account_name ram_payer, code_jurisdiction new_code, std::string new_name, std::string new_description )
    {
       require_auth( ram_payer );
 
@@ -59,7 +58,7 @@ namespace eosio {
                                                       { ram_payer, jurisdiction_fee_receiver, jurisdiction_fee, "jurisdiction fee" } );
    }
 
-   void jurisdiction::updateprod( account_name producer, std::vector< code_jurisdiction > new_jurisdictions )
+   void system_contract::updateprod( account_name producer, std::vector< code_jurisdiction > new_jurisdictions )
    {
       eosio::print("Entering jurisdiction::updateprod\n");
       require_auth( producer );
@@ -84,6 +83,4 @@ namespace eosio {
       eosio::print("Leaving jurisdiction::updateprod\n");
    }
 
-} /// namespace eosio
-
-EOSIO_ABI( eosio::jurisdiction, (addjurisdict)(updateprod) )
+} //namespace eosiosystem

@@ -14,8 +14,6 @@
 #include <eosio.gateway/eosio.gateway.abi.hpp>
 #include <eosio.distribution/eosio.distribution.wast.hpp>
 #include <eosio.distribution/eosio.distribution.abi.hpp>
-#include <eosio.jurisdiction/eosio.jurisdiction.wast.hpp>
-#include <eosio.jurisdiction/eosio.jurisdiction.abi.hpp>
 
 #include <Runtime/Runtime.h>
 
@@ -778,8 +776,6 @@ inline uint64_t check_asset_value(uint64_t value)
 
 class beos_jurisdiction_tester : public eosio_init_tester
 {
-   abi_serializer jurisdiction_abi_ser;
-
    public:
 
       beos_jurisdiction_tester()
@@ -809,10 +805,6 @@ class beos_jurisdiction_tester : public eosio_init_tester
          produce_blocks( 120 - control->head_block_num() );
          BOOST_REQUIRE_EQUAL( control->head_block_num(), 120u );
 
-         set_privileged( N(beos.jurisdi) );
-
-         prepare_account( N(beos.jurisdi), eosio_jurisdiction_wast, eosio_jurisdiction_abi, &jurisdiction_abi_ser );
-
          for( const auto& item : actors )
          {
             if( item != N(beos.jurisdi) )
@@ -839,11 +831,11 @@ class beos_jurisdiction_tester : public eosio_init_tester
 
       fc::variant get_jurisdiction( code_jurisdiction code )
       {
-         vector<char> data = get_row_by_account( N(beos.jurisdi), N(beos.jurisdi), N(infojurisdic), code );
+         vector<char> data = get_row_by_account( config::system_account_name, config::system_account_name, N(infojurisdic), code );
          if( data.empty() )
             return fc::variant();
          else
-            return jurisdiction_abi_ser.binary_to_variant( "info_jurisdiction", data, abi_serializer_max_time );
+            return system_abi_ser.binary_to_variant( "info_jurisdiction", data, abi_serializer_max_time );
       }
 
       action_result add_jurisdiction( account_name ram_payer, code_jurisdiction new_code, std::string new_name, std::string new_description )
@@ -853,8 +845,8 @@ class beos_jurisdiction_tester : public eosio_init_tester
             ("new_code", new_code )
             ("new_name", new_name )
             ("new_description", new_description ),
-            jurisdiction_abi_ser,
-            N(beos.jurisdi)
+            system_abi_ser,
+            config::system_account_name
             );
       }
 
@@ -863,8 +855,8 @@ class beos_jurisdiction_tester : public eosio_init_tester
          return push_action(producer, N(updateprod), mvo()
             ("producer",       producer )
             ("new_jurisdictions", new_jurisdictions ),
-            jurisdiction_abi_ser,
-            N(beos.jurisdi)
+            system_abi_ser,
+            config::system_account_name
             );
       }
 };

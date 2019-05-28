@@ -15,9 +15,36 @@
    },{
       "new_type_name": "weight_type",
       "type": "uint16"
+   },{
+      "new_type_name": "code_jurisdiction",
+      "type": "uint16"
    }],
    "____comment": "eosio.bios structs: set_account_limits, setpriv, set_global_limits, producer_key, set_producers, require_auth are provided so abi available for deserialization in future.",
    "structs": [{
+      "name": "info_jurisdiction",
+      "base": "",
+      "fields": [
+        {"name":"code",         "type":"code_jurisdiction"},
+        {"name":"name",         "type":"string"},
+        {"name":"description",  "type":"string"}
+      ]
+    },{
+      "name": "addjurisdict",
+      "base": "",
+      "fields": [
+        {"name":"ram_payer",        "type":"account_name"},
+        {"name":"new_code",         "type":"code_jurisdiction"},
+        {"name":"new_name",         "type":"string"},
+        {"name":"new_description",  "type":"string"}
+      ]
+    },{
+      "name": "updateprod",
+      "base": "",
+      "fields": [
+        {"name":"producer", "type":"account_name"},
+        {"name":"new_jurisdictions", "type":"code_jurisdiction[]"}
+      ]
+    },{
       "name": "initialissue",
       "base": "",
       "fields": [
@@ -445,6 +472,14 @@
     }
    ],
    "actions": [{
+      "name": "addjurisdict",
+      "type": "addjurisdict",
+      "ricardian_contract": ""
+    },{
+      "name": "updateprod",
+      "type": "updateprod",
+      "ricardian_contract": ""
+    },{
      "name": "initialissue",
      "type": "initialissue",
      "ricardian_contract": ""
@@ -577,7 +612,13 @@
       "type": "setparams",
       "ricardian_contract": ""
     }],
-  "tables": [
+  "tables": [{
+      "name": "infojurisdic",
+      "type": "info_jurisdiction",
+      "index_type": "i64",
+      "key_names": [ "owner" ],
+      "key_types": [ "uint64" ]
+    },
     {
       "name": "producers",
       "type": "producer_info",

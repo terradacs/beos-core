@@ -101,6 +101,25 @@ namespace eosiosystem {
    static constexpr uint32_t     seconds_per_day = 24 * 3600;
    static constexpr uint64_t     system_token_symbol = CORE_SYMBOL;
 
+   static constexpr uint16_t limit_256 = 256;
+   static constexpr uint32_t jurisdiction_fee = 100 * 1024;//100KB RAM
+
+   struct info_jurisdiction
+   {
+      code_jurisdiction    code;
+      std::string          name;
+      std::string          description;
+
+      uint64_t primary_key()const { return code; }
+      uint64_t get_key_name()const { return ::eosio::string_to_name( name.c_str() ); }
+
+      EOSLIB_SERIALIZE( info_jurisdiction, (code)(name)(description) )
+   };
+
+   typedef eosio::multi_index< N(infojurisdic), info_jurisdiction,
+                               indexed_by<N(infonamejuri), const_mem_fun<info_jurisdiction, uint64_t, &info_jurisdiction::get_key_name>  >
+                             >  info_jurisdiction_table;
+
    class immutable_system_contract : public native
       {
       public:
@@ -114,6 +133,8 @@ namespace eosiosystem {
          global_state_singleton  _global;
          eosio_global_state      _gstate;
 
+         info_jurisdiction_table info_jurisdictions;
+
          inline std::vector<block_producer_voting_info> prepare_producer_infos( uint32_t total_producers ) const
          {
             return std::vector<block_producer_voting_info>( total_producers );
@@ -121,7 +142,7 @@ namespace eosiosystem {
 
       public:
          immutable_system_contract(account_name s)
-         : native(s), _producers(_self, _self), _global(_self,_self) {}
+         : native(s), _producers(_self, _self), _global(_self,_self), info_jurisdictions( _self, _self ) {}
 
          std::vector<block_producer_voting_info> prepare_data_for_voting_update()
          {
@@ -253,6 +274,9 @@ namespace eosiosystem {
          bool is_allowed_vote_operation() const;
          bool is_allowed_ram_operation() const;
 
+         void addjurisdict( account_name ram_payer, code_jurisdiction new_code, std::string new_name, std::string new_description );
+         void updateprod( account_name producer, std::vector< code_jurisdiction > new_jurisdictions );
+
       private:
          void update_elected_producers( block_timestamp timestamp );
 
@@ -267,6 +291,8 @@ namespace eosiosystem {
          void update_votes( const account_name voter, const account_name proxy, const std::vector<account_name>& producers, bool voting );
          void update_voting_power(const account_name voter, int64_t stake_delta);
          void flush_voting_stats();
+
+         bool is_unique( const std::string& new_name );
 
    };
 

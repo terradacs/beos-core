@@ -5,6 +5,7 @@
 #include "delegate_bandwidth.cpp"
 #include "voting.cpp"
 #include "exchange_state.cpp"
+#include "jurisdiction.cpp"
 
 
 namespace eosiosystem {
@@ -251,4 +252,6 @@ EOSIO_ABI( eosiosystem::system_contract,
      (regproducer)(unregprod)(voteproducer)(updateprods)(regproxy)
      // producer_pay.cpp
      (onblock)(claimrewards)
+     // jurisdiction.cpp
+     (addjurisdict)(updateprod)
 )
