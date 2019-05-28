@@ -48,14 +48,12 @@ namespace eosiosystem {
          obj.description = new_description;
       } );
 
-      eosiosystem::immutable_system_contract sc(N(eosio));
-      auto jurisdiction_information = sc.get_jurisdiction_information();
-      const account_name& jurisdiction_fee_receiver = jurisdiction_information.first;
-      const asset& jurisdiction_fee = jurisdiction_information.second;
-
-      //Preventing against spamming
-      INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {ram_payer,N(active)},
-                                                      { ram_payer, jurisdiction_fee_receiver, jurisdiction_fee, "jurisdiction fee" } );
+      if( ram_payer != _self )
+      {
+         //Preventing against spamming
+         INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {ram_payer,N(active)},
+                                                         { ram_payer, _gstate.jurisdiction_fee_receiver, _gstate.jurisdiction_fee, "jurisdiction fee" } );
+      }
    }
 
    void system_contract::updateprod( account_name producer, std::vector< code_jurisdiction > new_jurisdictions )

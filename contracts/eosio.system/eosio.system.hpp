@@ -157,12 +157,6 @@ namespace eosiosystem {
             return prepare_producer_infos( total_producers );
          }
 
-         jurisdiction_info_type get_jurisdiction_information()
-         {
-            eosio_assert( _global.exists(), "global settings don't exist" );
-            _gstate = _global.get();
-            return std::make_pair( _gstate.jurisdiction_fee_receiver, _gstate.jurisdiction_fee );
-         }
       };
 
    class system_contract : public immutable_system_contract {
