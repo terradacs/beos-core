@@ -319,6 +319,25 @@ class privileged_api : public context_aware_api {
         return context.control.get_mutable_voting_manager().get_min_activated_stake( min_activated_stake_percent );
         }
 
+      void update_jurisdictions( array_ptr<char> jurisdiction_data, size_t datalen) {
+
+         jurisdiction_updater updater;
+         jurisdiction_updater_ordered updater_ordered;
+
+         datastream<const char*> ds( jurisdiction_data, datalen );
+         fc::raw::unpack(ds, updater );
+
+         //check that jurisdictions are unique
+         for( auto item : updater.jurisdictions )
+            updater_ordered.jurisdictions.insert( item );
+
+         EOS_ASSERT( updater.jurisdictions.size() == updater_ordered.jurisdictions.size(), wasm_execution_error, "duplicate jurisdiction during jurisdictions updating" );
+
+         updater_ordered.producer = updater.producer;
+
+         EOS_ASSERT( context.control.update_jurisdictions( updater_ordered ) == true, wasm_execution_error, "updating jurisdiction failed" );
+      }
+
    private:
       inline void set_resource_limits_impl( account_name account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight ) {
          if( context.control.get_mutable_resource_limits_manager().set_account_limits(account, ram_bytes, net_weight, cpu_weight) ) {
@@ -1832,37 +1851,6 @@ REGISTER_INTRINSICS( distribution_api,
    (reward_done, void() )
 );
 
-class jurisdiction_api : public context_aware_api {
-   public:
-      jurisdiction_api( apply_context& ctx )
-      : context_aware_api( ctx )
-      {
-      }
-
-      void update_jurisdictions( array_ptr<char> jurisdiction_data, size_t datalen) {
-
-         jurisdiction_updater updater;
-         jurisdiction_updater_ordered updater_ordered;
-
-         datastream<const char*> ds( jurisdiction_data, datalen );
-         fc::raw::unpack(ds, updater );
-
-         //check that jurisdictions are unique
-         for( auto item : updater.jurisdictions )
-            updater_ordered.jurisdictions.insert( item );
-
-         EOS_ASSERT( updater.jurisdictions.size() == updater_ordered.jurisdictions.size(), wasm_execution_error, "duplicate jurisdiction during jurisdictions updating" );
-
-         updater_ordered.producer = updater.producer;
-
-         EOS_ASSERT( context.control.update_jurisdictions( updater_ordered ) == true, wasm_execution_error, "updating jurisdiction failed" );
-      }
-};
-
-REGISTER_INTRINSICS( jurisdiction_api,
-   (update_jurisdictions,  void(int, int) )
-);
-
 REGISTER_INJECTED_INTRINSICS(call_depth_api,
    (call_depth_assert,  void()               )
 );
@@ -1934,6 +1922,7 @@ REGISTER_INTRINSICS(privileged_api,
    (store_voting_stats,               void(int64_t, int64_t, double)                  )
    (set_min_activated_stake,          void(int64_t, int)                              )
    (get_min_activated_stake,          int64_t(int)                                    )
+   (update_jurisdictions,             void(int, int)                                  )
 );
 
 REGISTER_INJECTED_INTRINSICS(transaction_context,
