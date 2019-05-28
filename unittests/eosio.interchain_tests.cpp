@@ -975,6 +975,20 @@ BOOST_FIXTURE_TEST_CASE( basic_test_02, beos_jurisdiction_tester ) try {
       BOOST_REQUIRE_EQUAL( true, updater.check_jurisdictions( control->db(), data_02 ) );
    }
 
+   auto message_01 = wasm_assert_msg("number of jurisdictions is greater than allowed");
+   auto message_02 = wasm_assert_msg("user is not a producer");
+   auto message_03 = wasm_assert_msg("jurisdiction doesn't exist");
+   std::vector< code_jurisdiction > too_long;
+
+   for( uint16_t i = 0; i < 256; ++i )
+      too_long.push_back( i );
+
+   {
+      BOOST_REQUIRE_EQUAL( message_01, update_jurisdictions( N(beos.proda), too_long ) );
+      BOOST_REQUIRE_EQUAL( message_02, update_jurisdictions( N(beos.gateway), {2,3} ) );
+      BOOST_REQUIRE_EQUAL( message_03, update_jurisdictions( N(beos.proda), {1024} ) );
+   }
+
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()
