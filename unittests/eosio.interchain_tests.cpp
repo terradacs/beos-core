@@ -829,22 +829,13 @@ class beos_jurisdiction_tester : public eosio_init_tester
          return r;
       }
 
-      fc::variant get_jurisdiction( code_jurisdiction code )
-      {
-         vector<char> data = get_row_by_account( config::system_account_name, config::system_account_name, N(infojurisdic), code );
-         if( data.empty() )
-            return fc::variant();
-         else
-            return system_abi_ser.binary_to_variant( "info_jurisdiction", data, abi_serializer_max_time );
-      }
-
       action_result add_jurisdiction( account_name ram_payer, code_jurisdiction new_code, std::string new_name, std::string new_description )
       {
          return push_action(ram_payer, N(addjurisdict), mvo()
-            ("ram_payer",       ram_payer )
-            ("new_code", new_code )
-            ("new_name", new_name )
-            ("new_description", new_description ),
+            ("ram_payer",        ram_payer )
+            ("new_code",         new_code )
+            ("new_name",         new_name )
+            ("new_description",  new_description ),
             system_abi_ser,
             config::system_account_name
             );
@@ -865,19 +856,11 @@ BOOST_AUTO_TEST_SUITE(eosio_jurisdiction_tests)
 
 BOOST_FIXTURE_TEST_CASE( basic_test_01, beos_jurisdiction_tester ) try {
 
-   auto message_01 = wasm_assert_msg("size of name is greater than allowed");
-   auto message_02 = wasm_assert_msg("size of description is greater than allowed");
-   auto message_03 = wasm_assert_msg("jurisdiction with the same code exists");
-   auto message_04 = wasm_assert_msg("jurisdiction with the same name exists");
-
-   std::string message_56           = "0123456789ABCDEFGHIJ0123456789ABCDEFGHIJ0123456789ABCDEF";
-   std::string message_56_to_lower  = "0123456789abcdefghij0123456789abcdefghij0123456789abcdef";
-   std::string message_100 = "0123456789ABCDEFGHIJ0123456789ABCDEFGHIJ0123456789ABCDEFGHIJ0123456789ABCDEFGHIJ0123456789ABCDEFGHIJ";
-   std::string message_256 = message_100 + message_100 + message_56;
+   jurisdiction_helper helper;
 
    {
       BOOST_REQUIRE_EQUAL( success(), add_jurisdiction( N(beos.jurisdi), 1, "POLAND", "EAST EUROPE" ) );
-      auto result = get_jurisdiction( 1 );
+      auto result = helper.get_jurisdiction( control->db(), 1 );
       BOOST_REQUIRE_EQUAL( false, result.is_null() );
       BOOST_REQUIRE_EQUAL( true, result["code"] == 1 );
       BOOST_REQUIRE_EQUAL( true, result["name"] == "poland" );
@@ -886,21 +869,37 @@ BOOST_FIXTURE_TEST_CASE( basic_test_01, beos_jurisdiction_tester ) try {
 
    {
       BOOST_REQUIRE_EQUAL( success(), add_jurisdiction( N(beos.proda), 2, "sweden", "EAST EUROPE" ) );
-      auto result = get_jurisdiction( 2 );
+      auto result = helper.get_jurisdiction( control->db(), 2 );
       BOOST_REQUIRE_EQUAL( false, result.is_null() );
       BOOST_REQUIRE_EQUAL( true, result["code"] == 2 );
       BOOST_REQUIRE_EQUAL( true, result["name"] == "sweden" );
       BOOST_REQUIRE_EQUAL( true, result["description"] == "EAST EUROPE" );
 
-      result = get_jurisdiction( 1 );
+      result = helper.get_jurisdiction( control->db(), 1 );
       BOOST_REQUIRE_EQUAL( false, result.is_null() );
    }
+
+   auto message_01 = wasm_assert_msg("size of name is greater than allowed");
+   auto message_02 = wasm_assert_msg("size of description is greater than allowed");
+   auto message_03 = "jurisdiction with the same code exists";
+   auto message_04 = "jurisdiction with the same name exists";
+
+   std::string message_56           = "0123456789ABCDEFGHIJ0123456789ABCDEFGHIJ0123456789ABCDEF";
+   std::string message_56_to_lower  = "0123456789abcdefghij0123456789abcdefghij0123456789abcdef";
+   std::string message_100 = "0123456789ABCDEFGHIJ0123456789ABCDEFGHIJ0123456789ABCDEFGHIJ0123456789ABCDEFGHIJ0123456789ABCDEFGHIJ";
+   std::string message_256 = message_100 + message_100 + message_56;
 
    {
       BOOST_REQUIRE_EQUAL( message_01, add_jurisdiction( N(beos.proda), 1, message_256, "SOMEWHERE" ) );
       BOOST_REQUIRE_EQUAL( message_02, add_jurisdiction( N(beos.proda), 1, "Czech Republic", message_256 ) );
-      BOOST_REQUIRE_EQUAL( message_03, add_jurisdiction( N(beos.proda), 1, "Russia", "EAST EUROPE/ASIA" ) );
-      BOOST_REQUIRE_EQUAL( message_04, add_jurisdiction( N(beos.proda), 3, "SWEDEN", "EAST EUROPE/ASIA" ) );
+
+      auto message = add_jurisdiction( N(beos.proda), 1, "Russia", "EAST EUROPE/ASIA" );
+      auto found = message.find( message_03 );
+      BOOST_REQUIRE_EQUAL( true, found != string::npos );
+
+      message = add_jurisdiction( N(beos.proda), 3, "SWEDEN", "EAST EUROPE/ASIA" );
+      found = message.find( message_04 );
+      BOOST_REQUIRE_EQUAL( true, found != string::npos );
    }
 
    {
@@ -911,7 +910,7 @@ BOOST_FIXTURE_TEST_CASE( basic_test_01, beos_jurisdiction_tester ) try {
 
       for( int i = 0; i < 10; ++i )
       {
-         auto result = get_jurisdiction( start + i );
+         auto result = helper.get_jurisdiction( control->db(), start + i );
          BOOST_REQUIRE_EQUAL( false, result.is_null() );
          BOOST_REQUIRE_EQUAL( true, result["code"] == start + i );
          BOOST_REQUIRE_EQUAL( true, result["name"] == message_56_to_lower + std::to_string( i ) );
@@ -923,7 +922,11 @@ BOOST_FIXTURE_TEST_CASE( basic_test_01, beos_jurisdiction_tester ) try {
       uint16_t start = 20000;
 
       for( int i = 0; i < 10; ++i )
-         BOOST_REQUIRE_EQUAL( message_04, add_jurisdiction( N(beos.prodc), start + i, message_56 + std::to_string( i ), "SOMEWHERE" ) );
+      {
+         auto message = add_jurisdiction( N(beos.prodc), start + i, message_56 + std::to_string( i ), "SOMEWHERE" );
+         auto found = message.find( message_04 );
+         BOOST_REQUIRE_EQUAL( true, found != string::npos );
+      }
    }
 
 } FC_LOG_AND_RETHROW()
@@ -977,7 +980,7 @@ BOOST_FIXTURE_TEST_CASE( basic_test_02, beos_jurisdiction_tester ) try {
 
    auto message_01 = wasm_assert_msg("number of jurisdictions is greater than allowed");
    auto message_02 = wasm_assert_msg("user is not a producer");
-   auto message_03 = wasm_assert_msg("jurisdiction doesn't exist");
+   auto message_03 = "jurisdiction doesn't exist";
    std::vector< code_jurisdiction > too_long;
 
    for( uint16_t i = 0; i < 256; ++i )
@@ -986,7 +989,10 @@ BOOST_FIXTURE_TEST_CASE( basic_test_02, beos_jurisdiction_tester ) try {
    {
       BOOST_REQUIRE_EQUAL( message_01, update_jurisdictions( N(beos.proda), too_long ) );
       BOOST_REQUIRE_EQUAL( message_02, update_jurisdictions( N(beos.gateway), {2,3} ) );
-      BOOST_REQUIRE_EQUAL( message_03, update_jurisdictions( N(beos.proda), {1024} ) );
+
+      auto message = update_jurisdictions( N(beos.proda), {1024} );
+      auto found = message.find( message_03 );
+      BOOST_REQUIRE_EQUAL( true, found != string::npos );
    }
 
 } FC_LOG_AND_RETHROW()

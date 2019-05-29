@@ -24,6 +24,21 @@ class jurisdiction_tester : public tester
       {
       }
 
+      void make_jurisdictions( chainbase::database &db, int8_t max )
+      {
+         jurisdiction_helper updater;
+
+         info_jurisdiction _info_jurisdiction;
+         _info_jurisdiction.description = "DESC";
+
+         for( int8_t i = 0; i < max; ++i )
+         {
+            _info_jurisdiction.code = i;
+            _info_jurisdiction.name = std::to_string( i );
+            updater.update( db, _info_jurisdiction );
+         }
+
+      }
 };
 
 BOOST_AUTO_TEST_SUITE(jurisdiction_tests)
@@ -104,6 +119,8 @@ BOOST_FIXTURE_TEST_CASE( basic_test_02, jurisdiction_tester ) try {
    jurisdiction_updater_ordered src;
    src.producer = N(tester);
 
+   make_jurisdictions( db, 22 );
+
    src.jurisdictions = {};
    updater.update( db, src );
    BOOST_REQUIRE_EQUAL( true, updater.check_jurisdictions( db, src ) );
@@ -150,6 +167,8 @@ BOOST_FIXTURE_TEST_CASE( basic_test_03, jurisdiction_tester ) try {
 
    chainbase::database &db = const_cast< chainbase::database& > ( control->db() );
    jurisdiction_helper updater;
+
+   make_jurisdictions( db, 10 );
 
    jurisdiction_updater_ordered src_01;
    src_01.producer = N(tester_01);

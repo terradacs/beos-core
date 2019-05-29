@@ -79,19 +79,77 @@ jurisdiction_helper::jurisdictions jurisdiction_helper::read( const extensions_t
    return res;
 }
 
+fc::variant jurisdiction_helper::get_jurisdiction( const chainbase::database& db, code_jurisdiction code )
+{
+   const auto& idx_by_code = db.get_index< jurisdiction_dictionary_index, by_code_jurisdiction_dictionary >();
+
+   auto found = idx_by_code.find( code );
+   if( found == idx_by_code.end() )
+      return fc::variant();
+   else
+      return fc::mutable_variant_object()
+         ("code", found->code )
+         ("name", found->name )
+         ("description", found->description );
+}
+
+bool jurisdiction_helper::update( chainbase::database& db, const info_jurisdiction& info )
+{
+   const auto& idx_by_code = db.get_index< jurisdiction_dictionary_index, by_code_jurisdiction_dictionary >();
+   const auto& idx_by_name = db.get_index< jurisdiction_dictionary_index, by_name_jurisdiction_dictionary >();
+
+   auto _info = info;
+   auto _tolower = []( const char& c ) { return std::tolower( c ); };
+   std::transform( _info.name.begin(), _info.name.end(), _info.name.begin(), _tolower );
+
+   auto found_code = idx_by_code.find( _info.code );
+   FC_ASSERT( found_code == idx_by_code.end(), "jurisdiction with the same code exists" );
+
+   auto found_name = idx_by_name.find( _info.name );
+   FC_ASSERT( found_name == idx_by_name.end(), "jurisdiction with the same name exists" );
+
+   db.create< jurisdiction_dictionary_object >( [&]( auto& obj ) {
+      obj.code = _info.code;
+      obj.name = _info.name;
+      obj.description = _info.description;
+   });
+
+   return true;
+}
+
 bool jurisdiction_helper::update( chainbase::database& db, const jurisdiction_updater_ordered& updater )
 {
-   try
+   const auto& idx_by_code = db.get_index< jurisdiction_dictionary_index, by_code_jurisdiction_dictionary >();
+
+   for( auto item : updater.jurisdictions )
+      FC_ASSERT( idx_by_code.find( item ) != idx_by_code.end(), "jurisdiction doesn't exist" );
+
+   auto& idx = db.get_mutable_index< jurisdiction_index >();
+   const auto& idx_by = db.get_index< jurisdiction_index, by_producer_jurisdiction >();
+
+   auto itr_state = idx_by.lower_bound( std::make_tuple( updater.producer, std::numeric_limits< code_jurisdiction >::min() ) );
+   auto itr_src = updater.jurisdictions.begin();
+
+   while( itr_src != updater.jurisdictions.end() )
    {
-      auto& idx = db.get_mutable_index< jurisdiction_index >();
-      const auto& idx_by = db.get_index< jurisdiction_index, by_producer_jurisdiction >();
-
-      auto itr_state = idx_by.lower_bound( std::make_tuple( updater.producer, std::numeric_limits< code_jurisdiction >::min() ) );
-      auto itr_src = updater.jurisdictions.begin();
-
-      while( itr_src != updater.jurisdictions.end() )
+      if( itr_state == idx_by.end() || itr_state->producer != updater.producer )
       {
-         if( itr_state == idx_by.end() || itr_state->producer != updater.producer )
+         db.create< jurisdiction_object >( [&]( auto& obj ) {
+            obj.producer = updater.producer;
+            obj.jurisdiction = *itr_src;
+         });
+         ++itr_src;
+      }
+      else if( itr_state->jurisdiction == *itr_src )
+      {
+         ++itr_state;
+         ++itr_src;
+      }
+      else
+      {
+         if( itr_state->jurisdiction < *itr_src )
+            itr_state = idx. template erase< by_producer_jurisdiction >( itr_state );
+         else
          {
             db.create< jurisdiction_object >( [&]( auto& obj ) {
                obj.producer = updater.producer;
@@ -99,33 +157,11 @@ bool jurisdiction_helper::update( chainbase::database& db, const jurisdiction_up
             });
             ++itr_src;
          }
-         else if( itr_state->jurisdiction == *itr_src )
-         {
-            ++itr_state;
-            ++itr_src;
-         }
-         else
-         {
-            if( itr_state->jurisdiction < *itr_src )
-               itr_state = idx. template erase< by_producer_jurisdiction >( itr_state );
-            else
-            {
-               db.create< jurisdiction_object >( [&]( auto& obj ) {
-                  obj.producer = updater.producer;
-                  obj.jurisdiction = *itr_src;
-               });
-               ++itr_src;
-            }
-         }
       }
+   }
 
-      while( itr_state != idx_by.end() && itr_state->producer == updater.producer )
-         itr_state = idx. template erase< by_producer_jurisdiction >( itr_state );
-   }
-   catch( ... )
-   {
-      return false;
-   }
+   while( itr_state != idx_by.end() && itr_state->producer == updater.producer )
+      itr_state = idx. template erase< by_producer_jurisdiction >( itr_state );
 
    return true;
 }

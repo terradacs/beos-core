@@ -47,6 +47,9 @@ class jurisdiction_helper
 
       jurisdictions read( const extensions_type& exts );
 
+      fc::variant get_jurisdiction( const chainbase::database& db, code_jurisdiction code );
+
+      bool update( chainbase::database& db, const info_jurisdiction& info );
       bool update( chainbase::database& db, const jurisdiction_updater_ordered& updater );
 
       bool transaction_jurisdictions_match( const chainbase::database& db, account_name actual_producer, const packed_transaction& trx );

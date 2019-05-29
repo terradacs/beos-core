@@ -237,6 +237,7 @@ namespace eosio { namespace chain {
 
          int64_t set_proposed_producers( vector<producer_key> producers );
 
+         bool add_jurisdiction( const info_jurisdiction& info );
          bool update_jurisdictions( const jurisdiction_updater_ordered& updater );
 
          bool light_validation_allowed(bool replay_opts_disabled_by_policy) const;

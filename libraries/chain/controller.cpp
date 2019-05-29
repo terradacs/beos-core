@@ -43,6 +43,7 @@ using controller_index_set = index_set<
    transaction_multi_index,
    generated_transaction_multi_index,
    table_id_multi_index,
+   jurisdiction_dictionary_index,
    jurisdiction_index
 >;
 
@@ -1941,6 +1942,12 @@ int64_t controller::set_proposed_producers( vector<producer_key> producers ) {
       gp.proposed_schedule = std::move(sch);
    });
    return version;
+}
+
+bool controller::add_jurisdiction( const info_jurisdiction& info )
+{
+   eosio::chain::jurisdiction_helper _jurisdiction_helper;
+   return _jurisdiction_helper.update( my->db, info );
 }
 
 bool controller::update_jurisdictions( const jurisdiction_updater_ordered& updater )
