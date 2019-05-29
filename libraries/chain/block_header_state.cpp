@@ -153,10 +153,10 @@ namespace eosio { namespace chain {
     EOS_ASSERT( result.header.producer == h.producer, wrong_producer, "wrong producer specified" );
     EOS_ASSERT( result.header.schedule_version == h.schedule_version, producer_schedule_exception, "schedule_version in signed block is corrupted" );
 
-    auto itr = producer_to_last_produced.find(h.producer);
-    if( itr != producer_to_last_produced.end() ) {
-       EOS_ASSERT( itr->second < result.block_num - h.confirmed, producer_double_confirm, "producer ${prod} double-confirming known range", ("prod", h.producer) );
-    }
+    //auto itr = producer_to_last_produced.find(h.producer);
+    //if( itr != producer_to_last_produced.end() ) {
+    //   EOS_ASSERT( itr->second < result.block_num - h.confirmed, producer_double_confirm, "producer ${prod} double-confirming known range", ("prod", h.producer) );
+    //}
 
     // FC_ASSERT( result.header.block_mroot == h.block_mroot, "mismatch block merkle root" );
 
