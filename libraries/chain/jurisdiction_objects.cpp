@@ -168,32 +168,25 @@ bool jurisdiction_helper::update( chainbase::database& db, const jurisdiction_up
 
 bool jurisdiction_helper::transaction_jurisdictions_match( const chainbase::database& db, account_name actual_producer, const packed_transaction& trx )
 {
-   try
+   auto exts = trx.get_transaction().transaction_extensions;
+   if( exts.empty() )
+      return true;
+
+   auto deserialized_data = read( exts );
+
+   const auto& idx_by = db.get_index< jurisdiction_index, by_producer_jurisdiction >();
+
+   for( auto item_trx_jurisdiction : deserialized_data )
    {
-      auto exts = trx.get_transaction().transaction_extensions;
-      if( exts.empty() )
-         return true;
-
-      auto deserialized_data = read( exts );
-
-      const auto& idx_by = db.get_index< jurisdiction_index, by_producer_jurisdiction >();
-
-      for( auto item_trx_jurisdiction : deserialized_data )
+      for( auto item : item_trx_jurisdiction.jurisdictions )
       {
-         for( auto item : item_trx_jurisdiction.jurisdictions )
-         {
-            auto found = idx_by.find( std::make_tuple( actual_producer, item ) );
-            if( found != idx_by.end() )
-               return true;
-         }
+         auto found = idx_by.find( std::make_tuple( actual_producer, item ) );
+         if( found != idx_by.end() )
+            return true;
       }
+   }
 
-      return false;
-   }
-   catch(...)
-   {
-      return false;
-   }
+   return false;
 }
 
 } } // eosio::chain
