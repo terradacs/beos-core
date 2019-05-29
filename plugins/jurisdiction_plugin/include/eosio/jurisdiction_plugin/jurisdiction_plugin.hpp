@@ -3,27 +3,37 @@
 #include <eosio/chain_plugin/chain_plugin.hpp>
 #include <eosio/chain/types.hpp>
 #include <set>
+#include <eosio/chain/jurisdiction_object.hpp>
 
 namespace eosio {
   namespace jurisdiction_apis
   {
+    const std::size_t JURISDICTION_QUERY_LIMIT = 1000;
+
     class read_write
     {
       public:
         struct get_producer_jurisdiction_params
         {
-          std::string producer_name;
+          std::vector<std::string> producer_names;
+        };
+
+        struct producer_jurisdiction_api_object
+        {
+          chain::account_name producer;
+          std::vector<chain::code_jurisdiction> jurisdictions;
+
+          producer_jurisdiction_api_object(const chain::account_name &producer, const std::vector<chain::code_jurisdiction> &jurisdictions) :
+            producer(producer),
+            jurisdictions(jurisdictions)
+          {
+
+          }
         };
 
         struct get_producer_jurisdiction_results
         {
-          chain::account_name producer_name;
-          std::vector<chain::code_jurisdiction> jurisdictions;
-        };
-
-        struct get_active_jurisdictions_results
-        {
-          std::set<chain::code_jurisdiction> jurisdictions;
+          std::vector<producer_jurisdiction_api_object> producer_jurisdictions;
         };
 
         struct get_active_jurisdictions_params
@@ -31,10 +41,34 @@ namespace eosio {
 
         };
 
+        struct get_active_jurisdictions_results
+        {
+          std::set<chain::code_jurisdiction> jurisdictions;
+        };
+
         struct get_all_jurisdictions_params
         {
-          chain::name code;
-          std::string scope;
+          
+        };
+
+        struct jurisdiction_api_dictionary_object
+        {
+          chain::code_jurisdiction code;
+          std::string name;
+          std::string description;
+
+          jurisdiction_api_dictionary_object(const chain::jurisdiction_dictionary_object &jdo) :
+            code(jdo.code),
+            name(jdo.name),
+            description(jdo.description)
+          {
+
+          }
+        };
+
+        struct get_all_jurisdictions_results
+        {
+          std::vector<jurisdiction_api_dictionary_object> jurisdictions;
         };
 
         read_write(controller& db, const fc::microseconds& abi_serializer_max_time) : 
@@ -44,9 +78,9 @@ namespace eosio {
 
         }
 
-        get_producer_jurisdiction_results get_producer_jurisdiction(const get_producer_jurisdiction_params &producer_name);
+        get_producer_jurisdiction_results get_producer_jurisdiction(const get_producer_jurisdiction_params &prod_jur_params);
         get_active_jurisdictions_results get_active_jurisdictions(const get_active_jurisdictions_params &);
-        chain_apis::read_only::get_table_rows_result get_all_jurisdictions(const get_all_jurisdictions_params &p);
+        get_all_jurisdictions_results get_all_jurisdictions(const get_all_jurisdictions_params &all_jur_params);
 
     private:
       controller& db;
@@ -75,8 +109,13 @@ namespace eosio {
   };
 }
 
-FC_REFLECT(eosio::jurisdiction_apis::read_write::get_producer_jurisdiction_params, (producer_name));
-FC_REFLECT(eosio::jurisdiction_apis::read_write::get_producer_jurisdiction_results, (producer_name)(jurisdictions));
-FC_REFLECT(eosio::jurisdiction_apis::read_write::get_active_jurisdictions_results, (jurisdictions));
+FC_REFLECT(eosio::jurisdiction_apis::read_write::producer_jurisdiction_api_object, (producer)(jurisdictions));
+FC_REFLECT(eosio::jurisdiction_apis::read_write::get_producer_jurisdiction_params, (producer_names));
+FC_REFLECT(eosio::jurisdiction_apis::read_write::get_producer_jurisdiction_results, (producer_jurisdictions));
+
 FC_REFLECT(eosio::jurisdiction_apis::read_write::get_active_jurisdictions_params, );
-FC_REFLECT(eosio::jurisdiction_apis::read_write::get_all_jurisdictions_params, (code)(scope));
+FC_REFLECT(eosio::jurisdiction_apis::read_write::get_active_jurisdictions_results, (jurisdictions));
+
+FC_REFLECT(eosio::jurisdiction_apis::read_write::jurisdiction_api_dictionary_object, (code)(name)(description));
+FC_REFLECT(eosio::jurisdiction_apis::read_write::get_all_jurisdictions_params, );
+FC_REFLECT(eosio::jurisdiction_apis::read_write::get_all_jurisdictions_results, (jurisdictions));
