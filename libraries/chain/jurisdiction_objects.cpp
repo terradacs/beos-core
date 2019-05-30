@@ -208,21 +208,20 @@ void jurisdiction_helper::process_jurisdiction_dictionary( const chainbase::data
 
 void jurisdiction_helper::process_jurisdiction_producer( const chainbase::database& db, const account_name& lowerBound, const account_name& upperBound, jurisdiction_producer_processor processor ) const
 {
-   // const auto& idx = db.get_index<jurisdiction_dictionary_index, by_id>();
+   const auto& idx = db.get_index< jurisdiction_producer_index, by_producer_jurisdiction >();
 
-   // auto lbI = lowerBound.empty() ? idx.begin() : idx.lower_bound(lowerBound);
-   // auto ubI = upperBound.empty() ? idx.end() : idx.lower_bound(upperBound);
-
-   // bool canContinue = true;
-   // for(; canContinue && lbI != ubI; ++lbI)
-   //    {
-   //    const jurisdiction_dictionary& v = *lbI;
-   //    auto nextI = lbI;
-   //    ++nextI;
-   //    bool hasNext = nextI != ubI; 
-   //    canContinue = processor(v, hasNext);
-   //    }
-
+   auto lbI = lowerBound.empty() ? idx.begin() : idx.lower_bound( std::make_tuple( lowerBound, std::numeric_limits<code_jurisdiction>::min() ) );
+   auto ubI = upperBound.empty() ? idx.end() : idx.lower_bound( std::make_tuple( upperBound, std::numeric_limits<code_jurisdiction>::min() ) );
+   
+   bool canContinue = true;
+   for(; canContinue && lbI != ubI; ++lbI)
+   {
+      const jurisdiction_producer_object& v = *lbI;
+      auto nextI = lbI;
+      ++nextI;
+      bool hasNext = nextI != ubI; 
+      canContinue = processor(v, hasNext);
+   }
 }
 
 } } // eosio::chain

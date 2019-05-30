@@ -1859,7 +1859,20 @@ read_only::get_table_rows_result read_only::get_jurisdiction_dictionary_table_ro
 
 read_only::get_table_rows_result read_only::get_jurisdiction_producer_table_rows(const get_table_rows_params& p) const
 {
+   using _object_type = jurisdiction_producer_object;
 
+   jurisdiction_helper helper;
+
+   auto manager_method = [&]( const account_name& lowerBound, const account_name& upperBound, iteration_processor_type< const _object_type& > iteration_processor )
+   {
+      helper.process_jurisdiction_producer( db.db(), lowerBound, upperBound, iteration_processor );
+   };
+   auto emplace_method =[]( const _object_type& obj )
+   {
+      return obj.convert_to_public_jurisdiction_producer_info();
+   };
+
+   return get_any_table_rows< const _object_type& >( p, manager_method, emplace_method );
 }
 
 read_only::get_table_rows_result read_only::get_voters_table_rows(const get_table_rows_params& p) const

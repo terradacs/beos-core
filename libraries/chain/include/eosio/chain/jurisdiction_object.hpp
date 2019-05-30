@@ -42,6 +42,13 @@ class jurisdiction_producer_object : public chainbase::object<jurisdiction_produ
    id_type              id;
    account_name         producer;
    code_jurisdiction    jurisdiction;
+
+   fc::mutable_variant_object convert_to_public_jurisdiction_producer_info() const
+   {
+      return fc::mutable_variant_object()
+         ("producer", producer)
+         ("jurisdiction", jurisdiction);
+   }
 };
 
 struct by_producer_jurisdiction;
