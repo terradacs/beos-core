@@ -53,7 +53,7 @@ namespace eosio {
       std::map<chain::account_name, std::vector<chain::code_jurisdiction> > producer_jurisdictions_map;
       try 
       {
-        const auto &idx_by_prod = db.db().get_index<chain::jurisdiction_index, chain::by_producer_jurisdiction>();
+        const auto &idx_by_prod = db.db().get_index<chain::jurisdiction_producer_index, chain::by_producer_jurisdiction>();
         for_each(prod_jur_params.producer_names.begin(), prod_jur_params.producer_names.end(), [&](const std::string &name) {
           auto itr_prod_jur = idx_by_prod.lower_bound(name);
           while (itr_prod_jur != idx_by_prod.end() && itr_prod_jur->producer == name)
@@ -99,7 +99,7 @@ namespace eosio {
       read_write::get_active_jurisdictions_results ret;
       try 
       {
-        const auto &idx_by_prod = db.db().get_index<chain::jurisdiction_index, chain::by_producer_jurisdiction>();
+        const auto &idx_by_prod = db.db().get_index<chain::jurisdiction_producer_index, chain::by_producer_jurisdiction>();
         for (auto itr = idx_by_prod.begin(); itr != idx_by_prod.end(); ++itr)
         {
           ret.jurisdictions.emplace(itr->jurisdiction);

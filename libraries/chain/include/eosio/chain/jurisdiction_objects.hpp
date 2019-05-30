@@ -44,7 +44,7 @@ class jurisdiction_helper
       using jurisdictions = std::vector< trx_jurisdiction >;
 
       using jurisdiction_dictionary_processor = jurisdiction_processor< jurisdiction_dictionary_object >;
-      using jurisdiction_producer_processor = jurisdiction_processor< jurisdiction_object >;
+      using jurisdiction_producer_processor = jurisdiction_processor< jurisdiction_producer_object >;
 
    private:
 

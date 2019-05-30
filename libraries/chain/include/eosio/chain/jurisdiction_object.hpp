@@ -36,8 +36,8 @@ using jurisdiction_dictionary_index = chainbase::shared_multi_index_container<
    >
 >;
 
-class jurisdiction_object : public chainbase::object<jurisdiction_object_type, jurisdiction_object> {
-   OBJECT_CTOR(jurisdiction_object)
+class jurisdiction_producer_object : public chainbase::object<jurisdiction_producer_object_type, jurisdiction_producer_object> {
+   OBJECT_CTOR(jurisdiction_producer_object)
 
    id_type              id;
    account_name         producer;
@@ -46,14 +46,14 @@ class jurisdiction_object : public chainbase::object<jurisdiction_object_type, j
 
 struct by_producer_jurisdiction;
 
-using jurisdiction_index = chainbase::shared_multi_index_container<
-   jurisdiction_object,
+using jurisdiction_producer_index = chainbase::shared_multi_index_container<
+   jurisdiction_producer_object,
    indexed_by<
-      ordered_unique<tag<by_id>, member<jurisdiction_object, jurisdiction_object::id_type, &jurisdiction_object::id>>,
+      ordered_unique<tag<by_id>, member<jurisdiction_producer_object, jurisdiction_producer_object::id_type, &jurisdiction_producer_object::id>>,
       ordered_unique<tag<by_producer_jurisdiction>,
-         composite_key<jurisdiction_object,
-            member<jurisdiction_object, account_name, &jurisdiction_object::producer>,
-            member<jurisdiction_object, code_jurisdiction, &jurisdiction_object::jurisdiction>
+         composite_key<jurisdiction_producer_object,
+            member<jurisdiction_producer_object, account_name, &jurisdiction_producer_object::producer>,
+            member<jurisdiction_producer_object, code_jurisdiction, &jurisdiction_producer_object::jurisdiction>
          >
       >
    >
@@ -62,7 +62,7 @@ using jurisdiction_index = chainbase::shared_multi_index_container<
 } } // eosio::chain
 
 CHAINBASE_SET_INDEX_TYPE(eosio::chain::jurisdiction_dictionary_object, eosio::chain::jurisdiction_dictionary_index)
-CHAINBASE_SET_INDEX_TYPE(eosio::chain::jurisdiction_object, eosio::chain::jurisdiction_index)
+CHAINBASE_SET_INDEX_TYPE(eosio::chain::jurisdiction_producer_object, eosio::chain::jurisdiction_producer_index)
 
 FC_REFLECT(eosio::chain::jurisdiction_dictionary_object, (code)(name)(description))
-FC_REFLECT(eosio::chain::jurisdiction_object, (producer)(jurisdiction))
+FC_REFLECT(eosio::chain::jurisdiction_producer_object, (producer)(jurisdiction))

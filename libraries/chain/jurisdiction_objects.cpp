@@ -23,7 +23,7 @@ const char* jurisdiction_helper::too_many_jurisdictions_exception = "Too many ju
 
 bool jurisdiction_helper::check_jurisdictions( const chainbase::database &db, const jurisdiction_updater_ordered& src )
 {
-   const auto& idx = db.get_index< jurisdiction_index, by_producer_jurisdiction >();
+   const auto& idx = db.get_index< jurisdiction_producer_index, by_producer_jurisdiction >();
    auto itr = idx.lower_bound( std::make_tuple( src.producer, std::numeric_limits< code_jurisdiction >::min() ) );
 
    auto jurisdictions = src.jurisdictions;
@@ -123,8 +123,8 @@ bool jurisdiction_helper::update( chainbase::database& db, const jurisdiction_up
    for( auto item : updater.jurisdictions )
       FC_ASSERT( idx_by_code.find( item ) != idx_by_code.end(), "jurisdiction doesn't exist" );
 
-   auto& idx = db.get_mutable_index< jurisdiction_index >();
-   const auto& idx_by = db.get_index< jurisdiction_index, by_producer_jurisdiction >();
+   auto& idx = db.get_mutable_index< jurisdiction_producer_index >();
+   const auto& idx_by = db.get_index< jurisdiction_producer_index, by_producer_jurisdiction >();
 
    auto itr_state = idx_by.lower_bound( std::make_tuple( updater.producer, std::numeric_limits< code_jurisdiction >::min() ) );
    auto itr_src = updater.jurisdictions.begin();
@@ -133,7 +133,7 @@ bool jurisdiction_helper::update( chainbase::database& db, const jurisdiction_up
    {
       if( itr_state == idx_by.end() || itr_state->producer != updater.producer )
       {
-         db.create< jurisdiction_object >( [&]( auto& obj ) {
+         db.create< jurisdiction_producer_object >( [&]( auto& obj ) {
             obj.producer = updater.producer;
             obj.jurisdiction = *itr_src;
          });
@@ -150,7 +150,7 @@ bool jurisdiction_helper::update( chainbase::database& db, const jurisdiction_up
             itr_state = idx. template erase< by_producer_jurisdiction >( itr_state );
          else
          {
-            db.create< jurisdiction_object >( [&]( auto& obj ) {
+            db.create< jurisdiction_producer_object >( [&]( auto& obj ) {
                obj.producer = updater.producer;
                obj.jurisdiction = *itr_src;
             });
@@ -173,7 +173,7 @@ bool jurisdiction_helper::transaction_jurisdictions_match( const chainbase::data
 
    auto deserialized_data = read( exts );
 
-   const auto& idx_by = db.get_index< jurisdiction_index, by_producer_jurisdiction >();
+   const auto& idx_by = db.get_index< jurisdiction_producer_index, by_producer_jurisdiction >();
 
    for( auto item_trx_jurisdiction : deserialized_data )
    {
