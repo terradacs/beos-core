@@ -1803,63 +1803,67 @@ chain::symbol read_only::extract_core_symbol()const {
    return core_symbol;
 }
 
-read_only::get_table_rows_result read_only::get_voters_table_rows(const get_table_rows_params& p) const
-   {
-   const auto& vm = db.get_voting_manager();
-
-   get_table_rows_result retVal;
+template< typename ObjectType, typename ManagerMethod, typename EmplaceMethod >
+read_only::get_table_rows_result read_only::get_any_table_rows(const get_table_rows_params& p, ManagerMethod manager_method, EmplaceMethod emplace_method ) const
+{
+   get_table_rows_result result;
 
    auto timeout = fc::time_point::now() + fc::microseconds(1000 * 10); /// 10ms max time
+
+   auto iteration_processor = [ &p, timeout, &result, &emplace_method ] ( ObjectType obj, bool hasNext )
+                  {
+                     if( result.rows.size() == p.limit || fc::time_point::now() > timeout )
+                     {
+                        result.more = hasNext;
+                        return false; /// stop iteration.
+                     }
+
+                     result.rows.emplace_back( emplace_method( std::forward< ObjectType >( obj ) ) );
+
+                     return true;
+                  };
 
    auto lb = convert_to_type<uint64_t>(p.lower_bound, "lower_bound");
    auto ub = convert_to_type<uint64_t>(p.upper_bound, "upper_bound");
 
-   account_name lbName(lb);
-   account_name ubName(ub);
+   manager_method( account_name(lb), account_name(ub), iteration_processor );
 
-   vm.process_voters(lbName, ubName, [&p, &timeout, &retVal](const voter_info_object& v, bool hasNext) -> bool
-      {
-      if(retVal.rows.size() == p.limit || fc::time_point::now() > timeout)
-         {
-         retVal.more = hasNext;
-         return false; /// stop iteration.
-         }
+   return result;
+}
 
-      retVal.rows.emplace_back(v.convert_to_public_voter_info());
+read_only::get_table_rows_result read_only::get_voters_table_rows(const get_table_rows_params& p) const
+{
+   using _object_type = voter_info_object;
 
-      return true;
-      }
-   );
+   const auto& vm = db.get_voting_manager();
+   auto manager_method = [&]( const account_name& lowerBound, const account_name& upperBound, iteration_processor_type< const _object_type& > iteration_processor )
+   {
+      vm.process_voters( lowerBound, upperBound, iteration_processor );
+   };
+   auto emplace_method =[]( const _object_type& obj )
+   {
+      return obj.convert_to_public_voter_info();
+   };
 
-   return retVal;
-   }
+   return get_any_table_rows< const _object_type& >( p, manager_method, emplace_method );
+}
 
 read_only::get_table_rows_result read_only::get_userres_table_rows(const get_table_rows_params& p) const
-  {
-  get_table_rows_result result;
+{
+   using _object_type = mutable_variant_object;
 
-  const resource_limits_manager& resource_limit_mgr = db.get_resource_limits_manager();
+   const resource_limits_manager& resource_limit_mgr = db.get_resource_limits_manager();
+   auto manager_method = [&]( const account_name& lowerBound, const account_name& upperBound, iteration_processor_type< _object_type&& > iteration_processor )
+   {
+      resource_limit_mgr.process_public_userres( lowerBound, upperBound, iteration_processor );
+   };
+   auto emplace_method =[]( _object_type&& obj )
+   {
+      return std::move( obj );
+   };
 
-  auto timeout = fc::time_point::now() + fc::microseconds(1000 * 10); /// 10ms max time
-
-  auto lb = convert_to_type<uint64_t>(p.lower_bound, "lower_bound");
-  auto ub = convert_to_type<uint64_t>(p.upper_bound, "upper_bound");
-
-  resource_limit_mgr.process_public_userres(account_name(lb), account_name(ub), [&p, timeout, &result] (mutable_variant_object&& obj, bool hasNext) -> bool
-    {
-    if (result.rows.size() == p.limit || fc::time_point::now() > timeout)
-      {
-      result.more = hasNext;
-      return false; /// stop iteration.
-      }
-
-    result.rows.emplace_back(std::move(obj));
-    return true;
-    }
-  );
-
-  return result;
-  }
+   return get_any_table_rows< _object_type&& >( p, manager_method, emplace_method );
+}
 
 } // namespace chain_apis
 } // namespace eosio
