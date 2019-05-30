@@ -856,7 +856,7 @@ BOOST_AUTO_TEST_SUITE(eosio_jurisdiction_tests)
 
 BOOST_FIXTURE_TEST_CASE( basic_test_01, beos_jurisdiction_tester ) try {
 
-   jurisdiction_helper helper;
+   jurisdiction_manager helper;
 
    {
       BOOST_REQUIRE_EQUAL( success(), add_jurisdiction( N(beos.jurisdi), 1, "POLAND", "EAST EUROPE" ) );
@@ -933,7 +933,7 @@ BOOST_FIXTURE_TEST_CASE( basic_test_01, beos_jurisdiction_tester ) try {
 
 BOOST_FIXTURE_TEST_CASE( basic_test_02, beos_jurisdiction_tester ) try {
 
-   jurisdiction_helper updater;
+   jurisdiction_manager updater;
 
    {
       jurisdiction_producer_ordered data;

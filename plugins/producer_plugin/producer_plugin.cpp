@@ -395,7 +395,7 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
             return;
          }
 
-         jurisdiction_helper jurisdiction_checker;
+         jurisdiction_manager jurisdiction_checker;
          bool match_result = jurisdiction_checker.transaction_jurisdictions_match( chain.db(), actual_producer_name, *trx );
          if( !match_result )
          {

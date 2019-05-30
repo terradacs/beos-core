@@ -1843,7 +1843,7 @@ read_only::get_table_rows_result read_only::get_jurisdiction_dictionary_table_ro
 {
    using _object_type = jurisdiction_dictionary_object;
 
-   jurisdiction_helper helper;
+   jurisdiction_manager helper;
 
    auto manager_method = [&]( const account_name& lowerBound, const account_name& upperBound, iteration_processor_type< const _object_type& > iteration_processor )
    {
@@ -1861,7 +1861,7 @@ read_only::get_table_rows_result read_only::get_jurisdiction_producer_table_rows
 {
    using _object_type = jurisdiction_producer_object;
 
-   jurisdiction_helper helper;
+   jurisdiction_manager helper;
 
    auto manager_method = [&]( const account_name& lowerBound, const account_name& upperBound, iteration_processor_type< const _object_type& > iteration_processor )
    {

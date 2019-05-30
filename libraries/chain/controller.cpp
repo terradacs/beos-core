@@ -1189,7 +1189,7 @@ struct controller_impl {
          start_block( b->timestamp, b->confirmed, s , producer_block_id);
 
          transaction_trace_ptr trace;
-         jurisdiction_helper jurisdiction_checker;
+         jurisdiction_manager jurisdiction_checker;
 
          for( const auto& receipt : b->transactions ) {
             auto num_pending_receipts = pending->_pending_block_state->block->transactions.size();
@@ -1946,14 +1946,14 @@ int64_t controller::set_proposed_producers( vector<producer_key> producers ) {
 
 bool controller::add_jurisdiction( const jurisdiction_dictionary& info )
 {
-   eosio::chain::jurisdiction_helper _jurisdiction_helper;
-   return _jurisdiction_helper.update( my->db, info );
+   eosio::chain::jurisdiction_manager mgr;
+   return mgr.update( my->db, info );
 }
 
 bool controller::update_jurisdictions( const jurisdiction_producer_ordered& updater )
 {
-   eosio::chain::jurisdiction_helper _jurisdiction_helper;
-   return _jurisdiction_helper.update( my->db, updater );
+   eosio::chain::jurisdiction_manager mgr;
+   return mgr.update( my->db, updater );
 }
 
 const producer_schedule_type&    controller::active_producers()const {

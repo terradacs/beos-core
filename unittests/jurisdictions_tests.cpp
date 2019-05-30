@@ -14,7 +14,7 @@ using namespace eosio::testing;
 using namespace fc;
 
 using eosio::chain::trx_jurisdiction;
-using eosio::chain::jurisdiction_helper;
+using eosio::chain::jurisdiction_manager;
 
 class jurisdiction_tester : public tester
 {
@@ -26,7 +26,7 @@ class jurisdiction_tester : public tester
 
       void make_jurisdictions( chainbase::database &db, int8_t max )
       {
-         jurisdiction_helper updater;
+         jurisdiction_manager updater;
 
          jurisdiction_dictionary dict;
          dict.description = "DESC";
@@ -61,7 +61,7 @@ BOOST_FIXTURE_TEST_CASE( basic_test, jurisdiction_tester ) try {
    any_extension.push_back( std::make_pair( idx, bytes_stream ) );
 
    //Deserializing
-   jurisdiction_helper reader;
+   jurisdiction_manager reader;
 
    auto deserialized_data = reader.read( any_extension );
    BOOST_REQUIRE_EQUAL( 1, deserialized_data.size() );
@@ -97,7 +97,7 @@ BOOST_FIXTURE_TEST_CASE( basic_test_01, jurisdiction_tester ) try {
       any_extension.emplace_back( std::make_pair( idx, item ) );
 
    //Deserializing
-   jurisdiction_helper reader;
+   jurisdiction_manager reader;
 
    auto deserialized_data = reader.read( any_extension );
    BOOST_REQUIRE_EQUAL( v_data_type.size(), deserialized_data.size() );
@@ -114,7 +114,7 @@ BOOST_FIXTURE_TEST_CASE( basic_test_01, jurisdiction_tester ) try {
 BOOST_FIXTURE_TEST_CASE( basic_test_02, jurisdiction_tester ) try {
 
    chainbase::database &db = const_cast< chainbase::database& > ( control->db() );
-   jurisdiction_helper updater;
+   jurisdiction_manager updater;
 
    jurisdiction_producer_ordered src;
    src.producer = N(tester);
@@ -166,7 +166,7 @@ BOOST_FIXTURE_TEST_CASE( basic_test_02, jurisdiction_tester ) try {
 BOOST_FIXTURE_TEST_CASE( basic_test_03, jurisdiction_tester ) try {
 
    chainbase::database &db = const_cast< chainbase::database& > ( control->db() );
-   jurisdiction_helper updater;
+   jurisdiction_manager updater;
 
    make_jurisdictions( db, 10 );
 

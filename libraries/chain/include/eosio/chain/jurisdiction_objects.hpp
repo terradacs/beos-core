@@ -29,7 +29,7 @@ struct trx_extensions_visitor
    void operator()( const trx_jurisdiction& _trx_jurisdiction ) const;
 };
 
-class jurisdiction_helper
+class jurisdiction_manager
 {
    private:
 
