@@ -1,6 +1,7 @@
 #pragma once
 
 #include <eosio/chain/types.hpp>
+#include <fc/variant_object.hpp>
 
 #include "multi_index_includes.hpp"
 
@@ -13,6 +14,14 @@ class jurisdiction_dictionary_object : public chainbase::object<jurisdiction_dic
    code_jurisdiction    code;
    std::string          name;
    std::string          description;
+
+   fc::mutable_variant_object convert_to_public_jurisdiction_dictionary_info() const
+   {
+      return fc::mutable_variant_object()
+         ("code", code)
+         ("name", name)
+         ("description", description);
+   }
 };
 
 struct by_code_jurisdiction_dictionary;

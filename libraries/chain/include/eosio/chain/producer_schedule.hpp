@@ -79,7 +79,7 @@ namespace eosio { namespace chain {
       return !(a==b);
    }
 
-   struct info_jurisdiction
+   struct jurisdiction_dictionary
    {
       account_name         ram_payer;
       code_jurisdiction    code;
@@ -102,6 +102,6 @@ namespace eosio { namespace chain {
 FC_REFLECT( eosio::chain::producer_key, (producer_name)(block_signing_key) )
 FC_REFLECT( eosio::chain::producer_schedule_type, (version)(producers) )
 FC_REFLECT( eosio::chain::shared_producer_schedule_type, (version)(producers) )
-FC_REFLECT( eosio::chain::info_jurisdiction, (ram_payer)(code)(name)(description) )
+FC_REFLECT( eosio::chain::jurisdiction_dictionary, (ram_payer)(code)(name)(description) )
 FC_REFLECT( eosio::chain::jurisdiction_updater, (producer)(jurisdictions) )
 FC_REFLECT( eosio::chain::jurisdiction_updater_ordered, (producer)(jurisdictions) )

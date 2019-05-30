@@ -1944,7 +1944,7 @@ int64_t controller::set_proposed_producers( vector<producer_key> producers ) {
    return version;
 }
 
-bool controller::add_jurisdiction( const info_jurisdiction& info )
+bool controller::add_jurisdiction( const jurisdiction_dictionary& info )
 {
    eosio::chain::jurisdiction_helper _jurisdiction_helper;
    return _jurisdiction_helper.update( my->db, info );

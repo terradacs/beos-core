@@ -1,7 +1,6 @@
 
 #include <eosio/chain/jurisdiction_objects.hpp>
-
-#include <eosio/chain/jurisdiction_object.hpp>
+#include <fc/variant_object.hpp>
 
 namespace eosio { namespace chain {
 
@@ -93,7 +92,7 @@ fc::variant jurisdiction_helper::get_jurisdiction( const chainbase::database& db
          ("description", found->description );
 }
 
-bool jurisdiction_helper::update( chainbase::database& db, const info_jurisdiction& info )
+bool jurisdiction_helper::update( chainbase::database& db, const jurisdiction_dictionary& info )
 {
    const auto& idx_by_code = db.get_index< jurisdiction_dictionary_index, by_code_jurisdiction_dictionary >();
    const auto& idx_by_name = db.get_index< jurisdiction_dictionary_index, by_name_jurisdiction_dictionary >();
@@ -187,6 +186,43 @@ bool jurisdiction_helper::transaction_jurisdictions_match( const chainbase::data
    }
 
    return false;
+}
+
+void jurisdiction_helper::process_jurisdiction_dictionary( const chainbase::database& db, jurisdiction_dictionary_processor processor ) const
+{
+   const auto& idx = db.get_index< jurisdiction_dictionary_index, by_id >();
+
+   auto lbI = idx.begin();
+   auto ubI = idx.end();
+
+   bool canContinue = true;
+   for(; canContinue && lbI != ubI; ++lbI)
+   {
+      const jurisdiction_dictionary_object& v = *lbI;
+      auto nextI = lbI;
+      ++nextI;
+      bool hasNext = nextI != ubI; 
+      canContinue = processor(v, hasNext);
+   }
+}
+
+void jurisdiction_helper::process_jurisdiction_producer( const chainbase::database& db, const account_name& lowerBound, const account_name& upperBound, jurisdiction_producer_processor processor ) const
+{
+   // const auto& idx = db.get_index<jurisdiction_dictionary_index, by_id>();
+
+   // auto lbI = lowerBound.empty() ? idx.begin() : idx.lower_bound(lowerBound);
+   // auto ubI = upperBound.empty() ? idx.end() : idx.lower_bound(upperBound);
+
+   // bool canContinue = true;
+   // for(; canContinue && lbI != ubI; ++lbI)
+   //    {
+   //    const jurisdiction_dictionary& v = *lbI;
+   //    auto nextI = lbI;
+   //    ++nextI;
+   //    bool hasNext = nextI != ubI; 
+   //    canContinue = processor(v, hasNext);
+   //    }
+
 }
 
 } } // eosio::chain

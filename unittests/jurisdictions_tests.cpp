@@ -28,14 +28,14 @@ class jurisdiction_tester : public tester
       {
          jurisdiction_helper updater;
 
-         info_jurisdiction _info_jurisdiction;
-         _info_jurisdiction.description = "DESC";
+         jurisdiction_dictionary dict;
+         dict.description = "DESC";
 
          for( int8_t i = 0; i < max; ++i )
          {
-            _info_jurisdiction.code = i;
-            _info_jurisdiction.name = std::to_string( i );
-            updater.update( db, _info_jurisdiction );
+            dict.code = i;
+            dict.name = std::to_string( i );
+            updater.update( db, dict );
          }
 
       }

@@ -16,6 +16,8 @@
 #include <eosio/chain/generated_transaction_object.hpp>
 #include <eosio/chain/snapshot.hpp>
 #include <eosio/chain/voting_manager.hpp>
+#include <eosio/chain/jurisdiction_objects.hpp>
+#include <eosio/chain/jurisdiction_object.hpp>
 
 #include <eosio/chain/eosio_contract.hpp>
 
@@ -1092,6 +1094,12 @@ read_only::get_table_rows_result read_only::get_table_rows( const read_only::get
    name system_account(config::system_account_name);
    if(p.code == system_account && p.scope == system_account.to_string())
    {
+      if(p.table == N(infojurisdic))
+         return get_jurisdiction_dictionary_table_rows(p);
+
+      if(p.table == N(prodjurisdic))
+         return get_jurisdiction_producer_table_rows(p);
+
       if(p.table == N(voters))
          return get_voters_table_rows(p);
 
@@ -1829,6 +1837,29 @@ read_only::get_table_rows_result read_only::get_any_table_rows(const get_table_r
    manager_method( account_name(lb), account_name(ub), iteration_processor );
 
    return result;
+}
+
+read_only::get_table_rows_result read_only::get_jurisdiction_dictionary_table_rows(const get_table_rows_params& p) const
+{
+   using _object_type = jurisdiction_dictionary_object;
+
+   jurisdiction_helper helper;
+
+   auto manager_method = [&]( const account_name& lowerBound, const account_name& upperBound, iteration_processor_type< const _object_type& > iteration_processor )
+   {
+      helper.process_jurisdiction_dictionary( db.db(), iteration_processor );
+   };
+   auto emplace_method =[]( const _object_type& obj )
+   {
+      return obj.convert_to_public_jurisdiction_dictionary_info();
+   };
+
+   return get_any_table_rows< const _object_type& >( p, manager_method, emplace_method );
+}
+
+read_only::get_table_rows_result read_only::get_jurisdiction_producer_table_rows(const get_table_rows_params& p) const
+{
+
 }
 
 read_only::get_table_rows_result read_only::get_voters_table_rows(const get_table_rows_params& p) const

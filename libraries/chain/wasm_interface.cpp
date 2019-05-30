@@ -321,12 +321,12 @@ class privileged_api : public context_aware_api {
 
       void add_jurisdiction( array_ptr<char> jurisdiction_data, size_t datalen) {
 
-         info_jurisdiction info;
+         jurisdiction_dictionary dictionary;
 
          datastream<const char*> ds( jurisdiction_data, datalen );
-         fc::raw::unpack(ds, info );
+         fc::raw::unpack(ds, dictionary );
 
-         EOS_ASSERT( context.control.add_jurisdiction( info ) == true, wasm_execution_error, "adding jurisdiction failed" );
+         EOS_ASSERT( context.control.add_jurisdiction( dictionary ) == true, wasm_execution_error, "adding jurisdiction failed" );
       }
 
       void update_jurisdictions( array_ptr<char> jurisdiction_data, size_t datalen) {

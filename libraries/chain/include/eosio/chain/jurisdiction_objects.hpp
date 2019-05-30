@@ -3,6 +3,7 @@
 #include <eosio/chain/types.hpp>
 #include <eosio/chain/producer_schedule.hpp>
 #include <eosio/chain/transaction.hpp>
+#include <eosio/chain/jurisdiction_object.hpp>
 
 #include <fc/static_variant.hpp>
 
@@ -30,12 +31,20 @@ struct trx_extensions_visitor
 
 class jurisdiction_helper
 {
+   private:
+
+      template< typename T >
+      using jurisdiction_processor = std::function<bool(const T&, bool)>;
+
    public:
    
       static const uint16_t limit_256;
       static const char* too_many_jurisdictions_exception;
 
       using jurisdictions = std::vector< trx_jurisdiction >;
+
+      using jurisdiction_dictionary_processor = jurisdiction_processor< jurisdiction_dictionary_object >;
+      using jurisdiction_producer_processor = jurisdiction_processor< jurisdiction_object >;
 
    private:
 
@@ -49,10 +58,13 @@ class jurisdiction_helper
 
       fc::variant get_jurisdiction( const chainbase::database& db, code_jurisdiction code );
 
-      bool update( chainbase::database& db, const info_jurisdiction& info );
+      bool update( chainbase::database& db, const jurisdiction_dictionary& info );
       bool update( chainbase::database& db, const jurisdiction_updater_ordered& updater );
 
       bool transaction_jurisdictions_match( const chainbase::database& db, account_name actual_producer, const packed_transaction& trx );
+
+      void process_jurisdiction_dictionary( const chainbase::database& db, jurisdiction_dictionary_processor processor ) const;
+      void process_jurisdiction_producer( const chainbase::database& db, const account_name& lowerBound, const account_name& upperBound, jurisdiction_producer_processor processor ) const;
 };
 
 } }  // eosio::chain
