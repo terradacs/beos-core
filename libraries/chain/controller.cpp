@@ -1950,7 +1950,7 @@ bool controller::add_jurisdiction( const jurisdiction_dictionary& info )
    return _jurisdiction_helper.update( my->db, info );
 }
 
-bool controller::update_jurisdictions( const jurisdiction_updater_ordered& updater )
+bool controller::update_jurisdictions( const jurisdiction_producer_ordered& updater )
 {
    eosio::chain::jurisdiction_helper _jurisdiction_helper;
    return _jurisdiction_helper.update( my->db, updater );

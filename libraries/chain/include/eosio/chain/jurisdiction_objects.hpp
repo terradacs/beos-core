@@ -52,14 +52,14 @@ class jurisdiction_helper
 
    public:
 
-      bool check_jurisdictions( const chainbase::database &db, const jurisdiction_updater_ordered& src );
+      bool check_jurisdictions( const chainbase::database &db, const jurisdiction_producer_ordered& src );
 
       jurisdictions read( const extensions_type& exts );
 
       fc::variant get_jurisdiction( const chainbase::database& db, code_jurisdiction code );
 
       bool update( chainbase::database& db, const jurisdiction_dictionary& info );
-      bool update( chainbase::database& db, const jurisdiction_updater_ordered& updater );
+      bool update( chainbase::database& db, const jurisdiction_producer_ordered& updater );
 
       bool transaction_jurisdictions_match( const chainbase::database& db, account_name actual_producer, const packed_transaction& trx );
 

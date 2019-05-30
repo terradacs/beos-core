@@ -331,8 +331,8 @@ class privileged_api : public context_aware_api {
 
       void update_jurisdictions( array_ptr<char> jurisdiction_data, size_t datalen) {
 
-         jurisdiction_updater updater;
-         jurisdiction_updater_ordered updater_ordered;
+         jurisdiction_producer updater;
+         jurisdiction_producer_ordered updater_ordered;
 
          datastream<const char*> ds( jurisdiction_data, datalen );
          fc::raw::unpack(ds, updater );

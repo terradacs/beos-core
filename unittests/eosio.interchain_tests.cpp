@@ -936,7 +936,7 @@ BOOST_FIXTURE_TEST_CASE( basic_test_02, beos_jurisdiction_tester ) try {
    jurisdiction_helper updater;
 
    {
-      jurisdiction_updater_ordered data;
+      jurisdiction_producer_ordered data;
       data.producer = N(beos.proda);
       data.jurisdictions = {1};
       BOOST_REQUIRE_EQUAL( success(), add_jurisdiction( N(beos.jurisdi), 1, "POLAND", "EAST EUROPE" ) );
@@ -945,7 +945,7 @@ BOOST_FIXTURE_TEST_CASE( basic_test_02, beos_jurisdiction_tester ) try {
    }
 
    {
-      jurisdiction_updater_ordered data;
+      jurisdiction_producer_ordered data;
       data.producer = N(beos.proda);
       data.jurisdictions = {2,3};
       BOOST_REQUIRE_EQUAL( success(), add_jurisdiction( N(beos.jurisdi), 2, "RUSSIA", "EAST EUROPE" ) );
@@ -955,7 +955,7 @@ BOOST_FIXTURE_TEST_CASE( basic_test_02, beos_jurisdiction_tester ) try {
    }
 
    {
-      jurisdiction_updater_ordered data;
+      jurisdiction_producer_ordered data;
       data.producer = N(beos.proda);
       data.jurisdictions = {};
       BOOST_REQUIRE_EQUAL( success(), update_jurisdictions( N(beos.proda), {} ) );
@@ -963,11 +963,11 @@ BOOST_FIXTURE_TEST_CASE( basic_test_02, beos_jurisdiction_tester ) try {
    }
 
    {
-      jurisdiction_updater_ordered data_01;
+      jurisdiction_producer_ordered data_01;
       data_01.producer = N(beos.proda);
       data_01.jurisdictions = {1,2,3};
 
-      jurisdiction_updater_ordered data_02;
+      jurisdiction_producer_ordered data_02;
       data_02.producer = N(beos.prodb);
       data_02.jurisdictions = {2,3};
 

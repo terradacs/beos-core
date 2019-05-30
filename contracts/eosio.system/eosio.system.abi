@@ -21,11 +21,11 @@
    }],
    "____comment": "eosio.bios structs: set_account_limits, setpriv, set_global_limits, producer_key, set_producers, require_auth are provided so abi available for deserialization in future.",
    "structs": [{
-      "name": "jurisdiction_updater",
+      "name": "jurisdiction_producer",
       "base": "",
       "fields": [
         {"name":"producer",         "type":"account_name"},
-        {"name":"jurisdictions",    "type":"code_jurisdiction[]"}
+        {"name":"jurisdiction",    "type":"code_jurisdiction"}
       ]
     },{
       "name": "jurisdiction_dictionary",
@@ -621,7 +621,7 @@
     }],
   "tables": [{
       "name": "prodjurisdic",
-      "type": "jurisdiction_updater",
+      "type": "jurisdiction_producer",
       "index_type": "i64",
       "key_names": [ "owner" ],
       "key_types": [ "uint64" ]

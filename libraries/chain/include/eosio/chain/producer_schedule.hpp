@@ -87,12 +87,12 @@ namespace eosio { namespace chain {
       std::string          description;
    };
 
-   struct jurisdiction_updater {
+   struct jurisdiction_producer {
       account_name                        producer;
       std::vector< code_jurisdiction >    jurisdictions;
    };
 
-   struct jurisdiction_updater_ordered {
+   struct jurisdiction_producer_ordered {
       account_name                        producer;
       std::set< code_jurisdiction >       jurisdictions;
    };
@@ -103,5 +103,5 @@ FC_REFLECT( eosio::chain::producer_key, (producer_name)(block_signing_key) )
 FC_REFLECT( eosio::chain::producer_schedule_type, (version)(producers) )
 FC_REFLECT( eosio::chain::shared_producer_schedule_type, (version)(producers) )
 FC_REFLECT( eosio::chain::jurisdiction_dictionary, (ram_payer)(code)(name)(description) )
-FC_REFLECT( eosio::chain::jurisdiction_updater, (producer)(jurisdictions) )
-FC_REFLECT( eosio::chain::jurisdiction_updater_ordered, (producer)(jurisdictions) )
+FC_REFLECT( eosio::chain::jurisdiction_producer, (producer)(jurisdictions) )
+FC_REFLECT( eosio::chain::jurisdiction_producer_ordered, (producer)(jurisdictions) )

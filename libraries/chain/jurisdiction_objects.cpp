@@ -21,7 +21,7 @@ void trx_extensions_visitor::operator()( const trx_jurisdiction& _trx_jurisdicti
 const uint16_t jurisdiction_helper::limit_256 = 256;
 const char* jurisdiction_helper::too_many_jurisdictions_exception = "Too many jurisdictions given, max value is 255.";
 
-bool jurisdiction_helper::check_jurisdictions( const chainbase::database &db, const jurisdiction_updater_ordered& src )
+bool jurisdiction_helper::check_jurisdictions( const chainbase::database &db, const jurisdiction_producer_ordered& src )
 {
    const auto& idx = db.get_index< jurisdiction_producer_index, by_producer_jurisdiction >();
    auto itr = idx.lower_bound( std::make_tuple( src.producer, std::numeric_limits< code_jurisdiction >::min() ) );
@@ -116,7 +116,7 @@ bool jurisdiction_helper::update( chainbase::database& db, const jurisdiction_di
    return true;
 }
 
-bool jurisdiction_helper::update( chainbase::database& db, const jurisdiction_updater_ordered& updater )
+bool jurisdiction_helper::update( chainbase::database& db, const jurisdiction_producer_ordered& updater )
 {
    const auto& idx_by_code = db.get_index< jurisdiction_dictionary_index, by_code_jurisdiction_dictionary >();
 
