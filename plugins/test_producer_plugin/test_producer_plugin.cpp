@@ -47,9 +47,14 @@ void test_producer_plugin::plugin_shutdown()
 {
 }
 
-test_producer_apis::read_write test_producer_plugin::get_read_write_api() const
+test_producer_apis::read_write test_producer_plugin::get_read_write_api()
 {
-  return test_producer_apis::read_write( my->producer_plug );
+  return test_producer_apis::read_write( my->producer_plug, this );
+}
+
+jurisdiction_test_provider& test_producer_plugin::get_test_provider()
+{
+   return my->test_provider;
 }
 
 namespace test_producer_apis
@@ -148,6 +153,37 @@ namespace test_producer_apis
 
     return accelerate_results( false );
   }
+
+   read_write::update_jurisdictions_results read_write::update_jurisdictions( const update_jurisdictions_params& params )
+   {
+
+      try {
+
+         assert( producer_plug && test_producer_plug );
+         test_producer_plug->get_test_provider().change( params );
+
+         return update_jurisdictions_results( true );
+
+      } catch (const fc::exception& e) {
+         throw e;
+      } catch( const std::exception& e ) {
+         auto fce = fc::exception(
+               FC_LOG_MESSAGE( info, "Caught std::exception: ${what}", ("what",e.what())),
+               fc::std_exception_code,
+               BOOST_CORE_TYPEID(e).name(),
+               e.what()
+         );
+         throw fce;
+      } catch( ... ) {
+         auto fce = fc::unhandled_exception(
+               FC_LOG_MESSAGE( info, "Caught unknown exception"),
+               std::current_exception()
+         );
+         throw fce;
+      }
+
+    return update_jurisdictions_results( false );
+   }
 }
 
 } // namespace eosio

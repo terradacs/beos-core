@@ -54,7 +54,7 @@ class jurisdiction_test_provider : public jurisdiction_provider_interface
       void update() const override;
       const jurisdiction_producer& get_jurisdiction_producer() const override;
 
-      void add( const account_name& producer, const std::vector< code_jurisdiction >& jurisdictions );
+      void change( const jurisdiction_producer& src );
 };
 
 class jurisdiction_action_launcher : public std::enable_shared_from_this< jurisdiction_action_launcher >
@@ -81,7 +81,7 @@ class jurisdiction_action_launcher : public std::enable_shared_from_this< jurisd
       void update_producer( account_name new_producer );
       void update_jurisdictions();
 
-      jurisdiction_producer get_jurisdiction_producer( account_name producer );
+      fc::optional< jurisdiction_producer > get_jurisdiction_producer( account_name producer );
 };
 
 class jurisdiction_manager

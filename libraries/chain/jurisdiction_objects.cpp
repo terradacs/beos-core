@@ -35,10 +35,9 @@ const jurisdiction_producer& jurisdiction_test_provider::get_jurisdiction_produc
    return data;
 }
 
-void jurisdiction_test_provider::add( const account_name& producer, const std::vector< code_jurisdiction >& jurisdictions )
+void jurisdiction_test_provider::change( const jurisdiction_producer& src )
 {
-   data.producer = producer;
-   data.jurisdictions = jurisdictions;
+   data = src;
 }
 
 /*=============================jurisdiction_launcher=============================*/
@@ -70,17 +69,17 @@ void jurisdiction_action_launcher::update_jurisdictions()
       provider->update();
 }
 
-jurisdiction_producer jurisdiction_action_launcher::get_jurisdiction_producer( account_name producer )
+fc::optional< jurisdiction_producer > jurisdiction_action_launcher::get_jurisdiction_producer( account_name producer )
 {
    if( active_producer == producer )
    {
       if( provider )
          return provider->get_jurisdiction_producer();
       else
-         return { active_producer, {} };
+         return fc::optional< jurisdiction_producer >();
    }
    else
-      return { active_producer, {} };
+      return fc::optional< jurisdiction_producer >();
 }
 
 /*=============================jurisdiction_manager=============================*/

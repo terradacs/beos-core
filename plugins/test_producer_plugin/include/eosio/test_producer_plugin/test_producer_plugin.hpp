@@ -14,6 +14,11 @@ namespace eosio {
 
   using namespace appbase;
 
+  using eosio::chain::jurisdiction_producer;
+  using eosio::chain::jurisdiction_test_provider;
+
+  class test_producer_plugin;
+
 namespace test_producer_apis
 {
 
@@ -62,35 +67,44 @@ namespace test_producer_apis
           '
      */
 
-      /**
-       * This structure holds information if acceleration was done.
-       */
-
-      struct accelerate_results
+      struct any_results
       {
         bool done;
-        accelerate_results(bool _done ) : done(_done)
+        any_results(bool _done ) : done(_done)
         {
         }
       };
 
+      /**
+       * This structure holds information if acceleration was done.
+       */
+      using accelerate_results = any_results;
+
+      using update_jurisdictions_params = jurisdiction_producer;
+      /**
+       * This structure holds information if updating of jurisdictions was done.
+       */
+      using update_jurisdictions_results = any_results;
 
     private:
 
       producer_plugin* producer_plug = nullptr;
+      test_producer_plugin* test_producer_plug = nullptr;
 
       template< typename CallMethod >
       accelerate_results accelerate_time_internal( const accelerate_time_params& params, CallMethod method );
 
     public:
 
-      read_write( producer_plugin* _producer_plug )
-          : producer_plug( _producer_plug ) {}
+      read_write( producer_plugin* _producer_plug, test_producer_plugin* _test_producer_plug )
+          : producer_plug( _producer_plug ), test_producer_plug( _test_producer_plug ) {}
 
 
       accelerate_results accelerate_time( const accelerate_time_params& params );
       accelerate_results accelerate_mock_time( const accelerate_time_params& params );
       accelerate_results accelerate_blocks( const accelerate_blocks_params& params );
+
+      update_jurisdictions_results update_jurisdictions( const update_jurisdictions_params& params );
   };
 
 } // namespace chain_apis
@@ -110,7 +124,9 @@ class test_producer_plugin : public plugin<test_producer_plugin>
       void plugin_startup();
       void plugin_shutdown();
 
-      test_producer_apis::read_write get_read_write_api() const;
+      test_producer_apis::read_write get_read_write_api();
+
+      jurisdiction_test_provider& get_test_provider();
 
    private:
 
