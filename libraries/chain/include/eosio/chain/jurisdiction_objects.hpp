@@ -37,9 +37,24 @@ class jurisdiction_provider_interface : public std::enable_shared_from_this< jur
 
    public:
 
-      virtual ptr_base getptr() = 0;
+      ptr_base getptr();
+
       virtual void update() const = 0;
-      virtual trx_jurisdiction get_trx_jurisdiction() const = 0;
+      virtual const jurisdiction_producer& get_jurisdiction_producer() const = 0;
+};
+
+class jurisdiction_test_provider : public jurisdiction_provider_interface
+{
+   private:
+
+      jurisdiction_producer data;
+
+   public:
+
+      void update() const override;
+      const jurisdiction_producer& get_jurisdiction_producer() const override;
+
+      void add( const account_name& producer, const std::vector< code_jurisdiction >& jurisdictions );
 };
 
 class jurisdiction_action_launcher : public std::enable_shared_from_this< jurisdiction_action_launcher >
@@ -66,7 +81,7 @@ class jurisdiction_action_launcher : public std::enable_shared_from_this< jurisd
       void update_producer( account_name new_producer );
       void update_jurisdictions();
 
-      jurisdiction_producer get_jurisdiction_producer();
+      jurisdiction_producer get_jurisdiction_producer( account_name producer );
 };
 
 class jurisdiction_manager

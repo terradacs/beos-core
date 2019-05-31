@@ -8,11 +8,15 @@ namespace eosio {
 
 static appbase::abstract_plugin& _test_producer_plugin = app().register_plugin<test_producer_plugin>();
 
+using eosio::chain::jurisdiction_test_provider;
+
 class test_producer_plugin_impl
 {
-  public:
+   public:
 
-    producer_plugin* producer_plug = nullptr;
+      jurisdiction_test_provider test_provider;
+
+      producer_plugin* producer_plug = nullptr;
 };
 
 test_producer_plugin::test_producer_plugin()
@@ -31,6 +35,8 @@ void test_producer_plugin::set_program_options(options_description& cli, options
 void test_producer_plugin::plugin_initialize(const variables_map& options)
 {
   my->producer_plug = app().find_plugin<producer_plugin>();
+
+  my->producer_plug->set_jurisdiction_provider( my->test_provider.getptr() );
 }
 
 void test_producer_plugin::plugin_startup()

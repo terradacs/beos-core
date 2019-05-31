@@ -16,6 +16,31 @@ void trx_extensions_visitor::operator()( const trx_jurisdiction& _trx_jurisdicti
    jurisdiction = fc::raw::unpack< trx_jurisdiction >( _buffer );
 }
 
+/*=============================jurisdiction_provider_interface=============================*/
+
+jurisdiction_provider_interface::ptr_base jurisdiction_provider_interface::getptr()
+{
+   return shared_from_this();
+}
+
+/*=============================jurisdiction_test_provider=============================*/
+
+void jurisdiction_test_provider::update() const
+{
+   //nothing to do
+}
+
+const jurisdiction_producer& jurisdiction_test_provider::get_jurisdiction_producer() const
+{
+   return data;
+}
+
+void jurisdiction_test_provider::add( const account_name& producer, const std::vector< code_jurisdiction >& jurisdictions )
+{
+   data.producer = producer;
+   data.jurisdictions = jurisdictions;
+}
+
 /*=============================jurisdiction_launcher=============================*/
 
 jurisdiction_action_launcher::ptr_base jurisdiction_action_launcher::getptr()
@@ -45,10 +70,15 @@ void jurisdiction_action_launcher::update_jurisdictions()
       provider->update();
 }
 
-jurisdiction_producer jurisdiction_action_launcher::get_jurisdiction_producer()
+jurisdiction_producer jurisdiction_action_launcher::get_jurisdiction_producer( account_name producer )
 {
-   if( provider )
-      return { active_producer, provider->get_trx_jurisdiction().jurisdictions };
+   if( active_producer == producer )
+   {
+      if( provider )
+         return provider->get_jurisdiction_producer();
+      else
+         return { active_producer, {} };
+   }
    else
       return { active_producer, {} };
 }
