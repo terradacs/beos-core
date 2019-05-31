@@ -19,7 +19,6 @@
 
 #include <eosio/chain/voting_manager.hpp>
 
-#include <eosio/chain/jurisdiction_objects.hpp>
 #include <eosio/chain/jurisdiction_object.hpp>
 
 #include <chainbase/chainbase.hpp>
@@ -157,6 +156,8 @@ struct controller_impl {
     *  can query this list when scheduling new transactions into blocks.
     */
    map<digest_type, transaction_metadata_ptr>     unapplied_transactions;
+
+   jurisdiction_action_launcher::ptr_base         launcher;
 
    void pop_block() {
       auto prev = fork_db.get_block( head->header.previous );
@@ -1942,6 +1943,11 @@ int64_t controller::set_proposed_producers( vector<producer_key> producers ) {
       gp.proposed_schedule = std::move(sch);
    });
    return version;
+}
+
+void controller::set_launcher( jurisdiction_action_launcher::ptr_base launcher )
+{
+   my->launcher = launcher;
 }
 
 bool controller::add_jurisdiction( const jurisdiction_dictionary& info )

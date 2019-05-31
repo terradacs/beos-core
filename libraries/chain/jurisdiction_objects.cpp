@@ -16,6 +16,43 @@ void trx_extensions_visitor::operator()( const trx_jurisdiction& _trx_jurisdicti
    jurisdiction = fc::raw::unpack< trx_jurisdiction >( _buffer );
 }
 
+/*=============================jurisdiction_launcher=============================*/
+
+jurisdiction_action_launcher::ptr_base jurisdiction_action_launcher::getptr()
+{
+   return shared_from_this();
+}
+
+const account_name& jurisdiction_action_launcher::get_active_producer() const
+{
+   return active_producer;
+}
+
+void jurisdiction_action_launcher::set_provider( ptr_provider new_provider )
+{
+   new_provider = provider;
+}
+
+void jurisdiction_action_launcher::update_producer( account_name new_producer )
+{
+   if( active_producer != new_producer )
+      active_producer = new_producer;
+}
+
+void jurisdiction_action_launcher::update_jurisdictions()
+{
+   if( provider )
+      provider->update();
+}
+
+jurisdiction_producer jurisdiction_action_launcher::get_jurisdiction_producer()
+{
+   if( provider )
+      return { active_producer, provider->get_trx_jurisdiction().jurisdictions };
+   else
+      return { active_producer, {} };
+}
+
 /*=============================jurisdiction_manager=============================*/
 
 const uint16_t jurisdiction_manager::limit_256 = 256;

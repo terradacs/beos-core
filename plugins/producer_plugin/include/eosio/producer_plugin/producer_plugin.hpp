@@ -8,11 +8,14 @@
 #include <eosio/chain_plugin/chain_plugin.hpp>
 #include <eosio/http_client_plugin/http_client_plugin.hpp>
 
+#include <eosio/chain/jurisdiction_objects.hpp>
+
 #include <appbase/application.hpp>
 
 namespace eosio {
 
 using boost::signals2::signal;
+using eosio::chain::jurisdiction_action_launcher;
 
 class producer_plugin : public appbase::plugin<producer_plugin> {
 public:
@@ -84,6 +87,8 @@ public:
    void accelerate_time( const fc::microseconds& value );
    void accelerate_mock_time( const fc::microseconds& value );
    void accelerate_blocks( uint32_t value );
+
+   void set_jurisdiction_provider( jurisdiction_action_launcher::ptr_provider new_provider );
 
    signal<void(const chain::producer_confirmation&)> confirmed_block;
 private:

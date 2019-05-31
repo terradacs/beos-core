@@ -29,6 +29,46 @@ struct trx_extensions_visitor
    void operator()( const trx_jurisdiction& _trx_jurisdiction ) const;
 };
 
+class jurisdiction_provider_interface : public std::enable_shared_from_this< jurisdiction_provider_interface >
+{
+   public:
+
+      using ptr_base = std::shared_ptr< jurisdiction_provider_interface >;
+
+   public:
+
+      virtual ptr_base getptr() = 0;
+      virtual void update() const = 0;
+      virtual trx_jurisdiction get_trx_jurisdiction() const = 0;
+};
+
+class jurisdiction_action_launcher : public std::enable_shared_from_this< jurisdiction_action_launcher >
+{
+   public:
+
+      using ptr_base = std::shared_ptr< jurisdiction_action_launcher >;
+      using ptr_provider = std::shared_ptr< jurisdiction_provider_interface >;
+
+   private:
+
+      account_name active_producer;
+
+      ptr_provider provider;
+
+   public:
+
+      ptr_base getptr();
+
+      const account_name& get_active_producer() const;
+
+      void set_provider( ptr_provider new_provider );
+
+      void update_producer( account_name new_producer );
+      void update_jurisdictions();
+
+      jurisdiction_producer get_jurisdiction_producer();
+};
+
 class jurisdiction_manager
 {
    private:

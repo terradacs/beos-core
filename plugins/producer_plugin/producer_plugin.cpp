@@ -9,8 +9,6 @@
 #include <eosio/chain/transaction_object.hpp>
 #include <eosio/chain/snapshot.hpp>
 
-#include <eosio/chain/jurisdiction_objects.hpp>
-
 #include <fc/io/json.hpp>
 #include <fc/smart_ref_impl.hpp>
 #include <fc/scoped_exit.hpp>
@@ -182,7 +180,8 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
       // path to write the snapshots to
       bfs::path _snapshots_dir;
 
-      account_name actual_producer_name;
+      jurisdiction_action_launcher  jurisdiction_launcher;
+      jurisdiction_manager          jurisdiction_checker;
 
       void on_block( const block_state_ptr& bsp ) {
          if( bsp->header.timestamp <= _last_signed_block_time ) return;
@@ -395,8 +394,7 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
             return;
          }
 
-         jurisdiction_manager jurisdiction_checker;
-         bool match_result = jurisdiction_checker.transaction_jurisdictions_match( chain.db(), actual_producer_name, *trx );
+         bool match_result = jurisdiction_checker.transaction_jurisdictions_match( chain.db(), jurisdiction_launcher.get_active_producer(), *trx );
          if( !match_result )
          {
             _pending_incoming_transactions.emplace_back(trx, persist_until_expired, next);
@@ -739,6 +737,7 @@ void producer_plugin::plugin_startup()
    EOS_ASSERT( my->_producers.empty() || chain.get_validation_mode() == chain::validation_mode::FULL, plugin_config_exception,
               "node cannot have any producer-name configured because block production is not safe when validation_mode is not \"full\"" );
 
+   chain.set_launcher( my->jurisdiction_launcher.getptr() );
 
    my->_accepted_block_connection.emplace(chain.accepted_block.connect( [this]( const auto& bsp ){ my->on_block( bsp ); } ));
    my->_irreversible_block_connection.emplace(chain.irreversible_block.connect( [this]( const auto& bsp ){ my->on_irreversible_block( bsp->block ); } ));
@@ -953,6 +952,11 @@ void producer_plugin::accelerate_blocks( uint32_t value )
   my->accelerate_blocks( value );
 }
 
+void producer_plugin::set_jurisdiction_provider( jurisdiction_action_launcher::ptr_provider new_provider )
+{
+   my->jurisdiction_launcher.set_provider( new_provider );
+}
+
 optional<fc::time_point> producer_plugin_impl::calculate_next_block_time(const account_name& producer_name, const block_timestamp_type& current_block_time) const {
    chain::controller& chain = app().get_plugin<chain_plugin>().chain();
    const auto& hbs = chain.head_block_state();
@@ -1090,7 +1094,9 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
    // Not our turn
    last_block = ((block_timestamp_type(block_time).slot % config::producer_repetitions) == config::producer_repetitions - 1);
    const auto& scheduled_producer = hbs->get_scheduled_producer(block_time);
-   actual_producer_name = scheduled_producer.producer_name;
+
+   jurisdiction_launcher.update_producer( scheduled_producer.producer_name );
+
    auto currrent_watermark_itr = _producer_watermarks.find(scheduled_producer.producer_name);
    auto signature_provider_itr = _signature_providers.find(scheduled_producer.block_signing_key);
    auto irreversible_block_age = get_irreversible_block_age();
