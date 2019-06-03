@@ -841,11 +841,11 @@ class beos_jurisdiction_tester : public eosio_init_tester
             );
       }
 
-      action_result update_jurisdictions( account_name producer, std::vector< code_jurisdiction > new_jurisdictions )
+      action_result update_jurisdictions( account_name producer, std::vector< code_jurisdiction > jurisdictions )
       {
          return push_action(producer, N(updateprod), mvo()
             ("producer",       producer )
-            ("new_jurisdictions", new_jurisdictions ),
+            ("jurisdictions", jurisdictions ),
             system_abi_ser,
             config::system_account_name
             );

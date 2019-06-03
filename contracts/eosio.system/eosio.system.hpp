@@ -251,7 +251,7 @@ namespace eosiosystem {
          bool is_allowed_ram_operation() const;
 
          void addjurisdict( account_name ram_payer, code_jurisdiction new_code, std::string new_name, std::string new_description );
-         void updateprod( account_name producer, std::vector< code_jurisdiction > new_jurisdictions );
+         void updateprod( account_name producer, std::vector< code_jurisdiction > jurisdictions );
 
       private:
          void update_elected_producers( block_timestamp timestamp );

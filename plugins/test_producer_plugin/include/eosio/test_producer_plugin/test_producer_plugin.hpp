@@ -125,8 +125,8 @@ class test_producer_plugin : public plugin<test_producer_plugin>
       void plugin_shutdown();
 
       test_producer_apis::read_write get_read_write_api();
-
-      jurisdiction_test_provider& get_test_provider();
+      
+      jurisdiction_test_provider::ptr_base get_test_provider();
 
    private:
 

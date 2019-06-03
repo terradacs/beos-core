@@ -14,9 +14,15 @@ class test_producer_plugin_impl
 {
    public:
 
-      jurisdiction_test_provider test_provider;
+      jurisdiction_test_provider::ptr_base test_provider;
 
       producer_plugin* producer_plug = nullptr;
+
+      test_producer_plugin_impl()
+            : test_provider( new jurisdiction_test_provider() )
+      {
+
+      }
 };
 
 test_producer_plugin::test_producer_plugin()
@@ -36,7 +42,7 @@ void test_producer_plugin::plugin_initialize(const variables_map& options)
 {
   my->producer_plug = app().find_plugin<producer_plugin>();
 
-  my->producer_plug->set_jurisdiction_provider( my->test_provider.getptr() );
+  my->producer_plug->set_jurisdiction_provider( my->test_provider->getptr() );
 }
 
 void test_producer_plugin::plugin_startup()
@@ -52,7 +58,7 @@ test_producer_apis::read_write test_producer_plugin::get_read_write_api()
   return test_producer_apis::read_write( my->producer_plug, this );
 }
 
-jurisdiction_test_provider& test_producer_plugin::get_test_provider()
+jurisdiction_test_provider::ptr_base test_producer_plugin::get_test_provider()
 {
    return my->test_provider;
 }
@@ -160,7 +166,7 @@ namespace test_producer_apis
       try {
 
          assert( producer_plug && test_producer_plug );
-         test_producer_plug->get_test_provider().change( params );
+         test_producer_plug->get_test_provider()->change( params );
 
          return update_jurisdictions_results( true );
 

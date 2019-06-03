@@ -238,7 +238,7 @@ namespace eosio { namespace chain {
 
          int64_t set_proposed_producers( vector<producer_key> producers );
 
-         void set_launcher( jurisdiction_action_launcher::ptr_base launcher );
+         void set_launcher( jurisdiction_action_launcher::ptr_base jurisdiction_launcher );
          bool add_jurisdiction( const jurisdiction_dictionary& info );
          bool update_jurisdictions( const jurisdiction_producer_ordered& updater );
 

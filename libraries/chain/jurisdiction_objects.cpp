@@ -25,7 +25,7 @@ jurisdiction_provider_interface::ptr_base jurisdiction_provider_interface::getpt
 
 /*=============================jurisdiction_test_provider=============================*/
 
-void jurisdiction_test_provider::update() const
+void jurisdiction_test_provider::update( const account_name& producer ) const
 {
    //nothing to do
 }
@@ -42,6 +42,12 @@ void jurisdiction_test_provider::change( const jurisdiction_producer& src )
 
 /*=============================jurisdiction_launcher=============================*/
 
+void jurisdiction_action_launcher::update_provider()
+{
+   if( provider )
+      provider->update( active_producer );
+}
+
 jurisdiction_action_launcher::ptr_base jurisdiction_action_launcher::getptr()
 {
    return shared_from_this();
@@ -57,27 +63,18 @@ void jurisdiction_action_launcher::set_provider( ptr_provider new_provider )
    new_provider = provider;
 }
 
-void jurisdiction_action_launcher::update_producer( account_name new_producer )
+void jurisdiction_action_launcher::update( account_name new_producer )
 {
    if( active_producer != new_producer )
       active_producer = new_producer;
+
+   update_provider();
 }
 
-void jurisdiction_action_launcher::update_jurisdictions()
+fc::optional< jurisdiction_producer > jurisdiction_action_launcher::get_jurisdiction_producer()
 {
    if( provider )
-      provider->update();
-}
-
-fc::optional< jurisdiction_producer > jurisdiction_action_launcher::get_jurisdiction_producer( account_name producer )
-{
-   if( active_producer == producer )
-   {
-      if( provider )
-         return provider->get_jurisdiction_producer();
-      else
-         return fc::optional< jurisdiction_producer >();
-   }
+      return provider->get_jurisdiction_producer();
    else
       return fc::optional< jurisdiction_producer >();
 }

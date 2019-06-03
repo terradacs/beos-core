@@ -32,12 +32,12 @@ namespace eosiosystem {
       eosio::print("Leaving system_contract::addjurisdict\n");
    }
 
-   void system_contract::updateprod( account_name producer, std::vector< code_jurisdiction > new_jurisdictions )
+   void system_contract::updateprod( account_name producer, std::vector< code_jurisdiction > jurisdictions )
    {
       eosio::print("Entering system_contract::updateprod\n");
       require_auth( producer );
 
-      eosio_assert( new_jurisdictions.size() < limit_256, "number of jurisdictions is greater than allowed" );
+      eosio_assert( jurisdictions.size() < limit_256, "number of jurisdictions is greater than allowed" );
 
       typedef eosio::multi_index< N(producers), eosiosystem::producer_info > producer_info_t;
       producer_info_t _producers( N(eosio), N(eosio) );

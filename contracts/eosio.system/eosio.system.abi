@@ -49,7 +49,7 @@
       "base": "",
       "fields": [
         {"name":"producer", "type":"account_name"},
-        {"name":"new_jurisdictions", "type":"code_jurisdiction[]"}
+        {"name":"jurisdictions", "type":"code_jurisdiction[]"}
       ]
     },{
       "name": "initialissue",
