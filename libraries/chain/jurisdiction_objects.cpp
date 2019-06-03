@@ -48,11 +48,6 @@ void jurisdiction_action_launcher::update_provider()
       provider->update( active_producer );
 }
 
-jurisdiction_action_launcher::ptr_base jurisdiction_action_launcher::getptr()
-{
-   return shared_from_this();
-}
-
 const account_name& jurisdiction_action_launcher::get_active_producer() const
 {
    return active_producer;
@@ -65,7 +60,8 @@ void jurisdiction_action_launcher::set_provider( ptr_provider new_provider )
 
 void jurisdiction_action_launcher::update( account_name new_producer )
 {
-   if( active_producer != new_producer )
+   producer_changed = active_producer != new_producer;
+   if( producer_changed )
       active_producer = new_producer;
 
    update_provider();
@@ -77,6 +73,39 @@ fc::optional< jurisdiction_producer > jurisdiction_action_launcher::get_jurisdic
       return provider->get_jurisdiction_producer();
    else
       return fc::optional< jurisdiction_producer >();
+}
+
+transaction_metadata_ptr jurisdiction_action_launcher::get_jurisdiction_transaction( const block_id_type& block_id, const time_point& time )
+{
+   if( !producer_changed )
+      return transaction_metadata_ptr();
+
+   fc::optional< jurisdiction_producer > jurisdiction_data = get_jurisdiction_producer();
+   if( !jurisdiction_data )
+      return transaction_metadata_ptr();
+
+   fc::variant _data = fc::mutable_variant_object()
+                  ("producer", jurisdiction_data->producer )
+                  ("jurisdictions", jurisdiction_data->jurisdictions );
+
+   action on_block_update_jurisdictions_act;
+   on_block_update_jurisdictions_act.account = config::system_account_name;
+   on_block_update_jurisdictions_act.name = N(updateprod);
+   on_block_update_jurisdictions_act.authorization = vector<permission_level>{{ active_producer, config::active_name }};
+   on_block_update_jurisdictions_act.data = fc::raw::pack( _data );
+
+   signed_transaction trx;
+   trx.actions.emplace_back( std::move( on_block_update_jurisdictions_act ) );
+
+   trx.set_reference_block( block_id );
+   trx.expiration = time + fc::microseconds(999'999); // Round up to nearest second to avoid appearing expired
+
+   return std::make_shared< transaction_metadata >( trx );
+}
+
+void jurisdiction_action_launcher::set_inactive_producer()
+{
+   producer_changed = false;
 }
 
 /*=============================jurisdiction_manager=============================*/

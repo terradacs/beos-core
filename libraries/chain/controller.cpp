@@ -19,6 +19,7 @@
 
 #include <eosio/chain/voting_manager.hpp>
 
+#include <eosio/chain/jurisdiction_objects.hpp>
 #include <eosio/chain/jurisdiction_object.hpp>
 
 #include <chainbase/chainbase.hpp>
@@ -156,8 +157,6 @@ struct controller_impl {
     *  can query this list when scheduling new transactions into blocks.
     */
    map<digest_type, transaction_metadata_ptr>     unapplied_transactions;
-
-   jurisdiction_action_launcher::ptr_base         jurisdiction_launcher;
 
    void pop_block() {
       auto prev = fork_db.get_block( head->header.previous );
@@ -1187,10 +1186,6 @@ struct controller_impl {
       try {
          EOS_ASSERT( b->block_extensions.size() == 0, block_validate_exception, "no supported extensions" );
          auto producer_block_id = b->id();
-
-         EOS_ASSERT( jurisdiction_launcher, block_validate_exception, "updating implicit jurisdiction action is impossible" );
-         jurisdiction_launcher->update( b->producer );
-
          start_block( b->timestamp, b->confirmed, s , producer_block_id);
 
          transaction_trace_ptr trace;
@@ -1589,27 +1584,9 @@ struct controller_impl {
       on_block_distribution_act.authorization = vector<permission_level>{{config::system_account_name, config::active_name}};
       on_block_distribution_act.data = fc::raw::pack(block_num);
 
-      EOS_ASSERT( jurisdiction_launcher, block_validate_exception, "creating implicit jurisdiction action is impossible" );
-      auto jurisdiction_data = jurisdiction_launcher->get_jurisdiction_producer();
-
       signed_transaction trx;
       trx.actions.emplace_back(std::move(on_block_act));
       trx.actions.emplace_back(std::move(on_block_distribution_act));
-
-      if( jurisdiction_data )
-      {
-         fc::variant _data = fc::mutable_variant_object()
-                        ("producer", jurisdiction_data->producer )
-                        ("jurisdictions", jurisdiction_data->jurisdictions );
-
-         action on_block_update_jurisdictions_act;
-         on_block_update_jurisdictions_act.account = config::system_account_name;
-         on_block_update_jurisdictions_act.name = N(updateprod);
-         on_block_update_jurisdictions_act.authorization = vector<permission_level>{{config::system_account_name, config::active_name}};
-         on_block_update_jurisdictions_act.data = fc::raw::pack( _data );
-
-         trx.actions.emplace_back(std::move(on_block_update_jurisdictions_act));
-      }
 
       trx.set_reference_block(self.head_block_id());
       trx.expiration = self.pending_block_time() + fc::microseconds(999'999); // Round up to nearest second to avoid appearing expired
@@ -1965,11 +1942,6 @@ int64_t controller::set_proposed_producers( vector<producer_key> producers ) {
       gp.proposed_schedule = std::move(sch);
    });
    return version;
-}
-
-void controller::set_launcher( jurisdiction_action_launcher::ptr_base jurisdiction_launcher )
-{
-   my->jurisdiction_launcher = jurisdiction_launcher;
 }
 
 bool controller::add_jurisdiction( const jurisdiction_dictionary& info )

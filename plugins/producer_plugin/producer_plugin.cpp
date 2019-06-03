@@ -111,7 +111,6 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
       producer_plugin_impl(boost::asio::io_service& io)
       :_timer(io)
       ,_transaction_ack_channel(app().get_channel<compat::channels::transaction_ack>())
-      ,jurisdiction_launcher( new jurisdiction_action_launcher() )
       {
       }
 
@@ -181,8 +180,8 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
       // path to write the snapshots to
       bfs::path _snapshots_dir;
 
-      jurisdiction_action_launcher::ptr_base    jurisdiction_launcher;
-      jurisdiction_manager                      jurisdiction_checker;
+      jurisdiction_action_launcher  jurisdiction_launcher;
+      jurisdiction_manager          jurisdiction_checker;
 
       void on_block( const block_state_ptr& bsp ) {
          if( bsp->header.timestamp <= _last_signed_block_time ) return;
@@ -346,6 +345,34 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
 
       std::deque<std::tuple<packed_transaction_ptr, bool, next_function<transaction_trace_ptr>>> _pending_incoming_transactions;
 
+      void push_custom_jurisdiction_transaction()
+      {
+         try
+         {
+            chain::controller& chain = app().get_plugin<chain_plugin>().chain();
+            auto block_time = chain.pending_block_state()->header.timestamp.to_time_point();
+
+            auto trx = jurisdiction_launcher.get_jurisdiction_transaction( chain.head_block_id(), chain.pending_block_time() );
+            jurisdiction_launcher.set_inactive_producer();
+            if( !trx )
+               return;
+
+            auto deadline = fc::time_point::now() + fc::milliseconds(_max_transaction_time_ms);
+
+            if( _max_transaction_time_ms < 0 || ( _pending_block_mode == pending_block_mode::producing && block_time < deadline ) )
+               deadline = block_time;
+
+            auto trace = chain.push_transaction( trx, deadline );
+            if( trace->except )
+               fc_dlog(_trx_trace_log, "Changing jurisdictions failed" );
+
+         } catch ( const guard_exception& e ) {
+            app().get_plugin<chain_plugin>().handle_guard_exception(e);
+         } catch ( boost::interprocess::bad_alloc& ) {
+            chain_plugin::handle_db_exhaustion();
+         };
+      }
+
       void on_incoming_transaction_async(const packed_transaction_ptr& trx, bool persist_until_expired, next_function<transaction_trace_ptr> next) {
          chain::controller& chain = app().get_plugin<chain_plugin>().chain();
          if (!chain.pending_block_state()) {
@@ -395,7 +422,7 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
             return;
          }
 
-         bool match_result = jurisdiction_checker.transaction_jurisdictions_match( chain.db(), jurisdiction_launcher->get_active_producer(), *trx );
+         bool match_result = jurisdiction_checker.transaction_jurisdictions_match( chain.db(), jurisdiction_launcher.get_active_producer(), *trx );
          if( !match_result )
          {
             _pending_incoming_transactions.emplace_back(trx, persist_until_expired, next);
@@ -738,8 +765,6 @@ void producer_plugin::plugin_startup()
    EOS_ASSERT( my->_producers.empty() || chain.get_validation_mode() == chain::validation_mode::FULL, plugin_config_exception,
               "node cannot have any producer-name configured because block production is not safe when validation_mode is not \"full\"" );
 
-   chain.set_launcher( my->jurisdiction_launcher->getptr() );
-
    my->_accepted_block_connection.emplace(chain.accepted_block.connect( [this]( const auto& bsp ){ my->on_block( bsp ); } ));
    my->_irreversible_block_connection.emplace(chain.irreversible_block.connect( [this]( const auto& bsp ){ my->on_irreversible_block( bsp->block ); } ));
 
@@ -955,7 +980,7 @@ void producer_plugin::accelerate_blocks( uint32_t value )
 
 void producer_plugin::set_jurisdiction_provider( jurisdiction_action_launcher::ptr_provider new_provider )
 {
-   my->jurisdiction_launcher->set_provider( new_provider );
+   my->jurisdiction_launcher.set_provider( new_provider );
 }
 
 optional<fc::time_point> producer_plugin_impl::calculate_next_block_time(const account_name& producer_name, const block_timestamp_type& current_block_time) const {
@@ -1096,7 +1121,7 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
    last_block = ((block_timestamp_type(block_time).slot % config::producer_repetitions) == config::producer_repetitions - 1);
    const auto& scheduled_producer = hbs->get_scheduled_producer(block_time);
 
-   jurisdiction_launcher->update( scheduled_producer.producer_name );
+   jurisdiction_launcher.update( scheduled_producer.producer_name );
 
    auto currrent_watermark_itr = _producer_watermarks.find(scheduled_producer.producer_name);
    auto signature_provider_itr = _signature_providers.find(scheduled_producer.block_signing_key);
@@ -1301,6 +1326,8 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
                       ("n", orig_count)
                       ("expired", num_expired));
             }
+
+            push_custom_jurisdiction_transaction();
 
             auto scheduled_trxs = chain.get_scheduled_transactions();
             if (!scheduled_trxs.empty()) {

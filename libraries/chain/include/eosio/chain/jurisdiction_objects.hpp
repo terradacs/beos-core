@@ -4,6 +4,7 @@
 #include <eosio/chain/producer_schedule.hpp>
 #include <eosio/chain/transaction.hpp>
 #include <eosio/chain/jurisdiction_object.hpp>
+#include <eosio/chain/transaction_metadata.hpp>
 
 #include <fc/static_variant.hpp>
 
@@ -37,6 +38,9 @@ class jurisdiction_provider_interface : public std::enable_shared_from_this< jur
 
    public:
 
+      jurisdiction_provider_interface(){}
+      virtual ~jurisdiction_provider_interface(){}
+
       ptr_base getptr();
 
       virtual void update( const account_name& producer ) const = 0;
@@ -55,30 +59,33 @@ class jurisdiction_test_provider : public jurisdiction_provider_interface
 
    public:
 
+      jurisdiction_test_provider(){}
+      ~jurisdiction_test_provider() override{}
+
       void update( const account_name& producer ) const override;
       const jurisdiction_producer& get_jurisdiction_producer() const override;
 
       void change( const jurisdiction_producer& src );
 };
 
-class jurisdiction_action_launcher : public std::enable_shared_from_this< jurisdiction_action_launcher >
+class jurisdiction_action_launcher
 {
    public:
 
-      using ptr_base = std::shared_ptr< jurisdiction_action_launcher >;
       using ptr_provider = std::shared_ptr< jurisdiction_provider_interface >;
 
    private:
+
+      bool producer_changed = false;
 
       account_name active_producer;
 
       ptr_provider provider;
 
       void update_provider();
+      fc::optional< jurisdiction_producer > get_jurisdiction_producer();
 
    public:
-
-      ptr_base getptr();
 
       const account_name& get_active_producer() const;
 
@@ -86,7 +93,8 @@ class jurisdiction_action_launcher : public std::enable_shared_from_this< jurisd
 
       void update( account_name new_producer );
 
-      fc::optional< jurisdiction_producer > get_jurisdiction_producer();
+      transaction_metadata_ptr get_jurisdiction_transaction( const block_id_type& block_id, const time_point& time );
+      void set_inactive_producer();
 };
 
 class jurisdiction_manager

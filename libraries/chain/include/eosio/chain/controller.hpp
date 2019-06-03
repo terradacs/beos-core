@@ -7,7 +7,6 @@
 #include <eosio/chain/abi_serializer.hpp>
 #include <eosio/chain/account_object.hpp>
 #include <eosio/chain/snapshot.hpp>
-#include <eosio/chain/jurisdiction_objects.hpp>
 
 namespace chainbase {
    class database;
@@ -238,7 +237,6 @@ namespace eosio { namespace chain {
 
          int64_t set_proposed_producers( vector<producer_key> producers );
 
-         void set_launcher( jurisdiction_action_launcher::ptr_base jurisdiction_launcher );
          bool add_jurisdiction( const jurisdiction_dictionary& info );
          bool update_jurisdictions( const jurisdiction_producer_ordered& updater );
 
