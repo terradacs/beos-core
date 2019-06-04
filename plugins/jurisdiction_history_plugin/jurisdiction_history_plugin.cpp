@@ -62,6 +62,7 @@ namespace eosio
 
   void jurisdiction_history_plugin::plugin_initialize(const variables_map& options)
   {
+    ilog("initializing jurisdiction_history_plugin");
     try 
     {
       my->chain_plug = app().find_plugin<chain_plugin>();
