@@ -8,12 +8,6 @@ namespace eosio
   class jurisdiction_history_plugin_impl
   {
     public:
-      struct updateprod
-      {
-        chain::account_name producer;
-        std::vector<chain::code_jurisdiction> new_jurisdictions;
-      };
-
       chain_plugin *chain_plug = nullptr;
       fc::optional<boost::signals2::scoped_connection> applied_transaction_connection;
 
@@ -23,9 +17,11 @@ namespace eosio
         {
           if (atrace.act.name == N(updateprod))
           {
-            ilog("=== updateprod detected by account ${n}", ("n", atrace.act.account));
-            ilog("    block num ${n}", ("n", trace->block_num));
-            //on_producer_jurisdiction_change(atrace.act.account, trace->block_num, trace->block_time, act_data.new_jurisdictions);
+            chain::jurisdiction_producer act_data;
+            chain::datastream<const char*> ds(atrace.act.data.data(), atrace.act.data.size());
+            fc::raw::unpack(ds, act_data);
+            
+            on_producer_jurisdiction_change(act_data.producer, trace->block_num, trace->block_time, act_data.jurisdictions);
           }
         }
       }
