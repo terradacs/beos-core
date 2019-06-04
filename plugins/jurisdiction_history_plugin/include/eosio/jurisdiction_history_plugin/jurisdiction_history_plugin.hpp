@@ -55,8 +55,6 @@ namespace eosio
         get_producer_jurisdiction_for_block_results get_producer_jurisdiction_for_block(const get_producer_jurisdiction_for_block_params &params);
         get_producer_jurisdiction_history_results get_producer_jurisdiction_history(const get_producer_jurisdiction_history_results &params);
 
-        void on_producer_jurisdiction_change(const chain::account_name &producer, uint64_t block_number, fc::time_point date_changed, std::vector<chain::code_jurisdiction> &new_jurisdictions);
-
         read_write(controller& db, const fc::microseconds& abi_serializer_max_time) : 
           db(db), 
           abi_serializer_max_time( abi_serializer_max_time ) 

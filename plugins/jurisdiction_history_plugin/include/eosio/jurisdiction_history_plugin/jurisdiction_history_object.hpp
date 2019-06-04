@@ -20,16 +20,37 @@ namespace eosio
 
   struct by_id;
   struct by_producer_name;
+  struct by_producer_block_number;
   struct by_block_number;
   struct by_date_changed;
 
   using jurisdiction_history_multi_index = chainbase::shared_multi_index_container<
     jurisdiction_history_object,
     bmi::indexed_by<
-      bmi::ordered_unique<bmi::tag<by_id>, bmi::member<jurisdiction_history_object, jurisdiction_history_object::id_type, &jurisdiction_history_object::id>,
-      bmi::ordered_unique<bmi::tag<by_producer_name>, bmi::member<jurisdiction_history_object, chain::account_name, &jurisdiction_history_object::producer_name>,
-      bmi::ordered_non_unique<bmi::tag<by_block_number>, bmi::member<jurisdiction_history_object, uint64_t, &jurisdiction_history_object::block_number>,
-      bmi::ordered_non_unique<bmi::tag<by_date_changed>, bmi::member<jurisdiction_history_object, fc::time_point, &jurisdiction_history_object::date_changed>
+      bmi::ordered_unique<
+        bmi::tag<by_id>, 
+        bmi::member<jurisdiction_history_object, jurisdiction_history_object::id_type, &jurisdiction_history_object::id>
+      >,
+      bmi::ordered_unique<
+        bmi::tag<by_producer_name>, 
+        bmi::member<jurisdiction_history_object, chain::account_name, &jurisdiction_history_object::producer_name>
+      >,
+      bmi::ordered_unique<
+        bmi::composite_key<
+        bmi::tag<by_producer_block_number>,
+          jurisdiction_history_object,
+          bmi::member<jurisdiction_history_object, chain::account_name, &jurisdiction_history_object::producer_name>,
+          bmi::member<jurisdiction_history_object, uint64_t, &jurisdiction_history_object::block_number>
+        >
+      >,
+      bmi::ordered_non_unique<
+        bmi::tag<by_block_number>, 
+        bmi::member<jurisdiction_history_object, uint64_t, &jurisdiction_history_object::block_number>
+      >,
+      bmi::ordered_non_unique<
+        bmi::tag<by_date_changed>, 
+        bmi::member<jurisdiction_history_object, fc::time_point, &jurisdiction_history_object::date_changed>
+      >
     >
   >;
 
