@@ -38,6 +38,6 @@ void jurisdiction_history_api_plugin::plugin_startup() {
    });
 }
 
-void jurisdiction_api_plugin::plugin_shutdown(){}
+void jurisdiction_history_api_plugin::plugin_shutdown(){}
 
 }

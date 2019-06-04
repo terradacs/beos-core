@@ -36,8 +36,8 @@ namespace eosio
         bmi::member<jurisdiction_history_object, chain::account_name, &jurisdiction_history_object::producer_name>
       >,
       bmi::ordered_unique<
-        bmi::composite_key<
         bmi::tag<by_producer_block_number>,
+        bmi::composite_key<
           jurisdiction_history_object,
           bmi::member<jurisdiction_history_object, chain::account_name, &jurisdiction_history_object::producer_name>,
           bmi::member<jurisdiction_history_object, uint64_t, &jurisdiction_history_object::block_number>

@@ -8,6 +8,12 @@ namespace eosio
   class jurisdiction_history_plugin_impl
   {
     public:
+      struct updateprod
+      {
+        chain::account_name producer;
+        std::vector<chain::code_jurisdiction> new_jurisdictions;
+      };
+
       chain_plugin *chain_plug = nullptr;
       fc::optional<boost::signals2::scoped_connection> applied_transaction_connection;
 
@@ -17,8 +23,9 @@ namespace eosio
         {
           if (atrace.act.name == N(updateprod))
           {
-            const auto updateprod = atrace.act.data_as<chain::updateprod>();
-            on_producer_jurisdiction_change(updateprod.producer, trace->block_num, trace->block_time, updateprod.new_jurisdictions);
+            ilog("=== updateprod detected by account ${n}", ("n", atrace.act.account));
+            ilog("    block num ${n}", ("n", trace->block_num));
+            //on_producer_jurisdiction_change(atrace.act.account, trace->block_num, trace->block_time, act_data.new_jurisdictions);
           }
         }
       }
@@ -96,7 +103,7 @@ namespace eosio
       read_write::get_producer_jurisdiction_for_block_results result;
       try 
       {
-        const auto &idx_by_producer_block = db.db().get_index<jurisdiction_history_index, by_producer_block_number>();
+        const auto &idx_by_producer_block = db.db().get_index<jurisdiction_history_multi_index, by_producer_block_number>();
         auto search = idx_by_producer_block.find(boost::make_tuple(params.producer, params.block_number));
         if (search != idx_by_producer_block.end())
         {
@@ -133,7 +140,7 @@ namespace eosio
       read_write::get_producer_jurisdiction_history_results result;
       try 
       {
-        const auto &idx_by_date_changed = db.db().get_index<jurisdiction_history_index, by_date_changed>();
+        const auto &idx_by_date_changed = db.db().get_index<jurisdiction_history_multi_index, by_date_changed>();
         auto itr = idx_by_date_changed.lower_bound(params.from_date);
         while (itr != idx_by_date_changed.end() && itr->date_changed < params.to_date)
         {
@@ -169,7 +176,4 @@ namespace eosio
       return result;
     }
   } // namespace jurisdiction_history_apis
-
-
-  
 }

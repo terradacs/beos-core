@@ -25,6 +25,8 @@ namespace eosio
           fc::time_point date_changed;
           std::vector<chain::code_jurisdiction> new_jurisdictions;
 
+          jurisdiction_history_api_object(){}
+
           jurisdiction_history_api_object(const jurisdiction_history_object &jho) :
             producer_name(jho.producer_name),
             block_number(jho.block_number),
@@ -53,7 +55,7 @@ namespace eosio
         };
 
         get_producer_jurisdiction_for_block_results get_producer_jurisdiction_for_block(const get_producer_jurisdiction_for_block_params &params);
-        get_producer_jurisdiction_history_results get_producer_jurisdiction_history(const get_producer_jurisdiction_history_results &params);
+        get_producer_jurisdiction_history_results get_producer_jurisdiction_history(const get_producer_jurisdiction_history_params &params);
 
         read_write(controller& db, const fc::microseconds& abi_serializer_max_time) : 
           db(db), 
@@ -86,7 +88,7 @@ namespace eosio
       void plugin_startup();
       void plugin_shutdown();
 
-      jurisdiction_apis::read_write get_read_write_api() const;
+      jurisdiction_history_apis::read_write get_read_write_api() const;
 
     private:
       std::unique_ptr<class jurisdiction_history_plugin_impl> my;
