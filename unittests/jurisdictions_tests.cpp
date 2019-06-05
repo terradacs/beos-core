@@ -116,8 +116,7 @@ BOOST_FIXTURE_TEST_CASE( basic_test_02, jurisdiction_tester ) try {
    chainbase::database &db = const_cast< chainbase::database& > ( control->db() );
    jurisdiction_manager updater;
 
-   jurisdiction_producer_ordered src;
-   src.producer = N(tester);
+   jurisdiction_producer_ordered src( N(tester) );
 
    make_jurisdictions( db, 22 );
 
@@ -170,12 +169,9 @@ BOOST_FIXTURE_TEST_CASE( basic_test_03, jurisdiction_tester ) try {
 
    make_jurisdictions( db, 10 );
 
-   jurisdiction_producer_ordered src_01;
-   src_01.producer = N(tester_01);
-   src_01.jurisdictions = { 0,1,2,3,4 };
+   jurisdiction_producer_ordered src_01( N(tester_01), { 0,1,2,3,4 } );
 
-   jurisdiction_producer_ordered src_02;
-   src_02.producer = N(tester_02);
+   jurisdiction_producer_ordered src_02( N(tester_02) );
 
    src_01.jurisdictions = { 0,1,2,3,4 };
    updater.update( db, src_01 );

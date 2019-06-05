@@ -937,18 +937,14 @@ BOOST_FIXTURE_TEST_CASE( basic_test_02, beos_jurisdiction_tester ) try {
    jurisdiction_manager updater;
 
    {
-      jurisdiction_producer_ordered data;
-      data.producer = N(beos.proda);
-      data.jurisdictions = {1};
+      jurisdiction_producer_ordered data( N(beos.proda), {1} );
       BOOST_REQUIRE_EQUAL( success(), add_jurisdiction( N(beos.jurisdi), 1, "POLAND", "EAST EUROPE" ) );
       BOOST_REQUIRE_EQUAL( success(), update_jurisdictions( N(beos.proda), {1} ) );
       BOOST_REQUIRE_EQUAL( true, updater.check_jurisdictions( control->db(), data ) );
    }
 
    {
-      jurisdiction_producer_ordered data;
-      data.producer = N(beos.proda);
-      data.jurisdictions = {2,3};
+      jurisdiction_producer_ordered data( N(beos.proda), {2,3} );
       BOOST_REQUIRE_EQUAL( success(), add_jurisdiction( N(beos.jurisdi), 2, "RUSSIA", "EAST EUROPE" ) );
       BOOST_REQUIRE_EQUAL( success(), add_jurisdiction( N(beos.jurisdi), 3, "SWEDEN", "EAST EUROPE" ) );
       BOOST_REQUIRE_EQUAL( success(), update_jurisdictions( N(beos.proda), {2,3} ) );
@@ -956,21 +952,15 @@ BOOST_FIXTURE_TEST_CASE( basic_test_02, beos_jurisdiction_tester ) try {
    }
 
    {
-      jurisdiction_producer_ordered data;
-      data.producer = N(beos.proda);
-      data.jurisdictions = {};
+      jurisdiction_producer_ordered data( N(beos.proda), {} );
       BOOST_REQUIRE_EQUAL( success(), update_jurisdictions( N(beos.proda), {} ) );
       BOOST_REQUIRE_EQUAL( true, updater.check_jurisdictions( control->db(), data ) );
    }
 
    {
-      jurisdiction_producer_ordered data_01;
-      data_01.producer = N(beos.proda);
-      data_01.jurisdictions = {1,2,3};
+      jurisdiction_producer_ordered data_01( N(beos.proda), {1,2,3} );
 
-      jurisdiction_producer_ordered data_02;
-      data_02.producer = N(beos.prodb);
-      data_02.jurisdictions = {2,3};
+      jurisdiction_producer_ordered data_02( N(beos.prodb), {2,3} );
 
       BOOST_REQUIRE_EQUAL( success(), update_jurisdictions( N(beos.proda), {1,2,3} ) );
       BOOST_REQUIRE_EQUAL( success(), update_jurisdictions( N(beos.prodb), {2,3} ) );

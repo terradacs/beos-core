@@ -28,13 +28,14 @@ jurisdiction_provider_interface::ptr_base jurisdiction_provider_interface::getpt
 void jurisdiction_test_provider::update( const account_name& new_producer )
 {
    active_producer = new_producer;
-   if( data.find( active_producer ) == data.end() )
-      data[ active_producer ] = jurisdiction_producer( active_producer );
 }
 
-const jurisdiction_producer& jurisdiction_test_provider::get_jurisdiction_producer()
+fc::optional< jurisdiction_producer > jurisdiction_test_provider::get_jurisdiction_producer()
 {
-   return data[ active_producer ];
+   if( data.find( active_producer ) != data.end() )
+      return data[ active_producer ];
+   else
+      return fc::optional< jurisdiction_producer >();
 }
 
 void jurisdiction_test_provider::change( const jurisdiction_producer& src )
@@ -53,6 +54,13 @@ void jurisdiction_action_launcher::update_provider()
 const account_name& jurisdiction_action_launcher::get_active_producer() const
 {
    return active_producer;
+}
+
+bool jurisdiction_action_launcher::is_equal( const chainbase::database &db, const jurisdiction_producer& src )
+{
+   jurisdiction_producer_ordered new_src( src );
+
+   return check_jurisdictions( db, new_src );
 }
 
 void jurisdiction_action_launcher::set_provider( ptr_provider new_provider )
@@ -80,13 +88,16 @@ fc::optional< jurisdiction_producer > jurisdiction_action_launcher::get_jurisdic
       return fc::optional< jurisdiction_producer >();
 }
 
-transaction_metadata_ptr jurisdiction_action_launcher::get_jurisdiction_transaction( const block_id_type& block_id, const time_point& time, const chain::chain_id_type& chain_id )
+transaction_metadata_ptr jurisdiction_action_launcher::get_jurisdiction_transaction( const chainbase::database &db, const block_id_type& block_id, const time_point& time, const chain::chain_id_type& chain_id )
 {
-   //if( !producer_changed )
-   //   return transaction_metadata_ptr();
+   if( !producer_changed || !signature_provider )
+      return transaction_metadata_ptr();
 
    fc::optional< jurisdiction_producer > jurisdiction_data = get_jurisdiction_producer();
-   if( !jurisdiction_data )
+   if( !jurisdiction_data.valid() )
+      return transaction_metadata_ptr();
+
+   if( is_equal( db, *jurisdiction_data ) )
       return transaction_metadata_ptr();
 
    action on_block_update_jurisdictions_act;
@@ -112,12 +123,7 @@ void jurisdiction_action_launcher::set_inactive_producer()
    producer_changed = false;
 }
 
-/*=============================jurisdiction_manager=============================*/
-
-const uint16_t jurisdiction_manager::limit_256 = 256;
-const char* jurisdiction_manager::too_many_jurisdictions_exception = "Too many jurisdictions given, max value is 255.";
-
-bool jurisdiction_manager::check_jurisdictions( const chainbase::database &db, const jurisdiction_producer_ordered& src )
+bool jurisdiction_action_launcher::check_jurisdictions( const chainbase::database &db, const jurisdiction_producer_ordered& src )
 {
    const auto& idx = db.get_index< jurisdiction_producer_index, by_producer_jurisdiction >();
    auto itr = idx.lower_bound( std::make_tuple( src.producer, std::numeric_limits< code_jurisdiction >::min() ) );
@@ -140,10 +146,20 @@ bool jurisdiction_manager::check_jurisdictions( const chainbase::database &db, c
       ++itr_src;
    }
 
-   FC_ASSERT( itr == idx.end() || itr->producer != src.producer, "incorrect jurisdictions" );
-   FC_ASSERT( itr_src == jurisdictions.end(), "incorrect jurisdictions" );
+   bool check1 = itr == idx.end() || itr->producer != src.producer;
+   bool check2 = itr_src == jurisdictions.end();
 
-   return res;
+   return res && check1 && check2;
+}
+
+/*=============================jurisdiction_manager=============================*/
+
+const uint16_t jurisdiction_manager::limit_256 = 256;
+const char* jurisdiction_manager::too_many_jurisdictions_exception = "Too many jurisdictions given, max value is 255.";
+
+bool jurisdiction_manager::check_jurisdictions( const chainbase::database &db, const jurisdiction_producer_ordered& src )
+{
+   return jurisdiction_action_launcher::check_jurisdictions( db, src );
 }
 
 uint16_t jurisdiction_manager::read( uint16_t idx, const std::vector< char>& buffer, std::vector< trx_jurisdiction >& dst )

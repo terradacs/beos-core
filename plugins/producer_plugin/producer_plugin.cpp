@@ -352,7 +352,7 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
             chain::controller& chain = app().get_plugin<chain_plugin>().chain();
             auto chain_id = app().get_plugin<chain_plugin>().get_chain_id();
 
-            auto trx = jurisdiction_launcher.get_jurisdiction_transaction( chain.head_block_id(), chain.pending_block_time(), chain_id );
+            auto trx = jurisdiction_launcher.get_jurisdiction_transaction( chain.db(), chain.head_block_id(), chain.pending_block_time(), chain_id );
             jurisdiction_launcher.set_inactive_producer();
             if( !trx )
                return;

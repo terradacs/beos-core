@@ -100,6 +100,16 @@ namespace eosio { namespace chain {
    struct jurisdiction_producer_ordered {
       account_name                        producer;
       std::set< code_jurisdiction >       jurisdictions;
+
+      jurisdiction_producer_ordered( account_name _producer = account_name(), std::set< code_jurisdiction > _jurisdictions = std::set< code_jurisdiction >() )
+                        : producer( _producer ), jurisdictions( _jurisdictions )
+      {
+      }
+
+      jurisdiction_producer_ordered( const jurisdiction_producer& src )
+                        : producer( src.producer ), jurisdictions( src.jurisdictions.begin(), src.jurisdictions.end() )
+      {
+      }
    };
 
 } } /// eosio::chain

@@ -332,19 +332,14 @@ class privileged_api : public context_aware_api {
       void update_jurisdictions( array_ptr<char> jurisdiction_data, size_t datalen) {
 
          jurisdiction_producer updater;
-         jurisdiction_producer_ordered updater_ordered;
 
          datastream<const char*> ds( jurisdiction_data, datalen );
          fc::raw::unpack(ds, updater );
 
+         jurisdiction_producer_ordered updater_ordered( updater );
+
          //check that jurisdictions are unique
-         for( auto item : updater.jurisdictions )
-            updater_ordered.jurisdictions.insert( item );
-
          EOS_ASSERT( updater.jurisdictions.size() == updater_ordered.jurisdictions.size(), wasm_execution_error, "duplicate jurisdiction during jurisdictions updating" );
-
-         updater_ordered.producer = updater.producer;
-
          EOS_ASSERT( context.control.update_jurisdictions( updater_ordered ) == true, wasm_execution_error, "updating jurisdictions failed" );
       }
 

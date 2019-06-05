@@ -44,7 +44,7 @@ class jurisdiction_provider_interface : public std::enable_shared_from_this< jur
       ptr_base getptr();
 
       virtual void update( const account_name& producer ) = 0;
-      virtual const jurisdiction_producer& get_jurisdiction_producer() = 0;
+      virtual fc::optional< jurisdiction_producer > get_jurisdiction_producer() = 0;
 };
 
 class jurisdiction_test_provider : public jurisdiction_provider_interface
@@ -66,7 +66,7 @@ class jurisdiction_test_provider : public jurisdiction_provider_interface
       ~jurisdiction_test_provider() override{}
 
       void update( const account_name& new_producer ) override;
-      const jurisdiction_producer& get_jurisdiction_producer() override;
+      fc::optional< jurisdiction_producer > get_jurisdiction_producer() override;
 
       void change( const jurisdiction_producer& src );
 };
@@ -83,13 +83,14 @@ class jurisdiction_action_launcher
       bool producer_changed = false;
 
       account_name active_producer;
-
       signature_provider_type signature_provider;
 
       ptr_provider provider;
 
       void update_provider();
       fc::optional< jurisdiction_producer > get_jurisdiction_producer();
+
+      bool is_equal( const chainbase::database &db, const jurisdiction_producer& src );
 
    public:
 
@@ -99,8 +100,10 @@ class jurisdiction_action_launcher
 
       void update( account_name new_producer, const signature_provider_type& new_signature_provider = signature_provider_type() );
 
-      transaction_metadata_ptr get_jurisdiction_transaction( const block_id_type& block_id, const time_point& time, const chain::chain_id_type& chain_id );
+      transaction_metadata_ptr get_jurisdiction_transaction( const chainbase::database &db, const block_id_type& block_id, const time_point& time, const chain::chain_id_type& chain_id );
       void set_inactive_producer();
+
+      static bool check_jurisdictions( const chainbase::database &db, const jurisdiction_producer_ordered& src );
 };
 
 class jurisdiction_manager
