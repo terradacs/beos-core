@@ -25,7 +25,7 @@
       "base": "",
       "fields": [
         {"name":"producer",      "type":"account_name"},
-        {"name":"jurisdiction",  "type":"code_jurisdiction"}
+        {"name":"jurisdictions",  "type":"code_jurisdiction[]"}
       ]
     },{
       "name": "jurisdiction_dictionary",
