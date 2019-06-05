@@ -350,19 +350,14 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
          try
          {
             chain::controller& chain = app().get_plugin<chain_plugin>().chain();
-            auto block_time = chain.pending_block_state()->header.timestamp.to_time_point();
+            auto chain_id = app().get_plugin<chain_plugin>().get_chain_id();
 
-            auto trx = jurisdiction_launcher.get_jurisdiction_transaction( chain.head_block_id(), chain.pending_block_time() );
+            auto trx = jurisdiction_launcher.get_jurisdiction_transaction( chain.head_block_id(), chain.pending_block_time(), chain_id );
             jurisdiction_launcher.set_inactive_producer();
             if( !trx )
                return;
 
-            auto deadline = fc::time_point::now() + fc::milliseconds(_max_transaction_time_ms);
-
-            if( _max_transaction_time_ms < 0 || ( _pending_block_mode == pending_block_mode::producing && block_time < deadline ) )
-               deadline = block_time;
-
-            auto trace = chain.push_transaction( trx, deadline );
+            auto trace = chain.push_transaction( trx, fc::time_point::maximum(), chain.get_global_properties().configuration.min_transaction_cpu_usage );
             if( trace->except )
                fc_dlog(_trx_trace_log, "Changing jurisdictions failed" );
 
@@ -1121,11 +1116,14 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
    last_block = ((block_timestamp_type(block_time).slot % config::producer_repetitions) == config::producer_repetitions - 1);
    const auto& scheduled_producer = hbs->get_scheduled_producer(block_time);
 
-   jurisdiction_launcher.update( scheduled_producer.producer_name );
-
    auto currrent_watermark_itr = _producer_watermarks.find(scheduled_producer.producer_name);
    auto signature_provider_itr = _signature_providers.find(scheduled_producer.block_signing_key);
    auto irreversible_block_age = get_irreversible_block_age();
+
+   if( signature_provider_itr == _signature_providers.end() )
+      jurisdiction_launcher.update( scheduled_producer.producer_name );
+   else
+      jurisdiction_launcher.update( scheduled_producer.producer_name, signature_provider_itr->second );
 
    // If the next block production opportunity is in the present or future, we're synced.
    if( !_production_enabled ) {

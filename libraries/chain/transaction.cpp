@@ -130,6 +130,11 @@ signature_type signed_transaction::sign(const private_key_type& key, const chain
    return key.sign(sig_digest(chain_id, context_free_data));
 }
 
+const signature_type& signed_transaction::sign( const std::function<signature_type(const digest_type&)>& signer, const chain_id_type& chain_id ) {
+   signatures.push_back( signer( sig_digest(chain_id, context_free_data) ) );
+   return signatures.back();
+  }
+
 flat_set<public_key_type> signed_transaction::get_signature_keys( const chain_id_type& chain_id, bool allow_duplicate_keys, bool use_cache )const
 {
    return transaction::get_signature_keys(signatures, chain_id, context_free_data, allow_duplicate_keys, use_cache);

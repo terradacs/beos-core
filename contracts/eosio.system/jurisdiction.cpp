@@ -32,17 +32,17 @@ namespace eosiosystem {
       eosio::print("Leaving system_contract::addjurisdict\n");
    }
 
-   void system_contract::updateprod( account_name producer, std::vector< code_jurisdiction > jurisdictions )
+   void system_contract::updateprod( eosio::jurisdiction_producer data )
    {
-      eosio::print("Entering system_contract::updateprod\n");
-      require_auth( producer );
+      eosio::print( ( "Entering system_contract::updateprod for producer: " + name{ data.producer }.to_string() + "\n" ).c_str() );
+      require_auth( data.producer );
 
-      eosio_assert( jurisdictions.size() < limit_256, "number of jurisdictions is greater than allowed" );
+      eosio_assert( data.jurisdictions.size() < limit_256, "number of jurisdictions is greater than allowed" );
 
       typedef eosio::multi_index< N(producers), eosiosystem::producer_info > producer_info_t;
       producer_info_t _producers( N(eosio), N(eosio) );
 
-      auto _found_producer = _producers.find( producer );
+      auto _found_producer = _producers.find( data.producer );
       eosio_assert( _found_producer != _producers.end(), "user is not a producer" );
 
       constexpr size_t max_stack_buffer_size = 512;

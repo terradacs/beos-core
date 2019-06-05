@@ -90,6 +90,11 @@ namespace eosio { namespace chain {
    struct jurisdiction_producer {
       account_name                        producer;
       std::vector< code_jurisdiction >    jurisdictions;
+
+      jurisdiction_producer( account_name _producer = account_name(), std::vector< code_jurisdiction > _jurisdictions = std::vector< code_jurisdiction >() )
+                        : producer( _producer ), jurisdictions( _jurisdictions )
+      {
+      }
    };
 
    struct jurisdiction_producer_ordered {

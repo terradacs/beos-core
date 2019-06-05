@@ -48,8 +48,7 @@
       "name": "updateprod",
       "base": "",
       "fields": [
-        {"name":"producer", "type":"account_name"},
-        {"name":"jurisdictions", "type":"code_jurisdiction[]"}
+        {"name":"data", "type":"jurisdiction_producer"}
       ]
     },{
       "name": "initialissue",

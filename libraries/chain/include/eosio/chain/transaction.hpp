@@ -92,6 +92,7 @@ namespace eosio { namespace chain {
 
       const signature_type&     sign(const private_key_type& key, const chain_id_type& chain_id);
       signature_type            sign(const private_key_type& key, const chain_id_type& chain_id)const;
+      const signature_type&     sign( const std::function<signature_type(const digest_type&)>& signer, const chain_id_type& chain_id );
       flat_set<public_key_type> get_signature_keys( const chain_id_type& chain_id, bool allow_duplicate_keys = false, bool use_cache = true )const;
    };
 

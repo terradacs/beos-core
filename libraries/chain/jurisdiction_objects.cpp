@@ -25,19 +25,21 @@ jurisdiction_provider_interface::ptr_base jurisdiction_provider_interface::getpt
 
 /*=============================jurisdiction_test_provider=============================*/
 
-void jurisdiction_test_provider::update( const account_name& producer ) const
+void jurisdiction_test_provider::update( const account_name& new_producer )
 {
-   //nothing to do
+   active_producer = new_producer;
+   if( data.find( active_producer ) == data.end() )
+      data[ active_producer ] = jurisdiction_producer( active_producer );
 }
 
-const jurisdiction_producer& jurisdiction_test_provider::get_jurisdiction_producer() const
+const jurisdiction_producer& jurisdiction_test_provider::get_jurisdiction_producer()
 {
-   return data;
+   return data[ active_producer ];
 }
 
 void jurisdiction_test_provider::change( const jurisdiction_producer& src )
 {
-   data = src;
+   data[ src.producer ] = src;
 }
 
 /*=============================jurisdiction_launcher=============================*/
@@ -55,14 +57,17 @@ const account_name& jurisdiction_action_launcher::get_active_producer() const
 
 void jurisdiction_action_launcher::set_provider( ptr_provider new_provider )
 {
-   new_provider = provider;
+   provider = new_provider;
 }
 
-void jurisdiction_action_launcher::update( account_name new_producer )
+void jurisdiction_action_launcher::update( account_name new_producer, const signature_provider_type& new_signature_provider )
 {
    producer_changed = active_producer != new_producer;
    if( producer_changed )
+   {
       active_producer = new_producer;
+      signature_provider = new_signature_provider;
+   }
 
    update_provider();
 }
@@ -75,32 +80,31 @@ fc::optional< jurisdiction_producer > jurisdiction_action_launcher::get_jurisdic
       return fc::optional< jurisdiction_producer >();
 }
 
-transaction_metadata_ptr jurisdiction_action_launcher::get_jurisdiction_transaction( const block_id_type& block_id, const time_point& time )
+transaction_metadata_ptr jurisdiction_action_launcher::get_jurisdiction_transaction( const block_id_type& block_id, const time_point& time, const chain::chain_id_type& chain_id )
 {
-   if( !producer_changed )
-      return transaction_metadata_ptr();
+   //if( !producer_changed )
+   //   return transaction_metadata_ptr();
 
    fc::optional< jurisdiction_producer > jurisdiction_data = get_jurisdiction_producer();
    if( !jurisdiction_data )
       return transaction_metadata_ptr();
 
-   fc::variant _data = fc::mutable_variant_object()
-                  ("producer", jurisdiction_data->producer )
-                  ("jurisdictions", jurisdiction_data->jurisdictions );
-
    action on_block_update_jurisdictions_act;
    on_block_update_jurisdictions_act.account = config::system_account_name;
    on_block_update_jurisdictions_act.name = N(updateprod);
    on_block_update_jurisdictions_act.authorization = vector<permission_level>{{ active_producer, config::active_name }};
-   on_block_update_jurisdictions_act.data = fc::raw::pack( _data );
+   on_block_update_jurisdictions_act.data = fc::raw::pack( *jurisdiction_data );
 
    signed_transaction trx;
    trx.actions.emplace_back( std::move( on_block_update_jurisdictions_act ) );
 
    trx.set_reference_block( block_id );
    trx.expiration = time + fc::microseconds(999'999); // Round up to nearest second to avoid appearing expired
+   trx.sign( signature_provider, chain_id );
 
-   return std::make_shared< transaction_metadata >( trx );
+   transaction_metadata_ptr res = std::make_shared< transaction_metadata >( trx );
+
+   return res;
 }
 
 void jurisdiction_action_launcher::set_inactive_producer()
