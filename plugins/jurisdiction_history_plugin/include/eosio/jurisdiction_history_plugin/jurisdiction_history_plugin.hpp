@@ -1,9 +1,7 @@
 #pragma once
 #include <appbase/application.hpp>
 #include <eosio/chain_plugin/chain_plugin.hpp>
-#include <eosio/chain/types.hpp>
-#include <eosio/chain/jurisdiction_object.hpp>
-#include <eosio/jurisdiction_history_plugin/jurisdiction_history_object.hpp>
+#include <eosio/chain/jurisdiction_history_object.hpp>
 
 namespace eosio 
 {
@@ -27,7 +25,7 @@ namespace eosio
 
           jurisdiction_history_api_object(){}
 
-          jurisdiction_history_api_object(const jurisdiction_history_object &jho) :
+          jurisdiction_history_api_object(const chain::jurisdiction_history_object &jho) :
             producer_name(jho.producer_name),
             block_number(jho.block_number),
             date_changed(jho.date_changed),

@@ -1,5 +1,4 @@
 #include <eosio/jurisdiction_history_plugin/jurisdiction_history_plugin.hpp>
-#include <boost/signals2/connection.hpp>
 
 namespace eosio
 {
@@ -9,36 +8,6 @@ namespace eosio
   {
     public:
       chain_plugin *chain_plug = nullptr;
-      fc::optional<boost::signals2::scoped_connection> applied_transaction_connection;
-
-      void on_applied_transaction(const chain::transaction_trace_ptr& trace)
-      {
-        for(const auto &atrace : trace->action_traces) 
-        {
-          if (atrace.act.name == N(updateprod))
-          {
-            chain::jurisdiction_producer act_data;
-            chain::datastream<const char*> ds(atrace.act.data.data(), atrace.act.data.size());
-            fc::raw::unpack(ds, act_data);
-            
-            on_producer_jurisdiction_change(act_data.producer, trace->block_num, trace->block_time, act_data.jurisdictions);
-          }
-        }
-      }
-
-      void on_producer_jurisdiction_change(const chain::account_name &producer, uint64_t block_number, fc::time_point date_changed, std::vector<chain::code_jurisdiction> &new_jurisdictions)
-      {
-        if (chain_plug != nullptr)
-        {
-          chainbase::database& rw_db = const_cast<chainbase::database&>(chain_plug->chain().db()); // Override read-only access to state DB (highly unrecommended practice!)
-          rw_db.create<jurisdiction_history_object>([&](jurisdiction_history_object &ob){
-            ob.producer_name = producer;
-            ob.block_number = block_number;
-            ob.date_changed = date_changed;
-            ob.new_jurisdictions = new_jurisdictions;
-          });
-        }
-      }
   };
 
   jurisdiction_history_plugin::jurisdiction_history_plugin() : my(new jurisdiction_history_plugin_impl())
@@ -63,16 +32,6 @@ namespace eosio
     {
       my->chain_plug = app().find_plugin<chain_plugin>();
       EOS_ASSERT(my->chain_plug, chain::missing_chain_plugin_exception, "");
-      auto& chain = my->chain_plug->chain();
-
-      chainbase::database& db = const_cast<chainbase::database&>(chain.db()); // Override read-only access to state DB (highly unrecommended practice!)
-      db.add_index<jurisdiction_history_multi_index>();
-      
-      my->applied_transaction_connection.emplace(
-        chain.applied_transaction.connect([&](const chain::transaction_trace_ptr& p){
-          my->on_applied_transaction(p);
-        })
-      );
     }
     FC_LOG_AND_RETHROW()
   }
@@ -100,8 +59,8 @@ namespace eosio
       read_write::get_producer_jurisdiction_for_block_results result;
       try 
       {
-        const auto &idx_by_producer_block = db.db().get_index<jurisdiction_history_multi_index, by_producer_block_number>();
-        auto search = idx_by_producer_block.find(boost::make_tuple(params.producer, params.block_number));
+        const auto &idx_by_producer_block = db.db().get_index<chain::jurisdiction_history_index, chain::by_producer_block_number>();
+        auto search = idx_by_producer_block.lower_bound(boost::make_tuple(params.producer, params.block_number));
         if (search != idx_by_producer_block.end())
         {
           result.producer_jurisdiction_for_block = jurisdiction_history_api_object(*search);
@@ -137,7 +96,7 @@ namespace eosio
       read_write::get_producer_jurisdiction_history_results result;
       try 
       {
-        const auto &idx_by_date_changed = db.db().get_index<jurisdiction_history_multi_index, by_date_changed>();
+        const auto &idx_by_date_changed = db.db().get_index<chain::jurisdiction_history_index, chain::by_date_changed>();
         auto itr = idx_by_date_changed.lower_bound(params.from_date);
         while (itr != idx_by_date_changed.end() && itr->date_changed < params.to_date)
         {

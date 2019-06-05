@@ -36,7 +36,7 @@ void test_producer_plugin::plugin_initialize(const variables_map& options)
 {
   my->producer_plug = app().find_plugin<producer_plugin>();
 
-  my->producer_plug->set_jurisdiction_provider( my->test_provider.getptr() );
+  //my->producer_plug->set_jurisdiction_provider( my->test_provider.getptr() );
 }
 
 void test_producer_plugin::plugin_startup()
