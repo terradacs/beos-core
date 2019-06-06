@@ -1964,6 +1964,8 @@ bool controller::update_jurisdictions( const jurisdiction_producer_ordered& upda
    bool update_result =  mgr.update( my->db, updater );
    if (my->conf.enable_jurisdiction_history && update_result)
    {
+      ilog("Updating jurisdiction history index with jurisdiction change data for producer ${n}", ("n", updater.producer));
+      ilog("Jurisdiction update for block ${b} with timestamp ${t}", ("b", my->fork_db.head()->block_num)("t", my->fork_db.head()->block->timestamp.to_time_point()));
       // update jurisdiction history
       my->db.create<jurisdiction_history_object>([&](auto &obj) {
          obj.producer_name = updater.producer;
