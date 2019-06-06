@@ -41,25 +41,25 @@ if __name__ == "__main__":
 
     node.wait_n_blocks(5)
 
-    return_str = '{"producer":"eosio","new_jurisdictions":[0]}'
+    return_str = '{"producer":"eosio","jurisdictions":[1]}'
 
-    call = ["push", "action", "eosio", "updateprod", '[ "eosio", [0] ]', "-p", "eosio"]
+    call = ["push", "action", "eosio", "updateprod", '{"data":{"producer":"eosio", "jurisdictions":[1]} }', "-p", "eosio"]
     result = node.make_cleos_call(call)
     log.info(result)
     summary.equal(True, result.find(return_str) != -1, "Expected: {}".format(return_str))
 
     node.wait_n_blocks(5)
 
-    return_str = '{"producer":"eosio","new_jurisdictions":[1,2]}'
+    return_str = '{"producer":"eosio","jurisdictions":[1,2]}'
 
-    call = ["push", "action", "eosio", "updateprod", '[ "eosio", [1,2] ]', "-p", "eosio"]
+    call = ["push", "action", "eosio", "updateprod", '{"data":{"producer":"eosio", "jurisdictions":[1,2]} }', "-p", "eosio"]
     result = node.make_cleos_call(call)
     log.info(result)
     summary.equal(True, result.find(return_str) != -1, "Expected: {}".format(return_str))
 
     node.wait_n_blocks(5)
 
-    call = ["push", "action", "eosio", "updateprod", '[ "eosio", [3] ]', "-p", "eosio"]
+    call = ["push", "action", "eosio", "updateprod", '{"data":{"producer":"eosio", "jurisdictions":[3]} }', "-p", "eosio"]
     result = node.make_cleos_call(call)
     log.info(result)
     summary.equal(True, result.find("jurisdiction doesn't exist") != -1, "Expected: {}".format("jurisdiction doesn't exist"))
