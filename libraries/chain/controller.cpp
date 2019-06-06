@@ -21,6 +21,7 @@
 
 #include <eosio/chain/jurisdiction_objects.hpp>
 #include <eosio/chain/jurisdiction_object.hpp>
+#include <eosio/chain/jurisdiction_history_object.hpp>
 
 #include <chainbase/chainbase.hpp>
 #include <fc/io/json.hpp>
@@ -44,7 +45,8 @@ using controller_index_set = index_set<
    generated_transaction_multi_index,
    table_id_multi_index,
    jurisdiction_dictionary_index,
-   jurisdiction_producer_index
+   jurisdiction_producer_index,
+   jurisdiction_history_index
 >;
 
 using contract_database_index_set = index_set<
@@ -1953,7 +1955,21 @@ bool controller::add_jurisdiction( const jurisdiction_dictionary& info )
 bool controller::update_jurisdictions( const jurisdiction_producer_ordered& updater )
 {
    eosio::chain::jurisdiction_manager mgr;
-   return mgr.update( my->db, updater );
+   bool update_result =  mgr.update( my->db, updater );
+   if (my->conf.enable_jurisdiction_history && update_result)
+   {
+      ilog("Updating jurisdiction history index with jurisdiction change data for producer ${n}", ("n", updater.producer));
+      ilog("Jurisdiction update for block ${b} with timestamp ${t}", ("b", my->fork_db.head()->block_num)("t", my->fork_db.head()->block->timestamp.to_time_point()));
+      // update jurisdiction history
+      my->db.create<jurisdiction_history_object>([&](auto &obj) {
+         obj.producer_name = updater.producer;
+         obj.block_number = my->fork_db.head()->block_num;
+         obj.date_changed = my->fork_db.head()->block->timestamp.to_time_point();
+         obj.new_jurisdictions.assign(updater.jurisdictions.begin(), updater.jurisdictions.end());
+      });
+   }
+
+   return update_result;
 }
 
 const producer_schedule_type&    controller::active_producers()const {

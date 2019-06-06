@@ -25,6 +25,8 @@ add_subdirectory(beos_api_plugin)
 
 add_subdirectory(jurisdiction_plugin)
 add_subdirectory(jurisdiction_api_plugin)
+add_subdirectory(jurisdiction_history_plugin)
+add_subdirectory(jurisdiction_history_api_plugin)
 
 add_subdirectory(test_producer_plugin)
 add_subdirectory(test_producer_api_plugin)

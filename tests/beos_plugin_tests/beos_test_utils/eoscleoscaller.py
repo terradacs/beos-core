@@ -35,11 +35,15 @@ class EOSCleosCaller(EOSCallerBase):
             else:
                 raise CleosCallerException("Invalid `parameters` type {0}".format(type(_parameters)))
             parameters.insert(0, self.path_to_cleos)
-            ret = subprocess.run(parameters, stdout=subprocess.PIPE)
+            print(parameters)
+            ret = subprocess.run(parameters, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             retcode = ret.returncode
             log.info("Cleos retcode {0}".format(retcode))
+# Sometimes retcode >0 is a good result that we want.
+#            if retcode > 0:
+#                raise CleosCallerException("Faild to execute cleos call with `{0}` parameters.".format(parameters))
             if retcode > 0:
-                raise CleosCallerException("Faild to execute cleos call with `{0}` parameters.".format(parameters))
+                return ret.stderr.decode('utf-8')
             return ret.stdout.decode('utf-8')
         except Exception as _ex:
             log.exception("Exception `{0}` occures while preparing cleos call.".format(str(_ex)))

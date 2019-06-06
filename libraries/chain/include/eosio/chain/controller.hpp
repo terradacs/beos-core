@@ -77,6 +77,8 @@ namespace eosio { namespace chain {
 
             flat_set<account_name>   resource_greylist;
             flat_set<account_name>   trusted_producers;
+
+            bool                     enable_jurisdiction_history = false;
          };
 
          enum class block_status {
@@ -328,4 +330,5 @@ FC_REFLECT( eosio::chain::controller::config,
             (wasm_runtime)
             (resource_greylist)
             (trusted_producers)
+            (enable_jurisdiction_history)
           )
