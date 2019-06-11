@@ -17,7 +17,7 @@ if __name__ == "__main__":
     return_str = '{"ram_payer":"eosio","new_code":0,"new_name":"POLAND","new_description":"EAST EUROPE"}'
 
     call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "0", "POLAND", "EAST EUROPE" ]', "-p", "eosio"]
-    result = node.make_cleos_call(call)
+    code, result = node.make_cleos_call(call)
     log.info(result)
     summary.equal(True, result.find(return_str) != -1, "Expected: {}".format(return_str))
 
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     return_str = '{"ram_payer":"eosio","new_code":1,"new_name":"GERMANY","new_description":"EAST EUROPE"}'
 
     call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "1", "GERMANY", "EAST EUROPE" ]', "-p", "eosio"]
-    result = node.make_cleos_call(call)
+    code, result = node.make_cleos_call(call)
     log.info(result)
     summary.equal(True, result.find(return_str) != -1, "Expected: {}".format(return_str))
 
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     return_str = '{"ram_payer":"eosio","new_code":2,"new_name":"RUSSIA","new_description":"EAST EUROPE"}'
 
     call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "2", "RUSSIA", "EAST EUROPE" ]', "-p", "eosio"]
-    result = node.make_cleos_call(call)
+    code, result = node.make_cleos_call(call)
     log.info(result)
     summary.equal(True, result.find(return_str) != -1, "Expected: {}".format(return_str))
 
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     return_str = '{"producer":"eosio","jurisdictions":[1]}'
 
     call = ["push", "action", "eosio", "updateprod", '{"data":{"producer":"eosio", "jurisdictions":[1]} }', "-p", "eosio"]
-    result = node.make_cleos_call(call)
+    code, result = node.make_cleos_call(call)
     log.info(result)
     summary.equal(True, result.find(return_str) != -1, "Expected: {}".format(return_str))
 
@@ -53,14 +53,14 @@ if __name__ == "__main__":
     return_str = '{"producer":"eosio","jurisdictions":[1,2]}'
 
     call = ["push", "action", "eosio", "updateprod", '{"data":{"producer":"eosio", "jurisdictions":[1,2]} }', "-p", "eosio"]
-    result = node.make_cleos_call(call)
+    code, result = node.make_cleos_call(call)
     log.info(result)
     summary.equal(True, result.find(return_str) != -1, "Expected: {}".format(return_str))
 
     node.wait_n_blocks(5)
 
     call = ["push", "action", "eosio", "updateprod", '{"data":{"producer":"eosio", "jurisdictions":[3]} }', "-p", "eosio"]
-    result = node.make_cleos_call(call)
+    code, result = node.make_cleos_call(call)
     log.info(result)
     summary.equal(True, result.find("jurisdiction doesn't exist") != -1, "Expected: {}".format("jurisdiction doesn't exist"))
 

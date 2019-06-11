@@ -10,4 +10,5 @@ if not parser:
     parser.add_argument('--keosd-port', metavar='', help="Port", default='8900')
     parser.add_argument('--master-wallet-name', metavar='', help="Name of main wallet.", default="beos_master_wallet" )
     parser.add_argument('--path-to-cleos', metavar='', help="Path to cleos executable." )
+    parser.add_argument('--path-to-contracts', metavar='', help="Path to contracts dir." )
     parser.add_argument('--scenarios', metavar='', help="Path to scenario(s) *.py file(s)." )

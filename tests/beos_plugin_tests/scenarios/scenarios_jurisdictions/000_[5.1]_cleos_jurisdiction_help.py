@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 
-# Scenario based on test : [6.1]-Undelegatebw---after-distribution-period---to-self,-without-voting
-
 import os
 import sys
 import time
@@ -14,18 +12,18 @@ from beos_test_utils.beos_utils_pack import init, ActionResult, ResourceResult, 
 if __name__ == "__main__":
 	try:
 		node, summary, args, log = init(__file__)
-
+		
 		look_for = "-u,--jurisdictions TEXT"
 
 		call = ["push", "action", "--help"]
-		result = node.make_cleos_call(call)
-		log.info(result)
-		summary.equal(True, result.find(look_for) != -1, "Push action should contain `jurisdiction` option.")
+		result, mess = node.make_cleos_call(call)
+		log.info(mess)
+		summary.equal(True, mess.find(look_for) != -1, "Push action should contain `jurisdiction` option.")
 
 		call = ["push", "transaction", "--help"]
-		result = node.make_cleos_call(call)
-		log.info(result)
-		summary.equal(True, result.find(look_for) != -1, "Push transaction should contain `jurisdiction` option.")
+		result, mess = node.make_cleos_call(call)
+		log.info(mess)
+		summary.equal(True, mess.find(look_for) != -1, "Push transaction should contain `jurisdiction` option.")
 
 	except Exception as _ex:
 		log.exception("Exception `{0}` occures while executing `{1}` tests.".format(str(_ex), __file__))
