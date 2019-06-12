@@ -23,14 +23,14 @@ jurisdiction_provider_interface::ptr_base jurisdiction_provider_interface::getpt
    return shared_from_this();
 }
 
-/*=============================jurisdiction_test_provider=============================*/
+/*=============================jurisdiction_base_provider=============================*/
 
-void jurisdiction_test_provider::update( const account_name& new_producer )
+void jurisdiction_base_provider::update( const account_name& new_producer )
 {
    active_producer = new_producer;
 }
 
-fc::optional< jurisdiction_producer > jurisdiction_test_provider::get_jurisdiction_producer()
+fc::optional< jurisdiction_producer > jurisdiction_base_provider::get_jurisdiction_producer()
 {
    if( data.find( active_producer ) != data.end() )
       return data[ active_producer ];
@@ -38,7 +38,7 @@ fc::optional< jurisdiction_producer > jurisdiction_test_provider::get_jurisdicti
       return fc::optional< jurisdiction_producer >();
 }
 
-void jurisdiction_test_provider::change( const jurisdiction_producer& src )
+void jurisdiction_base_provider::change( const jurisdiction_producer& src )
 {
    data[ src.producer ] = src;
 }

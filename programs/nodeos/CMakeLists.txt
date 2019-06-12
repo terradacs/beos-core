@@ -68,6 +68,8 @@ target_link_libraries( ${NODE_EXECUTABLE_NAME}
         PRIVATE -Wl,${whole_archive_flag} jurisdiction_history_plugin        -Wl,${no_whole_archive_flag}
         PRIVATE -Wl,${whole_archive_flag} test_producer_api_plugin   -Wl,${no_whole_archive_flag}
         PRIVATE -Wl,${whole_archive_flag} test_producer_plugin       -Wl,${no_whole_archive_flag}
+        PRIVATE -Wl,${whole_archive_flag} gps_api_plugin             -Wl,${no_whole_archive_flag}
+        PRIVATE -Wl,${whole_archive_flag} gps_plugin                 -Wl,${no_whole_archive_flag}
         PRIVATE -Wl,${whole_archive_flag} test_control_plugin        -Wl,${no_whole_archive_flag}
         PRIVATE -Wl,${whole_archive_flag} test_control_api_plugin    -Wl,${no_whole_archive_flag}
         PRIVATE -Wl,${build_id_flag}

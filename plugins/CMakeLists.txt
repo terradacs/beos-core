@@ -31,5 +31,8 @@ add_subdirectory(jurisdiction_history_api_plugin)
 add_subdirectory(test_producer_plugin)
 add_subdirectory(test_producer_api_plugin)
 
+add_subdirectory(gps_plugin)
+add_subdirectory(gps_api_plugin)
+
 # Forward variables to top level so packaging picks them up
 set(CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS} PARENT_SCOPE)

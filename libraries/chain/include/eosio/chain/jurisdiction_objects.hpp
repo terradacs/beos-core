@@ -47,11 +47,11 @@ class jurisdiction_provider_interface : public std::enable_shared_from_this< jur
       virtual fc::optional< jurisdiction_producer > get_jurisdiction_producer() = 0;
 };
 
-class jurisdiction_test_provider : public jurisdiction_provider_interface
+class jurisdiction_base_provider : public jurisdiction_provider_interface
 {
    public:
 
-      using ptr_base = std::shared_ptr< jurisdiction_test_provider >;
+      using ptr_base = std::shared_ptr< jurisdiction_base_provider >;
 
    private:
 
@@ -62,14 +62,17 @@ class jurisdiction_test_provider : public jurisdiction_provider_interface
 
    public:
 
-      jurisdiction_test_provider(){}
-      ~jurisdiction_test_provider() override{}
+      jurisdiction_base_provider(){}
+      ~jurisdiction_base_provider() override{}
 
       void update( const account_name& new_producer ) override;
       fc::optional< jurisdiction_producer > get_jurisdiction_producer() override;
 
       void change( const jurisdiction_producer& src );
 };
+
+using jurisdiction_test_provider = jurisdiction_base_provider;
+using jurisdiction_gps_provider  = jurisdiction_base_provider;
 
 class jurisdiction_action_launcher
 {
