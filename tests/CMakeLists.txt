@@ -223,6 +223,7 @@ foreach(scenario_dir ${Scenarios})
   --master-wallet-name ${MASTER_WALLET_NAME}
   --scenarios ${CMAKE_BINARY_DIR}/tests/beos_plugin_tests/scenarios/${scenario_dir}
   --path-to-cleos ${CMAKE_BINARY_DIR}/programs/cleos/
+  --path-to-contracts ${CMAKE_BINARY_DIR}/contracts/
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
   set_tests_properties( ${test_name} PROPERTIES LABELS beos_tests DEPENDS start_keosd_for_scenarios)
   set_property(TEST stop_keosd_for_scenarios APPEND PROPERTY DEPENDS ${test_name})
