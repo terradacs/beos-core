@@ -2049,11 +2049,42 @@ int main( int argc, char** argv ) {
    // get_producer_jurisdiction
    std::string producer_names;
    auto getProducerJurisdictions = get->add_subcommand("producer_jurisdiction", localized("Retrieve jurisdictions for given producer from the blockchain"), false);
-   getProducerJurisdictions->add_option("producer_names", producer_names, localized("The names of producers to retrieve"))->required();
+   getProducerJurisdictions->add_option("producer_names", producer_names, localized("The names of producers"))->required();
    getProducerJurisdictions->set_callback([&] {
       auto producers = get_producers( producer_names );
       auto result = call(jurisdiction_get_producer_jurisdiction, fc::mutable_variant_object( "producer_names", producers ) );
       std::cout << display_jurisdictions( result["producer_jurisdictions"].get_array(), display_producer_codes_jurisdiction, "producer_jurisdictions", false/*is_new_line*/ );
+   });
+
+   auto display_history_jurisdictions= []( const fc::variant& obj, display_jurisdiction_type display_jurisdiction_method, std::string basic_name )
+   {
+      std::string ret = "{\"" + basic_name + "\": {";
+      ret += display_jurisdiction_method( obj );
+      ret += "}\n";
+
+      return ret;
+   };
+
+   auto display_history_info_jurisdiction = [&]( const fc::variant& obj )
+   {
+      std::string _code = "\"producer_name\":\"" + obj["producer_name"].as_string() + "\", ";
+      std::string _name = "\"block_number\": \"" + obj["block_number"].as_string() + "\", ";
+      std::string _description = "\"date_changed\": \"" + obj["date_changed"].as_string() + "\", ";
+
+      std::string _jurisdictions = display_jurisdictions( obj["new_jurisdictions"].get_array(), display_code_jurisdiction, "new_jurisdictions", false/*is_new_line*/, false/*is_on_top*/ );
+
+      return _code + _name + _description + _jurisdictions;
+   };
+
+   // get_producer_jurisdiction_for_block
+   std::string producer;
+   uint64_t block_number;
+   auto getProducerJurisdictionForBlock = get->add_subcommand("producer_jurisdiction_for_block", localized("Retrieve jurisdictions for producer in given block from the blockchain"), false);
+   getProducerJurisdictionForBlock->add_option("producer", producer, localized("The name of producer"))->required();
+   getProducerJurisdictionForBlock->add_option("block_number", block_number, localized("The number of block"))->required();
+   getProducerJurisdictionForBlock->set_callback([&] {
+      auto result = call(jurisdiction_history_get_producer_jurisdiction_for_block, fc::mutable_variant_object( "producer", producer )( "block_number", block_number ) );
+      std::cout << display_history_jurisdictions( result["producer_jurisdiction_for_block"], display_history_info_jurisdiction, "producer_jurisdiction_for_block" );
    });
 
    // get code
