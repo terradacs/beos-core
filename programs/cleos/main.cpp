@@ -1978,9 +1978,11 @@ int main( int argc, char** argv ) {
 
    using display_jurisdiction_type = std::function< std::string( const fc::variant& ) >;
 
-   auto display_jurisdictions= []( const fc::variants& objs, display_jurisdiction_type display_jurisdiction_method, std::string basic_name, bool is_new_line )
+   auto display_jurisdictions= []( const fc::variants& objs, display_jurisdiction_type display_jurisdiction_method, std::string basic_name, bool is_new_line, bool is_on_top = true )
    {
-      std::string ret = "{ \"" + basic_name + "\": [";
+      std::string ret = is_on_top ? "{" : "";
+
+      ret += "\"" + basic_name + "\": [";
       bool first = true;
       for( const auto& r : objs )
       {
@@ -2009,9 +2011,9 @@ int main( int argc, char** argv ) {
 
    auto display_producer_codes_jurisdiction = [&]( const fc::variant& obj )
    {
-      std::string _code = "{ \"producer\":" + obj["producer"].as_string() + ", ";
-      std::string _jurisdictions = display_jurisdictions( obj["jurisdictions"].get_array(), display_code_jurisdiction, "jurisdictions", false/*is_new_line*/ );
-      return _code + ", " + _jurisdictions;
+      std::string _code = "{ \"producer\":\"" + obj["producer"].as_string() + "\", ";
+      std::string _jurisdictions = display_jurisdictions( obj["jurisdictions"].get_array(), display_code_jurisdiction, "jurisdictions", false/*is_new_line*/, false/*is_on_top*/ );
+      return _code + _jurisdictions;
    };
 
    auto get_producers = []( const std::string& producers )
