@@ -200,8 +200,8 @@ fc::variant jurisdiction_manager::get_jurisdiction( const chainbase::database& d
    else
       return fc::mutable_variant_object()
          ("code", found->code )
-         ("name", found->name )
-         ("description", found->description );
+         ("name", found->name.c_str() )
+         ("description", found->description.c_str() );
 }
 
 bool jurisdiction_manager::update( chainbase::database& db, const jurisdiction_dictionary& info )
@@ -221,8 +221,8 @@ bool jurisdiction_manager::update( chainbase::database& db, const jurisdiction_d
 
    db.create< jurisdiction_dictionary_object >( [&]( auto& obj ) {
       obj.code = _info.code;
-      obj.name = _info.name;
-      obj.description = _info.description;
+      obj.name = _info.name.c_str();
+      obj.description = _info.description.c_str();
    });
 
    return true;

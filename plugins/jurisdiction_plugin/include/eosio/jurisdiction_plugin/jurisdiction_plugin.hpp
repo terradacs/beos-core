@@ -59,8 +59,8 @@ namespace eosio {
 
           jurisdiction_api_dictionary_object(const chain::jurisdiction_dictionary_object &jdo) :
             code(jdo.code),
-            name(jdo.name),
-            description(jdo.description)
+            name(jdo.name.c_str()),
+            description(jdo.description.c_str())
           {
 
           }
