@@ -61,7 +61,7 @@ namespace eosio
       {
         const auto &idx_by_producer_block = db.db().get_index<chain::jurisdiction_history_index, chain::by_producer_block_number>();
         auto search = idx_by_producer_block.lower_bound(boost::make_tuple(params.producer, params.block_number));
-        if (search->block_number == params.block_number)
+        if (search->block_number == params.block_number && search->producer_name == params.producer)
         {
           result.producer_jurisdiction_for_block.emplace_back(jurisdiction_history_api_object(*search));
         }
@@ -70,7 +70,10 @@ namespace eosio
           if (search != idx_by_producer_block.begin())
           {
             --search;
-            result.producer_jurisdiction_for_block.emplace_back(jurisdiction_history_api_object(*search));
+            if (search->producer_name == params.producer)
+            {
+              result.producer_jurisdiction_for_block.emplace_back(jurisdiction_history_api_object(*search));
+            }
           }
         }
       }
