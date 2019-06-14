@@ -63,14 +63,14 @@ namespace eosio
         auto search = idx_by_producer_block.lower_bound(boost::make_tuple(params.producer, params.block_number));
         if (search->block_number == params.block_number)
         {
-          result.producer_jurisdiction_for_block = jurisdiction_history_api_object(*search);
+          result.producer_jurisdiction_for_block.emplace_back(jurisdiction_history_api_object(*search));
         }
         else
         {
           if (search != idx_by_producer_block.begin())
           {
             --search;
-            result.producer_jurisdiction_for_block = jurisdiction_history_api_object(*search);
+            result.producer_jurisdiction_for_block.emplace_back(jurisdiction_history_api_object(*search));
           }
         }
       }
@@ -105,8 +105,11 @@ namespace eosio
       try 
       {
         const auto &idx_by_date_changed = db.db().get_index<chain::jurisdiction_history_index, chain::by_date_changed>();
-        auto itr = idx_by_date_changed.lower_bound(params.from_date);
-        while (itr != idx_by_date_changed.end() && itr->date_changed < params.to_date)
+        const fc::time_point from_date = params.from_date.valid() ? *params.from_date : fc::time_point();
+        const fc::time_point to_date = params.to_date.valid() ? *params.to_date : fc::time_point::now();
+
+        auto itr = idx_by_date_changed.lower_bound(from_date);
+        while (itr != idx_by_date_changed.end() && itr->date_changed < to_date)
         {
           if (itr->producer_name == params.producer)
           {

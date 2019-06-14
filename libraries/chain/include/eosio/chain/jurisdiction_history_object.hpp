@@ -7,13 +7,13 @@ namespace eosio
   {
     class jurisdiction_history_object : public chainbase::object<chain::jurisdiction_history_object_type, jurisdiction_history_object> 
     {
-      OBJECT_CTOR(jurisdiction_history_object)
+      OBJECT_CTOR(jurisdiction_history_object, (new_jurisdictions))
 
       id_type id;
       chain::account_name producer_name;
       uint64_t block_number;
       fc::time_point date_changed;
-      std::vector<chain::code_jurisdiction> new_jurisdictions;
+      chain::shared_vector<chain::code_jurisdiction> new_jurisdictions;
     };
 
     struct by_producer_name;

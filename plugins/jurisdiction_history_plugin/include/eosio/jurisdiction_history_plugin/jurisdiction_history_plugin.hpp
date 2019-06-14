@@ -19,7 +19,7 @@ namespace eosio
         struct jurisdiction_history_api_object
         {
           chain::account_name producer_name;
-          uint64_t block_number;
+          uint64_t block_with_last_change;
           fc::time_point date_changed;
           std::vector<chain::code_jurisdiction> new_jurisdictions;
 
@@ -27,24 +27,23 @@ namespace eosio
 
           jurisdiction_history_api_object(const chain::jurisdiction_history_object &jho) :
             producer_name(jho.producer_name),
-            block_number(jho.block_number),
-            date_changed(jho.date_changed),
-            new_jurisdictions(jho.new_jurisdictions)
+            block_with_last_change(jho.block_number),
+            date_changed(jho.date_changed)
           {
-
+            new_jurisdictions.assign(jho.new_jurisdictions.begin(), jho.new_jurisdictions.end());
           }
         };
 
         struct get_producer_jurisdiction_for_block_results
         {
-          jurisdiction_history_api_object producer_jurisdiction_for_block;
+          std::vector<jurisdiction_history_api_object> producer_jurisdiction_for_block;
         };
 
         struct get_producer_jurisdiction_history_params
         {
           chain::account_name producer;
-          fc::time_point from_date;
-          fc::time_point to_date;
+          fc::optional<fc::time_point> from_date;
+          fc::optional<fc::time_point> to_date;
         };
 
         struct get_producer_jurisdiction_history_results
@@ -94,7 +93,7 @@ namespace eosio
 }
 
 FC_REFLECT(eosio::jurisdiction_history_apis::read_write::get_producer_jurisdiction_for_block_params, (producer)(block_number));
-FC_REFLECT(eosio::jurisdiction_history_apis::read_write::jurisdiction_history_api_object, (producer_name)(block_number)(date_changed)(new_jurisdictions));
+FC_REFLECT(eosio::jurisdiction_history_apis::read_write::jurisdiction_history_api_object, (producer_name)(block_with_last_change)(date_changed)(new_jurisdictions));
 FC_REFLECT(eosio::jurisdiction_history_apis::read_write::get_producer_jurisdiction_for_block_results, (producer_jurisdiction_for_block));
 FC_REFLECT(eosio::jurisdiction_history_apis::read_write::get_producer_jurisdiction_history_params, (producer)(from_date)(to_date));
 FC_REFLECT(eosio::jurisdiction_history_apis::read_write::get_producer_jurisdiction_history_results, (producer_jurisdiction_history));
