@@ -1976,6 +1976,84 @@ int main( int argc, char** argv ) {
    getAccount->add_flag("--json,-j", print_json, localized("Output in JSON format") );
    getAccount->set_callback([&]() { get_account(accountName, coresym, print_json); });
 
+   using display_jurisdiction_type = std::function< std::string( const fc::variant& ) >;
+
+   auto display_jurisdictions= []( const fc::variants& objs, display_jurisdiction_type display_jurisdiction_method, std::string basic_name, bool is_new_line )
+   {
+      std::string ret = "{ \"" + basic_name + "\": [";
+      bool first = true;
+      for( const auto& r : objs )
+      {
+         ret += ( first ? "" : ( is_new_line ? ",\n" : "," ) ) ;
+         if( first ) first = false;
+         ret += display_jurisdiction_method( r );
+      }
+      ret += "]}\n";
+
+      return ret;
+   };
+
+   auto display_info_jurisdiction = []( const fc::variant& obj )
+   {
+      std::string _code = "{ \"code\":" + obj["code"].as_string() + ", ";
+      std::string _name = "\"name\": \"" + obj["name"].as_string() + "\", ";
+      std::string _description = "\"description\": \"" + obj["description"].as_string() + "\" }";
+
+      return _code + _name + _description;
+   };
+
+   auto display_code_jurisdiction = []( const fc::variant& obj )
+   {
+      return obj.as_string();
+   };
+
+   auto display_producer_codes_jurisdiction = [&]( const fc::variant& obj )
+   {
+      std::string _code = "{ \"producer\":" + obj["producer"].as_string() + ", ";
+      std::string _jurisdictions = display_jurisdictions( obj["jurisdictions"].get_array(), display_code_jurisdiction, "jurisdictions", false/*is_new_line*/ );
+      return _code + ", " + _jurisdictions;
+   };
+
+   auto get_producers = []( const std::string& producers )
+   {
+      std::vector< std::string > result;
+
+      if( !producers.empty() )
+      {
+         auto data = json_from_file_or_string( producers );
+
+         for( auto item : data.get_array() ) {
+            result.push_back( item.as< std::string >() );
+         }
+      }
+
+      return result;
+   };
+
+   // get all jurisdictions
+   auto getAllJurisdictions = get->add_subcommand("all_jurisdictions", localized("Retrieve all jurisdictions from the blockchain"), false);
+   getAllJurisdictions->set_callback([&] {
+      auto result = call(jurisdiction_get_all_jurisdictions, fc::mutable_variant_object() );
+      std::cout << display_jurisdictions( result["jurisdictions"].get_array(), display_info_jurisdiction, "jurisdictions", true/*is_new_line*/ );
+   });
+
+   // get active jurisdictions
+   auto getActiveJurisdictions = get->add_subcommand("active_jurisdictions", localized("Retrieve active jurisdictions from the blockchain"), false);
+   getActiveJurisdictions->set_callback([&] {
+      auto result = call(jurisdiction_get_active_jurisdictions, fc::mutable_variant_object() );
+      std::cout << display_jurisdictions( result["jurisdictions"].get_array(), display_code_jurisdiction, "jurisdictions", false/*is_new_line*/ );
+   });
+
+   // get_producer_jurisdiction
+   std::string producer_names;
+   auto getProducerJurisdictions = get->add_subcommand("producer_jurisdiction", localized("Retrieve jurisdictions for given producer from the blockchain"), false);
+   getProducerJurisdictions->add_option("producer_names", producer_names, localized("The names of producers to retrieve"))->required();
+   getProducerJurisdictions->set_callback([&] {
+      auto producers = get_producers( producer_names );
+      auto result = call(jurisdiction_get_producer_jurisdiction, fc::mutable_variant_object( "producer_names", producers ) );
+      std::cout << display_jurisdictions( result["producer_jurisdictions"].get_array(), display_producer_codes_jurisdiction, "producer_jurisdictions", false/*is_new_line*/ );
+   });
+
    // get code
    string codeFilename;
    string abiFilename;

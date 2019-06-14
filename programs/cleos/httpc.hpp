@@ -130,5 +130,10 @@ namespace eosio { namespace client { namespace http {
    const string wallet_sign_trx = wallet_func_base + "/sign_transaction";
    const string keosd_stop = "/v1/keosd/stop";
 
+   const string jurisdiction_func_base = "/v1/jurisdiction";
+   const string jurisdiction_get_all_jurisdictions = jurisdiction_func_base + "/get_all_jurisdictions";
+   const string jurisdiction_get_active_jurisdictions = jurisdiction_func_base + "/get_active_jurisdictions";
+   const string jurisdiction_get_producer_jurisdiction = jurisdiction_func_base + "/get_producer_jurisdiction";
+
    FC_DECLARE_EXCEPTION( connection_exception, 1100000, "Connection Exception" );
  }}}
