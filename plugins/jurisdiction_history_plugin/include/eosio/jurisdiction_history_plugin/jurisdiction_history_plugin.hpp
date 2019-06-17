@@ -7,6 +7,7 @@ namespace eosio
 {
   namespace jurisdiction_history_apis
   {
+    constexpr uint16_t JURISDICTION_HISTORY_QUERY_LIMIT = 1000;
     class read_write
     {
       public:
@@ -52,6 +53,7 @@ namespace eosio
           chain::account_name producer;
           fc::optional<fc::time_point> from_date;
           fc::optional<fc::time_point> to_date;
+          uint16_t limit = JURISDICTION_HISTORY_QUERY_LIMIT;
         };
 
         struct get_producer_jurisdiction_history_results
@@ -107,5 +109,5 @@ FC_REFLECT(eosio::jurisdiction_history_apis::read_write::get_all_producer_jurisd
 FC_REFLECT(eosio::jurisdiction_history_apis::read_write::get_producer_jurisdiction_for_block_params, (producer)(block_number));
 FC_REFLECT(eosio::jurisdiction_history_apis::read_write::jurisdiction_history_api_object, (producer_name)(block_with_last_change)(date_changed)(new_jurisdictions));
 FC_REFLECT(eosio::jurisdiction_history_apis::read_write::get_producer_jurisdiction_for_block_results, (producer_jurisdiction_for_block));
-FC_REFLECT(eosio::jurisdiction_history_apis::read_write::get_producer_jurisdiction_history_params, (producer)(from_date)(to_date));
+FC_REFLECT(eosio::jurisdiction_history_apis::read_write::get_producer_jurisdiction_history_params, (producer)(from_date)(to_date)(limit));
 FC_REFLECT(eosio::jurisdiction_history_apis::read_write::get_producer_jurisdiction_history_results, (producer_jurisdiction_history));
