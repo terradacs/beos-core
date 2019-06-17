@@ -1976,46 +1976,6 @@ int main( int argc, char** argv ) {
    getAccount->add_flag("--json,-j", print_json, localized("Output in JSON format") );
    getAccount->set_callback([&]() { get_account(accountName, coresym, print_json); });
 
-   using display_jurisdiction_type = std::function< std::string( const fc::variant& ) >;
-
-   auto display_jurisdictions= []( const fc::variants& objs, display_jurisdiction_type display_jurisdiction_method, std::string basic_name, bool is_new_line, bool is_on_top = true )
-   {
-      std::string ret = is_on_top ? "{" : "";
-
-      ret += "\"" + basic_name + "\": [";
-      bool first = true;
-      for( const auto& r : objs )
-      {
-         ret += ( first ? "" : ( is_new_line ? ",\n" : "," ) ) ;
-         if( first ) first = false;
-         ret += display_jurisdiction_method( r );
-      }
-      ret += "]}\n";
-
-      return ret;
-   };
-
-   auto display_info_jurisdiction = []( const fc::variant& obj )
-   {
-      std::string _code = "{ \"code\":" + obj["code"].as_string() + ", ";
-      std::string _name = "\"name\": \"" + obj["name"].as_string() + "\", ";
-      std::string _description = "\"description\": \"" + obj["description"].as_string() + "\" }";
-
-      return _code + _name + _description;
-   };
-
-   auto display_code_jurisdiction = []( const fc::variant& obj )
-   {
-      return obj.as_string();
-   };
-
-   auto display_producer_codes_jurisdiction = [&]( const fc::variant& obj )
-   {
-      std::string _code = "{ \"producer\":\"" + obj["producer"].as_string() + "\", ";
-      std::string _jurisdictions = display_jurisdictions( obj["jurisdictions"].get_array(), display_code_jurisdiction, "jurisdictions", false/*is_new_line*/, false/*is_on_top*/ );
-      return _code + _jurisdictions;
-   };
-
    auto get_producers = []( const std::string& producers )
    {
       std::vector< std::string > result;
@@ -2036,24 +1996,55 @@ int main( int argc, char** argv ) {
    auto getAllJurisdictions = get->add_subcommand("all_jurisdictions", localized("Retrieve all jurisdictions from the blockchain"), false);
    getAllJurisdictions->set_callback([&] {
       auto result = call(jurisdiction_get_all_jurisdictions, fc::mutable_variant_object() );
-      std::cout << display_jurisdictions( result["jurisdictions"].get_array(), display_info_jurisdiction, "jurisdictions", true/*is_new_line*/ );
+      std::cout << fc::json::to_pretty_string( result ) << std::endl;
    });
 
    // get active jurisdictions
    auto getActiveJurisdictions = get->add_subcommand("active_jurisdictions", localized("Retrieve active jurisdictions from the blockchain"), false);
    getActiveJurisdictions->set_callback([&] {
       auto result = call(jurisdiction_get_active_jurisdictions, fc::mutable_variant_object() );
-      std::cout << display_jurisdictions( result["jurisdictions"].get_array(), display_code_jurisdiction, "jurisdictions", false/*is_new_line*/ );
+      std::cout << fc::json::to_pretty_string( result ) << std::endl;
    });
 
    // get_producer_jurisdiction
    std::string producer_names;
    auto getProducerJurisdictions = get->add_subcommand("producer_jurisdiction", localized("Retrieve jurisdictions for given producer from the blockchain"), false);
-   getProducerJurisdictions->add_option("producer_names", producer_names, localized("The names of producers to retrieve"))->required();
+   getProducerJurisdictions->add_option("producer_names", producer_names, localized("The names of producers"))->required();
    getProducerJurisdictions->set_callback([&] {
       auto producers = get_producers( producer_names );
       auto result = call(jurisdiction_get_producer_jurisdiction, fc::mutable_variant_object( "producer_names", producers ) );
-      std::cout << display_jurisdictions( result["producer_jurisdictions"].get_array(), display_producer_codes_jurisdiction, "producer_jurisdictions", false/*is_new_line*/ );
+      std::cout << fc::json::to_pretty_string( result ) << std::endl;
+   });
+
+   // get_producer_jurisdiction_for_block
+   std::string producer;
+   std::string block_number;
+   auto getProducerJurisdictionForBlock = get->add_subcommand("producer_jurisdiction_for_block", localized("Retrieve jurisdictions for producer in given block from the blockchain"), false);
+   getProducerJurisdictionForBlock->add_option("producer", producer, localized("The name of producer"))->required();
+   getProducerJurisdictionForBlock->add_option("block_number", block_number, localized("The number of block"));
+   getProducerJurisdictionForBlock->set_callback([&] {
+
+      fc::variant result;
+      if( !block_number.empty() )
+         result = call(jurisdiction_history_get_producer_jurisdiction_for_block, fc::mutable_variant_object  ( "producer", producer )
+                                                                                                                  ( "block_number", std::stol( block_number ) ) );
+      else
+         result = call(jurisdiction_history_get_producer_jurisdiction_for_block, fc::mutable_variant_object  ( "producer", producer ) );
+      std::cout << fc::json::to_pretty_string( result ) << std::endl;
+   });
+
+   // get_producer_jurisdiction_history
+   std::string from_date;
+   std::string to_date;
+   auto getProducerJurisdictionHistory = get->add_subcommand("producer_jurisdiction_history", localized("Retrieve jurisdictions for producer in given block from the blockchain"), false);
+   getProducerJurisdictionHistory->add_option("producer", producer, localized("The name of producer"))->required();
+   getProducerJurisdictionHistory->add_option("from_date", from_date, localized("From date"));
+   getProducerJurisdictionHistory->add_option("to_date", to_date, localized("To date"));
+   getProducerJurisdictionHistory->set_callback([&] {
+      auto result = call(jurisdiction_history_get_producer_jurisdiction_history, fc::mutable_variant_object ( "producer", producer )
+                                                                                                            ( "from_date", from_date.empty()? time_point() :( time_point::from_iso_string( from_date ) ) )
+                                                                                                            ( "to_date", to_date.empty()? time_point::now() : ( time_point::from_iso_string( to_date ) ) ) );
+      std::cout << fc::json::to_pretty_string( result ) << std::endl;
    });
 
    // get code

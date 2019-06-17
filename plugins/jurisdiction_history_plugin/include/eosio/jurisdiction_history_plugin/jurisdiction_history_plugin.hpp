@@ -14,7 +14,7 @@ namespace eosio
         struct get_producer_jurisdiction_for_block_params
         {
           chain::account_name producer;
-          uint64_t block_number;
+          fc::optional<uint64_t> block_number;
         };
 
         struct jurisdiction_history_api_object

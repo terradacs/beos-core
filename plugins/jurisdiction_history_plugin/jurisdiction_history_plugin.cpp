@@ -60,7 +60,8 @@ namespace eosio
       try 
       {
         const auto &idx_by_producer_block = db.db().get_index<chain::jurisdiction_history_index, chain::by_producer_block_number>();
-        auto search = idx_by_producer_block.lower_bound(boost::make_tuple(params.producer, params.block_number));
+        auto search = idx_by_producer_block.lower_bound(boost::make_tuple(params.producer,
+                                                         params.block_number.valid() ? *params.block_number : db.head_block_num() ));
         if (search->block_number == params.block_number && search->producer_name == params.producer)
         {
           result.producer_jurisdiction_for_block.emplace_back(jurisdiction_history_api_object(*search));

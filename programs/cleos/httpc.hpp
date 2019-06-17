@@ -135,5 +135,9 @@ namespace eosio { namespace client { namespace http {
    const string jurisdiction_get_active_jurisdictions = jurisdiction_func_base + "/get_active_jurisdictions";
    const string jurisdiction_get_producer_jurisdiction = jurisdiction_func_base + "/get_producer_jurisdiction";
 
+   const string jurisdiction_history_func_base = "/v1/jurisdiction_history";
+   const string jurisdiction_history_get_producer_jurisdiction_for_block = jurisdiction_history_func_base + "/get_producer_jurisdiction_for_block";
+   const string jurisdiction_history_get_producer_jurisdiction_history = jurisdiction_history_func_base + "/get_producer_jurisdiction_history";
+
    FC_DECLARE_EXCEPTION( connection_exception, 1100000, "Connection Exception" );
  }}}
