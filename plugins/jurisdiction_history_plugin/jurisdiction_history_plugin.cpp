@@ -54,9 +54,8 @@ namespace eosio
 
   namespace jurisdiction_history_apis
   {
-    read_write::get_producer_jurisdiction_for_block_results read_write::get_producer_jurisdiction_for_block(const read_write::get_producer_jurisdiction_for_block_params &params)
+    void read_write::get_producer_data( const read_write::get_producer_jurisdiction_for_block_params &params, read_write::get_all_producer_jurisdiction_for_block_results& dst )
     {
-      read_write::get_producer_jurisdiction_for_block_results result;
       try 
       {
         const auto &idx_by_producer_block = db.db().get_index<chain::jurisdiction_history_index, chain::by_producer_block_number>();
@@ -64,7 +63,7 @@ namespace eosio
                                                          params.block_number.valid() ? *params.block_number : db.head_block_num() ));
         if (search->block_number == params.block_number && search->producer_name == params.producer)
         {
-          result.producer_jurisdiction_for_block.emplace_back(jurisdiction_history_api_object(*search));
+          dst.producer_jurisdiction_for_block.emplace_back(jurisdiction_history_api_object(*search));
         }
         else
         {
@@ -73,7 +72,7 @@ namespace eosio
             --search;
             if (search->producer_name == params.producer)
             {
-              result.producer_jurisdiction_for_block.emplace_back(jurisdiction_history_api_object(*search));
+              dst.producer_jurisdiction_for_block.emplace_back(jurisdiction_history_api_object(*search));
             }
           }
         }
@@ -100,6 +99,33 @@ namespace eosio
         );
         throw fce;
       }
+    }
+
+    read_write::get_all_producer_jurisdiction_for_block_results read_write::get_all_producer_jurisdiction_for_block(const read_write::get_all_producer_jurisdiction_for_block_params &params)
+    {
+      get_producer_jurisdiction_for_block_params _params;
+      _params.block_number = params.block_number;
+
+      read_write::get_producer_jurisdiction_for_block_results result;
+
+      const auto &idx_by_producer_block = db.db().get_index<chain::jurisdiction_producer_history_index, chain::by_producer_name>();
+      auto itr = idx_by_producer_block.begin();
+
+      while( itr != idx_by_producer_block.end() )
+      {
+         _params.producer = itr->producer_name;
+         get_producer_data( _params, result );
+         ++itr;
+      }
+
+      return result;
+    }
+
+    read_write::get_producer_jurisdiction_for_block_results read_write::get_producer_jurisdiction_for_block(const read_write::get_producer_jurisdiction_for_block_params &params)
+    {
+      read_write::get_producer_jurisdiction_for_block_results result;
+      get_producer_data( params, result );
+
       return result;
     }
 

@@ -46,7 +46,8 @@ using controller_index_set = index_set<
    table_id_multi_index,
    jurisdiction_dictionary_index,
    jurisdiction_producer_index,
-   jurisdiction_history_index
+   jurisdiction_history_index,
+   jurisdiction_producer_history_index
 >;
 
 using contract_database_index_set = index_set<
@@ -1967,6 +1968,12 @@ bool controller::update_jurisdictions( const jurisdiction_producer_ordered& upda
          obj.date_changed = my->fork_db.head()->block->timestamp.to_time_point();
          obj.new_jurisdictions.assign(updater.jurisdictions.begin(), updater.jurisdictions.end());
       });
+
+      const auto &idx = my->db.get_index<chain::jurisdiction_producer_history_index, chain::by_producer_name>();
+      if( idx.find( updater.producer ) == idx.end() )
+         my->db.create<jurisdiction_producer_history_object>([&](auto &obj) {
+            obj.producer_name = updater.producer;
+         });
    }
 
    return update_result;

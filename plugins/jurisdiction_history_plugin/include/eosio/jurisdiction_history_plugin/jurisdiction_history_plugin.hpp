@@ -10,6 +10,12 @@ namespace eosio
     class read_write
     {
       public:
+
+        struct get_all_producer_jurisdiction_for_block_params
+        {
+          fc::optional<uint64_t> block_number;
+        };
+
         struct get_producer_jurisdiction_for_block_params
         {
           chain::account_name producer;
@@ -39,6 +45,8 @@ namespace eosio
           std::vector<jurisdiction_history_api_object> producer_jurisdiction_for_block;
         };
 
+        using get_all_producer_jurisdiction_for_block_results = get_producer_jurisdiction_for_block_results;
+
         struct get_producer_jurisdiction_history_params
         {
           chain::account_name producer;
@@ -51,6 +59,7 @@ namespace eosio
           std::vector<jurisdiction_history_api_object> producer_jurisdiction_history;
         };
 
+        get_all_producer_jurisdiction_for_block_results get_all_producer_jurisdiction_for_block(const get_all_producer_jurisdiction_for_block_params &params);
         get_producer_jurisdiction_for_block_results get_producer_jurisdiction_for_block(const get_producer_jurisdiction_for_block_params &params);
         get_producer_jurisdiction_history_results get_producer_jurisdiction_history(const get_producer_jurisdiction_history_params &params);
 
@@ -69,6 +78,8 @@ namespace eosio
       private:
         controller& db;
         const fc::microseconds abi_serializer_max_time;
+
+        void get_producer_data( const get_producer_jurisdiction_for_block_params &params, get_all_producer_jurisdiction_for_block_results& dst );
     };
   }
 
@@ -92,6 +103,7 @@ namespace eosio
   };
 }
 
+FC_REFLECT(eosio::jurisdiction_history_apis::read_write::get_all_producer_jurisdiction_for_block_params, (block_number));
 FC_REFLECT(eosio::jurisdiction_history_apis::read_write::get_producer_jurisdiction_for_block_params, (producer)(block_number));
 FC_REFLECT(eosio::jurisdiction_history_apis::read_write::jurisdiction_history_api_object, (producer_name)(block_with_last_change)(date_changed)(new_jurisdictions));
 FC_REFLECT(eosio::jurisdiction_history_apis::read_write::get_producer_jurisdiction_for_block_results, (producer_jurisdiction_for_block));

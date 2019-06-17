@@ -38,6 +38,7 @@ void jurisdiction_history_api_plugin::plugin_startup()
    auto rw_api = app().get_plugin<jurisdiction_history_plugin>().get_read_write_api();
 
    app().get_plugin<http_plugin>().add_api({
+      CHAIN_RW_CALL(get_all_producer_jurisdiction_for_block, 200l),
       CHAIN_RW_CALL(get_producer_jurisdiction_for_block, 200l),
       CHAIN_RW_CALL(get_producer_jurisdiction_history, 200l)
    });
