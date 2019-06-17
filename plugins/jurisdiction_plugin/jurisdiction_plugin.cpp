@@ -49,17 +49,20 @@ namespace eosio {
   {
     read_write::get_producer_jurisdiction_results read_write::get_producer_jurisdiction(const get_producer_jurisdiction_params &prod_jur_params)
     {
+      EOS_ASSERT(prod_jur_params.producer_names.size() <= JURISDICTION_QUERY_LIMIT, fc::invalid_arg_exception, "Query size is greater than query limit (${n})", ("n", JURISDICTION_QUERY_LIMIT));
       read_write::get_producer_jurisdiction_results ret;
       std::map<chain::account_name, std::vector<chain::code_jurisdiction> > producer_jurisdictions_map;
       try 
       {
+        uint16_t count = 0;
         const auto &idx_by_prod = db.db().get_index<chain::jurisdiction_producer_index, chain::by_producer_jurisdiction>();
         for_each(prod_jur_params.producer_names.begin(), prod_jur_params.producer_names.end(), [&](const std::string &name) {
           auto itr_prod_jur = idx_by_prod.lower_bound(name);
-          while (itr_prod_jur != idx_by_prod.end() && itr_prod_jur->producer == name)
+          while (itr_prod_jur != idx_by_prod.end() && itr_prod_jur->producer == name && count < JURISDICTION_QUERY_LIMIT)
           {
             producer_jurisdictions_map[name].emplace_back(itr_prod_jur->jurisdiction);
             ++itr_prod_jur;
+            ++count;
           }
         }
         );
@@ -94,15 +97,20 @@ namespace eosio {
       return ret;
     }
 
-    read_write::get_active_jurisdictions_results read_write::get_active_jurisdictions(const get_active_jurisdictions_params &)
+    read_write::get_active_jurisdictions_results read_write::get_active_jurisdictions(const get_active_jurisdictions_params &params)
     {
+      EOS_ASSERT(params.limit <= JURISDICTION_QUERY_LIMIT, fc::invalid_arg_exception, "Invalid value for limit ${s} > ${n}", ("s", params.limit)("n", JURISDICTION_QUERY_LIMIT));
       read_write::get_active_jurisdictions_results ret;
       try 
       {
         const auto &idx_by_prod = db.db().get_index<chain::jurisdiction_producer_index, chain::by_producer_jurisdiction>();
-        for (auto itr = idx_by_prod.begin(); itr != idx_by_prod.end(); ++itr)
+        auto itr = idx_by_prod.begin();
+        uint16_t count = 0;
+        while (itr != idx_by_prod.end() && count < params.limit)
         {
           ret.jurisdictions.emplace(itr->jurisdiction);
+          ++itr;
+          ++count;
         }
       } 
       catch (const fc::exception& e) 
@@ -132,13 +140,18 @@ namespace eosio {
 
     read_write::get_all_jurisdictions_results read_write::get_all_jurisdictions(const get_all_jurisdictions_params &all_jur_params)
     {
+      EOS_ASSERT(all_jur_params.limit <= JURISDICTION_QUERY_LIMIT, fc::invalid_arg_exception, "Invalid value for limit ${s} > ${n}", ("s", all_jur_params.limit)("n", JURISDICTION_QUERY_LIMIT));
       read_write::get_all_jurisdictions_results ret;
       try 
       {
         const auto &idx_by_prod = db.db().get_index<chain::jurisdiction_dictionary_index, chain::by_code_jurisdiction_dictionary>();
-        for (auto itr = idx_by_prod.begin(); itr != idx_by_prod.end(); ++itr)
+        auto itr = all_jur_params.last_code.valid() ? idx_by_prod.find(*all_jur_params.last_code) : idx_by_prod.begin();
+        uint16_t count = 0;
+        while (itr != idx_by_prod.end() && count < all_jur_params.limit)
         {
           ret.jurisdictions.emplace_back(jurisdiction_api_dictionary_object(*itr));
+          ++itr;
+          ++count;
         }
       } 
       catch (const fc::exception& e) 

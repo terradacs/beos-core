@@ -104,6 +104,7 @@ namespace eosio
 
     read_write::get_producer_jurisdiction_history_results read_write::get_producer_jurisdiction_history(const read_write::get_producer_jurisdiction_history_params &params)
     {
+      EOS_ASSERT(params.limit <= JURISDICTION_HISTORY_QUERY_LIMIT, fc::invalid_arg_exception, "Invalid value for limit ${s} > ${n}", ("s", params.limit)("n", JURISDICTION_HISTORY_QUERY_LIMIT));
       read_write::get_producer_jurisdiction_history_results result;
       try 
       {
@@ -112,11 +113,13 @@ namespace eosio
         const fc::time_point to_date = params.to_date.valid() ? *params.to_date : fc::time_point::now();
 
         auto itr = idx_by_date_changed.lower_bound(from_date);
-        while (itr != idx_by_date_changed.end() && itr->date_changed < to_date)
+        uint16_t count = 0;
+        while (itr != idx_by_date_changed.end() && itr->date_changed < to_date && count < params.limit)
         {
           if (itr->producer_name == params.producer)
           {
             result.producer_jurisdiction_history.emplace_back(jurisdiction_history_api_object(*itr));
+            ++count;
           }
           ++itr;
         }

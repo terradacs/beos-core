@@ -8,7 +8,7 @@
 namespace eosio {
   namespace jurisdiction_apis
   {
-    const std::size_t JURISDICTION_QUERY_LIMIT = 1000;
+    constexpr uint16_t JURISDICTION_QUERY_LIMIT = 1000;
 
     class read_write
     {
@@ -38,7 +38,7 @@ namespace eosio {
 
         struct get_active_jurisdictions_params
         {
-
+          uint16_t limit = JURISDICTION_QUERY_LIMIT;
         };
 
         struct get_active_jurisdictions_results
@@ -48,7 +48,8 @@ namespace eosio {
 
         struct get_all_jurisdictions_params
         {
-          
+          uint16_t limit = JURISDICTION_QUERY_LIMIT;
+          fc::optional<chain::code_jurisdiction> last_code;
         };
 
         struct jurisdiction_api_dictionary_object
@@ -79,7 +80,7 @@ namespace eosio {
         }
 
         get_producer_jurisdiction_results get_producer_jurisdiction(const get_producer_jurisdiction_params &prod_jur_params);
-        get_active_jurisdictions_results get_active_jurisdictions(const get_active_jurisdictions_params &);
+        get_active_jurisdictions_results get_active_jurisdictions(const get_active_jurisdictions_params &params);
         get_all_jurisdictions_results get_all_jurisdictions(const get_all_jurisdictions_params &all_jur_params);
 
     private:
@@ -113,9 +114,9 @@ FC_REFLECT(eosio::jurisdiction_apis::read_write::producer_jurisdiction_api_objec
 FC_REFLECT(eosio::jurisdiction_apis::read_write::get_producer_jurisdiction_params, (producer_names));
 FC_REFLECT(eosio::jurisdiction_apis::read_write::get_producer_jurisdiction_results, (producer_jurisdictions));
 
-FC_REFLECT(eosio::jurisdiction_apis::read_write::get_active_jurisdictions_params, );
+FC_REFLECT(eosio::jurisdiction_apis::read_write::get_active_jurisdictions_params, (limit));
 FC_REFLECT(eosio::jurisdiction_apis::read_write::get_active_jurisdictions_results, (jurisdictions));
 
 FC_REFLECT(eosio::jurisdiction_apis::read_write::jurisdiction_api_dictionary_object, (code)(name)(description));
-FC_REFLECT(eosio::jurisdiction_apis::read_write::get_all_jurisdictions_params, );
+FC_REFLECT(eosio::jurisdiction_apis::read_write::get_all_jurisdictions_params, (limit)(last_code));
 FC_REFLECT(eosio::jurisdiction_apis::read_write::get_all_jurisdictions_results, (jurisdictions));
