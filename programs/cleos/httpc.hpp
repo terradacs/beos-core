@@ -136,6 +136,7 @@ namespace eosio { namespace client { namespace http {
    const string jurisdiction_get_producer_jurisdiction = jurisdiction_func_base + "/get_producer_jurisdiction";
 
    const string jurisdiction_history_func_base = "/v1/jurisdiction_history";
+   const string jurisdiction_history_get_all_producer_jurisdiction_for_block = jurisdiction_history_func_base + "/get_all_producer_jurisdiction_for_block";
    const string jurisdiction_history_get_producer_jurisdiction_for_block = jurisdiction_history_func_base + "/get_producer_jurisdiction_for_block";
    const string jurisdiction_history_get_producer_jurisdiction_history = jurisdiction_history_func_base + "/get_producer_jurisdiction_history";
 

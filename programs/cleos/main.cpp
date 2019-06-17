@@ -2016,9 +2016,22 @@ int main( int argc, char** argv ) {
       std::cout << fc::json::to_pretty_string( result ) << std::endl;
    });
 
+   // get_all_producer_jurisdiction_for_block
+   std::string block_number;
+   auto getAllProducerJurisdictionForBlock = get->add_subcommand("all_producer_jurisdiction_for_block", localized("Retrieve all jurisdictions for all producer in given block from the blockchain"), false);
+   getAllProducerJurisdictionForBlock->add_option("block_number", block_number, localized("The number of block"));
+   getAllProducerJurisdictionForBlock->set_callback([&] {
+
+      fc::variant result;
+      if( !block_number.empty() )
+         result = call(jurisdiction_history_get_all_producer_jurisdiction_for_block, fc::mutable_variant_object( "block_number", std::stol( block_number ) ) );
+      else
+         result = call(jurisdiction_history_get_all_producer_jurisdiction_for_block, fc::mutable_variant_object() );
+      std::cout << fc::json::to_pretty_string( result ) << std::endl;
+   });
+
    // get_producer_jurisdiction_for_block
    std::string producer;
-   std::string block_number;
    auto getProducerJurisdictionForBlock = get->add_subcommand("producer_jurisdiction_for_block", localized("Retrieve jurisdictions for producer in given block from the blockchain"), false);
    getProducerJurisdictionForBlock->add_option("producer", producer, localized("The name of producer"))->required();
    getProducerJurisdictionForBlock->add_option("block_number", block_number, localized("The number of block"));
