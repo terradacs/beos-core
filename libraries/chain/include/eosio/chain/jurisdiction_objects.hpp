@@ -50,10 +50,10 @@ class jurisdiction_base_provider : public jurisdiction_provider_interface
 
    private:
 
-      using data_container = std::map< account_name, jurisdiction_producer >;
+      bool changed = false;
 
       account_name active_producer;
-      data_container data;
+      jurisdiction_basic data;
 
    public:
 
@@ -63,7 +63,7 @@ class jurisdiction_base_provider : public jurisdiction_provider_interface
       void update( const account_name& new_producer ) override;
       fc::optional< jurisdiction_producer > get_jurisdiction_producer() override;
 
-      void change( const jurisdiction_producer& src );
+      void change( const jurisdiction_basic& src );
 };
 
 using jurisdiction_test_provider = jurisdiction_base_provider;

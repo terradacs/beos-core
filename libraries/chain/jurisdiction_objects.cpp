@@ -32,15 +32,16 @@ void jurisdiction_base_provider::update( const account_name& new_producer )
 
 fc::optional< jurisdiction_producer > jurisdiction_base_provider::get_jurisdiction_producer()
 {
-   if( data.find( active_producer ) != data.end() )
-      return data[ active_producer ];
+   if( changed )
+      return jurisdiction_producer( active_producer, data.jurisdictions );
    else
       return fc::optional< jurisdiction_producer >();
 }
 
-void jurisdiction_base_provider::change( const jurisdiction_producer& src )
+void jurisdiction_base_provider::change( const jurisdiction_basic& src )
 {
-   data[ src.producer ] = src;
+   changed = true;
+   data = src;
 }
 
 /*=============================jurisdiction_action_launcher=============================*/

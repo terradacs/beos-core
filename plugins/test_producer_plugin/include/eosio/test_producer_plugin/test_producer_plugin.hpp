@@ -14,7 +14,7 @@ namespace eosio {
 
   using namespace appbase;
 
-  using eosio::chain::jurisdiction_producer;
+  using eosio::chain::jurisdiction_basic;
   using eosio::chain::jurisdiction_test_provider;
 
   class test_producer_plugin;
@@ -80,7 +80,7 @@ namespace test_producer_apis
        */
       using accelerate_results = any_results;
 
-      using update_jurisdictions_params = jurisdiction_producer;
+      using update_jurisdictions_params = jurisdiction_basic;
       /**
        * This structure holds information if updating of jurisdictions was done.
        */

@@ -14,7 +14,7 @@ namespace eosio {
 
   using namespace appbase;
 
-  using eosio::chain::jurisdiction_producer;
+  using eosio::chain::jurisdiction_basic;
   using eosio::chain::jurisdiction_gps_provider;
 
   class gps_plugin;
@@ -37,7 +37,7 @@ namespace gps_apis
         }
       };
 
-      using update_jurisdictions_params = jurisdiction_producer;
+      using update_jurisdictions_params = jurisdiction_basic;
 
     private:
 
