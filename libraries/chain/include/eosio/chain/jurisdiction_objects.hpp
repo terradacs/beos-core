@@ -10,12 +10,7 @@
 
 namespace eosio { namespace chain {
 
-struct trx_jurisdiction
-{
-   std::vector< code_jurisdiction >	jurisdictions;
-};
-
-using trx_extensions = fc::static_variant< trx_jurisdiction >;
+using trx_extensions = fc::static_variant< jurisdiction_basic >;
 
 struct trx_extensions_visitor
 {
@@ -23,11 +18,11 @@ struct trx_extensions_visitor
 
    const std::vector< char >& _buffer;
 
-   mutable trx_jurisdiction jurisdiction;
+   mutable jurisdiction_basic jurisdiction;
 
    trx_extensions_visitor( const std::vector< char >& buffer );
 
-   void operator()( const trx_jurisdiction& _trx_jurisdiction ) const;
+   void operator()( const jurisdiction_basic& _jurisdiction ) const;
 };
 
 class jurisdiction_provider_interface : public std::enable_shared_from_this< jurisdiction_provider_interface >
@@ -121,14 +116,14 @@ class jurisdiction_manager
       static const uint16_t limit_256;
       static const char* too_many_jurisdictions_exception;
 
-      using jurisdictions = std::vector< trx_jurisdiction >;
+      using jurisdictions = std::vector< jurisdiction_basic >;
 
       using jurisdiction_dictionary_processor = jurisdiction_processor< jurisdiction_dictionary_object >;
       using jurisdiction_producer_processor = jurisdiction_processor< jurisdiction_producer_object >;
 
    private:
 
-      uint16_t read( uint16_t idx, const std::vector< char >& buffer, std::vector< trx_jurisdiction >& dst );
+      uint16_t read( uint16_t idx, const std::vector< char >& buffer, std::vector< jurisdiction_basic >& dst );
 
    public:
 
@@ -148,5 +143,3 @@ class jurisdiction_manager
 };
 
 } }  // eosio::chain
-
-FC_REFLECT( eosio::chain::trx_jurisdiction, (jurisdictions) )

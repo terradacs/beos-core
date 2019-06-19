@@ -11,9 +11,9 @@ trx_extensions_visitor::trx_extensions_visitor( const std::vector< char>& buffer
 {
 }
 
-void trx_extensions_visitor::operator()( const trx_jurisdiction& _trx_jurisdiction ) const
+void trx_extensions_visitor::operator()( const jurisdiction_basic& _jurisdiction ) const
 {
-   jurisdiction = fc::raw::unpack< trx_jurisdiction >( _buffer );
+   jurisdiction = fc::raw::unpack< jurisdiction_basic >( _buffer );
 }
 
 /*=============================jurisdiction_provider_interface=============================*/
@@ -43,7 +43,7 @@ void jurisdiction_base_provider::change( const jurisdiction_producer& src )
    data[ src.producer ] = src;
 }
 
-/*=============================jurisdiction_launcher=============================*/
+/*=============================jurisdiction_action_launcher=============================*/
 
 void jurisdiction_action_launcher::update_provider()
 {
@@ -162,7 +162,7 @@ bool jurisdiction_manager::check_jurisdictions( const chainbase::database &db, c
    return jurisdiction_action_launcher::check_jurisdictions( db, src );
 }
 
-uint16_t jurisdiction_manager::read( uint16_t idx, const std::vector< char>& buffer, std::vector< trx_jurisdiction >& dst )
+uint16_t jurisdiction_manager::read( uint16_t idx, const std::vector< char>& buffer, std::vector< jurisdiction_basic >& dst )
 {
    eosio::chain::trx_extensions ext;
    ext.set_which( idx );
@@ -177,7 +177,7 @@ uint16_t jurisdiction_manager::read( uint16_t idx, const std::vector< char>& buf
 
 jurisdiction_manager::jurisdictions jurisdiction_manager::read( const extensions_type& exts )
 {
-   std::vector< trx_jurisdiction > res;
+   std::vector< jurisdiction_basic > res;
 
    uint32_t cnt = 0;
 

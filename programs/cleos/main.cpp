@@ -190,7 +190,7 @@ uint32_t tx_max_net_usage = 0;
 uint32_t delaysec = 0;
 
 std::string jurisdictions;
-eosio::chain::trx_jurisdiction juris;
+eosio::chain::jurisdiction_basic juris;
 
 vector<string> tx_permission;
 

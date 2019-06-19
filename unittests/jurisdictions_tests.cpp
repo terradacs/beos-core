@@ -13,7 +13,7 @@ using namespace eosio::chain;
 using namespace eosio::testing;
 using namespace fc;
 
-using eosio::chain::trx_jurisdiction;
+using eosio::chain::jurisdiction_basic;
 using eosio::chain::jurisdiction_manager;
 
 class jurisdiction_tester : public tester
@@ -47,7 +47,7 @@ BOOST_FIXTURE_TEST_CASE( basic_test, jurisdiction_tester ) try {
 
    using data_type = std::vector< code_jurisdiction >;
 
-   trx_jurisdiction src;
+   jurisdiction_basic src;
 
    const uint16_t idx = 0;
    data_type src_data = { 6, 3, 44, 55, 1, 2, 8, 4, 2 };
@@ -78,7 +78,7 @@ BOOST_FIXTURE_TEST_CASE( basic_test_01, jurisdiction_tester ) try {
    using data_type = std::vector< code_jurisdiction >;
    using buffer = std::vector< char >;
 
-   trx_jurisdiction src;
+   jurisdiction_basic src;
 
    const uint16_t idx = 0;
    std::vector< data_type > v_data_type = { { 5,6,7,8,9 }, { 0,1 }, { 2 }, { 3,4,5 } };
