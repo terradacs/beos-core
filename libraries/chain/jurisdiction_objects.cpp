@@ -32,15 +32,20 @@ void jurisdiction_base_provider::update( const account_name& new_producer )
 
 fc::optional< jurisdiction_producer > jurisdiction_base_provider::get_jurisdiction_producer()
 {
-   if( changed )
+   if( accounts.find( active_producer ) == accounts.end() )
       return jurisdiction_producer( active_producer, data.jurisdictions );
    else
       return fc::optional< jurisdiction_producer >();
 }
 
+void jurisdiction_base_provider::disable_producer()
+{
+   accounts.insert( active_producer );
+}
+
 void jurisdiction_base_provider::change( const jurisdiction_basic& src )
 {
-   changed = true;
+   accounts.clear();
    data = src;
 }
 
@@ -116,12 +121,10 @@ transaction_metadata_ptr jurisdiction_action_launcher::get_jurisdiction_transact
 
    transaction_metadata_ptr res = std::make_shared< transaction_metadata >( trx );
 
-   return res;
-}
+   if( provider )
+      provider->disable_producer();
 
-void jurisdiction_action_launcher::set_inactive_producer()
-{
-   producer_changed = false;
+   return res;
 }
 
 bool jurisdiction_action_launcher::check_jurisdictions( const chainbase::database &db, const jurisdiction_producer_ordered& src )

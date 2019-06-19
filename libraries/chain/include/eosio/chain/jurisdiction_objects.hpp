@@ -40,6 +40,7 @@ class jurisdiction_provider_interface : public std::enable_shared_from_this< jur
 
       virtual void update( const account_name& producer ) = 0;
       virtual fc::optional< jurisdiction_producer > get_jurisdiction_producer() = 0;
+      virtual void disable_producer() = 0;
 };
 
 class jurisdiction_base_provider : public jurisdiction_provider_interface
@@ -50,7 +51,8 @@ class jurisdiction_base_provider : public jurisdiction_provider_interface
 
    private:
 
-      bool changed = false;
+      using accounts_set = std::set< account_name >;
+      accounts_set accounts;
 
       account_name active_producer;
       jurisdiction_basic data;
@@ -62,6 +64,7 @@ class jurisdiction_base_provider : public jurisdiction_provider_interface
 
       void update( const account_name& new_producer ) override;
       fc::optional< jurisdiction_producer > get_jurisdiction_producer() override;
+      void disable_producer() override;
 
       void change( const jurisdiction_basic& src );
 };
@@ -99,7 +102,6 @@ class jurisdiction_action_launcher
       void update( account_name new_producer, const signature_provider_type& new_signature_provider = signature_provider_type() );
 
       transaction_metadata_ptr get_jurisdiction_transaction( const chainbase::database &db, const block_id_type& block_id, const time_point& time, const chain::chain_id_type& chain_id );
-      void set_inactive_producer();
 
       static bool check_jurisdictions( const chainbase::database &db, const jurisdiction_producer_ordered& src );
 };
