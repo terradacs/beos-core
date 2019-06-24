@@ -113,7 +113,7 @@ class BEOSNode(object):
             log.exception("Exception `{0}` occures during adding producers`{1}`".format(str(_ex), self.node_name))
         
 
-    def set_node_dirs(self, _workdir, _log_path):
+    def set_node_dirs(self, _workdir, _log_path, _prod = None, _new_dir = False):
         try:
             self.log_path    = _log_path
             self.working_dir = _workdir 
@@ -121,15 +121,15 @@ class BEOSNode(object):
                 os.makedirs(self.working_dir)
             if not os.path.exists(self.log_path):
                 os.makedirs(self.log_path)
-            run.clone_nodeos(self.working_dir, self.node_number, self.node_name,  None, True)
+            run.clone_nodeos(self.working_dir, self.node_number, self.node_name,  None, True, None, _new_dir, False)
         except Exception as _ex:
             log.exception("Exception `{0}` occures during setting node dirs `{1}`".format(str(_ex), self.node_name))
 
 
-    def run_node(self):
+    def run_node(self, _synth_with = None, _remove_eosio_as_producer = False, _genesis_json = None):
         try:
-            run.clone_nodeos(self.working_dir, self.node_number, self.node_name,  self.additiona_prod)
-            run.run_custom_nodeos(self.node_number, self.node_name, self.working_dir, self.log_path)
+            run.clone_nodeos(self.working_dir, self.node_number, self.node_name,  self.additiona_prod, False, _synth_with, False, _remove_eosio_as_producer)
+            run.run_custom_nodeos(self.node_number, self.node_name, self.working_dir, self.log_path, None, _genesis_json)
             self.node_is_running = True
             self.start_block_nr = self.utils.get_info()["head_block_num"]
             return self.start_block_nr

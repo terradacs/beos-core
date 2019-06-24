@@ -18,12 +18,12 @@ class BeosRunnerException(Exception):
 
 def run_wallet_unlock_postconf():
     wallet_password = None
-    with open("${WALLET_PASSWORD_PATH}", "r") as password_file:
+    with open("/home/lumpy/Work/beos//beos-core/build//wallet/wallet.dat", "r") as password_file:
         wallet_password = password_file.readline()
 
-    parameters = ["${CLEOS_EXECUTABLE}", 
+    parameters = ["/home/lumpy/Work/beos//beos-core/build//programs/cleos/cleos", 
         "wallet", "unlock", 
-        "-n", "${MASTER_WALLET_NAME}", 
+        "-n", "beos_master_wallet", 
         "--password", wallet_password
     ]
     print("Unlocking your wallet with command: {0}".format(" ".join(parameters)))
@@ -65,16 +65,16 @@ def run_keosd_postconf(ip_address, port, wallet_dir, use_https = False):
     if use_https:
         # run kleosd in https mode
         parameters = [
-            "${KEOSD_EXECUTABLE}",
+            "/home/lumpy/Work/beos//beos-core/build//programs/keosd/keosd",
             "--https-server-address","{0}:{1}".format(ip_address, port),
-            "--https-certificate-chain-file", "${KEOSD_CERTIFICATE_CHAIN_FILE}",
-            "--https-private-key-file", "${KEOSD_PRIVATE_KEY_FILE}",
+            "--https-certificate-chain-file", "None",
+            "--https-private-key-file", "None",
             "--wallet-dir", wallet_dir,
         ]
     else:
         # run kleosd in http mode
         parameters = [
-            "${KEOSD_EXECUTABLE}",
+            "/home/lumpy/Work/beos//beos-core/build//programs/keosd/keosd",
             "--http-server-address","{0}:{1}".format(ip_address, port) ,
             "--wallet-dir", wallet_dir,
         ]
@@ -101,14 +101,14 @@ def run_keosd_postconf(ip_address, port, wallet_dir, use_https = False):
         run_wallet_unlock_postconf()
     except Exception as ex:
         print("Exception during keosd run: {0}".format(ex))
-        kill_process("./run_keosd.pid", "keosd", "${KEOSD_IP_ADDRESS}", "${KEOSD_PORT}")
+        kill_process("./run_keosd.pid", "keosd", "127.0.0.1", "8900")
         sys.exit(1)
 
 def run_nodeos_postconf(node_index, name, public_key, use_https = False):
-    working_dir = "{0}{1}-{2}/".format("${NODEOS_WORKING_DIR}", node_index, name)
+    working_dir = "{0}{1}-{2}/".format("/tmp/", node_index, name)
 
     parameters = [
-        "${NODEOS_EXECUTABLE}",
+        "/home/lumpy/Work/beos//beos-core/build//programs/nodeos/nodeos",
         "--contracts-console",
         "--blocks-dir", os.path.abspath(working_dir) + '/blocks',
         "--config-dir", os.path.abspath(working_dir),
@@ -136,7 +136,7 @@ def run_nodeos_postconf(node_index, name, public_key, use_https = False):
         wait_for_string_in_file(log_file_name, "] Produced block", 60.)
     except Exception as ex:
         print("Exception during nodeos run: {0}".format(ex))
-        kill_process("./run_nodeos.pid", "nodeos", "${NODEOS_IP_ADDRESS}", "${NODEOS_PORT}")
+        kill_process("./run_nodeos.pid", "nodeos", "127.0.0.1", "8888")
         sys.exit(1)
 
 def kill_process(pid_file_name, proc_name, ip_address, port):
@@ -162,7 +162,7 @@ def clone_nodeos( _path_to_clone_to, _clone_index, _name, _additional_producers 
     p2p_listen_endpoint = "p2p-listen-endpoint"
     http_server_address = "http-server-address"
     
-    working_dir = "{0}{1}-{2}/".format("${NODEOS_WORKING_DIR}", "${START_NODE_INDEX}", "eosio")
+    working_dir = "{0}{1}-{2}/".format("/tmp/", "0", "eosio")
     copied_working_dir  = "{0}/{1}-{2}/".format(_path_to_clone_to, _clone_index, _name)
     if os.path.exists(copied_working_dir) and _clear_data_dir:
         clear = "rm -rf {0}".format(copied_working_dir)
@@ -199,7 +199,7 @@ def clone_nodeos( _path_to_clone_to, _clone_index, _name, _additional_producers 
         with open(copied_working_dir + '/' + config_ini, "a") as config:
             for prod, key in _additional_producers.items():
                 config.write("producer-name = {0}\n".format(prod))
-                config.write("signature-provider = {0}=KEOSD:http://${KEOSD_IP_ADDRESS}:${KEOSD_PORT}/v1/wallet/sign_digest\n".format(key))
+                config.write("signature-provider = {0}=KEOSD:http://127.0.0.1:8900/v1/wallet/sign_digest\n".format(key))
     if _sync_with:
         with open(copied_working_dir + '/' + config_ini, "a") as config:
             config.write("p2p-peer-address = {0}\n".format(_sync_with))
@@ -209,7 +209,7 @@ def run_custom_nodeos(_node_index, _name, _path_to_data_dir, _log_path, _sync = 
     working_dir = "{0}/{1}-{2}/".format(_path_to_data_dir, _node_index, _name)
 
     parameters = [
-        "${NODEOS_EXECUTABLE}",
+        "/home/lumpy/Work/beos//beos-core/build//programs/nodeos/nodeos",
         "--contracts-console",
         "--blocks-dir", os.path.abspath(working_dir) + '/blocks',
         "--config-dir", os.path.abspath(working_dir),
@@ -243,7 +243,7 @@ def run_custom_nodeos(_node_index, _name, _path_to_data_dir, _log_path, _sync = 
             wait_for_string_in_file(log_file_name, "] Produced block", 60.)
     except Exception as ex:
         print("Exception during nodeos run: {0}".format(ex))
-        kill_process(_path_to_data_dir+"/run_nodeos_{0}_{1}.pid".format(_node_index, _name), "nodeos-{0}".format(_node_index), "${NODEOS_IP_ADDRESS}", "${NODEOS_PORT}")
+        kill_process(_path_to_data_dir+"/run_nodeos_{0}_{1}.pid".format(_node_index, _name), "nodeos-{0}".format(_node_index), "127.0.0.1", "8888")
         sys.exit(1)
 
 description = """\nUsage:
@@ -262,13 +262,13 @@ if __name__ == "__main__":
     if args.cancel:
         if args.wallet or args.node:
             if args.wallet:
-                kill_process("./run_keosd.pid", "keosd", "${KEOSD_IP_ADDRESS}", "${KEOSD_PORT}")
+                kill_process("./run_keosd.pid", "keosd", "127.0.0.1", "8900")
             if args.node:
-                kill_process("./run_nodeos.pid", "nodeos", "${NODEOS_IP_ADDRESS}", "${NODEOS_PORT}")
+                kill_process("./run_nodeos.pid", "nodeos", "127.0.0.1", "8888")
             sys.exit(0)
         else:
-            kill_process("./run_keosd.pid", "keosd", "${KEOSD_IP_ADDRESS}", "${KEOSD_PORT}")
-            kill_process("./run_nodeos.pid", "nodeos", "${NODEOS_IP_ADDRESS}", "${NODEOS_PORT}")
+            kill_process("./run_keosd.pid", "keosd", "127.0.0.1", "8900")
+            kill_process("./run_nodeos.pid", "nodeos", "127.0.0.1", "8888")
             sys.exit(0)
 
     if args.wallet or args.node:
@@ -276,12 +276,12 @@ if __name__ == "__main__":
             if os.path.exists("./run_keosd.pid"):
                 print("run_keosd.pid exists in the filesystem. Please use --cancel option first")
                 sys.exit(1)
-            run_keosd_postconf("${KEOSD_IP_ADDRESS}", "${KEOSD_PORT}", "${DEFAULT_WALLET_DIR}")
+            run_keosd_postconf("127.0.0.1", "8900", "/home/lumpy/eosio-wallet")
         if args.node:
             if os.path.exists("./run_nodeos.pid"):
                 print("run_nodeos.pid exists in the filesystem. Please use --cancel option first")
                 sys.exit(1)
-            run_nodeos_postconf(0, "eosio", "${EOSIO_ROOT_KEY}")
+            run_nodeos_postconf(0, "eosio", "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV")
     else:
         if os.path.exists("./run_keosd.pid"):
             print("run_keosd.pid exists in the filesystem. Please use --cancel option first")
@@ -289,8 +289,8 @@ if __name__ == "__main__":
         if os.path.exists("./run_nodeos.pid"):
             print("run_nodeos.pid exists in the filesystem. Please use --cancel option first")
             sys.exit(1)
-        run_keosd_postconf("${KEOSD_IP_ADDRESS}", "${KEOSD_PORT}", "${DEFAULT_WALLET_DIR}")
-        run_nodeos_postconf(0, "eosio", "${EOSIO_ROOT_KEY}")
+        run_keosd_postconf("127.0.0.1", "8900", "/home/lumpy/eosio-wallet")
+        run_nodeos_postconf(0, "eosio", "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV")
         sys.exit(0)
 
 

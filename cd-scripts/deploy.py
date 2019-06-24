@@ -329,13 +329,17 @@ def install_beos(c_compiler, cxx_compiler):
 def build_beos(c_compiler, cxx_compiler):
     build_eosio(c_compiler, cxx_compiler)
 
-def initialize_wallet():
+def initialize_wallet(_config = None):
     import eosio_actions
     import eosio_runner
     try:
-        wallet_url = "http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)
-        eosio_runner.run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR, False, True)
-        eosio_actions.create_wallet(wallet_url, False)
+        if _config:
+            wallet_url = "http://{0}:{1}".format(_config.KEOSD_IP_ADDRESS, _config.KEOSD_PORT)
+            config.PRODUCERS_ARRAY = _config.PRODUCERS_ARRAY
+        else:
+            wallet_url = "http://{0}:{1}".format(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT)
+            eosio_runner.run_keosd(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR, False, True)
+            eosio_actions.create_wallet(wallet_url, False)
         # import producer keys
         for producer, data in config.PRODUCERS_ARRAY.items():
             logger.info("Importing keys for producer: {0}".format(producer))
@@ -346,13 +350,20 @@ def initialize_wallet():
         logger.error("Exception during initialize_wallet: {0}".format(ex))
         raise
 
-def initialize_beos():
+def initialize_beos(_config = None):
+    if _config:
+        config.NODEOS_WORKING_DIR = _config.NODEOS_WORKING_DIR
+        config.PRODUCERS_ARRAY = _config.PRODUCERS_ARRAY
+        config.BEOS_CONFIG_FILE_SRC = _config.BEOS_CONFIG_FILE_SRC
+        config.NODEOS_PORT  = _config.NODEOS_PORT
+        config.START_NODE_INDEX = _config.START_NODE_INDEX
+        config.PRODUCER_NAME = _config.PRODUCER_NAME
     import eosio_actions
     import eosio_runner
     import eosio_tools
     try:
-        initialize_wallet()
-        eosio_runner.run_nodeos(config.START_NODE_INDEX, config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY)
+        initialize_wallet(_config)
+        eosio_runner.run_nodeos(config.START_NODE_INDEX, config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY, False, _config)
 
         eosio_actions.create_account("eosio", "eosio.msig", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
         eosio_actions.create_account("eosio", "eosio.names", config.COMMON_SYSTEM_ACCOUNT_OWNER_PUBLIC_KEY, config.COMMON_SYSTEM_ACCOUNT_ACTIVE_PUBLIC_KEY)
@@ -441,16 +452,29 @@ def initialize_beos():
 
         #Just to produce few blocks and accept lately scheduled transaction(s)
         # we will wait for approx 10 blocks to be produced
-        eosio_tools.wait_for_blocks_produced(10, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
-        eosio_runner.terminate_running_tasks()
-        eosio_runner.show_keosd_postconf(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
-        eosio_runner.show_wallet_unlock_postconf()
-        eosio_runner.show_nodeos_postconf(config.START_NODE_INDEX, config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY)
+        if not _config:
+            finalize_beos_initialization()
+
     except Exception as ex:
         eosio_runner.terminate_running_tasks()
         logger.error("Exception during initialize: {0}".format(ex))
         raise
         #sys.exit(1)
+
+
+def finalize_beos_initialization(_config = None):
+    import eosio_actions
+    import eosio_runner
+    import eosio_tools
+    if _config:
+        work_dir = "{0}{1}-{2}/".format(config.NODEOS_WORKING_DIR, config.START_NODE_INDEX, config.PRODUCER_NAME)
+        eosio_tools.kill_process("{0}/run_nodeos.pid".format(work_dir), "nodeos", config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
+    else:
+        eosio_tools.wait_for_blocks_produced(10, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
+        eosio_runner.terminate_running_tasks()
+        eosio_runner.show_keosd_postconf(config.KEOSD_IP_ADDRESS, config.KEOSD_PORT, config.DEFAULT_WALLET_DIR)
+        eosio_runner.show_wallet_unlock_postconf()
+        eosio_runner.show_nodeos_postconf(config.START_NODE_INDEX, config.PRODUCER_NAME, config.EOSIO_PUBLIC_KEY)
 
 def clear_initialization_data(node_index, name):
     from shutil import rmtree
