@@ -135,29 +135,29 @@ def run_keosd(ip_address, port, wallet_dir, use_https = False, forceWalletCleanu
         eosio_tools.kill_process("./run_keosd.pid", "keosd", ip_address, port)
         sys.exit(1)
 
-def run_nodeos(node_index, name, public_key, use_https = False):
-    eosio_tools.detect_process_by_name("nodeos", config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
+def run_nodeos(node_index, name, public_key, use_https = False, _config = None):
+    #eosio_tools.detect_process_by_name("nodeos", config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
     if not public_key:
         eosio_tools.raiseEOSIOException("Public key is empty, aborting")
     from shutil import rmtree, copy, move
     working_dir = "{0}{1}-{2}/".format(config.NODEOS_WORKING_DIR, node_index, name)
 
     logger.info("*** START NODE in {0}".format(working_dir))
-
-    if os.path.exists(working_dir):
-        rmtree(working_dir)
-    os.makedirs(working_dir)
-    logger.info("Copying genesis file from {0} to {1}".format(config.GENESIS_JSON_FILE_SRC, working_dir + config.GENESIS_JSON_FILE))
-    if os.path.exists(config.GENESIS_JSON_FILE_SRC):
-        copy(config.GENESIS_JSON_FILE_SRC, working_dir + config.GENESIS_JSON_FILE)
-    else:
-        eosio_tools.raiseEOSIOException("File {0} does not exists.".format(config.GENESIS_JSON_FILE_SRC))
-        
-    logger.info("Copying config file from {0} to {1}".format(config.BEOS_CONFIG_FILE_SRC, working_dir + config.BEOS_CONFIG_FILE))
-    if os.path.exists(config.BEOS_CONFIG_FILE_SRC):
-        copy(config.BEOS_CONFIG_FILE_SRC, working_dir + config.BEOS_CONFIG_FILE)
-    else:
-        eosio_tools.raiseEOSIOException("File {0} does not exists.".format(config.BEOS_CONFIG_FILE_SRC))
+    if not _config:
+        if os.path.exists(working_dir):
+            rmtree(working_dir)
+        os.makedirs(working_dir)
+        logger.info("Copying genesis file from {0} to {1}".format(config.GENESIS_JSON_FILE_SRC, working_dir + config.GENESIS_JSON_FILE))
+        if os.path.exists(config.GENESIS_JSON_FILE_SRC):
+            copy(config.GENESIS_JSON_FILE_SRC, working_dir + config.GENESIS_JSON_FILE)
+        else:
+            eosio_tools.raiseEOSIOException("File {0} does not exists.".format(config.GENESIS_JSON_FILE_SRC))
+            
+        logger.info("Copying config file from {0} to {1}".format(config.BEOS_CONFIG_FILE_SRC, working_dir + config.BEOS_CONFIG_FILE))
+        if os.path.exists(config.BEOS_CONFIG_FILE_SRC):
+            copy(config.BEOS_CONFIG_FILE_SRC, working_dir + config.BEOS_CONFIG_FILE)
+        else:
+            eosio_tools.raiseEOSIOException("File {0} does not exists.".format(config.BEOS_CONFIG_FILE_SRC))
 
     log_file_name = eosio_tools.get_log_file_name("nodeos")
     if os.path.exists(log_file_name):
@@ -188,7 +188,11 @@ def run_nodeos(node_index, name, public_key, use_https = False):
     logger.info("Running nodeos with command: {0}".format(" ".join(parameters)))
     try:
         subprocess.Popen(parameters)
-        eosio_tools.save_pid_file("./run_nodeos.pid", "nodeos")
+        if _config:
+            work_dir = "{0}{1}-{2}/".format(config.NODEOS_WORKING_DIR, config.START_NODE_INDEX, config.PRODUCER_NAME)
+            eosio_tools.save_pid_file("{0}/run_nodeos.pid".format(work_dir), "nodeos")
+        else:
+            eosio_tools.save_pid_file("./run_nodeos.pid", "nodeos")
         eosio_tools.wait_for_blocks_produced(2, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
     except Exception as ex:
         logger.error("Exception during nodeos run: {0}".format(ex))

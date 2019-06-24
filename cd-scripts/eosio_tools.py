@@ -189,7 +189,9 @@ def detect_process_by_name(proc_name, ip_address, port):
         if ip_address in line and str(port) in line:
             line = line.strip().split()
             pids.append(line[0])
+            print(pids)
     if pids:
+
         raiseEOSIOException("{0} process is running on {1}:{2}. Please terminate that process and try again.".format(proc_name, ip_address, port))
 
 def get_log_file_name(executable, date = datetime.datetime.now().strftime("%Y-%m-%d")):
