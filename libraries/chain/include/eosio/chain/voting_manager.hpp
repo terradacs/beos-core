@@ -174,6 +174,7 @@ class voting_manager final
          return (uint32_t)(current_time() / 1000000);
       }
 
+      void validate_b1_vesting(int64_t stake) const;
       double stake2vote(int64_t staked) const;
 
       void eosio_assert(bool condition, const char* msg) const;

@@ -236,6 +236,30 @@ void voting_manager::update_voting_power(const account_name& from, int64_t stake
    
    aux::eosio_assert(0 <= foundVoterInfo->staked, "stake for voting cannot be negative");
 
+   /*
+      The method `validate_b1_vesting` should do nothing in BEOS. Unfortunately this is leftover of EOS fork.
+
+      There are three stages
+      1) an account `b1` doesn't exist:
+         `validate_b1_vesting` isn't called
+
+      2) an account `b1` exists, has some stakes AND `block number` < `_b1_account_threshold`:
+         assertion from `validate_b1_vesting` is called therefore the distribution fails
+
+      3) an account `b1` exists, has some stakes AND `block number` >= `_b1_account_threshold`:
+         `validate_b1_vesting` isn't called again
+
+      Everything is done only for BEOS mainnet.
+   */
+   const uint32_t _b1_account_threshold = 14484078;//(2019-06-25T10:00:00.000)
+   bool check_blocks_number = _controller.head_block_num() < _b1_account_threshold;
+
+   const std::string chain_id = "cbef47b0b26d2b8407ec6a6f91284100ec32d288a39d4b4bbd49655f7c484112";
+   bool check_chain_id = _controller.get_chain_id().str() == chain_id;
+
+   if(from == N(b1) && check_blocks_number && check_chain_id )
+      validate_b1_vesting(foundVoterInfo->staked);
+
    if(foundVoterInfo->producers.empty() == false || foundVoterInfo->proxy)
       {
          //When a power is changed, updating of producers is not necessary, because set of producers is still the same
@@ -423,6 +447,16 @@ int64_t voting_manager::get_min_activated_stake(uint32_t* min_activated_stake_pe
 
 inline uint64_t voting_manager::current_time() const {
    return static_cast<uint64_t>(_controller.pending_block_time().time_since_epoch().count());
+   }
+
+inline void voting_manager::validate_b1_vesting(int64_t stake) const
+   {
+   const int64_t base_time = 1527811200; /// 2018-06-01
+   const int64_t max_claimable = 100'000'000'0000ll;
+   const uint32_t seconds_per_year = 52 * 7 * 24 * 3600;
+   const int64_t claimable = int64_t(max_claimable * double(now() - base_time) / (10 * seconds_per_year));
+
+   aux::eosio_assert(max_claimable - claimable <= stake, "b1 can only claim their tokens over 10 years");
    }
 
 inline double voting_manager::stake2vote(int64_t staked) const {
