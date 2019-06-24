@@ -23,6 +23,7 @@ class Cluster(object):
 		self.bios_address = "{0}:{1}".format(self.bios.node_data.node_ip, int(self.bios.node_data.node_port)+9876)
 		self.nodes = []
 		self.number_of_producers = _producers_nr
+		self.bios_th = None
 
 	def generate_user_name(self):
 		name = list(Cluster.user_name)
@@ -89,7 +90,9 @@ class Cluster(object):
 			self.nodes[idx].user_name = Cluster.user_name
 			self.nodes[idx].add_producer_to_config(prod, _producers[prod]["pub_active"])
 			self.nodes[idx].run_node(self.bios_address, True, self.bios.working_dir + "/{0}-{1}/genesis.json".format(self.bios.node_number, self.bios.node_name))
-		self.stop_all()
+
+		for node in self.nodes:
+			node.stop_node()
 
 	def initialize_bios(self):
 		producers = self.prepare_producers_array()
@@ -101,20 +104,27 @@ class Cluster(object):
 		th.join()
 		deploy.finalize_beos_initialization(config)
 
-
 	def run_all(self):
+		if not self.bios_th:
+			self.bios_th = threading.Thread(target=self.bios.run_node, args=[None, False, None, True])
+			self.bios_th.start()
+		time.sleep(2)
 		for node in self.nodes:
 			try:
 				node.run_node()
 			except Exception as _ex:
 				print("Fail to run node {0}".format(node.node_name))
 
-	def stop_all(self):
+	def stop_all(self, _stop_bios = False):
 		for node in self.nodes:
 			try:
 				node.stop_node()
 			except Exception as _ex:
 				print("Fail to stop node {0}".format(node.node_name))
+		if self.bios_th:
+			self.bios.stop_node()
+			self.bios_th.join()
+			self.bios_th = None
 
 	def get_node(self, _nr):
 		if _nr > len(self.nodes):
