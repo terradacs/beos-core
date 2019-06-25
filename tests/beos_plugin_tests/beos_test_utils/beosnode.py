@@ -129,7 +129,7 @@ class BEOSNode(object):
     def run_node(self, _synth_with = None, _remove_eosio_as_producer = False, _genesis_json = None, _just_run = False):
         try:
             if _just_run:
-                run.run_custom_nodeos(self.node_number, self.node_name, self.working_dir, self.log_path, None, _genesis_json)
+                run.run_custom_nodeos(self.node_number, self.node_name, self.working_dir, self.log_path, True, _genesis_json)
             else:
                 run.clone_nodeos(self.working_dir, self.node_number, self.node_name,  self.additiona_prod, False, _synth_with, False, _remove_eosio_as_producer)
                 run.run_custom_nodeos(self.node_number, self.node_name, self.working_dir, self.log_path, None, _genesis_json)

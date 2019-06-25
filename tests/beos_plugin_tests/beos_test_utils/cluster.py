@@ -111,7 +111,6 @@ class Cluster(object):
 		th.start()
 		deploy.initialize_beos(config)
 		th.join()
-		time.sleep(5)
 		deploy.finalize_beos_initialization(config)
 
 
@@ -119,7 +118,6 @@ class Cluster(object):
 		if not self.bios_th:
 			self.bios_th = threading.Thread(target=self.bios.run_node, args=[None, False, None, True])
 			self.bios_th.start()
-		time.sleep(2)
 		for node in self.nodes:
 			try:
 				node.run_node()
