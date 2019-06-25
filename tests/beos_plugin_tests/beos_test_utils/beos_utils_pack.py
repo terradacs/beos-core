@@ -34,6 +34,8 @@ def init(_file, _bios = False):
 
 def init_cluster(_file, _pnodes, _producers_per_node):
     bios_node, summary, args, log = init(_file, True)
+    log_handlers = log.handlers
     cluster = Cluster(bios_node, _pnodes, _producers_per_node, _file)
     cluster.initialize_bios()
+    log.handlers = log_handlers
     return cluster, summary, args, log
