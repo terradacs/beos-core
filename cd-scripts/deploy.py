@@ -463,7 +463,6 @@ def initialize_beos(_config = None):
 
 
 def finalize_beos_initialization(_config = None):
-    import eosio_actions
     import eosio_runner
     import eosio_tools
     if _config:

@@ -32,11 +32,8 @@ def init(_file, _bios = False):
     except Exception as _ex:
         raise BEOSUtilsException(str(_ex))
 
-def init_cluster(_file, _nodes, _pnodes):
-    assert _nodes >= _pnodes  
-    print("INIT CLUSTER")
+def init_cluster(_file, _pnodes, _producers_per_node):
     bios_node, summary, args, log = init(_file, True)
-    cluster = Cluster(bios_node, _pnodes, _file)
+    cluster = Cluster(bios_node, _pnodes, _producers_per_node, _file)
     cluster.initialize_bios()
-    print("INITED CLUSTER")
     return cluster, summary, args, log
