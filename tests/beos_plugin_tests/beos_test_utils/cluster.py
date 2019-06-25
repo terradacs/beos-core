@@ -15,7 +15,6 @@ from cd_scripts import config
 class Cluster(object):
 	user_name = list("aaaaaaaaaaaa")
 
-
 	def __init__(self, _bios_node, _producers_nr, _producers_per_node, _file):
 		self.producers_nr = _producers_nr
 		self.file = _file
@@ -27,6 +26,7 @@ class Cluster(object):
 		self.producers = {}
 		self.bios_th = None
 
+
 	def generate_user_name(self):
 		name = list(Cluster.user_name)
 		Cluster.user_name[0] = chr(ord(Cluster.user_name[0]) + 1)
@@ -35,6 +35,7 @@ class Cluster(object):
 				Cluster.user_name[i] = 'a'
 				Cluster.user_name[i+1] = chr(ord(Cluster.user_name[i+1]) + 1)
 		return ''.join(name)
+
 
 	def init_create_nodes(self):
 		data = os.path.split(self.file)
@@ -48,6 +49,7 @@ class Cluster(object):
 				self.bios.node_data.keosd_port, self.bios.node_data.wallet_name, self.bios.cleos.path_to_cleos)
 			node.set_node_dirs(cdir+"/node/"+cfile, cdir+"/logs/"+cfile, None, True)
 			self.nodes.append(node)
+
 
 	def create_key(self):
 		_, mess = self.bios.make_cleos_call(["create", "key", "--to-console"])
@@ -64,21 +66,20 @@ class Cluster(object):
 
 
 	def prepare_producers_array(self):
-		for _ in range(0, self.number_of_producers):
+		for _ in range(0, self.number_of_producers*self.producers_per_node):
 			name = self.generate_user_name()
 			pua, pra = self.create_key()
 			puo, pro = self.create_key()
 			self.producers[name] = {"pub_active":pua,"prv_active":pra,"pub_owner":puo,"prv_owner":pro,"url":"https://{0}.proda.htms".format(name)}
+
 
 	def wait_for_bios_start(self):
 		for _ in range(5):
 			try:
 				head_block_num = self.bios.get_url_caller().chain.get_info()["head_block_num"]
 				if head_block_num > 0:
-					print("START")
 					return True
 			except:
-				print("WAIT FOR BIOS INIT")
 				time.sleep(1)
 		raise Exception("Bios initialization failuer: {wait_for_bios_start}")
 
@@ -86,16 +87,21 @@ class Cluster(object):
 	def create_and_run_nodes(self):
 		self.wait_for_bios_start()
 		self.init_create_nodes()
-		node = 0
+		nr = 0
 		for idx, prod in enumerate(self.producers):
-			self.nodes[idx].user_name = Cluster.user_name
-			self.nodes[idx].add_producer_to_config(prod, self.producers[prod]["pub_active"])
+			print("Adding producer {0} to node {1}".format(prod, nr))
+			self.nodes[nr].user_name = Cluster.user_name
+			self.nodes[nr].add_producer_to_config(prod, self.producers[prod]["pub_active"])
+			if idx % self.producers_per_node == self.producers_per_node - 1:
+				print("increasing nr")
+				nr += 1
 		
 		for node in self.nodes:
 			node.run_node(self.bios_address, True, self.bios.working_dir + "/{0}-{1}/genesis.json".format(self.bios.node_number, self.bios.node_name))
 
 		for node in self.nodes:
 			node.stop_node()
+
 
 	def initialize_bios(self):
 		self.prepare_producers_array()
@@ -105,7 +111,9 @@ class Cluster(object):
 		th.start()
 		deploy.initialize_beos(config)
 		th.join()
+		time.sleep(5)
 		deploy.finalize_beos_initialization(config)
+
 
 	def run_all(self):
 		if not self.bios_th:
@@ -117,6 +125,7 @@ class Cluster(object):
 				node.run_node()
 			except Exception as _ex:
 				print("Fail to run node {0}".format(node.node_name))
+
 
 	def stop_all(self, _stop_bios = False):
 		if self.bios_th:
@@ -136,6 +145,7 @@ class Cluster(object):
 			return None
 		else:
 			return self.nodes[_nr]
+
 
 	def get_free_ports(self, _ip, _start_port, _nr_of_required_ports):
 		assert _nr_of_required_ports > 0
