@@ -136,7 +136,8 @@ def run_keosd(ip_address, port, wallet_dir, use_https = False, forceWalletCleanu
         sys.exit(1)
 
 def run_nodeos(node_index, name, public_key, use_https = False, _config = None):
-    #eosio_tools.detect_process_by_name("nodeos", config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
+    if not _config:
+        eosio_tools.detect_process_by_name("nodeos", config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
     if not public_key:
         eosio_tools.raiseEOSIOException("Public key is empty, aborting")
     from shutil import rmtree, copy, move

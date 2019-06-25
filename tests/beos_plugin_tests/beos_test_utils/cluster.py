@@ -16,13 +16,15 @@ class Cluster(object):
 	user_name = list("aaaaaaaaaaaa")
 
 
-	def __init__(self, _bios_node, _producers_nr, _file):
+	def __init__(self, _bios_node, _producers_nr, _producers_per_node, _file):
 		self.producers_nr = _producers_nr
 		self.file = _file
 		self.bios = _bios_node
 		self.bios_address = "{0}:{1}".format(self.bios.node_data.node_ip, int(self.bios.node_data.node_port)+9876)
 		self.nodes = []
 		self.number_of_producers = _producers_nr
+		self.producers_per_node = _producers_per_node
+		self.producers = {}
 		self.bios_th = None
 
 	def generate_user_name(self):
@@ -53,22 +55,20 @@ class Cluster(object):
 		return mess[5], mess[2]
 
 
-	def prepare_config(self, _producers):
+	def prepare_config(self):
 		config.NODEOS_PORT = self.bios.node_data.node_port
-		config.PRODUCERS_ARRAY = _producers
+		config.PRODUCERS_ARRAY = self.producers
 		config.NODEOS_WORKING_DIR = self.bios.working_dir  + "/{0}-".format(self.bios.node_data.node_port)
 		config.PRODUCER_NAME = self.bios.node_data.node_port
 		config.START_NODE_INDEX = "node"
 
 
 	def prepare_producers_array(self):
-		producers = {}
 		for _ in range(0, self.number_of_producers):
 			name = self.generate_user_name()
 			pua, pra = self.create_key()
 			puo, pro = self.create_key()
-			producers[name] = {"pub_active":pua,"prv_active":pra,"pub_owner":puo,"prv_owner":pro,"url":"https://{0}.proda.htms".format(name)}
-		return producers
+			self.producers[name] = {"pub_active":pua,"prv_active":pra,"pub_owner":puo,"prv_owner":pro,"url":"https://{0}.proda.htms".format(name)}
 
 	def wait_for_bios_start(self):
 		for _ in range(5):
@@ -83,22 +83,25 @@ class Cluster(object):
 		raise Exception("Bios initialization failuer: {wait_for_bios_start}")
 
 
-	def create_and_run_nodes(self, _producers):
+	def create_and_run_nodes(self):
 		self.wait_for_bios_start()
 		self.init_create_nodes()
-		for idx, prod in enumerate(_producers):
+		node = 0
+		for idx, prod in enumerate(self.producers):
 			self.nodes[idx].user_name = Cluster.user_name
-			self.nodes[idx].add_producer_to_config(prod, _producers[prod]["pub_active"])
-			self.nodes[idx].run_node(self.bios_address, True, self.bios.working_dir + "/{0}-{1}/genesis.json".format(self.bios.node_number, self.bios.node_name))
+			self.nodes[idx].add_producer_to_config(prod, self.producers[prod]["pub_active"])
+		
+		for node in self.nodes:
+			node.run_node(self.bios_address, True, self.bios.working_dir + "/{0}-{1}/genesis.json".format(self.bios.node_number, self.bios.node_name))
 
 		for node in self.nodes:
 			node.stop_node()
 
 	def initialize_bios(self):
-		producers = self.prepare_producers_array()
-		self.prepare_config( producers )
+		self.prepare_producers_array()
+		self.prepare_config()
 
-		th = threading.Thread(target=self.create_and_run_nodes, args=[producers])
+		th = threading.Thread(target=self.create_and_run_nodes)
 		th.start()
 		deploy.initialize_beos(config)
 		th.join()
@@ -116,15 +119,16 @@ class Cluster(object):
 				print("Fail to run node {0}".format(node.node_name))
 
 	def stop_all(self, _stop_bios = False):
+		if self.bios_th:
+			self.bios.stop_node()
+			self.bios_th.join()
+			self.bios_th = None
 		for node in self.nodes:
 			try:
 				node.stop_node()
 			except Exception as _ex:
 				print("Fail to stop node {0}".format(node.node_name))
-		if self.bios_th:
-			self.bios.stop_node()
-			self.bios_th.join()
-			self.bios_th = None
+
 
 	def get_node(self, _nr):
 		if _nr > len(self.nodes):
