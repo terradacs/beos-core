@@ -124,11 +124,12 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
       bool     _pause_production                   = false;
       uint32_t _production_skip_flags              = 0; //eosio::chain::skip_nothing;
 
+      using watermark_data = std::pair< uint32_t, bool >;
       using signature_provider_type = std::function<chain::signature_type(chain::digest_type)>;
       std::map<chain::public_key_type, signature_provider_type> _signature_providers;
       std::set<chain::account_name>                             _producers;
       boost::asio::deadline_timer                               _timer;
-      std::map<chain::account_name, uint32_t>                   _producer_watermarks;
+      std::map<chain::account_name, watermark_data>             _producer_watermarks;
       pending_block_mode                                        _pending_block_mode;
       transaction_id_with_expiry_index                          _persistent_transactions;
 
@@ -179,6 +180,21 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
       // path to write the snapshots to
       bfs::path _snapshots_dir;
 
+      void fill_producer_watermark_block( const chain::account_name& producer, uint32_t block )
+      {
+         if( _producer_watermarks.find( producer ) == _producer_watermarks.end() )
+            _producer_watermarks[ producer ] = std::make_pair( block, false );
+         else
+            _producer_watermarks[ producer ].first = block;
+      }
+
+      void fill_producer_watermark_status( const chain::account_name& producer, bool status )
+      {
+         if( _producer_watermarks.find( producer ) == _producer_watermarks.end() )
+            _producer_watermarks[ producer ] = std::make_pair( 0, status );
+         else
+            _producer_watermarks[ producer ].second = status;
+      }
 
       void on_block( const block_state_ptr& bsp ) {
          if( bsp->header.timestamp <= _last_signed_block_time ) return;
@@ -234,11 +250,16 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
             }
 
             for( const auto& p: bsp->active_schedule.producers) {
-               new_producers.erase(p.producer_name);
+               auto key = new_bs.active_schedule.get_producer_key( p.producer_name );
+
+               if( key.valid() && p.block_signing_key.valid() && key != p.block_signing_key )
+                  fill_producer_watermark_status( p.producer_name, true );
+               else
+                  new_producers.erase(p.producer_name);
             }
 
             for (const auto& new_producer: new_producers) {
-               _producer_watermarks[new_producer] = hbn;
+               fill_producer_watermark_block( new_producer, hbn );
             }
          }
       }
@@ -955,7 +976,7 @@ optional<fc::time_point> producer_plugin_impl::calculate_next_block_time(const a
    // information then
    auto current_watermark_itr = _producer_watermarks.find(producer_name);
    if (current_watermark_itr != _producer_watermarks.end()) {
-      auto watermark = current_watermark_itr->second;
+      auto watermark = current_watermark_itr->second.first;
       auto block_num = chain.head_block_state()->block_num;
       if (chain.pending_block_state()) {
          ++block_num;
@@ -1074,10 +1095,10 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
    if (_pending_block_mode == pending_block_mode::producing) {
       // determine if our watermark excludes us from producing at this point
       if (currrent_watermark_itr != _producer_watermarks.end()) {
-         if (currrent_watermark_itr->second >= hbs->block_num + 1) {
+         if (currrent_watermark_itr->second.first >= hbs->block_num + 1) {
             elog("Not producing block because \"${producer}\" signed a BFT confirmation OR block at a higher block number (${watermark}) than the current fork's head (${head_block_num})",
                 ("producer", scheduled_producer.producer_name)
-                ("watermark", currrent_watermark_itr->second)
+                ("watermark", currrent_watermark_itr->second.first)
                 ("head_block_num", hbs->block_num));
             _pending_block_mode = pending_block_mode::speculating;
          }
@@ -1093,16 +1114,27 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
    try {
       uint16_t blocks_to_confirm = 0;
 
-      if (_pending_block_mode == pending_block_mode::producing) {
-         // determine how many blocks this producer can confirm
-         // 1) if it is not a producer from this node, assume no confirmations (we will discard this block anyway)
-         // 2) if it is a producer on this node that has never produced, the conservative approach is to assume no
-         //    confirmations to make sure we don't double sign after a crash TODO: make these watermarks durable?
-         // 3) if it is a producer on this node where this node knows the last block it produced, safely set it -UNLESS-
-         // 4) the producer on this node's last watermark is higher (meaning on a different fork)
-         if (currrent_watermark_itr != _producer_watermarks.end()) {
-            auto watermark = currrent_watermark_itr->second;
-            if (watermark < hbs->block_num) {
+      /*
+      Determine how many blocks this producer can confirm
+
+      (1) - if it is not a producer from this node, assume no confirmations (we will discard this block anyway)
+
+      (2) - if it is a producer on this node that has never produced, the conservative approach is to assume no
+            confirmations to make sure we don't double sign after a crash TODO: make these watermarks durable?
+
+      (3) - if it is a producer on this node where this node knows the last block it produced, safely set it -UNLESS-
+            the producer on this node's last watermark is higher (meaning on a different fork)
+
+      (4) - if it is a producer that produced long time ago on this node and after changing key by `regproducer` action
+            this node wants to restore production. We want to make sure we don't double sign.
+      */
+      if (_pending_block_mode == pending_block_mode::producing)/*1*/ {
+         if (currrent_watermark_itr != _producer_watermarks.end()/*2*/) {
+            auto watermark = currrent_watermark_itr->second.first;
+            auto key_was_changed = currrent_watermark_itr->second.second;
+            if( key_was_changed )
+               currrent_watermark_itr->second.second = false;
+            if (watermark < hbs->block_num/*3*/ && !key_was_changed/*4*/ ) {
                blocks_to_confirm = std::min<uint16_t>(std::numeric_limits<uint16_t>::max(), (uint16_t)(hbs->block_num - watermark));
             }
          }
@@ -1520,7 +1552,7 @@ void producer_plugin_impl::produce_block() {
    //idump((fc::time_point::now() - hbt));
 
    block_state_ptr new_bs = chain.head_block_state();
-   _producer_watermarks[new_bs->header.producer] = chain.head_block_num();
+   fill_producer_watermark_block( new_bs->header.producer, chain.head_block_num() );
    auto block_num = new_bs->block_num + chain.get_accelerated_block_num();
 
    ilog("Produced block ${id}... #${n} @ ${t} signed by ${p} [trxs: ${count}, lib: ${lib}, confirmed: ${confs}]",
