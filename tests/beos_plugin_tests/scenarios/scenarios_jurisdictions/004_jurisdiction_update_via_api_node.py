@@ -67,7 +67,8 @@ if __name__ == "__main__":
     log.info(result)
     result = json.loads(result)
     assert len(result["producer_jurisdictions"]) == 1, "Expecting 1 element in array"
-    assert result["producer_jurisdictions"][0] == 1, "Expecting jurisdiction code 1" 
+    assert len(result["producer_jurisdictions"][0]["jurisdictions"]) == 1, "Expecting 1 element in array"
+    assert result["producer_jurisdictions"][0]["jurisdictions"][0] == 1, "Expecting jurisdiction code 1" 
 
     log.info("Ask `get_producer_jurisdiction` for `baaaaaaaaaaa`")
     call = ["get", "producer_jurisdiction", '["baaaaaaaaaaa"]']
@@ -75,7 +76,8 @@ if __name__ == "__main__":
     log.info(result)
     result = json.loads(result)
     assert len(result["producer_jurisdictions"]) == 1, "Expecting 1 element in array"
-    assert result["producer_jurisdictions"][0] == 2, "Expecting jurisdiction code 2"
+    assert len(result["producer_jurisdictions"][0]["jurisdictions"]) == 1, "Expecting 1 element in array"
+    assert result["producer_jurisdictions"][0]["jurisdictions"][0] == 2, "Expecting jurisdiction code 2"
 
     log.info("Ask `get_producer_jurisdiction` for `caaaaaaaaaaa`")
     call = ["get", "producer_jurisdiction", '["caaaaaaaaaaa"]']
@@ -83,7 +85,8 @@ if __name__ == "__main__":
     log.info(result)
     result = json.loads(result)
     assert len(result["producer_jurisdictions"]) == 1, "Expecting 1 element in array"
-    assert result["producer_jurisdictions"][0] == 3, "Expecting jurisdiction code 3"
+    assert len(result["producer_jurisdictions"][0]["jurisdictions"]) == 1, "Expecting 1 element in array"
+    assert result["producer_jurisdictions"][0]["jurisdictions"][0] == 3, "Expecting jurisdiction code 3"
 
     call =[ "push", "action", "--jurisdictions", "[1]","beos.gateway", "issue", "[ \"{0}\", \"100.0000 BTS\", \"hello\" ]".format(prods[2]), "-p", "beos.gateway"]
     code, result = cluster.bios.make_cleos_call(call)
