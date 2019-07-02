@@ -115,11 +115,13 @@ class EOSTransactionCaller(EOSCallerBase):
 
 
  
-    def get_block(self, _block_num_or_id):
+    def get_block(self, _block_num_or_id, _get_full_data = False):
         try:
             data = {"block_num_or_id":_block_num_or_id["head_block_num"]}
             response = requests.post(self.nodeos_url+'/v1/chain/get_block', json = data)
             response_json = response.json()
+            if _get_full_data:
+                return response_json
             needed_data = { "timestamp":response_json["timestamp"], "block_num":response_json["block_num"], "ref_block_prefix":response_json["ref_block_prefix"] }
             return needed_data
         except Exception as _ex:

@@ -10,6 +10,8 @@ currentdir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(os.path.dirname(currentdir)))
 from beos_test_utils.beos_utils_pack import init, init_cluster, ActionResult, ResourceResult, VotersResult
 
+from common import get_transaction_id_from_result
+
 if __name__ == "__main__":
   try:
     number_of_pnodes  = 3
@@ -17,8 +19,8 @@ if __name__ == "__main__":
     cluster, summary, args, log = init_cluster(__file__, number_of_pnodes, producer_per_node)
     cluster.run_all()
 
-    log.info("Wait 60s")
-    time.sleep(60)
+    log.info("Wait 5s")
+    time.sleep(5)
     
     code, mess = cluster.bios.make_cleos_call(["get", "info"])
     log.info("Bios: code: {0}, mess {1}\n".format(code, mess))
@@ -42,8 +44,8 @@ if __name__ == "__main__":
     code, result = cluster.bios.make_cleos_call(call)
     log.info(f"{result}")
 
-    log.info("Wait 60s")
-    time.sleep(60)
+    log.info("Wait 10s. We will wait couple of blocks to be sure that jurisdiction data is added.")
+    time.sleep(10)
 
     idx = 0
     for node in cluster.nodes:
@@ -52,9 +54,8 @@ if __name__ == "__main__":
       log.info(f"{result}")
       idx += 1
 
-    log.info("Wait 60s")
+    log.info("Wait 60s for end of turn for each producer. We wait that long for jurisdiction change to take effect.")
     time.sleep(60)
-    
 
     log.info("Ask `get_producer_jurisdiction` for `aaaaaaaaaaaa`")
     call = ["get", "producer_jurisdiction", '["aaaaaaaaaaaa"]']
@@ -85,7 +86,9 @@ if __name__ == "__main__":
 
     call =[ "push", "action", "--jurisdictions", "[1]","beos.gateway", "issue", "[ \"{0}\", \"100.0000 BTS\", \"hello\" ]".format(prods[2]), "-p", "beos.gateway"]
     code, result = cluster.bios.make_cleos_call(call)
-    log.info(f"{result}")
+    trx_id = get_transaction_id_from_result(code, result)
+    log.info("Waiting for transaction id: {} in block".format(trx_id))
+    cluster.bios.wait_for_transaction_in_block(trx_id)
 
   except Exception as _ex:
     log.exception(_ex)
