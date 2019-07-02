@@ -74,7 +74,7 @@ class Cluster(object):
 
 
 	def wait_for_bios_start(self):
-		for _ in range(5):
+		for _ in range(60):
 			try:
 				head_block_num = self.bios.get_url_caller().chain.get_info()["head_block_num"]
 				if head_block_num > 0:

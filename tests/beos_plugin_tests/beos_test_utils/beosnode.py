@@ -25,6 +25,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from cd_scripts import eosio_rpc_actions
 from cd_scripts import eosio_rpc_client
 
+# we will wait max 240 blocks of time
+MAX_WAIT_INTERVALS = 240
 
 class BEOSNode(object):
     node = "node"
@@ -293,6 +295,31 @@ class BEOSNode(object):
             pass
         except Exception as _ex:
             log.exception("Exception `{0}` occures during `{1}`.".format(str(_ex), "wait_till_block"))
+
+    
+    def wait_for_transaction_in_block(self, _transaction_id):
+        try:
+            max_intervals = 0
+            while max_intervals < MAX_WAIT_INTERVALS:
+                block_num = {"head_block_num" : int(self.utils.get_info()["head_block_num"])}
+                block_data = self.utils.get_block(block_num, True)
+                for transaction in block_data["transactions"]:
+                    status = transaction.get("status", None)
+                    trx = transaction.get("trx", None)
+                    if trx is not None and status == "executed":
+                        tid = trx.get("id", None)
+                        if tid is not None and tid == _transaction_id:
+                            log.info("Transaction id: {0} found in block: {1}".format(_transaction_id, block_num))
+                            log.info(block_data)
+                            return
+                time.sleep(0.5)
+                max_intervals += 1
+            if max_intervals >= MAX_WAIT_INTERVALS:
+                raise TimeoutError("Timeout reached. Waited {} blocks".format(MAX_WAIT_INTERVALS))
+
+        except Exception as _ex:
+            log.exception("Exception `{0}` while `{1}`.".format(str(_ex), "wait_for_transaction_in_block"))
+
 
     def make_cleos_call(self, _params):
         try:
