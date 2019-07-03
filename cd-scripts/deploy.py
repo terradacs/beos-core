@@ -14,7 +14,7 @@ except Exception as ex:
 try:
     import distro
 except Exception as ex:
-    msg = "This program requires python-distro package. Please install python-distro package."
+    msg = "This program requires python-distro package. Please install python-distro package (by executing: apt-get install python3-distro python-distro && pip3 install distro)."
     print(msg)
     from sys import exit
     exit(1)
@@ -22,7 +22,7 @@ except Exception as ex:
 try:
     from git import Repo
 except Exception as ex:
-    msg = "This program requires python-git package. Please install python-git package."
+    msg = "This program requires python-git package. Please install python-git package (by executing: apt-get install python3-git python-git && pip3 install python-git)."
     print(msg)
     from sys import exit
     exit(1)
