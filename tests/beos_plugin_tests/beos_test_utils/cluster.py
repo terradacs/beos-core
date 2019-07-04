@@ -92,6 +92,7 @@ class Cluster(object):
 			print("Adding producer {0} to node {1}".format(prod, nr))
 			self.nodes[nr].user_name = Cluster.user_name
 			self.nodes[nr].add_producer_to_config(prod, self.producers[prod]["pub_active"])
+			self.producers[prod]["node"] = self.nodes[nr]
 			if idx % self.producers_per_node == self.producers_per_node - 1:
 				print("increasing nr")
 				nr += 1

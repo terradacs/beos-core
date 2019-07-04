@@ -54,7 +54,7 @@ class BEOSNode(object):
         self.node_name   = "{0}-{1}".format(BEOSNode.node, self.node_number)
         self.log_path    = None
         self.working_dir = None
-        self.additiona_prod = {}
+        self.node_producers = {}
         self.delay_block = 0
         self.user_name = list("aaaaaaaaaaaa")
 
@@ -110,7 +110,7 @@ class BEOSNode(object):
 
     def add_producer_to_config(self, _producer, _key):
         try:
-            self.additiona_prod[_producer]=_key
+            self.node_producers[_producer]=_key
         except Exception as _ex:
             log.exception("Exception `{0}` occures during adding producers`{1}`".format(str(_ex), self.node_name))
         
@@ -133,7 +133,7 @@ class BEOSNode(object):
             if _just_run:
                 run.run_custom_nodeos(self.node_number, self.node_name, self.working_dir, self.log_path, True, _genesis_json)
             else:
-                run.clone_nodeos(self.working_dir, self.node_number, self.node_name,  self.additiona_prod, False, _synth_with, False, _remove_eosio_as_producer)
+                run.clone_nodeos(self.working_dir, self.node_number, self.node_name,  self.node_producers, False, _synth_with, False, _remove_eosio_as_producer)
                 run.run_custom_nodeos(self.node_number, self.node_name, self.working_dir, self.log_path, None, _genesis_json)
             
             self.node_is_running = True
