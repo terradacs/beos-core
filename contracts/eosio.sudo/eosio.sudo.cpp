@@ -16,20 +16,19 @@ void sudo::exec( account_name executer,
 void sudo::exec() {
    require_auth( _self );
 
-   constexpr size_t max_stack_buffer_size = 512;
    size_t size = action_data_size();
-   char* buffer = (char*)( max_stack_buffer_size < size ? malloc(size) : alloca(size) );
-   read_action_data( buffer, size );
+   std::unique_ptr<char, decltype(&free)> buffer( reinterpret_cast<char*>( malloc( size ) ), &free );
+   read_action_data( buffer.get(), size );
 
    account_name executer;
 
-   datastream<const char*> ds( buffer, size );
+   datastream<const char*> ds( buffer.get(), size );
    ds >> executer;
 
    require_auth( executer );
 
    size_t trx_pos = ds.tellp();
-   send_deferred( (uint128_t(executer) << 64) | current_time(), executer, buffer+trx_pos, size-trx_pos );
+   send_deferred( (uint128_t(executer) << 64) | current_time(), executer, buffer.get()+trx_pos, size-trx_pos );
 }
 
 } /// namespace eosio

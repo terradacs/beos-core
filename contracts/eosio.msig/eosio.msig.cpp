@@ -17,17 +17,16 @@ void multisig::propose( account_name proposer,
 */
 
 void multisig::propose() {
-   constexpr size_t max_stack_buffer_size = 512;
    size_t size = action_data_size();
-   char* buffer = (char*)( max_stack_buffer_size < size ? malloc(size) : alloca(size) );
-   read_action_data( buffer, size );
+   std::unique_ptr<char, decltype(&free)> buffer( reinterpret_cast<char*>( malloc( size ) ), &free );
+   read_action_data( buffer.get(), size );
 
    account_name proposer;
    name proposal_name;
    vector<permission_level> requested;
    transaction_header trx_header;
 
-   datastream<const char*> ds( buffer, size );
+   datastream<const char*> ds( buffer.get(), size );
    ds >> proposer >> proposal_name >> requested;
 
    size_t trx_pos = ds.tellp();
@@ -41,7 +40,7 @@ void multisig::propose() {
    eosio_assert( proptable.find( proposal_name ) == proptable.end(), "proposal with the same name exists" );
 
    bytes packed_requested = pack(requested);
-   auto res = ::check_transaction_authorization( buffer+trx_pos, size-trx_pos,
+   auto res = ::check_transaction_authorization( buffer.get()+trx_pos, size-trx_pos,
                                                  (const char*)0, 0,
                                                  packed_requested.data(), packed_requested.size()
                                                );
@@ -49,7 +48,7 @@ void multisig::propose() {
 
    proptable.emplace( proposer, [&]( auto& prop ) {
       prop.proposal_name       = proposal_name;
-      prop.packed_transaction  = bytes( buffer+trx_pos, buffer+size );
+      prop.packed_transaction  = bytes( buffer.get()+trx_pos, buffer.get()+size );
    });
 
    approvals apptable(  _self, proposer );

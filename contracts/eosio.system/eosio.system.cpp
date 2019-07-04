@@ -124,11 +124,10 @@ namespace eosiosystem {
 
       eosio::print_f("system_contract::defineprods called to set %d producers\n", schedule.size());
 
-      constexpr size_t max_stack_buffer_size = 512;
       size_t size = action_data_size();
-      char* buffer = (char*)(max_stack_buffer_size < size ? malloc(size) : alloca(size));
-      read_action_data(buffer, size);
-      set_proposed_producers(buffer, size);
+      std::unique_ptr<char, decltype(&free)> buffer( reinterpret_cast<char*>( malloc( size ) ), &free );
+      read_action_data(buffer.get(), size);
+      set_proposed_producers(buffer.get(), size);
 
       eosio::print("Leaving system_contract::defineprods\n");
       }

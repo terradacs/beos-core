@@ -17,11 +17,10 @@ namespace eosiosystem {
       eosio_assert( new_name.size() < limit_256, "size of name is greater than allowed" );
       eosio_assert( new_description.size() < limit_256, "size of description is greater than allowed" );
 
-      constexpr size_t max_stack_buffer_size = 512;
       size_t size = action_data_size();
-      char* buffer = (char*)( max_stack_buffer_size < size ? malloc(size) : alloca(size) );
-      read_action_data( buffer, size );
-      add_jurisdiction( buffer, size );
+      std::unique_ptr<char, decltype(&free)> buffer( reinterpret_cast<char*>( malloc( size ) ), &free );
+      read_action_data( buffer.get(), size );
+      add_jurisdiction( buffer.get(), size );
 
       if( ram_payer != _self )
       {
@@ -45,11 +44,10 @@ namespace eosiosystem {
       auto _found_producer = _producers.find( data.producer );
       eosio_assert( _found_producer != _producers.end(), "user is not a producer" );
 
-      constexpr size_t max_stack_buffer_size = 512;
       size_t size = action_data_size();
-      char* buffer = (char*)( max_stack_buffer_size < size ? malloc(size) : alloca(size) );
-      read_action_data( buffer, size );
-      update_jurisdictions( buffer, size );
+      std::unique_ptr<char, decltype(&free)> buffer( reinterpret_cast<char*>( malloc( size ) ), &free );
+      read_action_data( buffer.get(), size );
+      update_jurisdictions( buffer.get(), size );
 
       eosio::print("Leaving system_contract::updateprod\n");
    }
