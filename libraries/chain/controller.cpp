@@ -1199,8 +1199,8 @@ struct controller_impl {
             if( receipt.trx.contains<packed_transaction>() ) {
                auto& pt = receipt.trx.get<packed_transaction>();
 
-               bool match_result = jurisdiction_checker.transaction_jurisdictions_match( db, b->producer, pt );
-               EOS_ASSERT( match_result == true, block_validate_exception, "producer has incorrect jurisdictions" );
+               auto match_result = jurisdiction_checker.transaction_jurisdictions_match( db, b->producer, pt );
+               EOS_ASSERT( match_result.first == true, block_validate_exception, "producer has incorrect jurisdictions" );
 
                auto mtrx = std::make_shared<transaction_metadata>(pt);
                trace = push_transaction( mtrx, fc::time_point::maximum(), receipt.cpu_usage_us, true );

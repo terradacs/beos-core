@@ -18,10 +18,10 @@ class BeosRunnerException(Exception):
 
 def run_wallet_unlock_postconf():
     wallet_password = None
-    with open("/home/lumpy/Work/beos//beos-core/build//wallet/wallet.dat", "r") as password_file:
+    with open("/home/dev/src/13.BEOS/beos-core/build_debug//wallet/wallet.dat", "r") as password_file:
         wallet_password = password_file.readline()
 
-    parameters = ["/home/lumpy/Work/beos//beos-core/build//programs/cleos/cleos", 
+    parameters = ["/home/dev/src/13.BEOS/beos-core/build_debug//programs/cleos/cleos", 
         "wallet", "unlock", 
         "-n", "beos_master_wallet", 
         "--password", wallet_password
@@ -65,7 +65,7 @@ def run_keosd_postconf(ip_address, port, wallet_dir, use_https = False):
     if use_https:
         # run kleosd in https mode
         parameters = [
-            "/home/lumpy/Work/beos//beos-core/build//programs/keosd/keosd",
+            "/home/dev/src/13.BEOS/beos-core/build_debug//programs/keosd/keosd",
             "--https-server-address","{0}:{1}".format(ip_address, port),
             "--https-certificate-chain-file", "None",
             "--https-private-key-file", "None",
@@ -74,7 +74,7 @@ def run_keosd_postconf(ip_address, port, wallet_dir, use_https = False):
     else:
         # run kleosd in http mode
         parameters = [
-            "/home/lumpy/Work/beos//beos-core/build//programs/keosd/keosd",
+            "/home/dev/src/13.BEOS/beos-core/build_debug//programs/keosd/keosd",
             "--http-server-address","{0}:{1}".format(ip_address, port) ,
             "--wallet-dir", wallet_dir,
         ]
@@ -108,7 +108,7 @@ def run_nodeos_postconf(node_index, name, public_key, use_https = False):
     working_dir = "{0}{1}-{2}/".format("/tmp/", node_index, name)
 
     parameters = [
-        "/home/lumpy/Work/beos//beos-core/build//programs/nodeos/nodeos",
+        "/home/dev/src/13.BEOS/beos-core/build_debug//programs/nodeos/nodeos",
         "--contracts-console",
         "--blocks-dir", os.path.abspath(working_dir) + '/blocks',
         "--config-dir", os.path.abspath(working_dir),
@@ -209,7 +209,7 @@ def run_custom_nodeos(_node_index, _name, _path_to_data_dir, _log_path, _sync = 
     working_dir = "{0}/{1}-{2}/".format(_path_to_data_dir, _node_index, _name)
 
     parameters = [
-        "/home/lumpy/Work/beos//beos-core/build//programs/nodeos/nodeos",
+        "/home/dev/src/13.BEOS/beos-core/build_debug//programs/nodeos/nodeos",
         "--contracts-console",
         "--blocks-dir", os.path.abspath(working_dir) + '/blocks',
         "--config-dir", os.path.abspath(working_dir),
@@ -239,7 +239,9 @@ def run_custom_nodeos(_node_index, _name, _path_to_data_dir, _log_path, _sync = 
     try:
         subprocess.Popen(parameters)
         save_pid_file(_path_to_data_dir+"/run_nodeos_{0}_{1}.pid".format(_node_index, _name), "nodeos-{0}".format(_node_index))
-        if not _sync:
+        if _sync:
+            wait_for_string_in_file(log_file_name, "] starting listener", 60.)
+        else:
             wait_for_string_in_file(log_file_name, "] Produced block", 60.)
     except Exception as ex:
         print("Exception during nodeos run: {0}".format(ex))
@@ -276,7 +278,7 @@ if __name__ == "__main__":
             if os.path.exists("./run_keosd.pid"):
                 print("run_keosd.pid exists in the filesystem. Please use --cancel option first")
                 sys.exit(1)
-            run_keosd_postconf("127.0.0.1", "8900", "/home/lumpy/eosio-wallet")
+            run_keosd_postconf("127.0.0.1", "8900", "/home/dev/eosio-wallet")
         if args.node:
             if os.path.exists("./run_nodeos.pid"):
                 print("run_nodeos.pid exists in the filesystem. Please use --cancel option first")
@@ -289,7 +291,7 @@ if __name__ == "__main__":
         if os.path.exists("./run_nodeos.pid"):
             print("run_nodeos.pid exists in the filesystem. Please use --cancel option first")
             sys.exit(1)
-        run_keosd_postconf("127.0.0.1", "8900", "/home/lumpy/eosio-wallet")
+        run_keosd_postconf("127.0.0.1", "8900", "/home/dev/eosio-wallet")
         run_nodeos_postconf(0, "eosio", "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV")
         sys.exit(0)
 

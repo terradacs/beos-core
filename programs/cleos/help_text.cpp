@@ -199,7 +199,6 @@ const char* error_advice_expired_tx_exception =  "Please increase the expiration
 const char* error_advice_tx_exp_too_far_exception =  "Please decrease the expiration time of your transaction!";
 const char* error_advice_invalid_ref_block_exception =  "Ensure that the reference block exist in the blockchain!";
 const char* error_advice_tx_duplicate =  "You can try embedding eosio nonce action inside your transaction to ensure uniqueness.";
-const char* error_incorrect_location_in_transaction =  "Transaction will be deferred due to the jurisdictions.";
 
 const char* error_advice_invalid_action_args_exception = R"=====(Ensure that your arguments follow the contract abi!
 You can check the contract's abi by using 'cleos get code' command.)=====";
@@ -245,7 +244,6 @@ const std::map<int64_t, std::string> error_advice = {
    { tx_exp_too_far_exception::code_value, error_advice_tx_exp_too_far_exception },
    { invalid_ref_block_exception::code_value, error_advice_invalid_ref_block_exception },
    { tx_duplicate::code_value, error_advice_tx_duplicate },
-   { tx_incorrect_location_exception::code_value, error_incorrect_location_in_transaction },
 
    { invalid_action_args_exception::code_value, error_advice_invalid_action_args_exception },
 
