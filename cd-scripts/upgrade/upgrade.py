@@ -108,9 +108,9 @@ if __name__ == "__main__":
   parser.add_argument('wallet_url', type=str, help="URL for keosd service")
   parser.add_argument('cleos_bin', type=str, help="Path to cleos executable")
   parser.add_argument('contract_dir', type=str, help="Directory with upgraded contracts")
-  parser.add_argument('old_contract_name', type=str, help="")
-  parser.add_argument('upgraded_contract_name', type=str, help="")
-  parser.add_argument('--compare-with', dest="compare_with", type=str, help="")
+  parser.add_argument('old_contract_name', type=str, help="Name of the contract to backup")
+  parser.add_argument('upgraded_contract_name', type=str, help="Name of the contract to upgrade")
+  parser.add_argument('--compare-with', dest="compare_with", type=str, help="Compare official transaction data with local transaction data")
 
   args = parser.parse_args()
 
@@ -126,13 +126,14 @@ if __name__ == "__main__":
       makedirs(UPGRADE_DATA_DIR)
 
     save_contract_data(args.cleos_bin, args.node_url, args.wallet_url, args.old_contract_name)
-    prepare_contract_data(args.cleos_bin, args.node_url, args.wallet_url, args.contract_dir, args.upgraded_contract_name)
+    prepare_contract_data(args.cleos_bin, args.node_url, args.wallet_url, args.contract_dir, args.old_contract_name)
     if args.compare_with:
       my_copy_path = "{}upgrade_{}.json".format(UPGRADE_DATA_DIR, args.upgraded_contract_name)
       diff_file_path = '{}contract_diff.txt'.format(UPGRADE_DATA_DIR)
-      file_diff = compare_transaction_data(my_copy_path, args.compare_with, diff_file_path)
+      file_diff = list(compare_transaction_data(my_copy_path, args.compare_with, diff_file_path))
 
-      if len(file_diff) != 3:
+      file_diff_len = len(file_diff)
+      if file_diff_len != 3:
         raise RuntimeError("Something is wrong with diff file. There should be three different lines: in expiration, ref_block_num, ref_block_prefix.")
 
   except Exception as ex:
