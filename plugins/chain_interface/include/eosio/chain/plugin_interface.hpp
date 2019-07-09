@@ -19,8 +19,10 @@ namespace eosio { namespace chain { namespace plugin_interface {
    struct warning_plugin
    {
       std::string status;
+      std::string trx_id;
 
-      warning_plugin( const std::string& _status ) : status( _status ) {}
+      warning_plugin( const std::string& _status, const std::string& _trx_id )
+                  : status( _status ), trx_id( _trx_id ) {}
 
    };
    using warning_plugin_ptr = std::shared_ptr< warning_plugin >;
@@ -72,4 +74,4 @@ namespace eosio { namespace chain { namespace plugin_interface {
 
 } } }
 
-FC_REFLECT( eosio::chain::plugin_interface::warning_plugin, (status) )
+FC_REFLECT( eosio::chain::plugin_interface::warning_plugin, (status)(trx_id) )

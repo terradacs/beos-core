@@ -429,7 +429,7 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
             _pending_incoming_transactions.emplace_back(trx, persist_until_expired, next);
             jurisdiction_checker.remember_transaction( id );
             if( !match_result.second )
-               send_response( std::make_shared<warning_plugin>( incorrect_location_in_transaction ) );
+               send_response( std::make_shared<warning_plugin>( incorrect_location_in_transaction, id.str() ) );
             return;
          }
          jurisdiction_checker.forget_transaction( id );
