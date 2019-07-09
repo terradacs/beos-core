@@ -2,12 +2,29 @@
 import eosio_actions
 import json
 
+# This is helper script for adding new tokens. 
+# Usage:
+# 
+# ./add_token.py --total-supply 10000000000.0000 --token-code TESTS --token-description tests
+#
+# Default values are:
+# --total-supply 10000000000.0000
+# --token-code BTSMD
+# --token-description btsmd
+#
+# So it is possible to use this script simply by calling:
+# ./add_token.py
+# this call is equall calling:
+# ./add_token.py --total-supply 10000000000.0000 --token-code BTSMD --token-description btsmd
+#
+
 if __name__ == "__main__":
   import argparse
-  parser = argparse.ArgumentParser()
-  parser.add_argument("total_suply", type=str, help="Total suply of the token (without code)")
-  parser.add_argument("token_code", type=str, help="Token code")
-  parser.add_argument("token_description", type=str, help="Token description")
+  description = "This is helper script for adding new tokens. Usage: ./add_token.py --total-supply 10000000000.0000 --token-code TESTS --token-description tests"
+  parser = argparse.ArgumentParser(description=description)
+  parser.add_argument("--total-supply", dest="total_suply", default="10000000000.0000", type=str, help="Total supply of the token (without code)")
+  parser.add_argument("--token-code", dest="token_code", default="BTSMD", type=str, help="Token code")
+  parser.add_argument("--token-description", dest="token_description", default="btsmd", type=str, help="Token description")
 
   args = parser.parse_args()
   try:
