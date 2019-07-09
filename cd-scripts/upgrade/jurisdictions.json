@@ -1,0 +1,6 @@
+{
+  "default" : [
+    {"code" : 0, "name" : "poland", "description" : "Country in central/eastern Europe"},
+    {"code" : 1, "name" : "germany", "description" : "Country in western Europe"}
+  ]
+}
