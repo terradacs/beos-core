@@ -6,6 +6,7 @@
 #include <eosio/chain_plugin/chain_plugin.hpp>
 #include <eosio/chain/wast_to_wasm.hpp>
 #include <eosio/utilities/key_conversion.hpp>
+#include <eosio/chain/plugin_interface.hpp>
 
 #include <fc/variant.hpp>
 #include <fc/io/json.hpp>
@@ -37,6 +38,7 @@ namespace eosio {
 static appbase::abstract_plugin& _txn_test_gen_plugin = app().register_plugin<txn_test_gen_plugin>();
 
 using namespace eosio::chain;
+using chain::plugin_interface::warning_plugin_ptr;
 
 #define CALL(api_name, api_handle, call_name, INVOKE, http_response_code) \
 {std::string("/v1/" #api_name "/" #call_name), \
@@ -90,8 +92,10 @@ using namespace eosio::chain;
 struct txn_test_gen_plugin_impl {
    static void push_next_transaction(const std::shared_ptr<std::vector<signed_transaction>>& trxs, size_t index, const std::function<void(const fc::exception_ptr&)>& next ) {
       chain_plugin& cp = app().get_plugin<chain_plugin>();
-      cp.accept_transaction( packed_transaction(trxs->at(index)), [=](const fc::static_variant<fc::exception_ptr, transaction_trace_ptr>& result){
-         if (result.contains<fc::exception_ptr>()) {
+      cp.accept_transaction( packed_transaction(trxs->at(index)), [=](const fc::static_variant<warning_plugin_ptr, fc::exception_ptr, transaction_trace_ptr>& result){
+         if (result.contains<warning_plugin_ptr>()) {
+            next(nullptr);
+         } else if (result.contains<fc::exception_ptr>()) {
             next(result.get<fc::exception_ptr>());
          } else {
             if (index + 1 < trxs->size()) {

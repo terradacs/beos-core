@@ -4,6 +4,7 @@
  */
 #include <eosio/chain_api_plugin/chain_api_plugin.hpp>
 #include <eosio/chain/exceptions.hpp>
+#include <eosio/chain/plugin_interface.hpp>
 
 #include <fc/io/json.hpp>
 
@@ -12,6 +13,7 @@ namespace eosio {
 static appbase::abstract_plugin& _chain_api_plugin = app().register_plugin<chain_api_plugin>();
 
 using namespace eosio;
+using chain::plugin_interface::warning_plugin_ptr;
 
 class chain_api_plugin_impl {
 public:
@@ -54,7 +56,7 @@ struct async_result_visitor : public fc::visitor<std::string> {
       if (body.empty()) body = "{}"; \
       api_handle.validate(); \
       api_handle.call_name(fc::json::from_string(body).as<api_namespace::call_name ## _params>(),\
-         [cb, body](const fc::static_variant<fc::exception_ptr, call_result>& result){\
+         [cb, body](const fc::static_variant<warning_plugin_ptr, fc::exception_ptr, call_result>& result){\
             if (result.contains<fc::exception_ptr>()) {\
                try {\
                   result.get<fc::exception_ptr>()->dynamic_rethrow_exception();\

@@ -60,6 +60,8 @@ static appbase::abstract_plugin& _producer_plugin = app().register_plugin<produc
 using namespace eosio::chain;
 using namespace eosio::chain::plugin_interface;
 
+using eosio::chain::message::incorrect_location_in_transaction;
+
 namespace {
    bool failure_is_subjective(const fc::exception& e, bool deadline_is_subjective) {
       auto code = e.code();
@@ -376,9 +378,12 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
 
          auto block_time = chain.pending_block_state()->header.timestamp.to_time_point();
 
-         auto send_response = [this, &trx, &chain, &next](const fc::static_variant<fc::exception_ptr, transaction_trace_ptr>& response) {
+         auto send_response = [this, &trx, &chain, &next](const fc::static_variant<warning_plugin_ptr, fc::exception_ptr, transaction_trace_ptr>& response) {
             next(response);
-            if (response.contains<fc::exception_ptr>()) {
+            if (response.contains<warning_plugin_ptr>()) {
+               fc_dlog(_trx_trace_log, "[TRX_TRACE] status: {status} tx: ${txid}",
+                        ("status",response.get<warning_plugin_ptr>()->status)("txid", trx->id()));
+            } else if (response.contains<fc::exception_ptr>()) {
                _transaction_ack_channel.publish(std::pair<fc::exception_ptr, packed_transaction_ptr>(response.get<fc::exception_ptr>(), trx));
                if (_pending_block_mode == pending_block_mode::producing) {
                   fc_dlog(_trx_trace_log, "[TRX_TRACE] Block ${block_num} for producer ${prod} is REJECTING tx: ${txid} : ${why} ",
@@ -407,22 +412,27 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
 
          auto id = trx->id();
          if( fc::time_point(trx->expiration()) < block_time ) {
+            jurisdiction_checker.forget_transaction( id );
             send_response(std::static_pointer_cast<fc::exception>(std::make_shared<expired_tx_exception>(FC_LOG_MESSAGE(error, "expired transaction ${id}", ("id", id)) )));
             return;
          }
 
          if( chain.is_known_unexpired_transaction(id) ) {
+            jurisdiction_checker.forget_transaction( id );
             send_response(std::static_pointer_cast<fc::exception>(std::make_shared<tx_duplicate>(FC_LOG_MESSAGE(error, "duplicate transaction ${id}", ("id", id)) )));
             return;
          }
 
-         bool match_result = jurisdiction_checker.transaction_jurisdictions_match( chain.db(), jurisdiction_launcher.get_active_producer(), *trx );
-         if( !match_result )
+         auto match_result = jurisdiction_checker.transaction_jurisdictions_match( chain.db(), jurisdiction_launcher.get_active_producer(), *trx, &id );
+         if( !match_result.first )
          {
             _pending_incoming_transactions.emplace_back(trx, persist_until_expired, next);
-            send_response(std::static_pointer_cast<fc::exception>(std::make_shared<tx_incorrect_location_exception>(FC_LOG_MESSAGE(error, "incorrect location for transaction ${id}", ("id", id)) )));
+            jurisdiction_checker.remember_transaction( id );
+            if( !match_result.second )
+               send_response( std::make_shared<warning_plugin>( incorrect_location_in_transaction, id.str() ) );
             return;
          }
+         jurisdiction_checker.forget_transaction( id );
 
          auto deadline = fc::time_point::now() + fc::milliseconds(_max_transaction_time_ms);
          bool deadline_is_subjective = false;

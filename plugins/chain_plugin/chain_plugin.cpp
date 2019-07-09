@@ -1449,8 +1449,10 @@ void read_write::push_transaction(const read_write::push_transaction_params& par
          abi_serializer::from_variant(params, *pretty_input, resolver, abi_serializer_max_time);
       } EOS_RETHROW_EXCEPTIONS(chain::packed_transaction_type_exception, "Invalid packed transaction")
 
-      app().get_method<incoming::methods::transaction_async>()(pretty_input, true, [this, next](const fc::static_variant<fc::exception_ptr, transaction_trace_ptr>& result) -> void{
-         if (result.contains<fc::exception_ptr>()) {
+      app().get_method<incoming::methods::transaction_async>()(pretty_input, true, [this, next](const fc::static_variant<warning_plugin_ptr, fc::exception_ptr, transaction_trace_ptr>& result) -> void{
+         if (result.contains<warning_plugin_ptr>()) {
+            next(result.get<warning_plugin_ptr>());
+         } else if (result.contains<fc::exception_ptr>()) {
             next(result.get<fc::exception_ptr>());
          } else {
             auto trx_trace_ptr = result.get<transaction_trace_ptr>();
@@ -1476,8 +1478,12 @@ void read_write::push_transaction(const read_write::push_transaction_params& par
 }
 
 static void push_recurse(read_write* rw, int index, const std::shared_ptr<read_write::push_transactions_params>& params, const std::shared_ptr<read_write::push_transactions_results>& results, const next_function<read_write::push_transactions_results>& next) {
-   auto wrapped_next = [=](const fc::static_variant<fc::exception_ptr, read_write::push_transaction_results>& result) {
-      if (result.contains<fc::exception_ptr>()) {
+   auto wrapped_next = [=](const fc::static_variant<warning_plugin_ptr, fc::exception_ptr, read_write::push_transaction_results>& result) {
+      if (result.contains<warning_plugin_ptr>()) {
+         const auto& w = result.get<warning_plugin_ptr>();
+         results->emplace_back( read_write::push_transaction_results{ transaction_id_type(), fc::mutable_variant_object( "warning", w->status ) } );
+      }
+      else if (result.contains<fc::exception_ptr>()) {
          const auto& e = result.get<fc::exception_ptr>();
          results->emplace_back( read_write::push_transaction_results{ transaction_id_type(), fc::mutable_variant_object( "error", e->to_detail_string() ) } );
       } else {

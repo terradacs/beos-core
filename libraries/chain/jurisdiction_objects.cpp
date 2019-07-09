@@ -4,6 +4,8 @@
 
 namespace eosio { namespace chain {
 
+std::string message::incorrect_location_in_transaction = "Transaction will be deferred due to the jurisdictions";
+
 /*=============================trx_extensions_visitor=============================*/
 
 trx_extensions_visitor::trx_extensions_visitor( const std::vector< char>& buffer )
@@ -283,11 +285,13 @@ bool jurisdiction_manager::update( chainbase::database& db, const jurisdiction_p
    return true;
 }
 
-bool jurisdiction_manager::transaction_jurisdictions_match( const chainbase::database& db, account_name actual_producer, const packed_transaction& trx )
+jurisdiction_manager::match_result_type jurisdiction_manager::transaction_jurisdictions_match( const chainbase::database& db, account_name actual_producer, const packed_transaction& trx, const transaction_id_type* trx_id )
 {
+   bool was_already = trx_id ? ( processed_transactions.find( *trx_id ) != processed_transactions.end() ) : false;
+
    auto exts = trx.get_transaction().transaction_extensions;
    if( exts.empty() )
-      return true;
+      return std::make_pair( true, was_already );
 
    auto deserialized_data = read( exts );
 
@@ -299,11 +303,21 @@ bool jurisdiction_manager::transaction_jurisdictions_match( const chainbase::dat
       {
          auto found = idx_by.find( std::make_tuple( actual_producer, item ) );
          if( found != idx_by.end() )
-            return true;
+            return std::make_pair( true, was_already );
       }
    }
 
-   return false;
+   return std::make_pair( false, was_already );
+}
+
+void jurisdiction_manager::remember_transaction( const transaction_id_type& trx_id )
+{
+   processed_transactions.insert( trx_id );
+}
+
+void jurisdiction_manager::forget_transaction( const transaction_id_type& trx_id )
+{
+   processed_transactions.erase( trx_id );
 }
 
 void jurisdiction_manager::process_jurisdiction_dictionary( const chainbase::database& db, jurisdiction_dictionary_processor processor ) const

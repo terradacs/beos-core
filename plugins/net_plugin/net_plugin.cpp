@@ -63,6 +63,9 @@ namespace eosio {
 
    using net_message_ptr = shared_ptr<net_message>;
 
+   using chain::plugin_interface::warning_plugin_ptr;
+   using eosio::chain::message::incorrect_location_in_transaction;
+
    struct node_transaction_state {
       transaction_id_type id;
       time_point_sec  expires;  /// time after which this may be purged.
@@ -2496,8 +2499,11 @@ namespace eosio {
          return;
       }
       dispatcher->recv_transaction(c, tid);
-      chain_plug->accept_transaction(msg, [=](const static_variant<fc::exception_ptr, transaction_trace_ptr>& result) {
-         if (result.contains<fc::exception_ptr>()) {
+      chain_plug->accept_transaction(msg, [=](const static_variant<warning_plugin_ptr, fc::exception_ptr, transaction_trace_ptr>& result) {
+         if (result.contains<warning_plugin_ptr>()) {
+            peer_dlog(c, "${m}", ("m",result.get<warning_plugin_ptr>()->status));
+         }
+         else if (result.contains<fc::exception_ptr>()) {
             peer_dlog(c, "bad packed_transaction : ${m}", ("m",result.get<fc::exception_ptr>()->what()));
          } else {
             auto trace = result.get<transaction_trace_ptr>();

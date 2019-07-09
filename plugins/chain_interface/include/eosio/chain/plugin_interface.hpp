@@ -16,8 +16,19 @@ namespace eosio { namespace chain { namespace plugin_interface {
    using namespace eosio::chain;
    using namespace appbase;
 
+   struct warning_plugin
+   {
+      std::string status;
+      std::string trx_id;
+
+      warning_plugin( const std::string& _status, const std::string& _trx_id )
+                  : status( _status ), trx_id( _trx_id ) {}
+
+   };
+   using warning_plugin_ptr = std::shared_ptr< warning_plugin >;
+
    template<typename T>
-   using next_function = std::function<void(const fc::static_variant<fc::exception_ptr, T>&)>;
+   using next_function = std::function<void(const fc::static_variant<warning_plugin_ptr, fc::exception_ptr, T>&)>;
 
    struct chain_plugin_interface;
 
@@ -62,3 +73,5 @@ namespace eosio { namespace chain { namespace plugin_interface {
    }
 
 } } }
+
+FC_REFLECT( eosio::chain::plugin_interface::warning_plugin, (status)(trx_id) )

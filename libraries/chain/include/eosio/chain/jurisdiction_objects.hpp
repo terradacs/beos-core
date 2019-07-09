@@ -10,6 +10,11 @@
 
 namespace eosio { namespace chain {
 
+namespace message
+{
+   extern std::string incorrect_location_in_transaction;
+}
+
 using trx_extensions = fc::static_variant< jurisdiction_basic >;
 
 struct trx_extensions_visitor
@@ -115,6 +120,8 @@ class jurisdiction_manager
       template< typename T >
       using jurisdiction_processor = std::function<bool(const T&, bool)>;
 
+      std::set< transaction_id_type > processed_transactions;
+
    public:
    
       static const uint16_t limit_256;
@@ -124,6 +131,8 @@ class jurisdiction_manager
 
       using jurisdiction_dictionary_processor = jurisdiction_processor< jurisdiction_dictionary_object >;
       using jurisdiction_producer_processor = jurisdiction_processor< jurisdiction_producer_object >;
+
+      using match_result_type = std::pair< bool/*match result*/, bool/*was_already*/ >;
 
    private:
 
@@ -140,7 +149,9 @@ class jurisdiction_manager
       bool update( chainbase::database& db, const jurisdiction_dictionary& info );
       bool update( chainbase::database& db, const jurisdiction_producer_ordered& updater );
 
-      bool transaction_jurisdictions_match( const chainbase::database& db, account_name actual_producer, const packed_transaction& trx );
+      match_result_type transaction_jurisdictions_match( const chainbase::database& db, account_name actual_producer, const packed_transaction& trx, const transaction_id_type* trx_id = nullptr );
+      void remember_transaction( const transaction_id_type& trx_id );
+      void forget_transaction( const transaction_id_type& trx_id );
 
       void process_jurisdiction_dictionary( const chainbase::database& db, jurisdiction_dictionary_processor processor ) const;
       void process_jurisdiction_producer( const chainbase::database& db, const account_name& lowerBound, const account_name& upperBound, jurisdiction_producer_processor processor ) const;
