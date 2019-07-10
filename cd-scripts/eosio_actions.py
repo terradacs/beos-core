@@ -227,6 +227,25 @@ def get_account(_account_name, schema = "http"):
     logger.info("Executing command: {0}".format(" ".join(parameters)))
     logger.info(json.dumps(json.loads(eosio_tools.run_command_and_return_output(parameters)),indent=2,separators=(',', ': ')))
 
+def get_table(account, scope, table, schema = "http"):
+    parameters = [
+        config.CLEOS_EXECUTABLE, 
+    ]
+    
+    if config.LOG_LEVEL == logging.DEBUG:
+        parameters = parameters + [
+            "--print-request",
+            "--print-response",
+        ]
+
+    parameters = parameters + [
+        "--url", "{0}://{1}:{2}".format(schema, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT),
+        "--wallet-url", "{0}://{1}:{2}".format(schema, config.KEOSD_IP_ADDRESS, config.KEOSD_PORT),
+        "get", "table", account, scope, table
+    ]
+    logger.info("Executing command: {0}".format(" ".join(parameters)))
+    return json.loads(eosio_tools.run_command_and_return_output(parameters))
+
 BLOCK_TYPE_HEADBLOCK = "head_block_num"
 BLOCK_TYPE_IRREVERSIBLE = "last_irreversible_block_num"
 def block_until_transaction_in_block(transaction_id, block_num, block_type = BLOCK_TYPE_HEADBLOCK, timeout = 60.):
