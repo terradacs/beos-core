@@ -240,9 +240,9 @@ def run_custom_nodeos(_node_index, _name, _path_to_data_dir, _log_path, _sync = 
         subprocess.Popen(parameters)
         save_pid_file(_path_to_data_dir+"/run_nodeos_{0}_{1}.pid".format(_node_index, _name), "nodeos-{0}".format(_node_index))
         if _sync:
-            wait_for_string_in_file(log_file_name, "] starting listener", 60.)
+            wait_for_string_in_file(log_file_name, "] starting listener", 240.)
         else:
-            wait_for_string_in_file(log_file_name, "] Produced block", 60.)
+            wait_for_string_in_file(log_file_name, "] Produced block", 240.)
     except Exception as ex:
         print("Exception during nodeos run: {0}".format(ex))
         kill_process(_path_to_data_dir+"/run_nodeos_{0}_{1}.pid".format(_node_index, _name), "nodeos-{0}".format(_node_index), "${NODEOS_IP_ADDRESS}", "${NODEOS_PORT}")
