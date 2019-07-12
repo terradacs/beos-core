@@ -240,7 +240,7 @@ class eosio_interchain_tester : public actions
                           uint64_t gateway_init_ram = 100'000'000,
                           uint64_t gateway_init_net = 1000'0000,
                           uint64_t gateway_init_cpu = 1000'0000,
-                          uint64_t distrib_init_ram = 30'000'300'000, //30'000'000'000 + 300'000 default leftover + 0 default ram trustee reward
+                          uint64_t distrib_init_ram = 30'000'301'000, //30'000'000'000 + 301'000 default leftover + 0 default ram trustee reward
                           uint64_t distrib_init_net = 200'001'001'0000, //200'000'000.0000 + 1.0000 leftover + 1000.0000 default beos trustee reward (set == 0 for auto calculation)
                           uint64_t distrib_init_cpu = 1'0000) //this is leftover from distribution - that amount will be left on distrib on both net and cpu
     : actions(state_size)
@@ -443,7 +443,7 @@ class eosio_init_tester: public eosio_interchain_tester
                     uint64_t gateway_init_ram = 100'000'000,
                     uint64_t gateway_init_net = 1000'0000,
                     uint64_t gateway_init_cpu = 1000'0000,
-                    uint64_t distrib_init_ram = 30'000'300'000,
+                    uint64_t distrib_init_ram = 30'000'301'000,
                     uint64_t distrib_init_net = 200'001'001'0000,
                     uint64_t distrib_init_cpu = 1'0000)
     : eosio_interchain_tester(state_size, initial_supply, min_activated_stake_percent, gateway_init_ram, gateway_init_net, gateway_init_cpu,
@@ -738,7 +738,7 @@ public:
 
 beos_mainnet_tester(uint64_t state_size = 1024*1024*8)
    : eosio_init_tester(state_size, 3'674'470'000'0000, 15, 164'000'000, 10'000'0000, 10'000'0000,
-                       32'000'300'000, 0, 1'0000) {}
+                       32'000'301'000, 0, 1'0000) {}
 };
 
 uint64_t eosio_init_bigstate_tester::state_size = 1 * 1024 * 1024 * 1024ll;
@@ -1124,7 +1124,7 @@ BOOST_FIXTURE_TEST_CASE( basic_param_test3, eosio_init_tester ) try {
   CHECK_STATS(alice, "1.0000 PROXY", "120000000.0000 BEOS", "18000000000");
   //note: proxy on gateway/distrib and unlimited system accounts influence weights but
   //don't consume resources; unused resources are all on distrib
-  CHECK_STATS(beos.distrib, "1.0000 PROXY", "80000002.0000 BEOS", "12000294552"); //+DEFAULT_RAM
+  CHECK_STATS(beos.distrib, "1.0000 PROXY", "80000002.0000 BEOS", "12000295552"); //+DEFAULT_RAM
 
   //ABW: it turns out that in case of such large imbalance in the system (one account has pretty
   //much all resources - in this case 'alice') when available net/cpu is calculated for account with
@@ -1288,7 +1288,7 @@ BOOST_FIXTURE_TEST_CASE( rewarding2, eosio_init_tester ) try {
   CHECK_STATS(dan, "", "152000000.0000 BEOS", "15000000000");
 
   //note: all beos rewards were distributed at this point
-  CHECK_STATS(beos.distrib, "", "2.0000 BEOS", "10000294552"); //+DEFAULT_RAM
+  CHECK_STATS(beos.distrib, "", "2.0000 BEOS", "10000295552"); //+DEFAULT_RAM
 
   BOOST_REQUIRE_EQUAL( success(), withdraw( N(dan), asset::from_string("50.0000 PROXY") ) );
   BOOST_REQUIRE_EQUAL( success(), withdraw( N(alice), asset::from_string("10.0000 PROXY") ) );
@@ -1305,7 +1305,7 @@ BOOST_FIXTURE_TEST_CASE( rewarding2, eosio_init_tester ) try {
   CHECK_STATS(carol, "", "12000000.0000 BEOS", "6250000000");
   CHECK_STATS(dan, "", "152000000.0000 BEOS", "15000000000");
 
-  CHECK_STATS(beos.distrib, "", "2.0000 BEOS", "5000294552"); //+DEFAULT_RAM
+  CHECK_STATS(beos.distrib, "", "2.0000 BEOS", "5000295552"); //+DEFAULT_RAM
 
   issue( N(dan), asset::from_string("70.0000 PROXY") );
 
@@ -1318,7 +1318,7 @@ BOOST_FIXTURE_TEST_CASE( rewarding2, eosio_init_tester ) try {
   CHECK_STATS(dan, "", "152000000.0000 BEOS", "18500000000");
 
   //note: all rewards were distributed
-  CHECK_STATS(beos.distrib, "", "2.0000 BEOS", "294552"); //+DEFAULT_RAM
+  CHECK_STATS(beos.distrib, "", "2.0000 BEOS", "295552"); //+DEFAULT_RAM
 
 } FC_LOG_AND_RETHROW()
 
@@ -1397,7 +1397,7 @@ BOOST_FIXTURE_TEST_CASE( rewarding3, eosio_init_tester ) try {
   CHECK_STATS(beos.trustee, "", "41001000.0000 BEOS", "6150000000");
 
   //note: all rewards were distributed
-  CHECK_STATS(beos.distrib, "", "2.0000 BEOS", "294552"); //+DEFAULT_RAM
+  CHECK_STATS(beos.distrib, "", "2.0000 BEOS", "295552"); //+DEFAULT_RAM
 
 } FC_LOG_AND_RETHROW()
 
@@ -1437,7 +1437,7 @@ BOOST_FIXTURE_TEST_CASE( rewarding_weights, eosio_init_tester ) try {
   CHECK_STATS(carol, "", "84000000.0000 BEOS", "4200000000");
 
   //note: all beos rewards were distributed
-  CHECK_STATS(beos.distrib, "", "2.0000 BEOS", "20000294552"); //+DEFAULT_RAM
+  CHECK_STATS(beos.distrib, "", "2.0000 BEOS", "20000295552"); //+DEFAULT_RAM
 
   tgs.ram.starting_block = 90;
   tgs.ram.ending_block = 100;
@@ -1466,7 +1466,7 @@ BOOST_FIXTURE_TEST_CASE( rewarding_weights, eosio_init_tester ) try {
   CHECK_STATS(bob, "", "54000000.0000 BEOS", "2700000000");
   CHECK_STATS(carol, "", "84000000.0000 BEOS", "9200000000");
   //alice/bob no change, carol took half of this interval pool, eosio.ram was eligible for second half but as it is unlimited account its reward returned to pool
-  CHECK_STATS(beos.distrib, "", "", "15000294552"); //+DEFAULT_RAM
+  CHECK_STATS(beos.distrib, "", "", "15000295552"); //+DEFAULT_RAM
 
   transfer(N(eosio.ram), N(alice), asset::from_string("1.0000 PROXY"), "fixed error", N(eosio.token));
 
@@ -1479,7 +1479,7 @@ BOOST_FIXTURE_TEST_CASE( rewarding_weights, eosio_init_tester ) try {
   CHECK_STATS(carol, "", "84000000.0000 BEOS", "16700000000");
 
   //note: all rewards were distributed (note bandwidth borrowed from eosio)
-  CHECK_STATS(beos.distrib, "", "20002.0000 BEOS", "294552"); //+DEFAULT_RAM
+  CHECK_STATS(beos.distrib, "", "20002.0000 BEOS", "295552"); //+DEFAULT_RAM
 
 } FC_LOG_AND_RETHROW()
 
@@ -2043,7 +2043,7 @@ BOOST_FIXTURE_TEST_CASE( trustee_reward_test, eosio_init_tester ) try {
 
   CHECK_STATS(beos.trustee, "10.0000 PROXY", "200001000.0000 BEOS", "30000000000");
   //note: beos.trustee finally consumed all rewards
-  CHECK_STATS(beos.distrib, "0.0000 PROXY", "2.0000 BEOS", "294552"); //+DEFAULT_RAM
+  CHECK_STATS(beos.distrib, "0.0000 PROXY", "2.0000 BEOS", "295552"); //+DEFAULT_RAM
 
 } FC_LOG_AND_RETHROW()
 
@@ -2544,7 +2544,7 @@ BOOST_FIXTURE_TEST_CASE( manipulation_lock_test, eosio_interchain_tester ) try {
   CHECK_STATS(alice, "", "50000000.0000 BEOS", "10000000000");
   CHECK_STATS(bob, "", "75000000.0000 BEOS", "0");
   //note: beos reward from final step left unclaimed
-  CHECK_STATS(beos.distrib, "0.0000 PROXY", "75000002.0000 BEOS", "20000294552"); //+DEFAULT_RAM
+  CHECK_STATS(beos.distrib, "0.0000 PROXY", "75000002.0000 BEOS", "20000295552"); //+DEFAULT_RAM
 
 } FC_LOG_AND_RETHROW()
 
@@ -2592,7 +2592,7 @@ BOOST_FIXTURE_TEST_CASE( manipulation_lock_test2, eosio_interchain_tester ) try 
 
   CHECK_STATS(alice, "33.0000 PROXY", "200000000.0000 BEOS", "10000000000");
   //note: beos reward distributed fully
-  CHECK_STATS(beos.distrib, "0.0000 PROXY", "2.0000 BEOS", "20000294552"); //+DEFAULT_RAM
+  CHECK_STATS(beos.distrib, "0.0000 PROXY", "2.0000 BEOS", "20000295552"); //+DEFAULT_RAM
 
 } FC_LOG_AND_RETHROW()
 
@@ -2665,7 +2665,7 @@ BOOST_FIXTURE_TEST_CASE( manipulation_lock_test3, eosio_interchain_tester ) try 
   CHECK_STATS(carol, "24.0000 PROXY", "65595238.0952 BEOS", "9166666666");
   CHECK_STATS(dan,   "0.0000 PROXY", "26785714.2857 BEOS", "2500000000");
   //note: just leftovers from reward truncation (0.0001 BEOS, 2 ram) remain unclaimed
-  CHECK_STATS(beos.distrib, "0.0000 PROXY", "2.0001 BEOS", "294554"); //+DEFAULT_RAM
+  CHECK_STATS(beos.distrib, "0.0000 PROXY", "2.0001 BEOS", "295554"); //+DEFAULT_RAM
 
 } FC_LOG_AND_RETHROW()
 
@@ -2715,7 +2715,7 @@ BOOST_FIXTURE_TEST_CASE( performance_lock_test, eosio_interchain_tester ) try {
 
   CHECK_STATS(alice, "15000000.6000 PROXY", "200000000.0000 BEOS", "30000000000");
   //note: all rewards used
-  CHECK_STATS(beos.distrib, "0.0000 PROXY", "2.0000 BEOS", "294552"); //+DEFAULT_RAM
+  CHECK_STATS(beos.distrib, "0.0000 PROXY", "2.0000 BEOS", "295552"); //+DEFAULT_RAM
 
 } FC_LOG_AND_RETHROW()
 
@@ -2823,7 +2823,7 @@ BOOST_FIXTURE_TEST_CASE( performance_lock_test2, eosio_interchain_tester ) try {
   CHECK_STATS(carol, "0.0000 PROXY", "49772727.2727 BEOS", "6500000000");
   CHECK_STATS(dan,   "0.0000 PROXY", "35227272.7272 BEOS", "2500000000");
   //note: almost all rewards used, just 0.0001 left from truncations
-  CHECK_STATS(beos.distrib, "0.0000 PROXY", "2.0001 BEOS", "294552"); //+DEFAULT_RAM
+  CHECK_STATS(beos.distrib, "0.0000 PROXY", "2.0001 BEOS", "295552"); //+DEFAULT_RAM
 
 } FC_LOG_AND_RETHROW()
 
@@ -2927,7 +2927,7 @@ BOOST_FIXTURE_TEST_CASE( performance_decrease_test, eosio_interchain_tester ) tr
 
   CHECK_STATS(alice,"0.0000 PROXY", "150000000.0000 BEOS", "20000000000");
   //note: beos reward from final step left unused
-  CHECK_STATS(beos.distrib, "0.0000 PROXY", "50000002.0000 BEOS", "10000294552"); //+DEFAULT_RAM
+  CHECK_STATS(beos.distrib, "0.0000 PROXY", "50000002.0000 BEOS", "10000295552"); //+DEFAULT_RAM
 
 } FC_LOG_AND_RETHROW()
 
@@ -3005,7 +3005,7 @@ BOOST_FIXTURE_TEST_CASE( performance_decrease_test2, eosio_interchain_tester ) t
   CHECK_STATS(carol, "48.0000 PROXY", "75000000.0000 BEOS", "0");
   CHECK_STATS(dan,   "0.0000 PROXY", "37500000.0000 BEOS", "0");
   //note: in the end all rewards were used
-  CHECK_STATS(beos.distrib, "0.0000 PROXY", "2.0000 BEOS", "294552"); //+DEFAULT_RAM
+  CHECK_STATS(beos.distrib, "0.0000 PROXY", "2.0000 BEOS", "295552"); //+DEFAULT_RAM
 
 } FC_LOG_AND_RETHROW()
 
@@ -3045,7 +3045,7 @@ BOOST_FIXTURE_TEST_CASE( main_commands_test_1, eosio_interchain_tester ) try {
 
   CHECK_STATS(alice,  "0.0000 PROXY", "125000000.0000 BEOS", "10000000000");
   //note: last beos reward unused, left on distrib
-  CHECK_STATS(beos.distrib, "0.0000 PROXY", "75000002.0000 BEOS", "20000294552"); //+DEFAULT_RAM
+  CHECK_STATS(beos.distrib, "0.0000 PROXY", "75000002.0000 BEOS", "20000295552"); //+DEFAULT_RAM
 
 } FC_LOG_AND_RETHROW()
 
@@ -3110,7 +3110,7 @@ BOOST_FIXTURE_TEST_CASE( main_commands_test_2, eosio_interchain_tester ) try {
   CHECK_STATS(carol, "0.0000 PROXY", "31250000.0000 BEOS", "7500000000");
   CHECK_STATS(dan,   "0.0000 PROXY", "31250000.0000 BEOS", "7500000000");
   //last step of beos reward at 270 is unused, left on distrib
-  CHECK_STATS(beos.distrib, "0.0000 PROXY", "75000002.0000 BEOS", "10000294552"); //+DEFAULT_RAM
+  CHECK_STATS(beos.distrib, "0.0000 PROXY", "75000002.0000 BEOS", "10000295552"); //+DEFAULT_RAM
 
 } FC_LOG_AND_RETHROW()
 
@@ -3182,7 +3182,7 @@ BOOST_FIXTURE_TEST_CASE( main_commands_test_3, eosio_interchain_tester ) try {
   CHECK_STATS(swiatowid,"0.0000 PROXY", "25000000.0000 BEOS", "2000000000");
   CHECK_STATS(weles,    "0.0000 PROXY", "25000000.0000 BEOS", "12000000000");
   //note: beos rewards from last step at 270 are lost (left on distrib)
-  CHECK_STATS(beos.distrib, "0.0000 PROXY", "75000002.0000 BEOS", "10000294552"); //+DEFAULT_RAM
+  CHECK_STATS(beos.distrib, "0.0000 PROXY", "75000002.0000 BEOS", "10000295552"); //+DEFAULT_RAM
 
 } FC_LOG_AND_RETHROW()
 
@@ -3250,7 +3250,7 @@ BOOST_FIXTURE_TEST_CASE( main_commands_test_4, eosio_interchain_tester ) try {
   CHECK_STATS(dan,      "0.0000 PROXY", "8333333.3333 BEOS", "1666666666");
   //note: beos rewards from staps at 260 and 270 are lost (left on distrib), also 0.0002 left
   //from reward truncations
-  CHECK_STATS(beos.distrib, "0.0000 PROXY", "100000002.0002 BEOS", "294552"); //+DEFAULT_RAM
+  CHECK_STATS(beos.distrib, "0.0000 PROXY", "100000002.0002 BEOS", "295552"); //+DEFAULT_RAM
 
 } FC_LOG_AND_RETHROW()
 

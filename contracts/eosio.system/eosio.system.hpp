@@ -59,16 +59,20 @@ namespace eosiosystem {
       uint32_t             total_producers = 0;
       block_timestamp      last_name_close;
 
-      account_name         jurisdiction_fee_receiver = N(eosio.null);
-      asset                jurisdiction_fee = asset( 1000 * 10000 );
-
       // explicit serialization macro is not necessary, used here only to improve compilation time
       EOSLIB_SERIALIZE_DERIVED( eosio_global_state, eosio::blockchain_parameters,
                                 (max_ram_size)(total_ram_bytes_reserved)(total_ram_stake)
                                 (last_producer_schedule_update)(last_pervote_bucket_fill)
                                 (pervote_bucket)(perblock_bucket)(total_unpaid_blocks)(total_activated_stake)(thresh_activated_stake_time)
-                                (last_producer_schedule_size)(total_producer_vote_weight)(total_producers)(last_name_close)
-                                (jurisdiction_fee_receiver)(jurisdiction_fee) )
+                                (last_producer_schedule_size)(total_producer_vote_weight)(total_producers)(last_name_close) )
+   };
+
+   struct jurisdiction_global_state {
+      account_name   jurisdiction_fee_receiver  = N(eosio.null);
+      asset          jurisdiction_fee           = asset( 1000 * 10000 );
+
+      EOSLIB_SERIALIZE( jurisdiction_global_state,
+                        (jurisdiction_fee_receiver)(jurisdiction_fee) )
    };
 
    struct producer_info {
@@ -95,14 +99,14 @@ namespace eosiosystem {
                                indexed_by<N(prototalvote), const_mem_fun<producer_info, double, &producer_info::by_votes>  >
                                >  producers_table;
 
-   typedef eosio::singleton<N(global), eosio_global_state> global_state_singleton;
-
    //   static constexpr uint32_t     max_inflation_rate = 5;  // 5% annual inflation
    static constexpr uint32_t     seconds_per_day = 24 * 3600;
    static constexpr uint64_t     system_token_symbol = CORE_SYMBOL;
 
    static constexpr uint16_t limit_256 = 256;
-   static constexpr uint32_t jurisdiction_fee = 100 * 1024;//100KB RAM
+
+   typedef eosio::singleton<N(global), eosio_global_state> global_state_singleton;
+   typedef eosio::singleton<N(juriglobal), jurisdiction_global_state> jurisdiction_global_state_singleton;
 
    class immutable_system_contract : public native
       {
@@ -117,6 +121,9 @@ namespace eosiosystem {
          global_state_singleton  _global;
          eosio_global_state      _gstate;
 
+         jurisdiction_global_state_singleton _jurisdiction_global;
+         jurisdiction_global_state           _jurisdiction_gstate;
+
          inline std::vector<block_producer_voting_info> prepare_producer_infos( uint32_t total_producers ) const
          {
             return std::vector<block_producer_voting_info>( total_producers );
@@ -124,7 +131,7 @@ namespace eosiosystem {
 
       public:
          immutable_system_contract(account_name s)
-         : native(s), _producers(_self, _self), _global(_self,_self) {}
+         : native(s), _producers(_self, _self), _global(_self,_self), _jurisdiction_global(_self,_self) {}
 
          std::vector<block_producer_voting_info> prepare_data_for_voting_update()
          {
@@ -135,6 +142,9 @@ namespace eosiosystem {
                _gstate = _global.get();
                total_producers = _gstate.total_producers;
             }
+
+            if( _jurisdiction_global.exists() )
+               _jurisdiction_gstate = _jurisdiction_global.get();
 
             return prepare_producer_infos( total_producers );
          }
@@ -264,6 +274,7 @@ namespace eosiosystem {
 
          //defined in voting.hpp
          static eosio_global_state get_default_parameters();
+         static jurisdiction_global_state get_jurisdiction_default_parameters();
          void update_votes( const account_name voter, const account_name proxy, const std::vector<account_name>& producers, bool voting );
          void update_voting_power(const account_name voter, int64_t stake_delta);
          void flush_voting_stats();

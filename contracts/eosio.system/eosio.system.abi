@@ -321,7 +321,12 @@
          {"name":"last_producer_schedule_size",   "type":"uint16"},
          {"name":"total_producer_vote_weight",    "type":"float64"},
          {"name":"total_producers",               "type":"uint32"},
-         {"name":"last_name_close",               "type":"block_timestamp_type"},
+         {"name":"last_name_close",               "type":"block_timestamp_type"}
+      ]
+    },{
+      "name": "jurisdiction_global_state",
+      "base": "",
+      "fields": [
          {"name":"jurisdiction_fee_receiver",     "type":"account_name"},
          {"name":"jurisdiction_fee",              "type":"asset"}
       ]
@@ -641,6 +646,13 @@
     {
       "name": "global",
       "type": "eosio_global_state",
+      "index_type": "i64",
+      "key_names": [],
+      "key_types": []
+    },
+    {
+      "name": "juriglobal",
+      "type": "jurisdiction_global_state",
       "index_type": "i64",
       "key_names": [],
       "key_types": []

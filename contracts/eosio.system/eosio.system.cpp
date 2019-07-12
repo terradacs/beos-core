@@ -23,6 +23,11 @@ namespace eosiosystem {
          _min_activated_stake = get_min_activated_stake( &_min_activated_stake_percent );
       }
 
+      if (_jurisdiction_global.exists() == false)
+         _jurisdiction_gstate = get_jurisdiction_default_parameters();
+      else
+         _jurisdiction_gstate = _jurisdiction_global.get();
+
       flush_voting_stats();
 
       auto itr = _rammarket.find(S(4,RAMCORE));
@@ -67,10 +72,15 @@ namespace eosiosystem {
       return dp;
    }
 
+   jurisdiction_global_state system_contract::get_jurisdiction_default_parameters() {
+      jurisdiction_global_state dp;
+      return dp;
+   }
 
    system_contract::~system_contract() {
       //print( "destruct system\n" );
       _global.set(_gstate, _self);
+      _jurisdiction_global.set(_jurisdiction_gstate, _self);
       //eosio_exit(0);
       }
 

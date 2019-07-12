@@ -550,7 +550,7 @@ namespace eosio { namespace testing {
         starting_block_for_initial_witness_election(100),
         beos(240, 270, 10, 1'000'0000),
         ram(240, 248, 4, 0),
-        ram_leftover(300000)
+        ram_leftover(301000)
         {
            proxy_assets.emplace_back(0, symbol(SY(4, PROXY)));
         }

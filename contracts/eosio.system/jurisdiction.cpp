@@ -26,7 +26,7 @@ namespace eosiosystem {
       {
          //Preventing against spamming
          INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {ram_payer,N(active)},
-                                                         { ram_payer, _gstate.jurisdiction_fee_receiver, _gstate.jurisdiction_fee, "jurisdiction fee" } );
+                                                         { ram_payer, _jurisdiction_gstate.jurisdiction_fee_receiver, _jurisdiction_gstate.jurisdiction_fee, "jurisdiction fee" } );
       }
       eosio::print("Leaving system_contract::addjurisdict\n");
    }
