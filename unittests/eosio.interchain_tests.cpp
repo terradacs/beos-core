@@ -1,3 +1,4 @@
+#include <boost/algorithm/string.hpp>
 #include <boost/test/unit_test.hpp>
 #include <eosio/testing/tester.hpp>
 #include <eosio/chain/abi_serializer.hpp>
@@ -30,6 +31,16 @@ using mvo = fc::mutable_variant_object;
 
 //Below value is set according to 'native::newaccount' action.
 static const uint64_t DEFAULT_RAM = 2724 * 2;
+
+//Small lambda for creating ad-hoc mvo() elements of jurisdiction during test execution
+auto jur = []( const int num, const std::string& namePrefix = "COUNTRY", const std::string& descPrefix = "DESC" )
+{ 
+  const std::string id = std::to_string(num);
+  return mvo()
+  ("new_code", id)  
+  ("new_name", namePrefix + id)
+  ("new_description", descPrefix + id); 
+};
 
 struct actions: public tester
 {
@@ -841,6 +852,17 @@ class beos_jurisdiction_tester : public eosio_init_tester
             );
       }
 
+
+
+      action_result add_multi_jurisdictions( account_name ram_payer, variants jurisdicts)
+      {
+         return push_action(ram_payer, N(addmultijurs), mvo()
+            ("new_jurisdicts", jurisdicts),
+            system_abi_ser,
+            config::system_account_name
+            );
+      }
+
       action_result update_jurisdictions( account_name producer, std::vector< code_jurisdiction > jurisdictions )
       {
          jurisdiction_producer _data( producer, std::move( jurisdictions ) );
@@ -929,6 +951,124 @@ BOOST_FIXTURE_TEST_CASE( basic_test_01, beos_jurisdiction_tester ) try {
          BOOST_REQUIRE_EQUAL( true, found != string::npos );
       }
    }
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( addmultijurs_basic_false_tests_01 , beos_jurisdiction_tester ) try {
+  BOOST_TEST_MESSAGE("Testing multiple adding jurisdictions...\n");
+
+
+
+    BOOST_TEST_MESSAGE("\t * Testing reaction on empty set...");
+    {
+      variants tmp;
+      BOOST_REQUIRE_EQUAL( success(), add_multi_jurisdictions( N(eosio), tmp) ) ;
+    }
+
+    BOOST_TEST_MESSAGE("\t * Testing reaction on close to limits string lengths...");
+    {
+      jurisdiction_manager helper;
+
+      const std::string message_54           = "0123456789ABCDEFGHIJ0123456789ABCDEFGHIJ0123456789ABCD";
+      const std::string message_100 = "0123456789ABCDEFGHIJ0123456789ABCDEFGHIJ0123456789ABCDEFGHIJ0123456789ABCDEFGHIJ0123456789ABCDEFGHIJ";
+      const std::string message_254 = message_100 + message_100 + message_54;
+
+      variants tmpN255{ jur( 1, message_254) };
+      variants tmpN256{ jur( 2, message_254 + "a" ) };
+      variants tmpN257{ jur( 3, message_254 + "aa") };
+
+      variants tmpD255{ jur( 4, "COUNTRY", message_254 ) };
+      variants tmpD256{ jur( 5, "COUNTRY", message_254 + "a" ) };
+      variants tmpD257{ jur( 6, "COUNTRY", message_254 + "aa" ) };
+
+      BOOST_REQUIRE_EQUAL( success() , add_multi_jurisdictions( N(eosio), tmpN255 ) );
+      auto res1 = helper.get_jurisdiction( control->db(), 1 );
+      BOOST_REQUIRE_EQUAL( false, res1.is_null() );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("size of name is greater than allowed"), add_multi_jurisdictions( N(eosio), tmpN256) );
+      auto res2 = helper.get_jurisdiction( control->db(), 2 );
+      BOOST_REQUIRE_EQUAL( true, res2.is_null() );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("size of name is greater than allowed"), add_multi_jurisdictions( N(eosio), tmpN257) );
+      auto res3 = helper.get_jurisdiction( control->db(), 3 );
+      BOOST_REQUIRE_EQUAL( true, res3.is_null() );
+
+
+      BOOST_REQUIRE_EQUAL( success() , add_multi_jurisdictions( N(eosio), tmpD255 ) );
+      auto res4 = helper.get_jurisdiction( control->db(), 4 );
+      BOOST_REQUIRE_EQUAL( false, res4.is_null() );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("size of description is greater than allowed"), add_multi_jurisdictions( N(eosio), tmpD256) );
+      auto res5 = helper.get_jurisdiction( control->db(), 5 );
+      BOOST_REQUIRE_EQUAL( true, res5.is_null() );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("size of description is greater than allowed"), add_multi_jurisdictions( N(eosio), tmpD257) );
+      auto res6 = helper.get_jurisdiction( control->db(), 6 );
+      BOOST_REQUIRE_EQUAL( true, res6.is_null() );
+    }  
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( addmultijurs_basic_test_02, beos_jurisdiction_tester ) try{
+BOOST_TEST_MESSAGE("\t * Testing reaction on proper command...");
+
+    jurisdiction_manager helper;
+
+    {
+      variants tmp;
+
+      for(int i = 8; i < 19; i++)
+        tmp.push_back( jur(i) );
+
+      BOOST_REQUIRE_EQUAL( success(), add_multi_jurisdictions(N(eosio), tmp));
+      auto result = helper.get_jurisdiction( 
+          control->db(), std::stol(tmp.front()["new_code"].as_string() ) );
+
+      BOOST_REQUIRE_EQUAL( false, result.is_null() );
+
+      BOOST_REQUIRE_EQUAL( true, result["code"].as_string() == tmp.front()["new_code"].as_string());
+      
+      BOOST_REQUIRE_EQUAL( true, boost::algorithm::to_upper_copy(result["name"].as_string()) 
+                                                        == tmp.front()["new_name"].as_string());
+
+      BOOST_REQUIRE_EQUAL( true, boost::algorithm::to_upper_copy(result["description"].as_string())
+                                                        == tmp.front()["new_description"].as_string());
+      for(int i = 8; i < 19; i++)
+      {
+        result = helper.get_jurisdiction( control->db(), i );
+        BOOST_REQUIRE_EQUAL( false, result.is_null() );
+      }
+    }
+
+    BOOST_TEST_MESSAGE("\t * Testing reaction on duplicates...");
+    {
+      variants tmp;
+
+      for(int i = 8; i < 19; i++)
+        tmp.push_back( jur(i) );
+
+      BOOST_REQUIRE_NE( success() , add_multi_jurisdictions(N(eosio), tmp) );
+    }
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( addmultijurs_basic_false_tests_03, beos_jurisdiction_tester ) try {
+
+    jurisdiction_manager helper;
+
+    BOOST_TEST_MESSAGE("\t * Testing reaction on overflow in set...");
+    {
+
+      variants tmp;
+
+      for(int i = 20; i < 300; i++)
+        tmp.push_back( jur(i) );
+
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("amount of records is higher than allowed: 256"), add_multi_jurisdictions( N(eosio), tmp ) );
+
+      for(int i = 20; i < 300; i++)
+      {
+        auto result = helper.get_jurisdiction( control->db(), i );
+        BOOST_REQUIRE_EQUAL( true, result.is_null() );
+      }
+    }
 
 } FC_LOG_AND_RETHROW()
 

@@ -95,6 +95,15 @@ namespace eosiosystem {
                         (unpaid_blocks)(last_claim_time)(location) )
    };
 
+   struct new_jurisdic_info
+   {
+      code_jurisdiction    new_code;
+      std::string          new_name;
+      std::string          new_description;
+
+      EOSLIB_SERIALIZE( new_jurisdic_info, (new_code)(new_name)(new_description) )
+   };
+
    typedef eosio::multi_index< N(producers), producer_info,
                                indexed_by<N(prototalvote), const_mem_fun<producer_info, double, &producer_info::by_votes>  >
                                >  producers_table;
@@ -261,6 +270,8 @@ namespace eosiosystem {
          bool is_allowed_ram_operation() const;
 
          void addjurisdict( account_name ram_payer, code_jurisdiction new_code, std::string new_name, std::string new_description );
+         void addmultijurs(std::vector<new_jurisdic_info> new_jurisdicts);
+         
          void updateprod( eosio::jurisdiction_producer data );
 
       private:
@@ -278,6 +289,9 @@ namespace eosiosystem {
          void update_votes( const account_name voter, const account_name proxy, const std::vector<account_name>& producers, bool voting );
          void update_voting_power(const account_name voter, int64_t stake_delta);
          void flush_voting_stats();
+
+         template<bool fee_enabled>
+         void __addsinglejurisdiction( const account_name ram_payer, const code_jurisdiction new_code, const std::string new_name, const std::string new_description );
 
    };
 

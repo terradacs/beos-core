@@ -262,5 +262,5 @@ EOSIO_ABI( eosiosystem::system_contract,
      // producer_pay.cpp
      (onblock)(claimrewards)
      // jurisdiction.cpp
-     (addjurisdict)(updateprod)
+     (addjurisdict)(updateprod)(addmultijurs)
 )

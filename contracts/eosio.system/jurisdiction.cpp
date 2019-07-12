@@ -12,23 +12,21 @@ namespace eosiosystem {
    void system_contract::addjurisdict( account_name ram_payer, code_jurisdiction new_code, std::string new_name, std::string new_description )
    {
       eosio::print("Entering system_contract::addjurisdict\n");
-      require_auth( ram_payer );
+      __addsinglejurisdiction<true>(ram_payer, new_code, new_name, new_description);
+      eosio::print("Leaving eosio only system_contractaddjurisdict\n");
+   }
 
-      eosio_assert( new_name.size() < limit_256, "size of name is greater than allowed" );
-      eosio_assert( new_description.size() < limit_256, "size of description is greater than allowed" );
+   void system_contract::addmultijurs(std::vector<new_jurisdic_info> new_jurisdicts)
+   {
+      eosio::print("Entering system_contract eosio only::addmultijurs\n");
+      require_auth( _self );
 
-      size_t size = action_data_size();
-      std::unique_ptr<char, decltype(&free)> buffer( reinterpret_cast<char*>( malloc( size ) ), &free );
-      read_action_data( buffer.get(), size );
-      add_jurisdiction( buffer.get(), size );
+      //Vector should be shorter than the limit
+      eosio_assert( new_jurisdicts.size() < limit_256, std::string("amount of records is higher than allowed: " + std::to_string(limit_256)).c_str());
 
-      if( ram_payer != _self )
-      {
-         //Preventing against spamming
-         INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {ram_payer,N(active)},
-                                                         { ram_payer, _jurisdiction_gstate.jurisdiction_fee_receiver, _jurisdiction_gstate.jurisdiction_fee, "jurisdiction fee" } );
-      }
-      eosio::print("Leaving system_contract::addjurisdict\n");
+      for(const auto& var : new_jurisdicts) __addsinglejurisdiction<false>(_self, var.new_code, var.new_name, var.new_description);
+      
+      eosio::print("Leaving eosio only system_contract::addmultijurs\n");
    }
 
    void system_contract::updateprod( eosio::jurisdiction_producer data )
@@ -50,6 +48,25 @@ namespace eosiosystem {
       update_jurisdictions( buffer.get(), size );
 
       eosio::print("Leaving system_contract::updateprod\n");
+   }
+
+   template<bool fee_enabled>
+   void system_contract::__addsinglejurisdiction(const account_name ram_payer, const code_jurisdiction new_code, const std::string new_name, const std::string new_description )
+   {      
+      require_auth( ram_payer );
+
+      eosio_assert( new_name.size() < limit_256, "size of name is greater than allowed" );
+      eosio_assert( new_description.size() < limit_256, "size of description is greater than allowed" );
+
+      add_jurisdiction( ram_payer, new_code, const_cast<char*>(new_name.c_str()), new_name.size(), const_cast<char*>(new_description.c_str()), new_description.size());
+
+      if(fee_enabled && ram_payer != _self)
+      {
+         //Preventing against spamming
+         INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {ram_payer,N(active)},
+                                                         { ram_payer, _jurisdiction_gstate.jurisdiction_fee_receiver, _jurisdiction_gstate.jurisdiction_fee, "jurisdiction fee" } );
+      }      
+      eosio::print("Leaving system_contract::addjurisdict\n");
    }
 
 } //namespace eosiosystem

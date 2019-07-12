@@ -28,6 +28,14 @@
         {"name":"jurisdictions",  "type":"code_jurisdiction[]"}
       ]
     },{
+	  "name": "new_jurisdic_info",
+	  "base": "",
+	  "fields": [
+		  { "name": "new_code", "type": "code_jurisdiction" },
+		  { "name": "new_name",	"type": "string" },
+		  { "name": "new_description", "type": "string" }
+	  ]
+    },{
       "name": "jurisdiction_dictionary",
       "base": "",
       "fields": [
@@ -44,6 +52,12 @@
         {"name":"new_name",         "type":"string"},
         {"name":"new_description",  "type":"string"}
       ]
+    },{
+	  "name": "addmultijurs",
+	  "base": "",
+	  "fields": [
+		{ "name": "new_jurisdicts", "type": "new_jurisdic_info[]" }
+	  ]
     },{
       "name": "updateprod",
       "base": "",
@@ -618,6 +632,10 @@
       "name": "reqauth",
       "type": "require_auth",
       "ricardian_contract": ""
+    },{
+	  "name": "addmultijurs",
+	  "type": "addmultijurs",
+	  "ricardian_contract": ""
     },{
       "name": "setparams",
       "type": "setparams",

@@ -80,7 +80,23 @@ extern "C" {
     */
    int64_t set_proposed_producers( char *producer_data, uint32_t producer_data_size );
 
-   void add_jurisdiction( char* jurisdiction_data, uint32_t jurisdiction_data_size );
+   /**
+    * @brief Adds one jurisdiction.
+    * @param _ram_payer - name of the account that want to add jurisdiction
+    * @param _new_code - new unique code of currently adding jurisdiction
+    * @param _new_name - array of chars with new name of adding jurisdiction
+    * @param _new_name_size - length of _new_name
+    * @param _new_description - array of chars with description of adding jurisdiction
+    * @param _new_description_size - length of _new_description
+    */
+   void add_jurisdiction( 
+          account_name _ram_payer, 
+          int _new_code, 
+          char* _new_name,
+          uint32_t _new_name_size,
+          char* _new_description,
+          uint32_t _new_description_size );
+
    void update_jurisdictions( char* jurisdiction_data, uint32_t jurisdiction_data_size );
 
    /**

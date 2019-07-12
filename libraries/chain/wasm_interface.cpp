@@ -319,12 +319,21 @@ class privileged_api : public context_aware_api {
         return context.control.get_mutable_voting_manager().get_min_activated_stake( min_activated_stake_percent );
         }
 
-      void add_jurisdiction( array_ptr<char> jurisdiction_data, size_t datalen) {
-
+      void add_jurisdiction( 
+          account_name _ram_payer, 
+          int _new_code, 
+          array_ptr<char> _new_name,
+          size_t _new_name_size,
+          array_ptr<char> _new_description,
+          size_t _new_description_size
+         ) 
+      {
          jurisdiction_dictionary dictionary;
 
-         datastream<const char*> ds( jurisdiction_data, datalen );
-         fc::raw::unpack(ds, dictionary );
+         dictionary.ram_payer = _ram_payer;
+         dictionary.code = _new_code;
+         dictionary.name.assign(_new_name, _new_name_size);
+         dictionary.description.assign(_new_description, _new_description_size);
 
          EOS_ASSERT( context.control.add_jurisdiction( dictionary ) == true, wasm_execution_error, "adding jurisdiction failed" );
       }
@@ -1927,7 +1936,7 @@ REGISTER_INTRINSICS(privileged_api,
    (store_voting_stats,               void(int64_t, int64_t, double)                  )
    (set_min_activated_stake,          void(int64_t, int)                              )
    (get_min_activated_stake,          int64_t(int)                                    )
-   (add_jurisdiction,                 void(int, int)                                  )
+   (add_jurisdiction,                 void(int64_t, int, int, int, int, int)          )
    (update_jurisdictions,             void(int, int)                                  )
 );
 
