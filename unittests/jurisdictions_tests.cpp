@@ -58,7 +58,7 @@ BOOST_FIXTURE_TEST_CASE( basic_test, jurisdiction_tester ) try {
 
    //Saving data
    extensions_type any_extension;
-   any_extension.push_back( std::make_pair( idx, bytes_stream ) );
+   any_extension.push_back( extension_storage{ idx, bytes_stream } );
 
    //Deserializing
    jurisdiction_manager reader;
@@ -94,7 +94,7 @@ BOOST_FIXTURE_TEST_CASE( basic_test_01, jurisdiction_tester ) try {
    //Saving data
    extensions_type any_extension;
    for( const auto& item : buffers )
-      any_extension.emplace_back( std::make_pair( idx, item ) );
+      any_extension.emplace_back( extension_storage{ idx, item } );
 
    //Deserializing
    jurisdiction_manager reader;

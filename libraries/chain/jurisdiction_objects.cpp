@@ -191,7 +191,7 @@ jurisdiction_manager::jurisdictions jurisdiction_manager::read( const extensions
 
    for( const auto& item : exts )
    {
-      cnt += read( std::get<0>( item ), std::get<1>( item ), res );
+      cnt += read( item.type, item.data, res );
       FC_ASSERT( cnt < limit_256, "$(str)",("str",too_many_jurisdictions_exception) );
    }
 

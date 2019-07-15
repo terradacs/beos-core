@@ -199,12 +199,25 @@ namespace eosio { namespace chain {
    using bytes               = vector<char>;
    using code_jurisdiction   = uint16_t;
    /**
-    *  Extentions are prefixed with type and are a buffer that can be
+    *  Extensions are prefixed with a type and a buffer that can be
     *  interpreted by code that is aware and ignored by unaware code.
     */
-   typedef vector<std::pair<uint16_t,vector<char>>> extensions_type;
+
+   struct extension_storage
+   {
+      uint16_t type;
+      std::vector<char> data;
+      
+      extension_storage() {}
+
+      extension_storage(uint16_t _type, const vector<char>& _data)
+         :type{_type}, data{_data} {}
+   };   
+
+   typedef vector<extension_storage> extensions_type;
 
 
 } }  // eosio::chain
 
 FC_REFLECT( eosio::chain::void_t, )
+FC_REFLECT( eosio::chain::extension_storage, (type)(data) )

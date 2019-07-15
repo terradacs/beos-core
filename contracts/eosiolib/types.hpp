@@ -7,10 +7,17 @@
 #include <functional>
 #include <tuple>
 #include <string>
+#include <vector>
 
 namespace eosio {
 
-   typedef std::vector<std::tuple<uint16_t,std::vector<char>>> extensions_type;
+   struct extension_storage
+   {
+      uint16_t type;
+      std::vector<char> data;
+   };
+
+   typedef std::vector<extension_storage> extensions_type;
 
    /**
     *  Converts a base32 symbol into its binary representation, used by string_to_name()
