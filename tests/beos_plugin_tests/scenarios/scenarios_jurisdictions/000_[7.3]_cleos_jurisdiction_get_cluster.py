@@ -1,12 +1,15 @@
 #!/usr/bin/python3
 
-from beos_test_utils.beos_utils_pack import init, start_cluster, ActionResult, ResourceResult, VotersResult
 import os
 import sys
 import time
 import datetime
 import requests
 import json
+
+currentdir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(os.path.dirname(currentdir)))
+from beos_test_utils.beos_utils_pack import init, start_cluster, ActionResult, ResourceResult, VotersResult
 
 def extract(resSTR):
 	resSTR = resSTR.replace("producer_jurisdictions", "").replace(
@@ -27,9 +30,6 @@ def generate_names_array(amount):
 
 def long_names(length : int, word : str = "x"):
     return word*length
-
-currentdir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.dirname(os.path.dirname(currentdir)))
 
 number_of_pnodes = 3
 producer_per_node = 1
@@ -158,12 +158,12 @@ if __name__ == "__main__":
 
 		# get producer_jurisdiction
 		resINT, resSTR = cluster.bios.make_cleos_call(
-			["get", "producer_jurisdiction", f'[ {generate_names_array(3000)} ]'])
+			["get", "producer_jurisdiction", '[ {} ]'.format(generate_names_array(3000))])
 		summary.equal(True, str(resSTR).find(
 			"Query size is greater than query limit") != -1, "there should be error")
 		summary.equal(True, resINT != 0, "this querry should crash")
 
-		resINT, resSTR = cluster.bios.make_cleos_call(["get", "producer_jurisdiction", f'[ "{ long_names(2000) }" ]'])
+		resINT, resSTR = cluster.bios.make_cleos_call(["get", "producer_jurisdiction", '[ "{}" ]'.format(long_names(2000))])
 		summary.equal(True, str(resSTR).find("Invalid name") == -1, "there shouldn't be an error")
 		summary.equal(True, resINT == 0, "this querry shouldn't crash")
 
