@@ -73,7 +73,7 @@ if __name__ == "__main__":
 		# Checking is there no jurisdictions
         rpc = node.get_url_caller()
         response = rpc.chain.get_table_rows({"scope": "eosio", "code": "eosio", "table": "infojurisdic", "json": True})
-        log.info(f"response {response}")
+        log.info("response {}".format(response))
         summary.equal(True, len(response["rows"]) == 0, "There should be no jurisdictions.")
 
         # PREPARING
@@ -90,11 +90,11 @@ if __name__ == "__main__":
                                                "eosio"])
 
         # get producer_jurisdiction
-        resINT, resSTR = node.make_cleos_call(["get", "producer_jurisdiction", f'[ {generate_names_array(3000)} ]'])
+        resINT, resSTR = node.make_cleos_call(["get", "producer_jurisdiction", '[ {} ]'.format(generate_names_array(3000))])
         summary.equal(True, str(resSTR).find("Query size is greater than query limit") != -1, "there should be error")
         summary.equal(True, resINT != 0, "this querry should crash")
 
-        resINT, resSTR = node.make_cleos_call(["get", "producer_jurisdiction", f'[ "{long_names(2000)}" ]'])
+        resINT, resSTR = node.make_cleos_call(["get", "producer_jurisdiction", '[ "{}" ]'.format(long_names(2000))])
         summary.equal(True, str(resSTR).find("Invalid name") != -1, "there should be error")
         summary.equal(True, resINT != 0, "this querry should crash")
 

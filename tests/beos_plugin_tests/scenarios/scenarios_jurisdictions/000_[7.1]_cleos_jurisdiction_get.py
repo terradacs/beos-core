@@ -65,7 +65,7 @@ if __name__ == "__main__":
         #Checking is there no jurisdictions
 		rpc = node.get_url_caller()
 		response = rpc.chain.get_table_rows({"scope":"eosio", "code":"eosio", "table":"infojurisdic", "json": True})
-		log.info(f"response {response}")
+		log.info("response {}".format(response))
 		summary.equal(True, len(response["rows"]) == 0, "There should be no jurisdictions.")
 		
 		# len({ ID, name, description }) == 3

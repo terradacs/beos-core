@@ -1,12 +1,15 @@
 #!/usr/bin/python3
 
-from beos_test_utils.beos_utils_pack import init, start_cluster, ActionResult, ResourceResult, VotersResult
 import os
 import sys
 import time
 import datetime
 import requests
 import json
+
+currentdir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(os.path.dirname(currentdir)))
+from beos_test_utils.beos_utils_pack import init, start_cluster, ActionResult, ResourceResult, VotersResult
 
 def extract(resSTR):
 	resSTR = resSTR.replace("producer_jurisdictions", "").replace(
@@ -27,10 +30,6 @@ def generate_names_array(amount):
 
 def long_names(length : int, word : str = "x"):
 	return word*length
-
-
-currentdir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.dirname(os.path.dirname(currentdir)))
 
 number_of_pnodes = 3
 producer_per_node = 1
@@ -167,7 +166,7 @@ if __name__ == "__main__":
 		"charged wrong amount of fee")
 
 		resINT, resSTR = cluster.bios.make_cleos_call(["push", "action", "eosio", "updatejurfee",
-		 f'["{2*CONST_ORGINAL_FEE_VALUE_INT}.0000 BEOS"]', "-p", "eosio"])
+		 '["{}.0000 BEOS"]'.format(2*CONST_ORGINAL_FEE_VALUE_INT), "-p", "eosio"])
 		summary.equal(0, resINT, "something goes wrong during `updatejurfee`")
 		log.info(resSTR)
 
