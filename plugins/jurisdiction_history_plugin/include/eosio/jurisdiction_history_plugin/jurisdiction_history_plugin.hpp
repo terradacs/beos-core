@@ -8,7 +8,7 @@ namespace eosio
   namespace jurisdiction_history_apis
   {
     constexpr uint16_t JURISDICTION_HISTORY_QUERY_LIMIT = 1000;
-    class read_write
+    class read_only
     {
       public:
 
@@ -65,20 +65,20 @@ namespace eosio
         get_producer_jurisdiction_for_block_results get_producer_jurisdiction_for_block(const get_producer_jurisdiction_for_block_params &params);
         get_producer_jurisdiction_history_results get_producer_jurisdiction_history(const get_producer_jurisdiction_history_params &params);
 
-        read_write(controller& db, const fc::microseconds& abi_serializer_max_time) : 
+        read_only(const controller& db, const fc::microseconds& abi_serializer_max_time) : 
           db(db), 
           abi_serializer_max_time( abi_serializer_max_time ) 
         {
 
         }
 
-        ~read_write()
+        ~read_only()
         {
 
         }
 
       private:
-        controller& db;
+        const controller& db;
         const fc::microseconds abi_serializer_max_time;
 
         void get_producer_data( const get_producer_jurisdiction_for_block_params &params, get_all_producer_jurisdiction_for_block_results& dst );
@@ -98,16 +98,16 @@ namespace eosio
       void plugin_startup();
       void plugin_shutdown();
 
-      jurisdiction_history_apis::read_write get_read_write_api() const;
+      jurisdiction_history_apis::read_only get_read_only_api() const;
 
     private:
       std::unique_ptr<class jurisdiction_history_plugin_impl> my;
   };
 }
 
-FC_REFLECT(eosio::jurisdiction_history_apis::read_write::get_all_producer_jurisdiction_for_block_params, (block_number));
-FC_REFLECT(eosio::jurisdiction_history_apis::read_write::get_producer_jurisdiction_for_block_params, (producer)(block_number));
-FC_REFLECT(eosio::jurisdiction_history_apis::read_write::jurisdiction_history_api_object, (producer_name)(block_with_last_change)(date_changed)(new_jurisdictions));
-FC_REFLECT(eosio::jurisdiction_history_apis::read_write::get_producer_jurisdiction_for_block_results, (producer_jurisdiction_for_block));
-FC_REFLECT(eosio::jurisdiction_history_apis::read_write::get_producer_jurisdiction_history_params, (producer)(from_date)(to_date)(limit));
-FC_REFLECT(eosio::jurisdiction_history_apis::read_write::get_producer_jurisdiction_history_results, (producer_jurisdiction_history));
+FC_REFLECT(eosio::jurisdiction_history_apis::read_only::get_all_producer_jurisdiction_for_block_params, (block_number));
+FC_REFLECT(eosio::jurisdiction_history_apis::read_only::get_producer_jurisdiction_for_block_params, (producer)(block_number));
+FC_REFLECT(eosio::jurisdiction_history_apis::read_only::jurisdiction_history_api_object, (producer_name)(block_with_last_change)(date_changed)(new_jurisdictions));
+FC_REFLECT(eosio::jurisdiction_history_apis::read_only::get_producer_jurisdiction_for_block_results, (producer_jurisdiction_for_block));
+FC_REFLECT(eosio::jurisdiction_history_apis::read_only::get_producer_jurisdiction_history_params, (producer)(from_date)(to_date)(limit));
+FC_REFLECT(eosio::jurisdiction_history_apis::read_only::get_producer_jurisdiction_history_results, (producer_jurisdiction_history));

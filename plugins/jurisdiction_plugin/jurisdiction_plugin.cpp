@@ -39,18 +39,18 @@ namespace eosio {
 
   }
 
-  jurisdiction_apis::read_write jurisdiction_plugin::get_read_write_api() const
+  jurisdiction_apis::read_only jurisdiction_plugin::get_read_only_api() const
   {
     controller& c = my->chain_plug->chain();
-    return jurisdiction_apis::read_write(c, my->chain_plug->get_abi_serializer_max_time());
+    return jurisdiction_apis::read_only(c, my->chain_plug->get_abi_serializer_max_time());
   }
 
   namespace jurisdiction_apis
   {
-    read_write::get_producer_jurisdiction_results read_write::get_producer_jurisdiction(const get_producer_jurisdiction_params &prod_jur_params)
+    read_only::get_producer_jurisdiction_results read_only::get_producer_jurisdiction(const get_producer_jurisdiction_params &prod_jur_params)
     {
       EOS_ASSERT(prod_jur_params.producer_names.size() <= JURISDICTION_QUERY_LIMIT, fc::invalid_arg_exception, "Query size is greater than query limit (${n})", ("n", JURISDICTION_QUERY_LIMIT));
-      read_write::get_producer_jurisdiction_results ret;
+      read_only::get_producer_jurisdiction_results ret;
       std::map<chain::account_name, std::vector<chain::code_jurisdiction> > producer_jurisdictions_map;
       try 
       {
@@ -97,10 +97,10 @@ namespace eosio {
       return ret;
     }
 
-    read_write::get_active_jurisdictions_results read_write::get_active_jurisdictions(const get_active_jurisdictions_params &params)
+    read_only::get_active_jurisdictions_results read_only::get_active_jurisdictions(const get_active_jurisdictions_params &params)
     {
       EOS_ASSERT(params.limit <= JURISDICTION_QUERY_LIMIT, fc::invalid_arg_exception, "Invalid value for limit ${s} > ${n}", ("s", params.limit)("n", JURISDICTION_QUERY_LIMIT));
-      read_write::get_active_jurisdictions_results ret;
+      read_only::get_active_jurisdictions_results ret;
       try 
       {
         const auto &idx_by_prod = db.db().get_index<chain::jurisdiction_producer_index, chain::by_producer_jurisdiction>();
@@ -138,10 +138,10 @@ namespace eosio {
       return ret;
     }
 
-    read_write::get_all_jurisdictions_results read_write::get_all_jurisdictions(const get_all_jurisdictions_params &all_jur_params)
+    read_only::get_all_jurisdictions_results read_only::get_all_jurisdictions(const get_all_jurisdictions_params &all_jur_params)
     {
       EOS_ASSERT(all_jur_params.limit <= JURISDICTION_QUERY_LIMIT, fc::invalid_arg_exception, "Invalid value for limit ${s} > ${n}", ("s", all_jur_params.limit)("n", JURISDICTION_QUERY_LIMIT));
-      read_write::get_all_jurisdictions_results ret;
+      read_only::get_all_jurisdictions_results ret;
       try 
       {
         const auto &idx_by_prod = db.db().get_index<chain::jurisdiction_dictionary_index, chain::by_code_jurisdiction_dictionary>();

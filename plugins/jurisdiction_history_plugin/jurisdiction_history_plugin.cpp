@@ -46,15 +46,15 @@ namespace eosio
 
   }
 
-  jurisdiction_history_apis::read_write jurisdiction_history_plugin::get_read_write_api() const
+  jurisdiction_history_apis::read_only jurisdiction_history_plugin::get_read_only_api() const
   {
     controller& c = my->chain_plug->chain();
-    return jurisdiction_history_apis::read_write(c, my->chain_plug->get_abi_serializer_max_time());
+    return jurisdiction_history_apis::read_only(c, my->chain_plug->get_abi_serializer_max_time());
   }
 
   namespace jurisdiction_history_apis
   {
-    void read_write::get_producer_data( const read_write::get_producer_jurisdiction_for_block_params &params, read_write::get_all_producer_jurisdiction_for_block_results& dst )
+    void read_only::get_producer_data( const read_only::get_producer_jurisdiction_for_block_params &params, read_only::get_all_producer_jurisdiction_for_block_results& dst )
     {
       try 
       {
@@ -101,12 +101,12 @@ namespace eosio
       }
     }
 
-    read_write::get_all_producer_jurisdiction_for_block_results read_write::get_all_producer_jurisdiction_for_block(const read_write::get_all_producer_jurisdiction_for_block_params &params)
+    read_only::get_all_producer_jurisdiction_for_block_results read_only::get_all_producer_jurisdiction_for_block(const read_only::get_all_producer_jurisdiction_for_block_params &params)
     {
       get_producer_jurisdiction_for_block_params _params;
       _params.block_number = params.block_number;
 
-      read_write::get_producer_jurisdiction_for_block_results result;
+      read_only::get_producer_jurisdiction_for_block_results result;
 
       const auto &idx_by_producer_block = db.db().get_index<chain::jurisdiction_producer_history_index, chain::by_producer_name>();
       auto itr = idx_by_producer_block.begin();
@@ -121,18 +121,18 @@ namespace eosio
       return result;
     }
 
-    read_write::get_producer_jurisdiction_for_block_results read_write::get_producer_jurisdiction_for_block(const read_write::get_producer_jurisdiction_for_block_params &params)
+    read_only::get_producer_jurisdiction_for_block_results read_only::get_producer_jurisdiction_for_block(const read_only::get_producer_jurisdiction_for_block_params &params)
     {
-      read_write::get_producer_jurisdiction_for_block_results result;
+      read_only::get_producer_jurisdiction_for_block_results result;
       get_producer_data( params, result );
 
       return result;
     }
 
-    read_write::get_producer_jurisdiction_history_results read_write::get_producer_jurisdiction_history(const read_write::get_producer_jurisdiction_history_params &params)
+    read_only::get_producer_jurisdiction_history_results read_only::get_producer_jurisdiction_history(const read_only::get_producer_jurisdiction_history_params &params)
     {
       EOS_ASSERT(params.limit <= JURISDICTION_HISTORY_QUERY_LIMIT, fc::invalid_arg_exception, "Invalid value for limit ${s} > ${n}", ("s", params.limit)("n", JURISDICTION_HISTORY_QUERY_LIMIT));
-      read_write::get_producer_jurisdiction_history_results result;
+      read_only::get_producer_jurisdiction_history_results result;
       try 
       {
         const auto &idx_by_date_changed = db.db().get_index<chain::jurisdiction_history_index, chain::by_date_changed>();

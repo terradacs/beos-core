@@ -29,18 +29,18 @@ void jurisdiction_history_api_plugin::plugin_initialize(const variables_map&)
           } \
        }}
 
-#define CHAIN_RW_CALL(call_name, http_response_code) CALL(jurisdiction_history, rw_api, jurisdiction_history_apis::read_write, call_name, http_response_code)
+#define CHAIN_RO_CALL(call_name, http_response_code) CALL(jurisdiction_history, ro_api, jurisdiction_history_apis::read_only, call_name, http_response_code)
 
 void jurisdiction_history_api_plugin::plugin_startup()
 {
    ilog( "starting jurisdiction_history_api_plugin" );
 
-   auto rw_api = app().get_plugin<jurisdiction_history_plugin>().get_read_write_api();
+   auto ro_api = app().get_plugin<jurisdiction_history_plugin>().get_read_only_api();
 
    app().get_plugin<http_plugin>().add_api({
-      CHAIN_RW_CALL(get_all_producer_jurisdiction_for_block, 200l),
-      CHAIN_RW_CALL(get_producer_jurisdiction_for_block, 200l),
-      CHAIN_RW_CALL(get_producer_jurisdiction_history, 200l)
+      CHAIN_RO_CALL(get_all_producer_jurisdiction_for_block, 200l),
+      CHAIN_RO_CALL(get_producer_jurisdiction_for_block, 200l),
+      CHAIN_RO_CALL(get_producer_jurisdiction_history, 200l)
    });
 }
 

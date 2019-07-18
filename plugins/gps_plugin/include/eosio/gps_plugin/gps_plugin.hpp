@@ -58,7 +58,7 @@ class gps_plugin : public plugin<gps_plugin>
 {
    public:
 
-      APPBASE_PLUGIN_REQUIRES((gps_plugin))
+      APPBASE_PLUGIN_REQUIRES((producer_plugin))
 
       gps_plugin();
       virtual ~gps_plugin();

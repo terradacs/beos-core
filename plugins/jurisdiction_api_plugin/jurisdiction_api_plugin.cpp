@@ -25,17 +25,17 @@ void jurisdiction_api_plugin::plugin_initialize(const variables_map&) {}
           } \
        }}
 
-#define CHAIN_RW_CALL(call_name, http_response_code) CALL(jurisdiction, rw_api, jurisdiction_apis::read_write, call_name, http_response_code)
+#define CHAIN_RO_CALL(call_name, http_response_code) CALL(jurisdiction, ro_api, jurisdiction_apis::read_only, call_name, http_response_code)
 
 void jurisdiction_api_plugin::plugin_startup() {
    ilog( "starting jurisdiction_api_plugin" );
 
-   auto rw_api = app().get_plugin<jurisdiction_plugin>().get_read_write_api();
+   auto ro_api = app().get_plugin<jurisdiction_plugin>().get_read_only_api();
 
    app().get_plugin<http_plugin>().add_api({
-      CHAIN_RW_CALL(get_producer_jurisdiction, 200l),
-      CHAIN_RW_CALL(get_active_jurisdictions, 200l),
-      CHAIN_RW_CALL(get_all_jurisdictions, 200l)
+      CHAIN_RO_CALL(get_producer_jurisdiction, 200l),
+      CHAIN_RO_CALL(get_active_jurisdictions, 200l),
+      CHAIN_RO_CALL(get_all_jurisdictions, 200l)
    });
 }
 
