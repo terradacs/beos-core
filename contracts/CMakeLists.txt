@@ -40,6 +40,7 @@ add_subdirectory(eosio.gateway)
 add_subdirectory(eosio.distribution)
 add_subdirectory(proxyinfo)
 add_subdirectory(producerjson)
+add_subdirectory(eosio.blocker)
 
 file(GLOB SKELETONS RELATIVE ${CMAKE_SOURCE_DIR}/contracts "skeleton/*")
 
