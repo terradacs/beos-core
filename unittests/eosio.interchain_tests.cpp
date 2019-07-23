@@ -13,6 +13,8 @@
 #include <eosio.gateway/eosio.gateway.abi.hpp>
 #include <eosio.distribution/eosio.distribution.wast.hpp>
 #include <eosio.distribution/eosio.distribution.abi.hpp>
+#include <eosio.blocker/eosio.blocker.wast.hpp>
+#include <eosio.blocker/eosio.blocker.abi.hpp>
 
 #include <Runtime/Runtime.h>
 
@@ -215,6 +217,8 @@ struct actions: public tester
 
 class eosio_interchain_tester : public actions
 {
+  protected:
+
   void prepare_account( account_name account, const char* _wast, const char* _abi, abi_serializer* ser = nullptr )
   {
     produce_blocks( 2 );
@@ -736,6 +740,88 @@ public:
 beos_mainnet_tester(uint64_t state_size = 1024*1024*8)
    : eosio_init_tester(state_size, 3'674'470'000'0000, 15, 164'000'000, 10'000'0000, 10'000'0000,
                        32'000'300'000, 0, 1'0000) {}
+};
+
+class beos_blocker_tester : public eosio_interchain_tester
+{
+   abi_serializer blocker_abi_ser;
+
+   public:
+
+      const std::string block_message = "transfer is blocked by manna contract";
+      const static uint64_t owner = N(manna);
+
+      bool exists( account_name account, bool from )
+      {
+         vector<char> data;
+         if( from )
+            data = get_row_by_account( owner, owner, N(fromaccounts), account );
+         else
+            data = get_row_by_account( owner, owner, N(toaccounts), account );
+
+         if( data.empty() )
+            return false;
+         else
+         {
+            auto res = blocker_abi_ser.binary_to_variant( "account_data", data, abi_serializer_max_time );
+            auto found = res[ "account" ].as<std::string>();
+            return found == account.to_string();
+         }
+      }
+
+      action_result transfer( account_name from, account_name to, asset quantity, string memo = "memo" )
+      {
+         return push_action( from, N(transfer), mvo()
+            ( "from", from)
+            ( "to", to)
+            ( "quantity", quantity)
+            ( "memo", memo),
+            token_abi_ser,
+            N(eosio.token)
+         );
+      }
+
+      action_result update_accounts( account_name account, bool from, bool insert, account_name contract_owner = owner )
+      {
+         return push_action( N(manna), N(update), mvo()
+            ( "account", account)
+            ( "from", from)
+            ( "insert", insert),
+            blocker_abi_ser,
+            contract_owner
+         );
+      }
+
+      beos_blocker_tester()
+      {
+         test_global_state tgs;
+
+         tgs.beos.starting_block = 30;
+         tgs.beos.ending_block = 30;
+         tgs.beos.block_interval = 5;
+         tgs.beos.trustee_reward = 0;
+         tgs.ram.starting_block = 30;
+         tgs.ram.ending_block = 30;
+         tgs.ram.block_interval = 5;
+         tgs.ram.trustee_reward = 0;
+
+         check_change_params( tgs );
+
+         create_account_with_resources( config::gateway_account_name, owner );
+
+         BOOST_REQUIRE_EQUAL( success(), issue( owner, asset::from_string("500.0000 PROXY") ) );
+         BOOST_REQUIRE_EQUAL( success(), issue( N(alice), asset::from_string("400.0000 PROXY") ) );
+         BOOST_REQUIRE_EQUAL( success(), issue( N(bob), asset::from_string("400.0000 PROXY") ) );
+         BOOST_REQUIRE_EQUAL( success(), issue( N(carol), asset::from_string("400.0000 PROXY") ) );
+         BOOST_REQUIRE_EQUAL( success(), issue( N(dan), asset::from_string("400.0000 PROXY") ) );
+
+         produce_blocks( 31 - control->head_block_num() );
+         BOOST_REQUIRE_EQUAL( control->head_block_num(), 31u );
+
+         prepare_account( owner, eosio_blocker_wast, eosio_blocker_abi, &blocker_abi_ser );
+         BOOST_REQUIRE_EQUAL( success(), create_currency( N(eosio.token), owner, asset::from_string("10000000000.0000 MANNA") ) );
+         BOOST_REQUIRE_EQUAL( success(), issue( owner, asset::from_string("500.0000 MANNA"), owner ) );
+      }
 };
 
 uint64_t eosio_init_bigstate_tester::state_size = 1 * 1024 * 1024 * 1024ll;
@@ -3256,6 +3342,219 @@ BOOST_FIXTURE_TEST_CASE( selling_ram, beos_mainnet_tester ) try {
   }
   BOOST_WARN_MESSAGE(false, std::string("Alice now has ")+liquid_beos.to_string());
   BOOST_REQUIRE_GE(liquid_beos, asset::from_string("3567000000.0000 BEOS"));
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(beos_block_transfer_tests)
+
+BOOST_FIXTURE_TEST_CASE( update_basic, beos_blocker_tester ) try {
+   BOOST_TEST_MESSAGE( "Updating accounts" );
+
+   auto alice = N(alice);
+   auto bob = N(bob);
+   auto carol = N(carol);
+
+   //(from:) (to:)
+   BOOST_REQUIRE_EQUAL( false, exists( alice, true/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( false, exists( alice, false/*from*/ ) );
+   
+   BOOST_REQUIRE_EQUAL( success(), update_accounts( alice, true/*from*/, true/*insert*/ ) );
+   //(from:) alice (to:)
+   BOOST_REQUIRE_EQUAL( true, exists( alice, true/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( false, exists( alice, false/*from*/ ) );
+
+   BOOST_REQUIRE_EQUAL( success(), update_accounts( bob, true/*from*/, true/*insert*/ ) );
+   //(from:) alice,bob (to:)
+   BOOST_REQUIRE_EQUAL( true, exists( bob, true/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( false, exists( bob, false/*from*/ ) );
+
+   BOOST_REQUIRE_EQUAL( success(), update_accounts( carol, false/*from*/, true/*insert*/ ) );
+   //(from:) alice,bob (to:)carol
+   BOOST_REQUIRE_EQUAL( true, exists( carol, false/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( false, exists( carol, true/*from*/ ) );
+
+   BOOST_REQUIRE_EQUAL( success(), update_accounts( bob, false/*from*/, true/*insert*/ ) );
+   //(from:) alice,bob (to:)carol,bob
+   BOOST_REQUIRE_EQUAL( true, exists( bob, true/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( true, exists( bob, false/*from*/ ) );
+
+   BOOST_REQUIRE_EQUAL( success(), update_accounts( bob, false/*from*/, false/*insert*/ ) );
+   //(from:) alice,bob (to:)carol
+   BOOST_REQUIRE_EQUAL( true, exists( bob, true/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( false, exists( bob, false/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( true, exists( alice, true/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( false, exists( alice, false/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( true, exists( carol, false/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( false, exists( carol, true/*from*/ ) );
+
+   BOOST_REQUIRE_EQUAL( success(), update_accounts( bob, true/*from*/, false/*insert*/ ) );
+   //(from:) alice (to:)carol
+   BOOST_REQUIRE_EQUAL( false, exists( bob, true/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( false, exists( bob, false/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( true, exists( alice, true/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( false, exists( alice, false/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( true, exists( carol, false/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( false, exists( carol, true/*from*/ ) );
+
+   BOOST_REQUIRE_EQUAL( success(), update_accounts( alice, true/*from*/, false/*insert*/ ) );
+   //(from:) (to:)carol
+   BOOST_REQUIRE_EQUAL( false, exists( bob, true/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( false, exists( bob, false/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( false, exists( alice, true/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( false, exists( alice, false/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( true, exists( carol, false/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( false, exists( carol, true/*from*/ ) );
+
+   BOOST_REQUIRE_EQUAL( success(), update_accounts( carol, false/*from*/, false/*insert*/ ) );
+   //(from:) (to:)
+   BOOST_REQUIRE_EQUAL( false, exists( bob, true/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( false, exists( bob, false/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( false, exists( alice, true/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( false, exists( alice, false/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( false, exists( carol, false/*from*/ ) );
+   BOOST_REQUIRE_EQUAL( false, exists( carol, true/*from*/ ) );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( update_basic_02, beos_blocker_tester ) try {
+   BOOST_TEST_MESSAGE( "Updating accounts" );
+
+   auto alice = N(alice);
+   auto bob = N(bob);
+   auto xyz = N(xyz);
+
+   auto helper_update_method = [&]( bool from )
+   {
+      /*
+         Explanation of comments:
+         A /or/ B
+
+         A - is active when from == true
+         B - is active when from == false
+      */
+      BOOST_REQUIRE_EQUAL( success(), update_accounts( alice, from, true/*insert*/ ) );
+      //(from:) alice (to:) /or/ (from:) (to:) alice
+      BOOST_REQUIRE_EQUAL( true, exists( alice, from ) );
+      BOOST_REQUIRE_EQUAL( false, exists( alice, !from ) );
+
+      BOOST_REQUIRE_EQUAL( success(), update_accounts( alice, !from, false/*insert*/ ) );
+      //(from:) alice (to:) /or/ (from:) (to:) alice
+      BOOST_REQUIRE_EQUAL( true, exists( alice, from ) );
+      BOOST_REQUIRE_EQUAL( false, exists( alice, !from ) );
+
+      BOOST_REQUIRE_EQUAL( success(), update_accounts( bob, from, true/*insert*/ ) );
+      //(from:) alice,bob (to:) /or/ (from:) (to:) alice,bob
+      BOOST_REQUIRE_EQUAL( true, exists( alice, from ) );
+      BOOST_REQUIRE_EQUAL( false, exists( alice, !from ) );
+      BOOST_REQUIRE_EQUAL( true, exists( bob, from ) );
+      BOOST_REQUIRE_EQUAL( false, exists( bob, !from ) );
+
+      BOOST_REQUIRE_EQUAL( success(), update_accounts( alice, !from, false/*insert*/ ) );
+      //(from:) alice,bob (to:) /or/ (from:) (to:) alice,bob
+      BOOST_REQUIRE_EQUAL( true, exists( alice, from ) );
+      BOOST_REQUIRE_EQUAL( false, exists( alice, !from ) );
+      BOOST_REQUIRE_EQUAL( true, exists( bob, from ) );
+      BOOST_REQUIRE_EQUAL( false, exists( bob, !from ) );
+
+      BOOST_REQUIRE_EQUAL( success(), update_accounts( xyz, !from, false/*insert*/ ) );
+      //(from:) alice,bob (to:) /or/ (from:) (to:) alice,bob
+      BOOST_REQUIRE_EQUAL( true, exists( alice, from ) );
+      BOOST_REQUIRE_EQUAL( false, exists( alice, !from ) );
+      BOOST_REQUIRE_EQUAL( true, exists( bob, from ) );
+      BOOST_REQUIRE_EQUAL( false, exists( bob, !from ) );
+
+      BOOST_REQUIRE_EQUAL( success(), update_accounts( xyz, from, false/*insert*/ ) );
+      //(from:) alice,bob (to:) /or/ (from:) (to:) alice,bob
+      BOOST_REQUIRE_EQUAL( true, exists( alice, from ) );
+      BOOST_REQUIRE_EQUAL( false, exists( alice, !from ) );
+      BOOST_REQUIRE_EQUAL( true, exists( bob, from ) );
+      BOOST_REQUIRE_EQUAL( false, exists( bob, !from ) );
+
+      BOOST_REQUIRE_EQUAL( success(), update_accounts( alice, from, false/*insert*/ ) );
+      //(from:) bob (to:) /or/ (from:) (to:) bob
+      BOOST_REQUIRE_EQUAL( false, exists( alice, from ) );
+      BOOST_REQUIRE_EQUAL( false, exists( alice, !from ) );
+      BOOST_REQUIRE_EQUAL( true, exists( bob, from ) );
+      BOOST_REQUIRE_EQUAL( false, exists( bob, !from ) );
+
+      BOOST_REQUIRE_EQUAL( success(), update_accounts( bob, from, false/*insert*/ ) );
+      //(from:) (to:)
+      BOOST_REQUIRE_EQUAL( false, exists( alice, from ) );
+      BOOST_REQUIRE_EQUAL( false, exists( alice, !from ) );
+      BOOST_REQUIRE_EQUAL( false, exists( bob, from ) );
+      BOOST_REQUIRE_EQUAL( false, exists( bob, !from ) );
+   };
+
+   helper_update_method( true/*from*/ );
+   helper_update_method( false/*from*/ );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( block_basic, beos_blocker_tester ) try {
+   BOOST_TEST_MESSAGE( "Blocking transfer of custom currency" );
+
+   auto alice = N(alice);
+   auto bob = N(bob);
+   auto carol = N(carol);
+   auto _asset = asset::from_string("1.0000 MANNA");
+   auto _small_asset = asset::from_string("0.0001 MANNA");
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( block_message ), transfer( owner, alice, _asset ) );
+   BOOST_REQUIRE_EQUAL( success(), update_accounts( alice, false/*from*/, true/*insert*/ ) );
+   //(from:) (to:) alice
+   BOOST_REQUIRE_EQUAL( success(), transfer( owner, alice, _asset ) );
+   BOOST_REQUIRE_EQUAL( asset::from_string("1.0000 MANNA"), get_balance( alice, "MANNA" ) );
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( block_message ), transfer( owner, bob, _asset ) );
+   BOOST_REQUIRE_EQUAL( success(), update_accounts( bob, false/*from*/, true/*insert*/ ) );
+   //(from:) (to:) alice,bob
+   BOOST_REQUIRE_EQUAL( success(), transfer( owner, bob, _asset ) );
+   BOOST_REQUIRE_EQUAL( asset::from_string("1.0000 MANNA"), get_balance( bob, "MANNA" ) );
+   BOOST_REQUIRE_EQUAL( success(), transfer( alice, bob, _small_asset ) );
+   BOOST_REQUIRE_EQUAL( asset::from_string("0.9999 MANNA"), get_balance( alice, "MANNA" ) );
+   BOOST_REQUIRE_EQUAL( asset::from_string("1.0001 MANNA"), get_balance( bob, "MANNA" ) );
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( block_message ), transfer( bob, carol, _asset ) );
+   BOOST_REQUIRE_EQUAL( success(), update_accounts( bob, true/*from*/, true/*insert*/ ) );
+   //(from:) bob (to:) alice,bob
+   BOOST_REQUIRE_EQUAL( success(), transfer( bob, carol, asset::from_string("0.5000 MANNA") ) );
+   BOOST_REQUIRE_EQUAL( asset::from_string("0.5001 MANNA"), get_balance( bob, "MANNA" ) );
+   BOOST_REQUIRE_EQUAL( asset::from_string("0.5000 MANNA"), get_balance( carol, "MANNA" ) );  
+
+   BOOST_REQUIRE_EQUAL( success(), transfer( carol, bob, _small_asset ) );
+   BOOST_REQUIRE_EQUAL( asset::from_string("0.5002 MANNA"), get_balance( bob, "MANNA" ) );
+   BOOST_REQUIRE_EQUAL( asset::from_string("0.4999 MANNA"), get_balance( carol, "MANNA" ) );  
+
+   BOOST_REQUIRE_EQUAL( success(), update_accounts( bob, false/*from*/, false/*insert*/ ) );
+   //(from:) bob (to:) alice
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( block_message ), transfer( carol, bob, _small_asset ) );
+   BOOST_REQUIRE_EQUAL( success(), transfer( bob, carol, _small_asset ) );
+   BOOST_REQUIRE_EQUAL( asset::from_string("0.5001 MANNA"), get_balance( bob, "MANNA" ) );
+   BOOST_REQUIRE_EQUAL( asset::from_string("0.5000 MANNA"), get_balance( carol, "MANNA" ) );  
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( block_message ), transfer( alice, bob, _small_asset ) );
+   BOOST_REQUIRE_EQUAL( success(), transfer( bob, alice, _small_asset ) );
+   BOOST_REQUIRE_EQUAL( asset::from_string("0.5000 MANNA"), get_balance( bob, "MANNA" ) );
+   BOOST_REQUIRE_EQUAL( asset::from_string("1.0000 MANNA"), get_balance( alice, "MANNA" ) );  
+
+   BOOST_REQUIRE_EQUAL( success(), update_accounts( bob, false/*from*/, false/*insert*/ ) );
+   //(from:) bob (to:) alice
+   BOOST_REQUIRE_EQUAL( success(), transfer( bob, alice, _small_asset ) );
+   BOOST_REQUIRE_EQUAL( asset::from_string("0.4999 MANNA"), get_balance( bob, "MANNA" ) );
+   BOOST_REQUIRE_EQUAL( asset::from_string("1.0001 MANNA"), get_balance( alice, "MANNA" ) );
+
+   BOOST_REQUIRE_EQUAL( success(), update_accounts( bob, true/*from*/, false/*insert*/ ) );
+   //(from:) (to:) alice
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( block_message ), transfer( bob, carol, _small_asset ) );
+   BOOST_REQUIRE_EQUAL( asset::from_string("0.4999 MANNA"), get_balance( bob, "MANNA" ) );
+   BOOST_REQUIRE_EQUAL( asset::from_string("0.5000 MANNA"), get_balance( carol, "MANNA" ) );
+
+   BOOST_REQUIRE_EQUAL( success(), transfer( bob, alice, _small_asset ) );
+   BOOST_REQUIRE_EQUAL( asset::from_string("0.4998 MANNA"), get_balance( bob, "MANNA" ) );
+   BOOST_REQUIRE_EQUAL( asset::from_string("1.0002 MANNA"), get_balance( alice, "MANNA" ) );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( block_message ), transfer( alice, bob, _small_asset ) );
 
 } FC_LOG_AND_RETHROW()
 
