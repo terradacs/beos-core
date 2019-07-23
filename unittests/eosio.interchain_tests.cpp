@@ -873,6 +873,120 @@ class beos_jurisdiction_tester : public eosio_init_tester
             config::system_account_name
             );
       }
+
+};
+
+class beos_jurisdiction_tester_fee : public eosio_init_tester
+{
+  bool users_initialized = false;
+
+public:
+ 
+  typedef std::tuple<account_name, uint32_t, uint32_t> additional_user_field;
+
+  const uint32_t distribution_start;
+  const uint32_t distribution_stop;
+  const uint32_t distribution_interval;
+
+  beos_jurisdiction_tester_fee()
+    : distribution_start{100u}, distribution_stop{200u}, distribution_interval{10u}
+  {
+    test_global_state tgs;
+
+    tgs.ram.starting_block = distribution_start;
+    tgs.ram.ending_block = distribution_stop;
+    tgs.ram.block_interval = distribution_interval;
+
+    tgs.beos.starting_block = distribution_start;
+    tgs.beos.ending_block = distribution_stop;
+    tgs.beos.block_interval = distribution_interval;
+
+    check_change_params( tgs );
+  }  
+
+  void add_users(const std::vector<additional_user_field>& additionalUsers = {})
+  {
+    if(users_initialized)
+      return;
+    else 
+      users_initialized = true;
+
+    const std::vector< account_name > actors = { N(beos.jurisdi), N(beos.proda),
+                    N(beos.prodb), N(beos.prodc) };
+    
+    produce_blocks( 2 );    
+    const uint32_t reductor = 10000u;
+
+    for( const auto& item : actors )
+    {
+      create_account_with_resources( config::gateway_account_name, item );
+      issue( item, asset::from_string("100.0000 PROXY") );
+    }
+
+    for(const auto& var : additionalUsers)
+    {
+      create_account_with_resources ( config::gateway_account_name, std::get<0>(var));
+      issue( std::get<0>(var), asset::from_string(std::to_string((std::get<1>(var) + std::get<2>(var)) / reductor ) + ".0000 PROXY"));
+    }
+
+    produce_blocks( (distribution_stop + 20) - control->head_block_num() );
+    BOOST_REQUIRE_EQUAL( control->head_block_num(), (distribution_stop + 20) );
+
+    for( const auto& item : actors )
+    {
+      if( item != N(beos.jurisdi) )
+      {
+          BOOST_REQUIRE_EQUAL( success(), create_producer( item ) );
+          produce_blocks(1);
+          BOOST_REQUIRE_EQUAL( success(), vote_producer( item, { item } ) );
+          produce_blocks(1);
+      }
+    }
+
+    for( const auto& var : additionalUsers)
+    {
+      BOOST_REQUIRE_EQUAL( success(), vote_producer( std::get<0>(var), { N( beos.proda ) } ));
+      produce_blocks(1);
+    }
+
+    for( const auto& item : actors )
+      BOOST_REQUIRE_EQUAL( success(), unstake( item, item, asset::from_string("16000000.0000 BEOS"), asset::from_string("16000000.0000 BEOS") ) );
+
+    produce_block( fc::hours(3*25) );
+    produce_blocks(1);
+
+  }
+
+  action_result add_jurisdiction( account_name ram_payer, code_jurisdiction new_code, std::string new_name, std::string new_description )
+  {
+    return push_action(ram_payer, N(addjurisdict), mvo()
+      ("ram_payer",        ram_payer )
+      ("new_code",         new_code )
+      ("new_name",         new_name )
+      ("new_description",  new_description ),
+      system_abi_ser,
+      config::system_account_name
+      );
+  }
+
+  action_result update_jurisdiction_fee( asset quantity )
+  {
+    return push_action(N(eosio), N(updatejurfee), mvo()
+        ("quantity", quantity),
+        system_abi_ser,
+        config::system_account_name
+        );
+  }
+
+  action_result update_jurisdiction_fee_account ( account_name  account )
+  {
+    return push_action(N(eosio), N(updatejuracc) ,mvo()
+        ("target_account", account),
+        system_abi_ser,
+        config::system_account_name
+        );
+  }
+
 };
 
 BOOST_AUTO_TEST_SUITE(eosio_jurisdiction_tests)
@@ -1069,6 +1183,91 @@ BOOST_FIXTURE_TEST_CASE( addmultijurs_basic_false_tests_03, beos_jurisdiction_te
         BOOST_REQUIRE_EQUAL( true, result.is_null() );
       }
     }
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( update_jurisdiction_fee_test_part_01, beos_jurisdiction_tester_fee ) try {
+  BOOST_TEST_MESSAGE("Testing changing fee value...");
+  BOOST_TEST_MESSAGE("\t * Testing proper values...");
+
+    add_users( { additional_user_field( N(sampleuser), 20000u, 20000u ) });
+
+    jurisdiction_manager helper;
+    const uint32_t defaultFee = 1000u;
+    const uint32_t newFee = 2000u;
+
+    //Gathering BEOS'es
+    BOOST_REQUIRE_EQUAL( success(), sellram(N(sampleuser), get_staked_balance( N(sampleuser) )["ram_bytes"].as_int64() / 2) );
+
+    //Changing fee
+    BOOST_REQUIRE_EQUAL( success(), update_jurisdiction_fee(asset::from_string(std::to_string(newFee) + ".0000 BEOS") ) );
+
+    //Preparation for final test
+    const auto accountBalanceBefore = get_balance( N(sampleuser) );
+    BOOST_REQUIRE_EQUAL( success(), add_jurisdiction( N(sampleuser), 777, "Testolandia", "Description" ));
+    produce_blocks(1);
+
+    //Final test
+    BOOST_REQUIRE_EQUAL( get_balance( N(sampleuser) ).get_amount(), accountBalanceBefore.get_amount() - ( newFee * 10000) );
+    
+    //Verification of jurisdiction existance
+    auto result = helper.get_jurisdiction( control->db(), 777 );
+    BOOST_REQUIRE_EQUAL( false, result.is_null() );
+
+    //Setting to default
+    update_jurisdiction_fee( asset::from_string(std::to_string(defaultFee) + ".0000 BEOS") );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( update_jurisdiction_fee_false_test_part_02, beos_jurisdiction_tester_fee ) try {
+  BOOST_TEST_MESSAGE("\t * Testing invalid values...");
+
+    add_users();
+
+    const uint32_t newFee = 2000u;
+    const std::string errMsg = std::string("only native coin allowed");
+    
+    BOOST_TEST_MESSAGE("\n\t\t * Invalid currency...");
+    auto msg1 = update_jurisdiction_fee( asset::from_string(std::to_string(newFee) + ".0000 BTS") );
+    BOOST_REQUIRE_NE( std::string::npos, msg1.find(errMsg));
+
+    BOOST_TEST_MESSAGE("\t\t * Invalid precision...");
+    auto msg2 = update_jurisdiction_fee( asset::from_string(std::to_string(newFee) + ".000 BEOS") );
+    BOOST_REQUIRE_NE( std::string::npos, msg2.find(errMsg));
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( update_jurisdiction_fee_account_test_part_01, beos_jurisdiction_tester_fee ) try {
+  BOOST_TEST_MESSAGE("\t * Testing switching fee account...");
+
+    add_users( { additional_user_field( N(sampleuser), 20000u, 20000u ) });
+
+    BOOST_REQUIRE_EQUAL( success(), sellram(N(sampleuser), get_staked_balance( N(sampleuser) )["ram_bytes"].as_int64() / 2) );
+
+    const asset currentFee = asset::from_string("1000.0000 BEOS");
+    create_account_with_resources( N(beos.gateway), N(mario) );
+    produce_blocks(1);
+    BOOST_REQUIRE_EQUAL( success(), update_jurisdiction_fee_account( N(mario) ) );
+    BOOST_REQUIRE_EQUAL( 0 , get_balance( N(mario) ).get_amount());
+    BOOST_REQUIRE_EQUAL( success(), add_jurisdiction( N(sampleuser), 888, "chrzaszczyzewoszyce", "powiat_lekolody"));
+    produce_blocks(1);
+    BOOST_REQUIRE_EQUAL( get_balance(N(mario)).get_amount(), currentFee.get_amount());
+
+    //To default
+    BOOST_REQUIRE_EQUAL( success(), update_jurisdiction_fee_account( N(eosio.null) ) );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( update_jurisdiction_fee_account_false_test_part_02, beos_jurisdiction_tester_fee ) try {
+  BOOST_TEST_MESSAGE("\t * Testing switching fee account...");
+
+    add_users();
+
+    const  std::string wasm_alert_01= "target account must exist";
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg(wasm_alert_01), update_jurisdiction_fee_account( N(mario) ) );
+
+    //To default 
+    BOOST_REQUIRE_EQUAL( success(), update_jurisdiction_fee_account( N(eosio.null) ) );
 
 } FC_LOG_AND_RETHROW()
 

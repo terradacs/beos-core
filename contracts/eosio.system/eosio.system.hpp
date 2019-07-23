@@ -274,6 +274,9 @@ namespace eosiosystem {
          
          void updateprod( eosio::jurisdiction_producer data );
 
+         void updatejurfee(asset quantity);
+         void updatejuracc(account_name target_account);
+
       private:
          void update_elected_producers( block_timestamp timestamp );
 

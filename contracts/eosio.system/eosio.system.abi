@@ -59,6 +59,18 @@
 		{ "name": "new_jurisdicts", "type": "new_jurisdic_info[]" }
 	  ]
     },{
+      "name": "updatejurfee",
+      "base": "",
+      "fields": [
+        { "name": "quantity", "type": "asset" }
+      ]
+    },{
+      "name": "updatejuracc",
+      "base": "",
+      "fields": [
+        { "name": "target_account", "type": "account_name" }
+      ]
+    },{
       "name": "updateprod",
       "base": "",
       "fields": [
@@ -636,6 +648,14 @@
 	  "name": "addmultijurs",
 	  "type": "addmultijurs",
 	  "ricardian_contract": ""
+    },{
+      "name": "updatejurfee",
+      "type": "updatejurfee",
+      "ricardian_contract": ""
+    },{
+      "name": "updatejuracc",
+      "type": "updatejuracc",
+      "ricardian_contract": ""
     },{
       "name": "setparams",
       "type": "setparams",

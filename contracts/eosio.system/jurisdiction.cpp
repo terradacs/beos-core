@@ -50,6 +50,32 @@ namespace eosiosystem {
       eosio::print("Leaving system_contract::updateprod\n");
    }
 
+   void system_contract::updatejurfee(asset quantity)
+   {
+      eosio::print("Entering system_contract eosio only - updatejurfee");
+
+      require_auth( _self );
+      eosio_assert( quantity.symbol == asset().symbol , std::string("only native coin allowed").c_str() );
+
+      _jurisdiction_gstate.jurisdiction_fee = quantity;
+      _jurisdiction_global.set(_jurisdiction_gstate, _self);
+
+      eosio::print("Leaving system_contract::updatejurfee");
+   }
+
+   void system_contract::updatejuracc(account_name target_account)
+   {
+      eosio::print("Entering system_contract eosio only - updatejuracc");
+
+      require_auth( _self );
+      eosio_assert( is_account( target_account ), "target account must exist");
+
+      _jurisdiction_gstate.jurisdiction_fee_receiver = target_account;
+      _jurisdiction_global.set(_jurisdiction_gstate, _self);
+
+      eosio::print("Leaving system_contract::updatejuracc");
+   }
+
    template<bool fee_enabled>
    void system_contract::__addsinglejurisdiction(const account_name ram_payer, const code_jurisdiction new_code, const std::string new_name, const std::string new_description )
    {      
