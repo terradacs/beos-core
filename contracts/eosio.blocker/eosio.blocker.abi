@@ -28,13 +28,13 @@
     }
   ],
   "tables": [{
-      "name": "fromaccounts",
+      "name": "validsenders",
       "type": "account_data",
       "index_type": "i64",
       "key_names": [],
       "key_types": []
     },{
-      "name": "toaccounts",
+      "name": "validrecip",
       "type": "account_data",
       "index_type": "i64",
       "key_names": [],

@@ -792,9 +792,9 @@ class beos_blocker_tester : public eosio_interchain_tester
       {
          vector<char> data;
          if( from )
-            data = get_row_by_account( owner, owner, N(fromaccounts), account );
+            data = get_row_by_account( owner, owner, N(validsenders), account );
          else
-            data = get_row_by_account( owner, owner, N(toaccounts), account );
+            data = get_row_by_account( owner, owner, N(validrecip), account );
 
          if( data.empty() )
             return false;
