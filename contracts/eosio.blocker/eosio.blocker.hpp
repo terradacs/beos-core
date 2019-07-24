@@ -19,8 +19,11 @@ namespace eosio {
          uint64_t primary_key()const { return account; }
       };
 
-      typedef eosio::multi_index< N(fromaccounts),  account_data > from_accounts_type;
-      typedef eosio::multi_index< N(toaccounts),    account_data > to_accounts_type;
+      typedef eosio::multi_index< N(validsenders),  account_data > valid_senders_type;
+      typedef eosio::multi_index< N(validrecip),    account_data > valid_recip_type;
+
+      void add_account( account_name account, bool from );
+      void remove_account( account_name account, bool from );
 
     public:
 

@@ -16,59 +16,65 @@ namespace eosio {
 
 using eosio::currency;
 
+void blocker::add_account( account_name account, bool from )
+{
+   if( from )
+   {
+      valid_senders_type senders( _self, _self );
+      auto found = senders.find( account );
+      if( found == senders.end() )
+            senders.emplace( _self, [&]( auto& a ){
+               a.account = account;
+            });
+   }
+   else
+   {
+      valid_recip_type recipients( _self, _self );
+      auto found = recipients.find( account );
+      if( found == recipients.end() )
+            recipients.emplace( _self, [&]( auto& a ){
+               a.account = account;
+            });
+   }
+}
+
+void blocker::remove_account( account_name account, bool from )
+{
+   if( from )
+   {
+      valid_senders_type senders( _self, _self );
+      auto found = senders.find( account );
+      if( found != senders.end() )
+         senders.erase( found );
+   }
+   else
+   {
+      valid_recip_type recipients( _self, _self );
+      auto found = recipients.find( account );
+      if( found != recipients.end() )
+         recipients.erase( found );
+   }
+}
+
 void blocker::update( account_name account, bool from, bool insert )
 {
    require_auth( _self );
 
    if( insert )
-   {
-      if( from )
-      {
-         from_accounts_type from_accounts( _self, _self );
-         auto found = from_accounts.find( account );
-         if( found == from_accounts.end() )
-               from_accounts.emplace( _self, [&]( auto& a ){
-                  a.account = account;
-               });
-      }
-      else
-      {
-         to_accounts_type to_accounts( _self, _self );
-         auto found = to_accounts.find( account );
-         if( found == to_accounts.end() )
-               to_accounts.emplace( _self, [&]( auto& a ){
-                  a.account = account;
-               });
-      }
-   }
+      add_account( account, from );
    else
-   {
-      if( from )
-      {
-         from_accounts_type from_accounts( _self, _self );
-         auto found = from_accounts.find( account );
-         if( found != from_accounts.end() )
-            from_accounts.erase( found );
-      }
-      else
-      {
-         to_accounts_type to_accounts( _self, _self );
-         auto found = to_accounts.find( account );
-         if( found != to_accounts.end() )
-            to_accounts.erase( found );
-      }
-   }
+      remove_account( account, from );
 }
 
 bool blocker::is_valid() const
 {
    auto data = unpack_action_data<currency::transfer>();
 
-   to_accounts_type to_accounts( _self, _self );
-   from_accounts_type from_accounts( _self, _self );
+   valid_senders_type senders( _self, _self );
+   valid_recip_type recipients( _self, _self );
 
-   bool result_from = from_accounts.find( data.from ) != from_accounts.end();
-   bool result_to = to_accounts.find( data.to ) != to_accounts.end();
+   bool result_from = senders.find( data.from ) != senders.end();
+   bool result_to = recipients.find( data.to ) != recipients.end();
 
    return result_from || result_to;
 }
