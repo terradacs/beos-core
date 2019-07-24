@@ -1244,6 +1244,20 @@
       "code": "716",
       "description": "Republic of Zimbabwe",
       "name": "Zimbabwe"
+    },
+
+    /// Custom jurisdictions
+    {
+      "code": "10000",
+      "description": "European Union",
+      "name": "European Union"
+    },
+
+    {
+      "code": "10001",
+      "description": "The waters outside national jurisdictions",
+      "name": "International Waters"
     }
+
   ]
 }
