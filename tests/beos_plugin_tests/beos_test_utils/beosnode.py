@@ -311,7 +311,7 @@ class BEOSNode(object):
                         if tid is not None and tid == _transaction_id:
                             log.info("Transaction id: {0} found in block: {1}".format(_transaction_id, block_num))
                             log.info(block_data)
-                            return
+                            return block_num["head_block_num"]
                 time.sleep(0.5)
                 max_intervals += 1
             if max_intervals >= MAX_WAIT_INTERVALS:
