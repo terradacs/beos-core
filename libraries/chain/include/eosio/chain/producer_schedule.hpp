@@ -95,6 +95,23 @@ namespace eosio { namespace chain {
                         : jurisdictions( _jurisdictions )
       {
       }
+
+      std::string to_string()
+      {
+         std::string ret;
+         bool first = true;
+
+         for( auto item : jurisdictions )
+         {
+            if( !first )
+               ret += ",";
+            first = false;
+
+            ret += std::to_string( item );
+         }
+
+         return ret;
+      }
    };
 
    struct jurisdiction_producer

@@ -254,6 +254,8 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
           "Disable the check which subjectively fails a transaction if a contract bills more RAM to another account within the context of a notification handler (i.e. when the receiver is not the code of the action).")
          ("enable-jurisdiction-history", bpo::bool_switch()->default_value(false),
           "Enable registering jurisdiction changes for producers.")
+         ("enable-jurisdiction-log-error", bpo::bool_switch()->default_value(false),
+          "Logging errors when a transaction has any jurisdictions.")
          ;
 
 // TODO: rate limiting
@@ -432,6 +434,7 @@ void chain_plugin::plugin_initialize(const variables_map& options) {
       my->chain_config->contracts_console = options.at( "contracts-console" ).as<bool>();
       my->chain_config->allow_ram_billing_in_notify = options.at( "disable-ram-billing-notify-checks" ).as<bool>();
       my->chain_config->enable_jurisdiction_history = options.at("enable-jurisdiction-history").as<bool>();
+      my->chain_config->enable_jurisdiction_log_error = options.at("enable-jurisdiction-log-error").as<bool>();
 
       if( options.count( "extract-genesis-json" ) || options.at( "print-genesis-json" ).as<bool>()) {
          genesis_state gs;

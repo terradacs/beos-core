@@ -557,24 +557,36 @@ namespace eosio {
       });
    }
 
+   void http_plugin::execute_callback( int32_t code, const error_results& results, const char *api_name, const char *call_name, url_response_callback cb )
+   {
+      try
+      {
+         cb( code, fc::json::to_string( results ) );
+      }
+      catch( ... )
+      {
+         std::cerr << "Exception attempting to execute callback for " << api_name << "." << call_name << std::endl;
+      }
+      
+   }
    void http_plugin::handle_exception( const char *api_name, const char *call_name, const string& body, url_response_callback cb ) {
       try {
          try {
             throw;
          } catch (chain::unsatisfied_authorization& e) {
             error_results results{401, "UnAuthorized", error_results::error_info(e, verbose_http_errors)};
-            cb( 401, fc::json::to_string( results ));
+            execute_callback( 401, results, api_name, call_name, cb );
          } catch (chain::tx_duplicate& e) {
             error_results results{409, "Conflict", error_results::error_info(e, verbose_http_errors)};
-            cb( 409, fc::json::to_string( results ));
+            execute_callback( 409, results, api_name, call_name, cb );
          } catch (fc::eof_exception& e) {
             error_results results{422, "Unprocessable Entity", error_results::error_info(e, verbose_http_errors)};
-            cb( 422, fc::json::to_string( results ));
+            execute_callback( 422, results, api_name, call_name, cb );
             elog( "Unable to parse arguments to ${api}.${call}", ("api", api_name)( "call", call_name ));
             dlog("Bad arguments: ${args}", ("args", body));
          } catch (fc::exception& e) {
             error_results results{500, "Internal Service Error", error_results::error_info(e, verbose_http_errors)};
-            cb( 500, fc::json::to_string( results ));
+            execute_callback( 500, results, api_name, call_name, cb );
             if (e.code() != chain::greylist_net_usage_exceeded::code_value && e.code() != chain::greylist_cpu_usage_exceeded::code_value) {
                elog( "FC Exception encountered while processing ${api}.${call}",
                      ("api", api_name)( "call", call_name ));
@@ -582,14 +594,14 @@ namespace eosio {
             }
          } catch (std::exception& e) {
             error_results results{500, "Internal Service Error", error_results::error_info(fc::exception( FC_LOG_MESSAGE( error, e.what())), verbose_http_errors)};
-            cb( 500, fc::json::to_string( results ));
+            execute_callback( 500, results, api_name, call_name, cb );
             elog( "STD Exception encountered while processing ${api}.${call}",
                   ("api", api_name)( "call", call_name ));
             dlog( "Exception Details: ${e}", ("e", e.what()));
          } catch (...) {
             error_results results{500, "Internal Service Error",
                error_results::error_info(fc::exception( FC_LOG_MESSAGE( error, "Unknown Exception" )), verbose_http_errors)};
-            cb( 500, fc::json::to_string( results ));
+            execute_callback( 500, results, api_name, call_name, cb );
             elog( "Unknown Exception encountered while processing ${api}.${call}",
                   ("api", api_name)( "call", call_name ));
          }

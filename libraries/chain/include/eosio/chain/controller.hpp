@@ -79,6 +79,7 @@ namespace eosio { namespace chain {
             flat_set<account_name>   trusted_producers;
 
             bool                     enable_jurisdiction_history = false;
+            bool                     enable_jurisdiction_log_error = false;
          };
 
          enum class block_status {

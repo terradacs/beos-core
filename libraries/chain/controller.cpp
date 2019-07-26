@@ -150,6 +150,7 @@ struct controller_impl {
    optional<fc::microseconds>     subjective_cpu_leeway;
    bool                           trusted_producer_light_validation = false;
    uint32_t                       snapshot_head_block = 0;
+   bool                           enable_jurisdiction_log_error = false;
 
    typedef pair<scope_name,action_name>                   handler_key;
    map< account_name, map<handler_key, apply_handler> >   apply_handlers;
@@ -201,7 +202,8 @@ struct controller_impl {
     voting_mgr(s, db),
     conf( cfg ),
     chain_id( cfg.genesis.compute_chain_id() ),
-    read_mode( cfg.read_mode )
+    read_mode( cfg.read_mode ),
+    enable_jurisdiction_log_error( cfg.enable_jurisdiction_log_error )
    {
 
 #define SET_APP_HANDLER( receiver, contract, action) \
@@ -1086,6 +1088,13 @@ struct controller_impl {
          } catch (const fc::exception& e) {
             trace->except = e;
             trace->except_ptr = std::current_exception();
+
+            if( enable_jurisdiction_log_error )
+            {
+               jurisdiction_manager helper;
+               auto str_jurisdictions = helper.get_jurisdictions( trx->trx );
+               elog( "Execution transaction with jurisdiction failed. Jurisdictions: ${jur}", ( "jur", str_jurisdictions ) );
+            }
          }
 
          if (!failure_is_subjective(*trace->except)) {

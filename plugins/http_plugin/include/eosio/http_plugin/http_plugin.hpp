@@ -40,6 +40,53 @@ namespace eosio {
     */
    using api_description = std::map<string, url_handler>;
 
+   /**
+    * @brief Structure used to create JSON error responses
+    */
+   struct error_results {
+      uint16_t code;
+      string message;
+
+      struct error_info {
+         int64_t code;
+         string name;
+         string what;
+
+         struct error_detail {
+            string message;
+            string file;
+            uint64_t line_number;
+            string method;
+         };
+
+         vector<error_detail> details;
+
+         static const uint8_t details_limit = 10;
+
+         error_info() {};
+
+         error_info(const fc::exception& exc, bool include_log) {
+            code = exc.code();
+            name = exc.name();
+            what = exc.what();
+            if (include_log) {
+               for (auto itr = exc.get_log().begin(); itr != exc.get_log().end(); ++itr) {
+                  // Prevent sending trace that are too big
+                  if (details.size() >= details_limit) break;
+                  // Append error
+                  error_detail detail = {
+                          itr->get_message(), itr->get_context().get_file(),
+                          itr->get_context().get_line_number(), itr->get_context().get_method()
+                  };
+                  details.emplace_back(detail);
+               }
+            }
+         }
+      };
+
+      error_info error;
+   };
+
    struct http_plugin_defaults {
       //If not empty, this string is prepended on to the various configuration
       // items for setting listen addresses
@@ -89,6 +136,7 @@ namespace eosio {
               add_handler(call.first, call.second);
         }
 
+        static void execute_callback( int32_t code, const error_results& results, const char *api_name, const char *call_name, url_response_callback cb );
         // standard exception handling for api handlers
         static void handle_exception( const char *api_name, const char *call_name, const string& body, url_response_callback cb );
 
@@ -101,52 +149,6 @@ namespace eosio {
         std::unique_ptr<class http_plugin_impl> my;
    };
 
-   /**
-    * @brief Structure used to create JSON error responses
-    */
-   struct error_results {
-      uint16_t code;
-      string message;
-
-      struct error_info {
-         int64_t code;
-         string name;
-         string what;
-
-         struct error_detail {
-            string message;
-            string file;
-            uint64_t line_number;
-            string method;
-         };
-
-         vector<error_detail> details;
-
-         static const uint8_t details_limit = 10;
-
-         error_info() {};
-
-         error_info(const fc::exception& exc, bool include_log) {
-            code = exc.code();
-            name = exc.name();
-            what = exc.what();
-            if (include_log) {
-               for (auto itr = exc.get_log().begin(); itr != exc.get_log().end(); ++itr) {
-                  // Prevent sending trace that are too big
-                  if (details.size() >= details_limit) break;
-                  // Append error
-                  error_detail detail = {
-                          itr->get_message(), itr->get_context().get_file(),
-                          itr->get_context().get_line_number(), itr->get_context().get_method()
-                  };
-                  details.emplace_back(detail);
-               }
-            }
-         }
-      };
-
-      error_info error;
-   };
 }
 
 FC_REFLECT(eosio::error_results::error_info::error_detail, (message)(file)(line_number)(method))

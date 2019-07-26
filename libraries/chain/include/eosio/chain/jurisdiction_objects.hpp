@@ -155,6 +155,8 @@ class jurisdiction_manager
 
       void process_jurisdiction_dictionary( const chainbase::database& db, jurisdiction_dictionary_processor processor ) const;
       void process_jurisdiction_producer( const chainbase::database& db, const account_name& lowerBound, const account_name& upperBound, jurisdiction_producer_processor processor ) const;
+
+      std::string get_jurisdictions( const signed_transaction& trx );
 };
 
 } }  // eosio::chain

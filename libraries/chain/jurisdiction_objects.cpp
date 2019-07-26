@@ -356,4 +356,43 @@ void jurisdiction_manager::process_jurisdiction_producer( const chainbase::datab
    }
 }
 
+std::string jurisdiction_manager::get_jurisdictions( const signed_transaction& trx )
+{
+   try
+   {
+      auto exts = trx.transaction_extensions;
+      if( exts.empty() )
+         return "";
+
+      std::string ret;
+      auto deserialized_data = read( exts );
+
+      bool first = true;
+      for( auto item : deserialized_data )
+      {
+         if( !first )
+            ret += " : ";
+         first = true;
+
+         ret += item.to_string();
+      }
+
+      return ret;
+   }
+   catch( fc::exception& e )
+   {
+      elog( "Exception Details: ${e}", ( "e", e.to_detail_string() ) );
+   }
+   catch( std::exception& e )
+   {
+      elog( "Exception Details: ${e}", ( "e", e.what() ) );
+   }
+   catch( ... )
+   {
+      elog( "Unknown exception during when jurisdictions are read" );
+   }
+
+   return "";
+}
+
 } } // eosio::chain
