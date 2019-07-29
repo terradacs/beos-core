@@ -1,10 +1,13 @@
 
 import os
-import socket
+import json
 import time
+import socket
+import requests
 import threading
 
 from beos_test_utils.beosnode      import BEOSNode
+from beos_test_utils.logger		   import log
 
 from cd_scripts import eosio_rpc_actions
 from cd_scripts import eosio_rpc_client
@@ -163,3 +166,39 @@ class Cluster(object):
 		return ports
 
 
+	def accelerate_nodes(self, _type, _time, ):
+		def wait_for_new_producer(_producer = None):
+			_, result = self.bios.make_cleos_call(["get", "info"])
+			result = json.loads(result)
+			head_block_prod = _producer or result["head_block_producer"]
+			new_head_block_prod = None
+			log.info("Waiting for new producer.")
+			while True:
+				_, result = self.bios.make_cleos_call(["get", "info"])
+				result = json.loads(result)
+				new_head_block_prod = result["head_block_producer"]
+				if head_block_prod != new_head_block_prod:
+					log.info("New producer `{0}`, previous producer `{1}`".format(new_head_block_prod, head_block_prod))
+					break
+				time.sleep(0.5)
+				log.info("Wait...")
+			return new_head_block_prod
+
+		def accelerate_node(_node):
+				accelerate_url = "http://{0}:{1}/v1/test_producer/accelerate_mock_time".format(node.node_data.node_ip, node.node_data.node_port)
+				accelerate_data = {"time":_time, "type":_type}
+				result = requests.post(url=accelerate_url, json=accelerate_data)
+				log.info("Node `{0}` acceleration status `{1}`".format(accelerate_url, result.text))
+
+		bios_url = "http://{0}:{1}/v1/test_producer/accelerate_mock_time".format(self.bios.node_data.node_ip, self.bios.node_data.node_port)
+		accelerate_data = {"time":_time, "type":_type}
+		result = requests.post(url=bios_url, json=accelerate_data)
+		log.info("Bios `{0}` acceleration status `{1}`".format(bios_url, result.text))
+		current_prod = wait_for_new_producer()
+		for name, item in self.producers.items():
+			if current_prod != name:
+				node = item["node"]
+				accelerate_node(node)
+		wait_for_new_producer(current_prod)
+		node = self.producers[current_prod]["node"]
+		accelerate_node(node)
