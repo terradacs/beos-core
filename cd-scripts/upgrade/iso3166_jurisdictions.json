@@ -1246,13 +1246,14 @@
       "name": "Zimbabwe"
     },
 
-    /// Custom jurisdictions
+
+
+
     {
       "code": "10000",
       "description": "European Union",
       "name": "European Union"
     },
-
     {
       "code": "10001",
       "description": "The waters outside national jurisdictions",
