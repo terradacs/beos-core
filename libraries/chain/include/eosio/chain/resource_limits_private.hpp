@@ -154,23 +154,26 @@ namespace eosio { namespace chain { namespace resource_limits {
       int64_t distribution_cpu_weight = 0;
       int64_t distribution_ram_bytes = 0;
 
-      void set_resource_limits( int64_t _ram_bytes, int64_t _net_weight, int64_t _cpu_weight, bool is_distribution )
+      void change_resource_limits( int64_t _ram_bytes, int64_t _net_weight, int64_t _cpu_weight, bool is_distribution )
+      {
+        ram_bytes += _ram_bytes;
+        net_weight += _net_weight;
+        cpu_weight += _cpu_weight;
+
+        if( is_distribution )
+        {
+           EOS_ASSERT( _ram_bytes >= 0 && _net_weight >= 0 && _cpu_weight >= 0, resource_limit_exception, "during distribution only positive rewards are allowed" );
+           distribution_ram_bytes += _ram_bytes;
+           distribution_net_weight += _net_weight;
+           distribution_cpu_weight += _cpu_weight;
+        }
+      }
+
+      void set_resource_limits( int64_t _ram_bytes, int64_t _net_weight, int64_t _cpu_weight )
       {
         ram_bytes = _ram_bytes;
         net_weight = _net_weight;
         cpu_weight = _cpu_weight;
-
-        if( is_distribution )
-        {
-            if( _ram_bytes > distribution_ram_bytes )
-              distribution_ram_bytes = _ram_bytes;
-
-            if( _net_weight > distribution_net_weight )
-              distribution_net_weight = _net_weight;
-
-            if( _cpu_weight > distribution_cpu_weight )
-              distribution_cpu_weight = _cpu_weight;
-        }
       }
    };
 
