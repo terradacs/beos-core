@@ -44,25 +44,9 @@ static inline void print_debug(account_name receiver, const action_trace& ar) {
 inline void apply_context::change_any_resource_limits_impl( const account_name& acc, int64_t ram, int64_t net, int64_t cpu, bool is_distribution )const
 {
    auto& resource_limit_mgr = control.get_mutable_resource_limits_manager();
-   int64_t ram_bytes = 0;
-   int64_t net_weight = 0;
-   int64_t cpu_weight = 0;
 
-   resource_limit_mgr.get_account_limits( acc, ram_bytes, net_weight, cpu_weight );
-   ram_bytes += ram;
-   net_weight += net;
-   cpu_weight += cpu;
-
-   if( is_distribution )
-   {
-    if (resource_limit_mgr.set_distribution_account_limits( acc, ram_bytes, net_weight, cpu_weight ))
-        trx_context.validate_ram_usage.insert( acc );
-   }
-   else
-   {
-    if (resource_limit_mgr.set_account_limits( acc, ram_bytes, net_weight, cpu_weight ))
-        trx_context.validate_ram_usage.insert( acc );
-   }
+   if( resource_limit_mgr.change_account_limits( acc, ram, net, cpu, is_distribution ) )
+      trx_context.validate_ram_usage.insert( acc );
 }
 
 inline void apply_context::change_distribution_resource_limits( const account_name& acc, int64_t ram, int64_t net, int64_t cpu )const {

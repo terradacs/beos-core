@@ -301,40 +301,55 @@ fc::mutable_variant_object resource_limits_manager::convert_to_public( const res
     ( "ram_bytes",  object.ram_bytes );
   }
 
-bool resource_limits_manager::set_any_account_limits_impl( const account_name& account,
-                                                       int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight,
-                                                       bool is_distribution ) {
+const resource_limits_object& resource_limits_manager::find_or_create_pending_limits( const account_name& account )
+{
    //const auto& usage = _db.get<resource_usage_object,by_owner>( account );
    /*
     * Since we need to delay these until the next resource limiting boundary, these are created in a "pending"
     * state or adjusted in an existing "pending" state.  The chain controller will collapse "pending" state into
     * the actual state at the next appropriate boundary.
     */
-   auto find_or_create_pending_limits = [&]() -> const resource_limits_object& {
-      const auto* pending_limits = _db.find<resource_limits_object, by_owner>( boost::make_tuple(true, account) );
-      if (pending_limits == nullptr) {
-         const auto& limits = _db.get<resource_limits_object, by_owner>( boost::make_tuple(false, account));
-         return _db.create<resource_limits_object>([&](resource_limits_object& pending_limits){
-            pending_limits.owner = limits.owner;
+   const auto* pending_limits = _db.find<resource_limits_object, by_owner>( boost::make_tuple(true, account) );
+   if (pending_limits == nullptr) {
+      const auto& limits = _db.get<resource_limits_object, by_owner>( boost::make_tuple(false, account));
+      return _db.create<resource_limits_object>([&](resource_limits_object& pending_limits){
+         pending_limits.owner = limits.owner;
 
-            pending_limits.ram_bytes = limits.ram_bytes;
-            pending_limits.net_weight = limits.net_weight;
-            pending_limits.cpu_weight = limits.cpu_weight;
+         pending_limits.ram_bytes = limits.ram_bytes;
+         pending_limits.net_weight = limits.net_weight;
+         pending_limits.cpu_weight = limits.cpu_weight;
 
-            pending_limits.distribution_ram_bytes = limits.distribution_ram_bytes;
-            pending_limits.distribution_net_weight = limits.distribution_net_weight;
-            pending_limits.distribution_cpu_weight = limits.distribution_cpu_weight;
+         pending_limits.distribution_ram_bytes = limits.distribution_ram_bytes;
+         pending_limits.distribution_net_weight = limits.distribution_net_weight;
+         pending_limits.distribution_cpu_weight = limits.distribution_cpu_weight;
 
-            pending_limits.pending = true;
-            pending_limits.unstaked_mode = limits.unstaked_mode;
-         });
-      } else {
-         return *pending_limits;
-      }
-   };
+         pending_limits.pending = true;
+         pending_limits.unstaked_mode = limits.unstaked_mode;
+      });
+   } else {
+      return *pending_limits;
+   }
+}
 
+bool resource_limits_manager::change_any_account_limits_impl( const account_name& account,
+                                                       int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight,
+                                                       bool is_distribution )
+{
    // update the users weights directly
-   auto& limits = find_or_create_pending_limits();
+   auto& limits = find_or_create_pending_limits( account );
+
+   _db.modify( limits, [&]( resource_limits_object& pending_limits ){
+      pending_limits.change_resource_limits( ram_bytes, net_weight, cpu_weight, is_distribution );
+   });
+
+   return ram_bytes < 0;
+}
+
+bool resource_limits_manager::set_any_account_limits_impl( const account_name& account,
+                                                       int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight )
+{
+   // update the users weights directly
+   auto& limits = find_or_create_pending_limits( account );
 
    bool decreased_limit = false;
 
@@ -352,18 +367,20 @@ bool resource_limits_manager::set_any_account_limits_impl( const account_name& a
    }
 
    _db.modify( limits, [&]( resource_limits_object& pending_limits ){
-      pending_limits.set_resource_limits( ram_bytes, net_weight, cpu_weight, is_distribution );
+      pending_limits.set_resource_limits( ram_bytes, net_weight, cpu_weight );
    });
 
    return decreased_limit;
 }
 
-bool resource_limits_manager::set_distribution_account_limits( const account_name& account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight) {
-  return set_any_account_limits_impl( account, ram_bytes, net_weight, cpu_weight, true/*is_distribution*/ );
+bool resource_limits_manager::change_account_limits( const account_name& account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight, bool is_distribution )
+{
+  return change_any_account_limits_impl( account, ram_bytes, net_weight, cpu_weight, is_distribution );
 }
 
-bool resource_limits_manager::set_account_limits( const account_name& account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight) {
-  return set_any_account_limits_impl( account, ram_bytes, net_weight, cpu_weight, false/*is_distribution*/ );
+bool resource_limits_manager::set_account_limits( const account_name& account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight)
+{
+  return set_any_account_limits_impl( account, ram_bytes, net_weight, cpu_weight );
 }
 
 bool resource_limits_manager::get_any_account_data( const account_name& account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight, bool is_distribution ) const
