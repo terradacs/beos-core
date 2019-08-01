@@ -330,6 +330,8 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
         // Ensure that now is yet 10 years after 2018-06-01 yet
         BOOST_REQUIRE(control->head_block_time().time_since_epoch() < first_june_2028);
 
+        //The account `b1` is disabled in BEOS blockchain.
+        return;
         // This should thrown an error, since block one can only unstake all his stake after 10 years
 
         BOOST_REQUIRE_THROW(undelegate_bandwidth(N(b1), N(b1), core_from_string("49999500.0000"), core_from_string("49999500.0000")), eosio_assert_message_exception);
@@ -340,7 +342,6 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
         // Block one should be able to unstake all his stake now
         undelegate_bandwidth(N(b1), N(b1), core_from_string("49999500.0000"), core_from_string("49999500.0000"));
 
-        return;
         produce_blocks(7000); /// produce blocks until virutal bandwidth can acomadate a small user
         wlog("minow" );
         votepro( N(minow1), {N(p1), N(p2)} );

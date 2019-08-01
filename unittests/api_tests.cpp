@@ -777,7 +777,7 @@ BOOST_AUTO_TEST_CASE(checktime_fail_tests) { try {
 
    BOOST_CHECK_EXCEPTION( call_test( t, test_api_action<TEST_METHOD("test_checktime", "checktime_failure")>{},
                                      0 ),
-                          tx_cpu_usage_exceeded, is_tx_cpu_usage_exceeded );
+                          deadline_exception, is_deadline_exception );
 
    uint32_t time_left_in_block_us = config::default_max_block_cpu_usage - config::default_min_transaction_cpu_usage;
    std::string dummy_string = "nonce";
