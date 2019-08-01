@@ -10,14 +10,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/signals2/connection.hpp>
 
-#define CAVEMEN_DEBUG
-
-#ifdef CAVEMEN_DEBUG
-#define DBG(format, ... ) { FILE *pFile = fopen("debug.log","a"); fprintf(pFile,format "\n",__VA_ARGS__); fclose(pFile); }
-#else
-#define DBG(format, ... )
-#endif
-
 namespace eosio {
    using namespace chain;
    using boost::signals2::scoped_connection;
@@ -146,25 +138,13 @@ namespace eosio {
    class history_plugin_impl {
       public:
          bool bypass_filter = false;
-         bool ban_block_production_logs = false;
          std::set<filter_entry> filter_on;
          std::set<filter_entry> filter_out;
          chain_plugin*          chain_plug = nullptr;
          fc::optional<scoped_connection> applied_transaction_connection;
 
           bool filter(const action_trace& act) {
-            if(ban_block_production_logs && act.act.name == action_name("onblock") && 
-                  ( 
-                     act.act.account == chain::config::system_account_name ||
-                     act.act.account == chain::config::distribution_account_name
-                  )
-               )
-            {
-               return false;
-            }
-
             bool pass_on = false;
-
             if (bypass_filter) {
               pass_on = true;
             }
@@ -274,10 +254,6 @@ namespace eosio {
 
          void on_action_trace( const action_trace& at ) {
             if( filter( at ) ) {
-            
-               DBG("%s;%s;%s;%s", std::to_string(at.block_num).c_str(), std::to_string(at.act.data.size()).c_str(),
-                 at.act.name.to_string().c_str(), at.act.authorization.front().actor.to_string().c_str());
-
                //idump((fc::json::to_pretty_string(at)));
                auto& chain = chain_plug->chain();
                chainbase::database& db = const_cast<chainbase::database&>( chain.db() ); // Override read-only access to state DB (highly unrecommended practice!)
@@ -337,18 +313,9 @@ namespace eosio {
          if( options.count( "filter-on" )) {
             auto fo = options.at( "filter-on" ).as<vector<string>>();
             for( auto& s : fo ) {
-               
-               if( s == "$" || s == "\"$\"" )
-               {
-                  my->ban_block_production_logs = true;
-                  my->bypass_filter = true;
-                  wlog( "--filter-on '$' enabled. All information will be gathered except internal transactions. This can fill shared_mem, causing nodeos to stop." );
-                  break;
-               }
-
                if( s == "*" || s == "\"*\"" ) {
                   my->bypass_filter = true;
-                  wlog( "--filter-on '*' enabled. This can fill shared_mem, causing nodeos to stop." );
+                  wlog( "--filter-on * enabled. This can fill shared_mem, causing nodeos to stop." );
                   break;
                }
                std::vector<std::string> v;
