@@ -40,18 +40,20 @@ if __name__ == "__main__":
 		}
 
 		node.changeparams(newparams)
+
+		#Changes in _ram_bytes values [AD 1] due to this commit: 93430498700a04b8bb49612ebbddffcc144e627c, from 12 Jul, 2019
 		
 		#Actions
 		summary.user_block_status(node, tester, ResourceResult(_balance="5.0000 BTS",_net_weight="0.0000 BEOS",_cpu_weight="0.0000 BEOS",_ram_bytes=5448))
 		node.wait_till_block(11)
-		summary.user_block_status(node, tester, ResourceResult(_balance="5.0000 BTS",_net_weight="367121673.1379 BEOS",_cpu_weight="367121673.1380 BEOS",_ram_bytes=10666672114))
+		#[AD 1] Previous _ram_bytes = 10666672114
+		summary.user_block_status(node, tester, ResourceResult(_balance="5.0000 BTS",_net_weight="367121673.1379 BEOS",_cpu_weight="367121673.1380 BEOS",_ram_bytes=10666672052))
 		node.wait_till_block(16)
-		summary.user_block_status(node, tester, ResourceResult(_balance="5.0000 BTS",_net_weight="734243346.2758 BEOS",_cpu_weight="734243346.2760 BEOS",_ram_bytes=21333338781))
+		#[AD 1] Previous _ram_bytes = 21333338781
+		summary.user_block_status(node, tester, ResourceResult(_balance="5.0000 BTS",_net_weight="734243346.2758 BEOS",_cpu_weight="734243346.2760 BEOS",_ram_bytes=21333338656))
 		node.wait_till_block(21)
-		summary.user_block_status(node, tester, ResourceResult(_balance="5.0000 BTS",_net_weight="1101365019.4137 BEOS",_cpu_weight="1101365019.4140 BEOS",_ram_bytes=32000005448))
-		
-		#At end
-		summary.user_block_status(node, tester, ResourceResult(_balance="5.0000 BTS",_net_weight="1101365019.4137 BEOS",_cpu_weight="1101365019.4140 BEOS",_ram_bytes=32000005448))
+		#[AD 1] Previous _ram_bytes = 32000005448
+		summary.user_block_status(node, tester, ResourceResult(_balance="5.0000 BTS",_net_weight="1101365019.4137 BEOS",_cpu_weight="1101365019.4140 BEOS",_ram_bytes=32000005261))
 	except Exception as _ex:
 		log.exception("Exception `{0}` occures while executing `{1}` tests.".format(str(_ex), __file__))
 	finally:

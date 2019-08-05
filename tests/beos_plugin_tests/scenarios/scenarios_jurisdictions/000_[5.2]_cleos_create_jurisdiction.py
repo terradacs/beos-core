@@ -45,11 +45,13 @@ if __name__ == "__main__":
     summary.equal(True, result.find("jurisdiction with the same name exists") != -1, "jurisdiction with the same name exists")
 
     # trying to create jurisdiction with negative code
+    return_str = "{\"ram_payer\":\"eosio\",\"new_code\":65535,\"new_name\":\"NEGATIVE\",\"new_description\":\"dwad\"}"
+
     call = ["push", "action", "eosio", "addjurisdict", "[ \"eosio\", \"-1\", \"NEGATIVE\", \"EAST EUROPE\" ]", "-p", "eosio"]
     code, result = node.make_cleos_call(call)
     print("result {}".format(result))
     log.info(result)
-    summary.equal(True, result.find("jurisdiction with the same name exists") != -1, "jurisdiction with the same name exists")
+    summary.equal(True, result.find(return_str) != -1, "Expected: {}".format(return_str))
 
     # trying to create jurisdiction with empty description
     return_str = "{\"ram_payer\":\"eosio\",\"new_code\":2,\"new_name\":\"GERMANY\",\"new_description\":\"\"}"

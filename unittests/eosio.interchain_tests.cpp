@@ -444,6 +444,232 @@ fc::variant get_init_param()
   }
 };
 
+class eosio_native_tester : public actions
+{
+  protected:
+
+  void prepare_account( account_name account, const char* _wast, const char* _abi, abi_serializer* ser = nullptr )
+  {
+    produce_blocks( 2 );
+
+    set_code( account, _wast );
+    set_abi( account, _abi );
+
+    const auto& accnt = control->db().get<account_object,by_name>( account );
+    abi_def abi;
+    BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
+    if( ser )
+      ser->set_abi(abi, abi_serializer_max_time);
+  }
+
+  public:
+
+  eosio_native_tester(uint64_t state_size = 1024*1024*8,
+                          uint64_t initial_supply = 3674470000'0000,
+                          uint8_t min_activated_stake_percent = 15, // 15% is default in eosio
+                          uint64_t gateway_init_ram = 16400'0000,
+                          uint64_t gateway_init_net = 10000'0000,
+                          uint64_t gateway_init_cpu = 10000'0000,
+                          uint64_t distrib_init_ram = 3200030'0000, //30'000'000'000 + 301'000 default leftover + 0 default ram trustee reward
+                          uint64_t distrib_init_net = 0, //200'000'000.0000 + 1.0000 leftover + 1000.0000 default beos trustee reward (set == 0 for auto calculation)
+                          uint64_t distrib_init_cpu = 1'0000) //this is leftover from distribution - that amount will be left on distrib on both net and cpu
+    : actions(state_size)
+  {
+    produce_blocks( 2 );
+
+    create_accounts({
+                      N(eosio.token), N(eosio.ram), N(eosio.ramfee), N(eosio.stake),
+                      N(eosio.bpay), N(eosio.vpay), N(eosio.saving), N(eosio.names),
+                      N(beos.init)
+                    });
+
+    prepare_account( N(eosio.token), eosio_token_wast, eosio_token_abi, &token_abi_ser );
+
+    create_currency( N(eosio.token), config::system_account_name, asset::from_string("10000000000.0000 BEOS") );
+    create_currency( N(eosio.token), config::gateway_account_name, asset::from_string("10000000000.0000 PROXY") );
+    create_currency( N(eosio.token), config::gateway_account_name, asset::from_string("10000000000.000000 BROWNIE") );
+    create_currency( N(eosio.token), config::gateway_account_name, asset::from_string("10000000000.00000 PXEOS") );
+    produce_blocks( 1 );
+
+    prepare_account( config::system_account_name, eosio_system_wast, eosio_system_abi, &system_abi_ser );
+    prepare_account( N(beos.init), eosio_init_wast, eosio_init_abi, &beos_init_abi_ser );
+    prepare_account( config::gateway_account_name, eosio_gateway_wast, eosio_gateway_abi, &beos_gateway_abi_ser );
+    prepare_account( config::distribution_account_name, eosio_distribution_wast, eosio_distribution_abi, &beos_distrib_abi_ser );
+
+    //BOOST_REQUIRE_EQUAL( success(), issue( config::system_account_name, asset::from_string("1000000000.0000 BEOS"), config::system_account_name ) );
+    BOOST_REQUIRE_EQUAL( success(), push_action( config::system_account_name, N(initialissue),
+                                                 mvo()
+                                                   ( "quantity", initial_supply )
+                                                   ( "min_activated_stake_percent", min_activated_stake_percent ),
+                                                 system_abi_ser,
+                                                 config::system_account_name
+                                               )
+                       );
+
+    BOOST_REQUIRE_EQUAL( success(), initresource( config::gateway_account_name,
+                                                    gateway_init_ram,
+                                                    asset(gateway_init_net, symbol(4,"BEOS")),
+                                                    asset(gateway_init_cpu, symbol(4,"BEOS"))
+                                                )
+                       );
+    BOOST_REQUIRE_EQUAL( success(), initresource( config::distribution_account_name,
+                                                    distrib_init_ram,
+                                                    asset::from_string("-0.0001 BEOS"),
+                                                    asset::from_string("-0.0001 BEOS")
+                                                )
+                       );
+    //beos.distrib only distributes resources stored as net weight (minus value on cpu)
+    if (distrib_init_net == 0) {
+       distrib_init_net = get_balance(config::system_account_name).get_amount() - distrib_init_cpu;
+    }
+    BOOST_REQUIRE_EQUAL( success(), initresource( config::distribution_account_name,
+                                                    -1,
+                                                    asset(distrib_init_net, symbol(4,"BEOS")),
+                                                    asset(distrib_init_cpu, symbol(4,"BEOS"))
+                                                )
+                       );
+    //ABW: we need to have enough resources to cover all tests regardless of distribution parameters (we leave plenty of liquid BEOS on eosio
+    //because if it was calculated as in case of normal initialization phase test results for distribution would be more unstable)
+
+    // create_account_with_resources( config::gateway_account_name, N(terradacs) );
+    create_account_with_resources( config::gateway_account_name, N(beos.trustee) );
+
+    // create_account_with_resources( config::gateway_account_name, N(alice) );
+    // create_account_with_resources( config::gateway_account_name, N(bob) );
+    // create_account_with_resources( config::gateway_account_name, N(carol) );
+    // create_account_with_resources( config::gateway_account_name, N(dan) );
+    produce_blocks( 1 );
+  }
+
+  asset get_balance( const account_name& act, std::string coin_name = "BEOS" )
+  {
+  vector<char> data = get_row_by_account( N(eosio.token), act, N(accounts), symbol( 4, coin_name.c_str() ).to_symbol_code().value );
+  return data.empty() ? asset(0, symbol( 4, coin_name.c_str() )) : token_abi_ser.binary_to_variant( "account", data, abi_serializer_max_time )["balance"].as<asset>();
+  }
+
+  fc::variant check_data( account_name acc )
+  {
+    asset balance = get_balance( acc, "PROXY" );
+    const auto& resource_limit_mgr = control->get_resource_limits_manager();
+    int64_t ram_bytes = 0;
+    int64_t net_weight = 0;
+    int64_t cpu_weight = 0;
+
+    resource_limit_mgr.get_account_limits( acc, ram_bytes, net_weight, cpu_weight );
+
+    asset a_total_net_cpu( net_weight + cpu_weight );
+
+    return mvo()
+      ( "balance", balance )
+      ( "staked_balance", a_total_net_cpu )
+      ( "staked_ram", ram_bytes );
+  }
+
+  transaction_trace_ptr create_account_with_resources( account_name creator, account_name a ) {
+    signed_transaction trx;
+    set_transaction_headers(trx);
+
+    authority owner_auth;
+
+    owner_auth =  authority( get_public_key( a, "owner" ) );
+
+    trx.actions.emplace_back( vector<permission_level>{{creator,config::active_name}},
+                              newaccount{
+                                  .creator  = creator,
+                                  .name     = a,
+                                  .init_ram = true,
+                                  .owner    = owner_auth,
+                                  .active   = authority( get_public_key( a, "active" ) )
+                              });
+
+    set_transaction_headers(trx);
+    trx.sign( get_private_key( creator, "active" ), control->get_chain_id()  );
+    return push_transaction( trx );
+  }
+
+  action_result change_init_params( const test_global_state& tgs )
+  {
+    variants v;
+    v.emplace_back( tgs.starting_block_for_initial_witness_election );
+    return push_action( N(beos.init), N(changeparams), mvo()
+       ("new_params", v), beos_init_abi_ser, N(beos.init) );
+  }
+
+  action_result change_distrib_params( const test_global_state& tgs )
+  {
+    variants v;
+    v.emplace_back( std::move( tgs.beos ) );
+    v.emplace_back( std::move( tgs.ram ) );
+    v.emplace_back( std::move( tgs.proxy_assets ) );
+    v.emplace_back( std::move( tgs.ram_leftover ) );
+    return push_action( N(beos.distrib), N(changeparams), mvo()
+       ("new_params", v), beos_distrib_abi_ser, N(beos.distrib) );
+  }
+
+  action_result change_gateway_params()
+  {
+    test_gateway_global_state tgs;
+
+    tgs.proxy_assets.emplace_back( asset( 0, symbol(SY(6, PROXY)) ), "bts" );
+    tgs.proxy_assets.emplace_back( asset( 0, symbol(SY(6, BROWNIE)) ), "brownie.pts" );
+    tgs.proxy_assets.emplace_back( asset( 0, symbol(SY(6, PXEOS)) ), "eos" );
+
+    variants v;
+    v.emplace_back( std::move( tgs.proxy_assets ) );
+    return push_action( N(beos.gateway), N(changeparams), mvo()
+       ("new_params", v), beos_gateway_abi_ser, N(beos.gateway) );
+  }
+
+  void check_change_params( const test_global_state& tgs )
+  {
+    BOOST_REQUIRE_EQUAL( success(), change_init_params( tgs ) );
+    BOOST_REQUIRE_EQUAL( success(), change_distrib_params( tgs ) );
+    BOOST_REQUIRE_EQUAL( success(), change_gateway_params() );
+  }
+
+  fc::variant get_init_param()
+  {
+    vector<char> data = get_row_by_account( N(beos.init), N(beos.init), N(beosglobal), N(beosglobal) );
+    if( data.empty() )
+      return fc::variant();
+    else
+      return beos_init_abi_ser.binary_to_variant( "beos_global_state", data, abi_serializer_max_time );
+  }
+
+  fc::variant get_distrib_param()
+  {
+    vector<char> data = get_row_by_account( N(beos.distrib), N(beos.distrib), N(distribstate), N(distribstate) );
+    if( data.empty() )
+      return fc::variant();
+    else
+      return beos_distrib_abi_ser.binary_to_variant( "distrib_global_state", data, abi_serializer_max_time );
+  }
+
+  action_result store_params_init()
+  {
+    return push_action( N(beos.init), N(storeparams), mvo()("dummy",0),
+        beos_init_abi_ser,
+        N(beos.init)
+      );
+  }
+
+  action_result store_params_distrib()
+  {
+    return push_action( N(beos.distrib), N(storeparams), mvo()("dummy", 0),
+        beos_distrib_abi_ser,
+        N(beos.distrib)
+      );
+  }
+
+  void check_user_stats(const uint64_t expected_balance, const uint64_t expected_ram, const uint64_t expected_net, const uint64_t expected_cpu)
+  {
+    BOOST_REQUIRE_EQUAL( expected_balance * 1'0000,  get_currency_balance( N(eosio.token), symbol(SY(4, PROXY)) , N(aaaa) ).get_amount() );
+    BOOST_REQUIRE_EQUAL( expected_ram, get_staked_balance( N(aaaa) )["ram_bytes"].as_int64() );
+    BOOST_REQUIRE_EQUAL( expected_net, get_staked_balance( N(aaaa) )["net_weight"].as_int64() );
+    BOOST_REQUIRE_EQUAL( expected_cpu, get_staked_balance( N(aaaa) )["cpu_weight"].as_int64() );
+  };
+};
+
 class eosio_init_tester: public eosio_interchain_tester
 {
   public:
@@ -988,6 +1214,108 @@ public:
   }
 
 };
+
+BOOST_AUTO_TEST_SUITE( issue_basic_tests_on_native_settings )
+
+BOOST_FIXTURE_TEST_CASE( issue_test_01, eosio_native_tester ) try {
+
+  create_account_with_resources(N(beos.gateway), N(aaaa));
+  issue(N(aaaa), asset::from_string("5.0000 PROXY"));
+
+  test_global_state tgs;
+
+  uint32_t curr = control->head_block_num();
+
+  tgs.beos.starting_block = curr + 10;
+  tgs.beos.next_block = 0;
+  tgs.beos.ending_block = curr + 30;
+  tgs.beos.block_interval = 5;
+  tgs.beos.trustee_reward = 1000000;
+
+  tgs.ram.starting_block = curr + 10;
+  tgs.ram.next_block = 0;
+  tgs.ram.ending_block = curr + 18;
+  tgs.ram.block_interval = 4;
+  tgs.ram.trustee_reward = 0;
+
+  tgs.proxy_assets = { asset::from_string("0.0000 PROXY") };
+  tgs.ram_leftover = 300000;
+  tgs.starting_block_for_initial_witness_election = curr + 10;
+
+  check_change_params( tgs );
+  produce_blocks(2);
+
+  curr = control->head_block_num();
+
+  check_user_stats( 5, 5448, 0, 0);
+
+  produce_blocks( curr - tgs.beos.starting_block + 11);
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), curr += ( curr - tgs.beos.starting_block ) + 11 );  
+  check_user_stats( 5, 10666672052, 3671216731379, 3671216731380);
+
+  produce_blocks(4U);
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), curr += 4 );
+  check_user_stats( 5, 21333338656, 7342433462758, 7342433462760);
+
+  produce_blocks(5U);
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), curr += 5 );
+  check_user_stats( 5, 32000005261, 11013650194137, 11013650194140);
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( issue_test_02, eosio_native_tester ) try {
+
+  create_account_with_resources(N(beos.gateway), N(aaaa));
+  issue(N(aaaa), asset::from_string("5.0000 PROXY"));
+
+  test_global_state tgs;
+
+  uint32_t curr = control->head_block_num();
+
+  tgs.beos.starting_block = curr + 10;
+  tgs.beos.next_block = 0;
+  tgs.beos.ending_block = curr + 30;
+  tgs.beos.block_interval = 5;
+  tgs.beos.trustee_reward = 1000000;
+
+  tgs.ram.starting_block = curr + 10;
+  tgs.ram.next_block = 0;
+  tgs.ram.ending_block = curr + 20;
+  tgs.ram.block_interval = 5;
+  tgs.ram.trustee_reward = 0;
+
+  tgs.proxy_assets = { asset::from_string("0.0000 PROXY") };
+  tgs.ram_leftover = 300000;
+  tgs.starting_block_for_initial_witness_election = curr + 120;
+
+  check_change_params( tgs );
+  produce_blocks();
+
+  curr = control->head_block_num();
+
+  check_user_stats( 5, 5448, 0, 0);
+  produce_blocks( curr - tgs.beos.starting_block + 10);
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), curr += ( curr - tgs.beos.starting_block ) + 10 );
+  issue(N(aaaa), asset::from_string("5.0000 PROXY"));
+  produce_blocks(1U);
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), curr += 2 );
+  check_user_stats( 10, 10666672052, 3671216731379, 3671216731380);
+  produce_blocks(3U);
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), curr += 3 );
+  issue(N(aaaa), asset::from_string("5.0000 PROXY"));
+  produce_blocks(1U);
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), curr += 2 );
+  check_user_stats( 15, 21333338656, 7342433462758, 7342433462760);
+  produce_blocks(3U);
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), curr += 3 );
+  issue(N(aaaa), asset::from_string("5.0000 PROXY"));
+  produce_blocks(1U);
+  BOOST_REQUIRE_EQUAL( control->head_block_num(), curr += 2 );
+  check_user_stats( 20, 32000005261, 11013650194137, 11013650194140);
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(eosio_jurisdiction_tests)
 
