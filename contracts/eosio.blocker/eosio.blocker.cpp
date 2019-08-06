@@ -7,6 +7,7 @@
 
 #include <eosiolib/action.hpp>
 #include <eosiolib/currency.hpp>
+#include <eosio.token/eosio.token.hpp>
 
 using eosio::print;
 using eosio::name;
@@ -69,6 +70,11 @@ void blocker::update( account_name account, bool from, bool insert )
 bool blocker::is_valid() const
 {
    auto data = unpack_action_data<currency::transfer>();
+
+   //Issuer of given coin must be the same as owner of `blocker` contract.
+   bool owner_of_asset = eosio::token( N(eosio.token) ).get_issuer( data.quantity.symbol.name() ) == _self;
+   if( !owner_of_asset )
+      return true;
 
    valid_senders_type senders( _self, _self );
    valid_recip_type recipients( _self, _self );
