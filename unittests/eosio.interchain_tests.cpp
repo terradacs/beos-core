@@ -4181,10 +4181,15 @@ BOOST_FIXTURE_TEST_CASE( block_basic, beos_blocker_tester ) try {
    auto alice = N(alice);
    auto bob = N(bob);
    auto carol = N(carol);
+   auto _another_asset = asset::from_string("1.0000 PROXY");
    auto _asset = asset::from_string("1.0000 MANNA");
    auto _small_asset = asset::from_string("0.0001 MANNA");
 
    BOOST_REQUIRE_EQUAL( wasm_assert_msg( block_message ), transfer( owner, alice, _asset ) );
+
+   //only `MANNA` is sensitible for blocking
+   BOOST_REQUIRE_EQUAL( success(), transfer( owner, alice, _another_asset ) );
+
    BOOST_REQUIRE_EQUAL( success(), update_accounts( alice, false/*from*/, true/*insert*/ ) );
    //(from:) (to:) alice
    BOOST_REQUIRE_EQUAL( success(), transfer( owner, alice, _asset ) );
