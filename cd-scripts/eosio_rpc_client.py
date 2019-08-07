@@ -19,7 +19,9 @@ NODEOS_API_LIST = [
   "chain",
   "history",
   "producer",
-  "net"
+  "net",
+  "jurisdiction",
+  "jurisdiction_history"
 ]
 
 KEOSD_API_LIST = [
