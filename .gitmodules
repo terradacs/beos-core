@@ -1,6 +1,6 @@
 [submodule "libraries/chainbase"]
 	path = libraries/chainbase
-	url = https://gitlab.syncad.com/blocktrades/chainbase.git
+	url = git@gitlab.syncad.com:blocktrades/chainbase.git
 [submodule "libraries/appbase"]
 	path = libraries/appbase
 	url = https://github.com/eosio/appbase
