@@ -189,7 +189,7 @@ DISTRIBUTION_PARAMS = {
     "block_interval" : 1 * 3600 * 2, # hours(1).to_seconds() * 2
     "trustee_reward" : 0 # no ram for trustee as reward
   },
-  "proxy_assets" : [ "0.0000 BTS", "0.0000 BROWNIE" ],
+  "proxy_assets" : [ "0.0000 BTS", "0.0000 BRNP" ],
   "ram_leftover" : DISTRIB_RAM_LEFTOVER,
 }
 
@@ -201,7 +201,7 @@ GATEWAY_PARAMS = {
         "description" : "bts"
      },
      {
-        "proxy_asset" : "10000000000.0000 BROWNIE", # maximum amount that will ever be allowed to be issued (must cover all Brownie.PTS)
+        "proxy_asset" : "10000000000.0000 BRNP", # maximum amount that will ever be allowed to be issued (must cover all Brownie.PTS)
         "description" : "brownie.pts"
      },
      {
