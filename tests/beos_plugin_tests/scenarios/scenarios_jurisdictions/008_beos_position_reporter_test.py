@@ -23,49 +23,43 @@ if __name__ == "__main__":
 
     log.info("Wait 5s")
     time.sleep(5)
-    
-    code, mess = cluster.bios.make_cleos_call(["get", "info"])
-    log.info("Bios: code: {0}, mess {1}\n".format(code, mess))
-    for node in cluster.nodes:
-      code, mess = node.make_cleos_call(["get", "info"])
-      log.info("Nodes: code: {0}, mess {1}\n".format(code, mess))
 
     log.info("Adding test jurisdictions")
     call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "1", "GERMANY", "EAST EUROPE" ]', "-p", "eosio"]
     code, result = cluster.bios.make_cleos_call(call)
-    assert code == 0, "Expecting operation success"
+    summary.equal(True, code == 0, "Expecting operation success")
 
     call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "2", "RUSSIA", "EAST EUROPE" ]', "-p", "eosio"]
     code, result = cluster.bios.make_cleos_call(call)
-    assert code == 0, "Expecting operation success"
+    summary.equal(True, code == 0, "Expecting operation success")
 
     call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "3", "CZECH REPUBLIC", "EAST EUROPE" ]', "-p", "eosio"]
     code, result = cluster.bios.make_cleos_call(call)
-    assert code == 0, "Expecting operation success"
+    summary.equal(True, code == 0, "Expecting operation success")
 
     call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "4", "IRELAND", "WEST EUROPE" ]', "-p", "eosio"]
     code, result = cluster.bios.make_cleos_call(call)
-    assert code == 0, "Expecting operation success"
+    summary.equal(True, code == 0, "Expecting operation success")
 
     call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "5", "SPAIN", "WEST EUROPE" ]', "-p", "eosio"]
     code, result = cluster.bios.make_cleos_call(call)
-    assert code == 0, "Expecting operation success"
+    summary.equal(True, code == 0, "Expecting operation success")
 
     call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "6", "FRANCE", "WEST EUROPE" ]', "-p", "eosio"]
     code, result = cluster.bios.make_cleos_call(call)
-    assert code == 0, "Expecting operation success"
+    summary.equal(True, code == 0, "Expecting operation success")
 
     call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "7", "UKRAINE", "EAST EUROPE" ]', "-p", "eosio"]
     code, result = cluster.bios.make_cleos_call(call)
-    assert code == 0, "Expecting operation success"
+    summary.equal(True, code == 0, "Expecting operation success")
 
     call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "8", "POLAND", "EAST EUROPE" ]', "-p", "eosio"]
     code, result = cluster.bios.make_cleos_call(call)
-    assert code == 0, "Expecting operation success"
+    summary.equal(True, code == 0, "Expecting operation success")
 
     call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "9", "SLOVAKIA", "EAST EUROPE" ]', "-p", "eosio"]
     code, result = cluster.bios.make_cleos_call(call)
-    assert code == 0, "Expecting operation success"
+    summary.equal(True, code == 0, "Expecting operation success")
 
     log.info("Wait 10s. We will wait couple of blocks to be sure that jurisdiction data is added.")
     time.sleep(10)
@@ -97,11 +91,11 @@ if __name__ == "__main__":
     log.info("Testing `get_all_producer_jurisdiction_for_block` API call")
     ret = api_rpc_caller.jurisdiction_history.get_all_producer_jurisdiction_for_block()
     #log.info(ret)
-    assert len(ret["producer_jurisdiction_for_block"]) == 3, "Expecting result len 3"
+    summary.equal(True, len(ret["producer_jurisdiction_for_block"]) == 3, "Expecting result len 3")
     for idx in range(3):
-      assert ret["producer_jurisdiction_for_block"][idx]["producer_name"] == ref_producers[idx], "Expecting producer {}".format(ref_producers[idx])
-      assert len(ret["producer_jurisdiction_for_block"][idx]["new_jurisdictions"]) == 1, "Expecting one jurisdiction code"
-      assert ret["producer_jurisdiction_for_block"][idx]["new_jurisdictions"][0] == ref_jurisdictions[idx][2], "Expecting code {} got {}".format(ref_jurisdictions[idx][2], ret["producer_jurisdiction_for_block"][idx]["new_jurisdictions"][0])
+      summary.equal(True, ret["producer_jurisdiction_for_block"][idx]["producer_name"] == ref_producers[idx], "Expecting producer {}".format(ref_producers[idx]))
+      summary.equal(True, len(ret["producer_jurisdiction_for_block"][idx]["new_jurisdictions"]) == 1, "Expecting one jurisdiction code")
+      summary.equal(True, ret["producer_jurisdiction_for_block"][idx]["new_jurisdictions"][0] == ref_jurisdictions[idx][2], "Expecting code {} got {}".format(ref_jurisdictions[idx][2], ret["producer_jurisdiction_for_block"][idx]["new_jurisdictions"][0]))
 
     ref_jurisdictions_idx = 0
     for producer in ref_producers:
@@ -114,15 +108,18 @@ if __name__ == "__main__":
       log.info("Testing `get_producer_jurisdiction_history` API call with {}".format(data))
       ret = api_rpc_caller.jurisdiction_history.get_producer_jurisdiction_history(data)
       #log.info(ret)
-      assert len(ret["producer_jurisdiction_history"]) == 3, "Expecing result len 3"
+      summary.equal(True, len(ret["producer_jurisdiction_history"]) == 3, "Expecing result len 3")
       for idx in range(3):
-        assert ret["producer_jurisdiction_history"][idx]["producer_name"] == producer, "Expecting producer name {}".format(producer)
-        assert ret["producer_jurisdiction_history"][idx]["new_jurisdictions"][0] == ref_jurisdictions[ref_jurisdictions_idx][idx], "Expecting code {} got {}".format(ref_jurisdictions[ref_jurisdictions_idx][idx], ret["producer_jurisdiction_history"][idx]["new_jurisdictions"][0])
+        summary.equal(True, ret["producer_jurisdiction_history"][idx]["producer_name"] == producer, "Expecting producer name {}".format(producer))
+        summary.equal(True, ret["producer_jurisdiction_history"][idx]["new_jurisdictions"][0] == ref_jurisdictions[ref_jurisdictions_idx][idx], "Expecting code {} got {}".format(ref_jurisdictions[ref_jurisdictions_idx][idx], ret["producer_jurisdiction_history"][idx]["new_jurisdictions"][0]))
       ref_jurisdictions_idx += 1
 
   except Exception as _ex:
     log.exception(_ex)
+    summary.equal(False, True, "Exception occured durring testing.")
   finally:
     for code_changer in code_changers:
       code_changer.stop()
+    status = summary.summarize()
     cluster.stop_all()
+    exit(status)
