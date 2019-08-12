@@ -68,27 +68,27 @@ if __name__ == "__main__":
     code, result = cluster.bios.make_cleos_call(call)
     log.info(result)
     result = json.loads(result)
-    assert len(result["producer_jurisdictions"]) == 1, "Expecting 1 element in array"
-    assert len(result["producer_jurisdictions"][0]["jurisdictions"]) == 1, "Expecting 1 element in array"
-    assert result["producer_jurisdictions"][0]["jurisdictions"][0] == 1, "Expecting jurisdiction code 1" 
+    summary.equal(True, len(result["producer_jurisdictions"]) == 1, "Expecting 1 element in array")
+    summary.equal(True, len(result["producer_jurisdictions"][0]["jurisdictions"]) == 1, "Expecting 1 element in array")
+    summary.equal(True, result["producer_jurisdictions"][0]["jurisdictions"][0] == 1, "Expecting jurisdiction code 1" )
 
     log.info("Ask `get_producer_jurisdiction` for `baaaaaaaaaaa`")
     call = ["get", "producer_jurisdiction", '["baaaaaaaaaaa"]']
     code, result = cluster.bios.make_cleos_call(call)
     log.info(result)
     result = json.loads(result)
-    assert len(result["producer_jurisdictions"]) == 1, "Expecting 1 element in array"
-    assert len(result["producer_jurisdictions"][0]["jurisdictions"]) == 1, "Expecting 1 element in array"
-    assert result["producer_jurisdictions"][0]["jurisdictions"][0] == 2, "Expecting jurisdiction code 2"
+    summary.equal(True, len(result["producer_jurisdictions"]) == 1, "Expecting 1 element in array")
+    summary.equal(True, len(result["producer_jurisdictions"][0]["jurisdictions"]) == 1, "Expecting 1 element in array")
+    summary.equal(True, result["producer_jurisdictions"][0]["jurisdictions"][0] == 2, "Expecting jurisdiction code 2")
 
     log.info("Ask `get_producer_jurisdiction` for `caaaaaaaaaaa`")
     call = ["get", "producer_jurisdiction", '["caaaaaaaaaaa"]']
     code, result = cluster.bios.make_cleos_call(call)
     log.info(result)
     result = json.loads(result)
-    assert len(result["producer_jurisdictions"]) == 1, "Expecting 1 element in array"
-    assert len(result["producer_jurisdictions"][0]["jurisdictions"]) == 1, "Expecting 1 element in array"
-    assert result["producer_jurisdictions"][0]["jurisdictions"][0] == 3, "Expecting jurisdiction code 3"
+    summary.equal(True, len(result["producer_jurisdictions"]) == 1, "Expecting 1 element in array")
+    summary.equal(True, len(result["producer_jurisdictions"][0]["jurisdictions"]) == 1, "Expecting 1 element in array")
+    summary.equal(True, result["producer_jurisdictions"][0]["jurisdictions"][0] == 3, "Expecting jurisdiction code 3")
 
     call =[ "push", "action", "--jurisdictions", "[1]","beos.gateway", "issue", "[ \"{0}\", \"100.0000 BTS\", \"hello\" ]".format(prods[2]), "-p", "beos.gateway"]
     code, result = cluster.bios.make_cleos_call(call)
@@ -98,6 +98,8 @@ if __name__ == "__main__":
 
   except Exception as _ex:
     log.exception(_ex)
+    summary.equal(False, True, "Exception occured durring testing.")
   finally:
+    status = summary.summarize()
     cluster.stop_all()
-    exit(0)
+    exit(status)

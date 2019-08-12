@@ -213,8 +213,8 @@ math(EXPR nr_of_scenarios_folders "${nr_of_scenarios_folders}-1")
 set(port_counter 1)
 set(test_base_name "test03_scenarios_deploy_")
 foreach(scenario_dir ${Scenarios})
-  math(EXPR NODEOS_SCENARIO_PORT "10000+${port_counter}")
   set(test_name "${test_base_name}${scenario_dir}")
+  math(EXPR NODEOS_SCENARIO_PORT "10000+${port_counter}")
   add_test(NAME ${test_name} COMMAND tests/beos_plugin_tests/test03_scenarios_deploy.py
   --nodeos-ip ${NODEOS_IP_ADDRESS}
   --nodeos-port ${NODEOS_SCENARIO_PORT}
@@ -228,7 +228,7 @@ foreach(scenario_dir ${Scenarios})
   set_tests_properties( ${test_name} PROPERTIES LABELS beos_tests DEPENDS start_keosd_for_scenarios)
   set_property(TEST stop_keosd_for_scenarios APPEND PROPERTY DEPENDS ${test_name})
   set_property(TEST start_nodeos_keosd_via_run_py APPEND PROPERTY DEPENDS ${test_name})
-  math(EXPR port_counter "${port_counter}+1")
+  math(EXPR port_counter "${port_counter}+100")
 endforeach()
 
 set_property(TEST start_nodeos_keosd_via_run_py APPEND PROPERTY DEPENDS stop_keosd_for_scenarios )
