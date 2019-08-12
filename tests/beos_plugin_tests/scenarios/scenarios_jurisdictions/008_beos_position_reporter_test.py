@@ -25,41 +25,23 @@ if __name__ == "__main__":
     time.sleep(5)
 
     log.info("Adding test jurisdictions")
-    call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "1", "GERMANY", "EAST EUROPE" ]', "-p", "eosio"]
-    code, result = cluster.bios.make_cleos_call(call)
-    summary.equal(True, code == 0, "Expecting operation success")
 
-    call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "2", "RUSSIA", "EAST EUROPE" ]', "-p", "eosio"]
-    code, result = cluster.bios.make_cleos_call(call)
-    summary.equal(True, code == 0, "Expecting operation success")
+    jurisdictions = [
+      ["1", "GERMANY", "EAST EUROPE"],
+      ["2", "RUSSIA", "EAST EUROPE"],
+      ["3", "CZECH REPUBLIC", "EAST EUROPE"],
+      ["4", "IRELAND", "WEST EUROPE"],
+      ["5", "SPAIN", "WEST EUROPE"],
+      ["6", "FRANCE", "WEST EUROPE"],
+      ["7", "UKRAINE", "EAST EUROPE"],
+      ["8", "POLAND", "EAST EUROPE"],
+      ["9", "SLOVAKIA", "EAST EUROPE"]
+    ]
 
-    call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "3", "CZECH REPUBLIC", "EAST EUROPE" ]', "-p", "eosio"]
-    code, result = cluster.bios.make_cleos_call(call)
-    summary.equal(True, code == 0, "Expecting operation success")
-
-    call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "4", "IRELAND", "WEST EUROPE" ]', "-p", "eosio"]
-    code, result = cluster.bios.make_cleos_call(call)
-    summary.equal(True, code == 0, "Expecting operation success")
-
-    call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "5", "SPAIN", "WEST EUROPE" ]', "-p", "eosio"]
-    code, result = cluster.bios.make_cleos_call(call)
-    summary.equal(True, code == 0, "Expecting operation success")
-
-    call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "6", "FRANCE", "WEST EUROPE" ]', "-p", "eosio"]
-    code, result = cluster.bios.make_cleos_call(call)
-    summary.equal(True, code == 0, "Expecting operation success")
-
-    call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "7", "UKRAINE", "EAST EUROPE" ]', "-p", "eosio"]
-    code, result = cluster.bios.make_cleos_call(call)
-    summary.equal(True, code == 0, "Expecting operation success")
-
-    call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "8", "POLAND", "EAST EUROPE" ]', "-p", "eosio"]
-    code, result = cluster.bios.make_cleos_call(call)
-    summary.equal(True, code == 0, "Expecting operation success")
-
-    call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "9", "SLOVAKIA", "EAST EUROPE" ]', "-p", "eosio"]
-    code, result = cluster.bios.make_cleos_call(call)
-    summary.equal(True, code == 0, "Expecting operation success")
+    for jurisdiction in jurisdictions:
+      call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "{}", "{}", "{}" ]'.format(jurisdiction[0], jurisdiction[1], jurisdiction[2]), "-p", "eosio"]
+      code, result = cluster.bios.make_cleos_call(call)
+      summary.equal(True, code == 0, "Expecting operation success")
 
     log.info("Wait 10s. We will wait couple of blocks to be sure that jurisdiction data is added.")
     time.sleep(10)
