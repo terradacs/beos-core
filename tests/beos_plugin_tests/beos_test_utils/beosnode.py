@@ -39,6 +39,9 @@ class BEOSNode(object):
             self.keosd_port  = _keosd_port
             self.wallet_name = _wallet_name,
 
+        def get_url(self):
+            return "http://{}:{}".format(self.node_ip, self.node_port)
+
     def __init__(self, _node_ip, _node_port, _keosd_ip, _keosd_port, _wallet_name, _path_to_cleos ):
         self.cleos     = EOSCleosCaller(_node_ip, _node_port, _keosd_ip, _keosd_port, _wallet_name, _path_to_cleos)
         self.utils     = EOSTransactionCaller(_node_ip, _node_port, _keosd_ip, _keosd_port, _wallet_name)
@@ -58,6 +61,8 @@ class BEOSNode(object):
         self.delay_block = 0
         self.user_name = list("aaaaaaaaaaaa")
 
+    def get_url(self):
+        return self.node_data.get_url()
 
     def generate_user_name(self):
         name = list(self.user_name)
