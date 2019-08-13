@@ -27,14 +27,15 @@ jurisdiction_provider_interface::ptr_base jurisdiction_provider_interface::getpt
 
 /*=============================jurisdiction_base_provider=============================*/
 
-void jurisdiction_base_provider::update( const account_name& new_producer )
+void jurisdiction_base_provider::update( const account_name& new_producer, size_t _producers_on_node )
 {
    active_producer = new_producer;
+   producers_on_node = _producers_on_node;
 }
 
 fc::optional< jurisdiction_producer > jurisdiction_base_provider::get_jurisdiction_producer()
 {
-   if( accounts.find( active_producer ) == accounts.end() && was_change )
+   if( accounts.find( active_producer ) == accounts.end() && accounts.size() < producers_on_node )
       return jurisdiction_producer( active_producer, data.jurisdictions );
    else
       return fc::optional< jurisdiction_producer >();
@@ -42,13 +43,11 @@ fc::optional< jurisdiction_producer > jurisdiction_base_provider::get_jurisdicti
 
 void jurisdiction_base_provider::postprocess()
 {
-   was_change = false;
    accounts.insert( active_producer );
 }
 
 void jurisdiction_base_provider::change( const jurisdiction_basic& src )
 {
-   was_change = true;
    accounts.clear();
    data = src;
 }
@@ -58,7 +57,12 @@ void jurisdiction_base_provider::change( const jurisdiction_basic& src )
 void jurisdiction_action_launcher::update_provider()
 {
    if( provider )
-      provider->update( active_producer );
+      provider->update( active_producer, producers_on_node );
+}
+
+void jurisdiction_action_launcher::init( size_t _producers_on_node )
+{
+   producers_on_node = _producers_on_node;
 }
 
 const account_name& jurisdiction_action_launcher::get_active_producer() const

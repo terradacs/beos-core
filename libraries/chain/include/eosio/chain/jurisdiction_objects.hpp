@@ -43,7 +43,7 @@ class jurisdiction_provider_interface : public std::enable_shared_from_this< jur
 
       ptr_base getptr();
 
-      virtual void update( const account_name& producer ) = 0;
+      virtual void update( const account_name& producer, size_t producers_on_node ) = 0;
       virtual fc::optional< jurisdiction_producer > get_jurisdiction_producer() = 0;
       virtual void postprocess() = 0;
 };
@@ -56,7 +56,7 @@ class jurisdiction_base_provider : public jurisdiction_provider_interface
 
    private:
 
-      bool was_change = false;
+      size_t producers_on_node = 0;
 
       using accounts_set = std::set< account_name >;
       accounts_set accounts;
@@ -69,7 +69,7 @@ class jurisdiction_base_provider : public jurisdiction_provider_interface
       jurisdiction_base_provider(){}
       ~jurisdiction_base_provider() override{}
 
-      void update( const account_name& new_producer ) override;
+      void update( const account_name& new_producer, size_t _producers_on_node ) override;
       fc::optional< jurisdiction_producer > get_jurisdiction_producer() override;
       void postprocess() override;
 
@@ -88,6 +88,8 @@ class jurisdiction_action_launcher
 
    private:
 
+      uint16_t producers_on_node = 0;
+
       bool producer_changed = false;
 
       account_name active_producer;
@@ -101,6 +103,8 @@ class jurisdiction_action_launcher
       bool is_equal( const chainbase::database &db, const jurisdiction_producer& src );
 
    public:
+
+      void init( size_t _producers_on_node );
 
       const account_name& get_active_producer() const;
 
