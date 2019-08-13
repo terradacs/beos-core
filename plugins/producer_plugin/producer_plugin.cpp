@@ -360,7 +360,12 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
 
             auto trace = chain.push_transaction( trx, fc::time_point::maximum(), chain.get_global_properties().configuration.min_transaction_cpu_usage );
             if( trace->except )
-               fc_dlog(_trx_trace_log, "Changing jurisdictions failed" );
+            {
+               ilog( "Change of jurisdictions failed" );
+               ilog("${detail}", ( "detail", trace->except->to_detail_string() ) );
+            }
+            else
+               jurisdiction_launcher.confirm();
 
          } catch ( const guard_exception& e ) {
             app().get_plugin<chain_plugin>().handle_guard_exception(e);

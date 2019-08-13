@@ -125,10 +125,13 @@ transaction_metadata_ptr jurisdiction_action_launcher::get_jurisdiction_transact
 
    transaction_metadata_ptr res = std::make_shared< transaction_metadata >( trx );
 
+   return res;
+}
+
+void jurisdiction_action_launcher::confirm()
+{
    if( provider )
       provider->postprocess();
-
-   return res;
 }
 
 bool jurisdiction_action_launcher::check_jurisdictions( const chainbase::database &db, const jurisdiction_producer_ordered& src )

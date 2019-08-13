@@ -109,6 +109,7 @@ class jurisdiction_action_launcher
       void update( account_name new_producer, const signature_provider_type& new_signature_provider = signature_provider_type() );
 
       transaction_metadata_ptr get_jurisdiction_transaction( const chainbase::database &db, const block_id_type& block_id, const time_point& time, const chain::chain_id_type& chain_id );
+      void confirm();
 
       static bool check_jurisdictions( const chainbase::database &db, const jurisdiction_producer_ordered& src );
 };
