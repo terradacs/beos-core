@@ -73,7 +73,7 @@ if __name__ == "__main__":
 
     log.info("Testing `get_all_producer_jurisdiction_for_block` API call")
     ret = api_rpc_caller.jurisdiction_history.get_all_producer_jurisdiction_for_block()
-    #log.info(ret)
+    log.info(ret)
     summary.equal(True, len(ret["producer_jurisdiction_for_block"]) == 3, "Expecting result len 3")
     for idx in range(3):
       summary.equal(True, ret["producer_jurisdiction_for_block"][idx]["producer_name"] == ref_producers[idx], "Expecting producer {}".format(ref_producers[idx]))
@@ -90,7 +90,7 @@ if __name__ == "__main__":
       }
       log.info("Testing `get_producer_jurisdiction_history` API call with {}".format(data))
       ret = api_rpc_caller.jurisdiction_history.get_producer_jurisdiction_history(data)
-      #log.info(ret)
+      log.info(ret)
       summary.equal(True, len(ret["producer_jurisdiction_history"]) == 3, "Expecing result len 3")
       for idx in range(3):
         summary.equal(True, ret["producer_jurisdiction_history"][idx]["producer_name"] == producer, "Expecting producer name {}".format(producer))
