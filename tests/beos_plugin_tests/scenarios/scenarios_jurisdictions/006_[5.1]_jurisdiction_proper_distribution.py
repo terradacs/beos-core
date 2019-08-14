@@ -25,36 +25,36 @@ if __name__ == "__main__":
 
 		call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "0", "POLAND", "EAST EUROPE" ]', "-p", "eosio"]
 		code, result = cluster.bios.make_cleos_call(call)
-		log.info(f"{result}")
+		log.info("{0}".format(result))
 
 		call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "1", "GERMANY", "EAST EUROPE" ]', "-p", "eosio"]
 		code, result = cluster.bios.make_cleos_call(call)
-		log.info(f"{result}")
+		log.info("{0}".format(result))
 
 		call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "2", "RUSSIA", "EAST EUROPE" ]', "-p", "eosio"]
 		code, result = cluster.bios.make_cleos_call(call)
-		log.info(f"{result}")
+		log.info("{0}".format(result))
 
 		prods_0_jurisdiction = 0
 		prods_1_jurisdiction = 1
 		prods_2_jurisdiction = 2
 
-		call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[{1}]}} }}'.format(prods[0], prods_0_jurisdiction), "-p", f"{prods[0]}"]
+		call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[{1}]}} }}'.format(prods[0], prods_0_jurisdiction), "-p", "{0}".format(prods[0])]
 		code, result = cluster.bios.make_cleos_call(call)
-		log.info(f"{result}")
+		log.info("{0}".format(result))
 
-		call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[{1}]}} }}'.format(prods[1], prods_1_jurisdiction), "-p", f"{prods[1]}"]
+		call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[{1}]}} }}'.format(prods[1], prods_1_jurisdiction), "-p", "{0}".format(prods[1])]
 		code, result = cluster.bios.make_cleos_call(call)
-		log.info(f"{result}")
+		log.info("{0}".format(result))
 
-		call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[{1}]}} }}'.format(prods[2], prods_2_jurisdiction), "-p", f"{prods[2]}"]
+		call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[{1}]}} }}'.format(prods[2], prods_2_jurisdiction), "-p", "{0}".format(prods[2])]
 		code, result = cluster.bios.make_cleos_call(call)
-		log.info(f"{result}")
+		log.info("{0}".format(result))
 
 
 		call =[ "push", "action", "--jurisdictions", "[{0}]".format(prods_1_jurisdiction), "beos.gateway", "issue", "[ \"{0}\", \"111.0000 BTS\", \"hello\" ]".format(prods[0]), "-p", "beos.gateway"]
 		code, result = cluster.bios.make_cleos_call(call)
-		log.info(f"{result}")
+		log.info("{0}".format(result))
 
 		trx_id = get_transaction_id_from_result(code, result)
 		log.info("Waiting for transaction id: {} in block".format(trx_id))
@@ -74,7 +74,7 @@ if __name__ == "__main__":
 
 		call =[ "push", "action", "--jurisdictions", "[{0}]".format(prods_0_jurisdiction), "beos.gateway", "issue", "[ \"{0}\", \"122.0000 BTS\", \"hello\" ]".format(prods[1]), "-p", "beos.gateway"]
 		code, result = cluster.bios.make_cleos_call(call)
-		log.info(f"{result}")
+		log.info("{0}".format(result))
 
 		trx_id = get_transaction_id_from_result(code, result)
 		log.info("Waiting for transaction id: {} in block".format(trx_id))

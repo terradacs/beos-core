@@ -44,17 +44,17 @@ if __name__ == "__main__":
 
 		rpc = node.get_url_caller()
 		response = rpc.chain.get_table_rows({"scope":"eosio", "code":"eosio", "table":"infojurisdic", "json": True})
-		log.info(f"response {response}")
+		log.info("response {0}".format(response))
 
 		summary.equal(True, len(response["rows"]) == 0, "There should be no jurisdictions.")
 
 		node.wait_n_blocks(5)
 		code, mess = node.make_cleos_call(["push", "action", "eosio", "addjurisdict", '[ "eosio", "0", "POLAND", "EAST EUROPE" ]', "-p", "eosio"])
-		log.info(f"Code {code} mess {mess}")
+		log.info("Code {0} mess {1}".format(code,mess))
 
 		node.wait_n_blocks(5)
 		response = rpc.chain.get_table_rows({"scope":"eosio", "code":"eosio", "table":"infojurisdic", "json": True})
-		log.info(f"response {response}")
+		log.info("response {0}".format(response))
 
 		summary.equal(True, len(response["rows"]) == 1, "There should be one jurisdiction.")
 		summary.equal(True, response["rows"][0]["name"].lower() == "POLAND".lower(), "Name of the jurisdiction should be `POLAND`")

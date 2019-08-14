@@ -68,7 +68,7 @@ if __name__ == "__main__":
     log.info("Setting jurisdiction codes for producers")
     idx = 0
     for node in cluster.nodes:
-      call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[{1}]}} }}'.format(prods[idx], idx+1), "-p", f"{prods[idx]}"]
+      call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[{1}]}} }}'.format(prods[idx], idx+1), "-p", "{0}".format(prods[idx])]
       code, result = node.make_cleos_call(call)
       summary.equal(True, code == 0, "Expecting operation success")
       idx += 1

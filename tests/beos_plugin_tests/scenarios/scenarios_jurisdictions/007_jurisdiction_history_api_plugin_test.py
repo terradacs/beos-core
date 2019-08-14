@@ -59,7 +59,7 @@ if __name__ == "__main__":
     idx = 0
     jurisdictions = [1,2,3]
     for node in cluster.nodes:
-      call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[{1}]}} }}'.format(prods[idx], jurisdictions[idx]), "-p", f"{prods[idx]}"]
+      call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[{1}]}} }}'.format(prods[idx], jurisdictions[idx]), "-p", "{0}".format(prods[idx])]
       code, result = node.make_cleos_call(call)
       summary.equal(True, code == 0, "Expecting operation success")
       idx += 1
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     idx = 0
     jurisdictions = [2,3,1]
     for node in cluster.nodes:
-      call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[{1}]}} }}'.format(prods[idx], jurisdictions[idx]), "-p", f"{prods[idx]}"]
+      call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[{1}]}} }}'.format(prods[idx], jurisdictions[idx]), "-p", "{0}".format(prods[idx])]
       code, result = node.make_cleos_call(call)
       summary.equal(True, code == 0, "Expecting operation success")
       idx += 1
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     idx = 0
     jurisdictions = [3,1,2]
     for node in cluster.nodes:
-      call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[{1}]}} }}'.format(prods[idx], jurisdictions[idx]), "-p", f"{prods[idx]}"]
+      call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[{1}]}} }}'.format(prods[idx], jurisdictions[idx]), "-p", "{0}".format(prods[idx])]
       code, result = node.make_cleos_call(call)
       summary.equal(True, code == 0, "Expecting operation success")
       idx += 1

@@ -184,11 +184,17 @@ class Cluster(object):
 				log.info("Wait...")
 			return new_head_block_prod
 
-		def accelerate_node(_node):
-				accelerate_url = "http://{0}:{1}/v1/test_producer/accelerate_mock_time".format(node.node_data.node_ip, node.node_data.node_port)
-				accelerate_data = {"time":_time, "type":_type}
-				result = requests.post(url=accelerate_url, json=accelerate_data)
-				log.info("Node `{0}` acceleration status `{1}`".format(accelerate_url, result.text))
+		def accelerate_mock_time(_node):
+			accelerate_url = "http://{0}:{1}/v1/test_producer/accelerate_mock_time".format(node.node_data.node_ip, node.node_data.node_port)
+			accelerate_data = {"time":_time, "type":_type}
+			result = requests.post(url=accelerate_url, json=accelerate_data)
+			log.info("Node `{0}` acceleration mock status `{1}`".format(accelerate_url, result.text))
+			
+		def accelerate_time(_node):
+			accelerate_url = "http://{0}:{1}/v1/test_producer/accelerate_time".format(node.node_data.node_ip, node.node_data.node_port)
+			accelerate_data = {"time":_time, "type":_type}
+			result = requests.post(url=accelerate_url, json=accelerate_data)
+			log.info("Node `{0}` acceleration mock status `{1}`".format(accelerate_url, result.text))
 
 		bios_url = "http://{0}:{1}/v1/test_producer/accelerate_mock_time".format(self.bios.node_data.node_ip, self.bios.node_data.node_port)
 		accelerate_data = {"time":_time, "type":_type}
@@ -198,7 +204,12 @@ class Cluster(object):
 		for name, item in self.producers.items():
 			if current_prod != name:
 				node = item["node"]
-				accelerate_node(node)
+				accelerate_mock_time(node)
 		wait_for_new_producer(current_prod)
 		node = self.producers[current_prod]["node"]
-		accelerate_node(node)
+		accelerate_mock_time(node)
+
+		for name, item in self.producers.items():
+			node = item["node"]
+			accelerate_time(node)
+

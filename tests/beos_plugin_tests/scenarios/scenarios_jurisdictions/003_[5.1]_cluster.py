@@ -24,48 +24,48 @@ if __name__ == "__main__":
 
 		call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "0", "POLAND", "EAST EUROPE" ]', "-p", "eosio"]
 		code, result = cluster.bios.make_cleos_call(call)
-		log.info(f"{result}")
-		summary.equal(True, code == 0, f"This call {call} should succeed" )
+		log.info("{0}".format(result))
+		summary.equal(True, code == 0, "This call {0} should succeed".format(call) )
 
 		call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "1", "GERMANY", "EAST EUROPE" ]', "-p", "eosio"]
 		code, result = cluster.bios.make_cleos_call(call)
-		log.info(f"{result}")
-		summary.equal(True, code == 0, f"This call {call} should succeed" )
+		log.info("{0}".format(result))
+		summary.equal(True, code == 0, "This call {0} should succeed".format(call) )
 
 		call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "2", "RUSSIA", "EAST EUROPE" ]', "-p", "eosio"]
 		code, result = cluster.bios.make_cleos_call(call)
-		log.info(f"{result}")
-		summary.equal(True, code == 0, f"This call {call} should succeed" )
+		log.info("{0}".format(result))
+		summary.equal(True, code == 0, "This call {0} should succeed".format(call) )
 
-		call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[0]}} }}'.format(prods[0]), "-p", f"{prods[0]}"]
+		call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[0]}} }}'.format(prods[0]), "-p", "{0}".format(prods[0])]
 		code, result = cluster.bios.make_cleos_call(call)
-		log.info(f"{result}")
-		summary.equal(True, code == 0, f"This call {call} should succeed" )
+		log.info("{0}".format(result))
+		summary.equal(True, code == 0, "This call {0} should succeed".format(call) )
 
-		call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[1]}} }}'.format(prods[1]), "-p", f"{prods[1]}"]
+		call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[1]}} }}'.format(prods[1]), "-p", "{0}".format(prods[1])]
 		code, result = cluster.bios.make_cleos_call(call)
-		log.info(f"{result}")
-		summary.equal(True, code == 0, f"This call {call} should succeed" )
+		log.info("{0}".format(result))
+		summary.equal(True, code == 0, "This call {0} should succeed".format(call) )
 
-		call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[2]}} }}'.format(prods[2]), "-p", f"{prods[2]}"]
+		call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[2]}} }}'.format(prods[2]), "-p", "{0}".format(prods[2])]
 		code, result = cluster.bios.make_cleos_call(call)
-		log.info(f"{result}")
-		summary.equal(True, code == 0, f"This call {call} should succeed" )
+		log.info("{0}".format(result))
+		summary.equal(True, code == 0, "This call {0} should succeed".format(call) )
 
 		call =[ "push", "action", "--jurisdictions", "[0]", "beos.gateway", "issue", "[ \"{0}\", \"100.0000 BTS\", \"hello\" ]".format(prods[0]), "-p", "beos.gateway"]
 		code, result = cluster.bios.make_cleos_call(call)
-		log.info(f"{result}")
-		summary.equal(True, code == 0, f"This call {call} should succeed" )
+		log.info("{0}".format(result))
+		summary.equal(True, code == 0, "This call {0} should succeed".format(call) )
 
 		call =[ "push", "action", "--jurisdictions", "[1]", "beos.gateway", "issue", "[ \"{0}\", \"100.0000 BTS\", \"hello\" ]".format(prods[1]), "-p", "beos.gateway"]
 		code, result = cluster.bios.make_cleos_call(call)
-		log.info(f"{result}")
-		summary.equal(True, code == 0, f"This call {call} should succeed" )
+		log.info("{0}".format(result))
+		summary.equal(True, code == 0, "This call {0} should succeed".format(call) )
 
 		call =[ "push", "action", "--jurisdictions", "[2]","beos.gateway", "issue", "[ \"{0}\", \"100.0000 BTS\", \"hello\" ]".format(prods[2]), "-p", "beos.gateway"]
 		code, result = cluster.bios.make_cleos_call(call)
-		log.info(f"{result}")
-		summary.equal(True, code == 0, f"This call {call} should succeed" )
+		log.info("{0}".format(result))
+		summary.equal(True, code == 0, "This call {0} should succeed".format(call) )
 
 	except Exception as _ex:
 		log.exception(_ex)
