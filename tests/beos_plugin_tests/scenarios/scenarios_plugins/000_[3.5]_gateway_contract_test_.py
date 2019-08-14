@@ -29,6 +29,8 @@ def check_gateway_table( node ):
 	if rpc_result == None:
 		return 0
 
+	log.info( rpc_result )
+
 	for row in rpc_result["rows"]:
 		for asset in row["proxy_assets"]:
 			item = asset["proxy_asset"]
