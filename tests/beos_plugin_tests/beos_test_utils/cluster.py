@@ -8,8 +8,9 @@ import datetime
 import threading
 import collections
 
-from beos_test_utils.beosnode      import BEOSNode
-from beos_test_utils.logger		   import log
+from beos_test_utils.beosnode			import BEOSNode
+from beos_test_utils.logger			 import log
+from beos_test_utils.summarizer		import Summarizer
 
 from cd_scripts import eosio_rpc_actions
 from cd_scripts import eosio_rpc_client
@@ -28,9 +29,10 @@ class Cluster(object):
 		self.bios_address = "{0}:{1}".format(self.bios.node_data.node_ip, int(self.bios.node_data.node_port)+9876)
 		self.nodes = []
 		self.number_of_producers = _producers_nr
-		self.producers_per_node = _producers_per_node
+		self.producers_per_node = _producers_per_node + 1
 		self.producers = collections.OrderedDict()
 		self.bios_th = None
+		self.mock_producers = collections.OrderedDict()
 
 	def wait_full_jurisdiction_cycle(self):
 		bufor = 10
@@ -48,6 +50,34 @@ class Cluster(object):
 				Cluster.user_name[i+1] = chr(ord(Cluster.user_name[i+1]) + 1)
 		return ''.join(name)
 
+	def create_mock_producer(self, summary : Summarizer = None):
+		if len(self.mock_producers) == 0:
+			return None
+		user = list(self.mock_producers.items())[0]
+		resINT_1, _ = self.bios.make_cleos_call([ "wallet", "import", "-n", "beos_master_wallet", "--private-key", user[1]["prv_active"]])
+		resINT_2, _ = self.bios.make_cleos_call([ "wallet", "import", "-n", "beos_master_wallet", "--private-key", user[1]["prv_owner"]])
+		resINT_3, _ = self.bios.make_cleos_call(["create", "account", "beos.gateway", user[0], user[1]["pub_active"], user[1]["pub_owner"], "--transfer-ram"])
+		if summary:
+			summary.equal(0, resINT_1)
+			summary.equal(0, resINT_2)
+		if resINT_1 + resINT_2 + resINT_3 != 0:
+			return None
+		else:
+			return user[0]
+
+	def reg_mock_producer(self, producer_name : str, summary : Summarizer = None):
+		if producer_name not in self.mock_producers.keys():
+			return False		
+		data = self.mock_producers[producer_name]
+		resINT, _ = self.bios.make_cleos_call([ "system", "regproducer", producer_name, data["pub_active"], data["url"], "0"])
+		if summary:
+			summary.equal(0, resINT)
+		if resINT:
+			return False
+		else:
+			self.producers[producer_name] = self.mock_producers.pop(producer_name)
+			self.producers = collections.OrderedDict(sorted(self.producers.items()))
+			return True
 
 	def init_create_nodes(self):
 		data = os.path.split(self.file)
@@ -71,8 +101,8 @@ class Cluster(object):
 
 	def prepare_config(self):
 		config.NODEOS_PORT = self.bios.node_data.node_port
-		config.PRODUCERS_ARRAY = self.producers
-		config.NODEOS_WORKING_DIR = self.bios.working_dir  + "/{0}-".format(self.bios.node_data.node_port)
+		config.PRODUCERS_ARRAY = self.producers 
+		config.NODEOS_WORKING_DIR = self.bios.working_dir	+ "/{0}-".format(self.bios.node_data.node_port)
 		config.PRODUCER_NAME = self.bios.node_data.node_port
 		config.START_NODE_INDEX = "node"
 		config.BIOS_LOG_FILE_NAME = self.bios.log_file_path
@@ -83,8 +113,10 @@ class Cluster(object):
 			name = self.generate_user_name()
 			pua, pra = self.create_key()
 			puo, pro = self.create_key()
-			self.producers[name] = {"pub_active":pua,"prv_active":pra,"pub_owner":puo,"prv_owner":pro,"url":"https://{0}.proda.htms".format(name)}
-
+			if _ % self.producers_per_node != self.producers_per_node-1:
+				self.producers[name] = {"pub_active":pua,"prv_active":pra,"pub_owner":puo,"prv_owner":pro,"url":"https://{0}.proda.htms".format(name)}
+			else:
+				self.mock_producers[name] = {"pub_active":pua,"prv_active":pra,"pub_owner":puo,"prv_owner":pro,"url":"https://{0}.proda.htms".format(name)}
 
 	def wait_for_bios_start(self):
 		for _ in range(60):
@@ -118,11 +150,12 @@ class Cluster(object):
 		self.bios.log_file_path = self.bios.log_path+"/{0}-{1}-{2}-{3}.log".format("nodeos", datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S"), self.bios.node_number, self.bios.node_name)
 		self.prepare_producers_array()
 		self.prepare_config()
-
+		self.producers = concatenate_dictionaries(self.producers, self.mock_producers)
 		th = threading.Thread(target=self.create_and_run_nodes)
 		th.start()
 		deploy.initialize_beos(config)
 		th.join()
+		self.producers = dictionaries_diffrence(self.producers, self.mock_producers)
 		self.bios.wait_n_blocks(20)
 
 
@@ -158,7 +191,7 @@ class Cluster(object):
 			port = port + 1
 		return ports
 
-
+	#if using this methode make sure, that schedule is stable, and no pending schemes
 	def accelerate_nodes(self, _type, _time, ):
 		def wait_for_new_producer(_producer = None):
 			_, result = self.bios.make_cleos_call(["get", "info"])
@@ -194,15 +227,50 @@ class Cluster(object):
 		result = requests.post(url=bios_url, json=accelerate_data)
 		log.info("Bios `{0}` acceleration status `{1}`".format(bios_url, result.text))
 		current_prod = wait_for_new_producer()
+		already_accelerated = []
 		for name, item in self.producers.items():
 			if current_prod != name:
 				node = item["node"]
-				accelerate_mock_time(node)
+				if node not in already_accelerated:
+					accelerate_mock_time(node)
+					already_accelerated.append(node)
 		wait_for_new_producer(current_prod)
 		node = self.producers[current_prod]["node"]
 		accelerate_mock_time(node)
-
+		already_accelerated = []
 		for name, item in self.producers.items():
 			node = item["node"]
-			accelerate_time(node)
+			if node not in already_accelerated:
+				accelerate_time(node)
+				already_accelerated.append(node)
+		log.info("Acceleration complete.")
 
+def concatenate_dictionaries(summand_1 : collections.OrderedDict, summand_2 : collections.OrderedDict, sort : bool = True):
+	if summand_1 == None or summand_2 == None:
+		try:
+			raise AttributeError("Invalid arguments")
+		except:
+			raise
+	to_return = list(summand_1.items())
+	to_return.extend(list(summand_2.items()))
+	if sort:
+		return collections.OrderedDict(sorted(to_return))
+	else:
+		return collections.OrderedDict(to_return)
+
+def dictionaries_diffrence(minuend : collections.OrderedDict, substrahent : collections.OrderedDict, sort : bool = True):
+	if minuend == None or substrahent == None:
+		try:
+			raise AttributeError("Invalid arguments")
+		except:
+			raise
+
+	to_return = list()
+	for name, data in minuend.items():
+		if name not in substrahent:
+			to_return.append((name, data))
+	
+	if sort:
+		return collections.OrderedDict(sorted(to_return))
+	else:
+		return collections.OrderedDict(to_return)
