@@ -56,7 +56,6 @@ class jurisdiction_base_provider : public jurisdiction_provider_interface
 
    private:
 
-      bool was_change = false;
       size_t producers_on_node = 0;
 
       using accounts_set = std::set< account_name >;

@@ -35,7 +35,7 @@ void jurisdiction_base_provider::update( const account_name& new_producer, size_
 
 fc::optional< jurisdiction_producer > jurisdiction_base_provider::get_jurisdiction_producer()
 {
-   if( was_change && accounts.find( active_producer ) == accounts.end() && accounts.size() < producers_on_node )
+   if( accounts.find( active_producer ) == accounts.end() && accounts.size() < producers_on_node )
       return jurisdiction_producer( active_producer, data.jurisdictions );
    else
       return fc::optional< jurisdiction_producer >();
@@ -48,7 +48,6 @@ void jurisdiction_base_provider::postprocess()
 
 void jurisdiction_base_provider::change( const jurisdiction_basic& src )
 {
-   was_change = true;
    accounts.clear();
    data = src;
 }
