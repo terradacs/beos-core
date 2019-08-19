@@ -34,24 +34,24 @@ if __name__ == "__main__":
 
     call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "1", "GERMANY", "EAST EUROPE" ]', "-p", "eosio"]
     code, result = cluster.bios.make_cleos_call(call)
-    log.info(f"{result}")
+    log.info("{0}".format(result))
 
     call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "2", "RUSSIA", "EAST EUROPE" ]', "-p", "eosio"]
     code, result = cluster.bios.make_cleos_call(call)
-    log.info(f"{result}")
+    log.info("{0}".format(result))
 
     call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "3", "CZECH REPUBLIC", "EAST EUROPE" ]', "-p", "eosio"]
     code, result = cluster.bios.make_cleos_call(call)
-    log.info(f"{result}")
+    log.info("{0}".format(result))
 
     log.info("Wait 10s. We will wait couple of blocks to be sure that jurisdiction data is added.")
     time.sleep(10)
 
     idx = 0
     for node in cluster.nodes:
-      call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[{1}]}} }}'.format(prods[idx], idx+1), "-p", f"{prods[idx]}"]
+      call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[{1}]}} }}'.format(prods[idx], idx+1), "-p", "{0}".format(prods[idx])]
       code, result = node.make_cleos_call(call)
-      log.info(f"{result}")
+      log.info("{0}".format(result))
       idx += 1
 
     log.info("Wait 60s for end of turn for each producer. We wait that long for jurisdiction change to take effect.")
