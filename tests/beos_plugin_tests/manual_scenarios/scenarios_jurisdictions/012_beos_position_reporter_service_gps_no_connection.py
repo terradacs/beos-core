@@ -32,7 +32,7 @@ if __name__ == "__main__":
       ["2", "Czechia", "EAST EUROPE"],
       ["3", "Germany", "EAST EUROPE"],
       ["4", "Netherlands", "WEST EUROPE"],
-#      ["5", "Belgium", "WEST EUROPE"],
+      ["5", "Belgium", "WEST EUROPE"],
       ["6", "France", "WEST EUROPE"],
       ["7", "Austria", "WEST EUROPE"],
       ["8", "Slovakia", "EAST EUROPE"],
@@ -80,7 +80,20 @@ if __name__ == "__main__":
 
     jurisdictions_count = len(jurisdictions)
     log.info("Wait {} minutes for code changer to change codes for producer {}.".format(jurisdictions_count + 1, ref_producers[0]))
-    for i in range(jurisdictions_count + 1):
+    for i in range(4):
+      log.info("{} minutes to go".format(jurisdictions_count + 1 - i))
+      time.sleep(60)
+
+    #disable node for one minute
+    log.info("Stopping node {}".format(cluster.nodes[0].get_url()))
+    cluster.nodes[0].stop_node()
+    log.info("Wait 60 seconds for position reporter to try set jurisdiction on disabled node")
+    time.sleep(60)
+    log.info("Starting node {}".format(cluster.nodes[0].get_url()))
+    cluster.nodes[0].run_node()
+    time.sleep(60)
+
+    for i in range(7, jurisdictions_count + 1):
       log.info("{} minutes to go".format(jurisdictions_count + 1 - i))
       time.sleep(60)
     
