@@ -47,6 +47,8 @@ if __name__ == "__main__":
       code, result = cluster.bios.make_cleos_call(call)
       summary.equal(True, code == 0, "Expecting operation success")
 
+    cluster.bios.wait_for_last_irreversible_block()
+
     ref_jurisdictions = [[1,2,3],[4,5,6],[7,8,9]]
     #prods = ["aaaaaaaaaaaa","baaaaaaaaaaa","caaaaaaaaaaa"]
 
