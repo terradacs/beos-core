@@ -111,7 +111,7 @@ class Cluster(object):
 		for node in self.nodes:
 			node.run_node(self.bios_address, True, self.bios.working_dir + "/{0}-{1}/genesis.json".format(self.bios.node_number, self.bios.node_name))
 
-		self.bios.wait_n_blocks(10)
+		self.bios.wait_n_blocks(20)
 
 		for node in self.nodes:
 			node.stop_node()
