@@ -5,6 +5,7 @@ import time
 import socket
 import requests
 import threading
+import collections
 
 from beos_test_utils.beosnode      import BEOSNode
 from beos_test_utils.logger		   import log
@@ -17,6 +18,7 @@ from cd_scripts import config
 
 class Cluster(object):
 	user_name = list("aaaaaaaaaaaa")
+	producer_block_cycle = 12
 
 	def __init__(self, _bios_node, _producers_nr, _producers_per_node, _file):
 		self.producers_nr = _producers_nr
@@ -26,9 +28,15 @@ class Cluster(object):
 		self.nodes = []
 		self.number_of_producers = _producers_nr
 		self.producers_per_node = _producers_per_node
-		self.producers = {}
+		self.producers = collections.OrderedDict()
 		self.bios_th = None
 
+	def wait_full_jurisdiction_cycle(self):
+		bufor = 10
+		waiting_blocks = (Cluster.producer_block_cycle * self.number_of_producers * self.producers_per_node) + bufor
+		log.info("Wait {0} blocks for end of turn for each producer. We wait that long for jurisdiction change to take effect.".format(waiting_blocks))
+		self.bios.wait_n_blocks(waiting_blocks)
+		log.info("Proceed.")
 
 	def generate_user_name(self):
 		name = list(Cluster.user_name)
@@ -92,16 +100,18 @@ class Cluster(object):
 		self.init_create_nodes()
 		nr = 0
 		for idx, prod in enumerate(self.producers):
-			print("Adding producer {0} to node {1}".format(prod, nr))
+			log.info("Adding producer {0} to node {1}".format(prod, nr))
 			self.nodes[nr].user_name = Cluster.user_name
 			self.nodes[nr].add_producer_to_config(prod, self.producers[prod]["pub_active"])
 			self.producers[prod]["node"] = self.nodes[nr]
 			if idx % self.producers_per_node == self.producers_per_node - 1:
-				print("increasing nr")
+				log.info("increasing nr")
 				nr += 1
 		
 		for node in self.nodes:
 			node.run_node(self.bios_address, True, self.bios.working_dir + "/{0}-{1}/genesis.json".format(self.bios.node_number, self.bios.node_name))
+
+		self.bios.wait_n_blocks(10)
 
 		for node in self.nodes:
 			node.stop_node()
@@ -115,6 +125,7 @@ class Cluster(object):
 		th.start()
 		deploy.initialize_beos(config)
 		th.join()
+		time.sleep(10)	#wait about 20 block to make all things done - at this level we cannot use wait_n_blocks because all producers are gone
 		deploy.finalize_beos_initialization(config)
 
 
@@ -126,24 +137,24 @@ class Cluster(object):
 			try:
 				node.run_node()
 			except Exception as _ex:
-				print("Fail to run node {0}".format(node.node_name))
+				log.info("Fail to run node {0}".format(node.node_name))
 
 
 	def stop_all(self, _stop_bios = False):
-		if self.bios_th:
-			self.bios.stop_node()
-			self.bios_th.join()
-			self.bios_th = None
 		for node in self.nodes:
 			try:
 				node.stop_node()
 			except Exception as _ex:
-				print("Fail to stop node {0}".format(node.node_name))
+				log.info("Fail to stop node {0}".format(node.node_name))
+		if self.bios_th:
+			self.bios.stop_node()
+			self.bios_th.join()
+			self.bios_th = None
 
 
 	def get_node(self, _nr):
 		if _nr > len(self.nodes):
-			print("Error: index to great")
+			log.info("Error: index to great")
 			return None
 		else:
 			return self.nodes[_nr]

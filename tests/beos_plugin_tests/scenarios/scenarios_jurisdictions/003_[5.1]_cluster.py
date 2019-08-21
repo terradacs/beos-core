@@ -37,6 +37,8 @@ if __name__ == "__main__":
 		log.info("{0}".format(result))
 		summary.equal(True, code == 0, "This call {0} should succeed".format(call) )
 
+		cluster.bios.wait_for_last_irreversible_block() 
+
 		call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[0]}} }}'.format(prods[0]), "-p", "{0}".format(prods[0])]
 		code, result = cluster.bios.make_cleos_call(call)
 		log.info("{0}".format(result))

@@ -59,6 +59,7 @@ class BEOSNode(object):
         self.working_dir = None
         self.node_producers = {}
         self.delay_block = 0
+        self.start_block_nr = 0
         self.user_name = list("aaaaaaaaaaaa")
 
     def get_url(self):
@@ -135,15 +136,19 @@ class BEOSNode(object):
 
     def run_node(self, _synth_with = None, _remove_eosio_as_producer = False, _genesis_json = None, _just_run = False):
         try:
-            if _just_run:
-                run.run_custom_nodeos(self.node_number, self.node_name, self.working_dir, self.log_path, True, _genesis_json)
+            if not self.node_is_running:
+                log.info("Running node nr {0}".format(self.node_number))
+                if _just_run:
+                    run.run_custom_nodeos(self.node_number, self.node_name, self.working_dir, self.log_path, True, _genesis_json)
+                else:
+                    run.clone_nodeos(self.working_dir, self.node_number, self.node_name,  self.node_producers, False, _synth_with, False, _remove_eosio_as_producer)
+                    run.run_custom_nodeos(self.node_number, self.node_name, self.working_dir, self.log_path, None, _genesis_json)
+                self.node_is_running = True
+                self.start_block_nr = self.utils.get_info()["head_block_num"]
+                return self.start_block_nr
             else:
-                run.clone_nodeos(self.working_dir, self.node_number, self.node_name,  self.node_producers, False, _synth_with, False, _remove_eosio_as_producer)
-                run.run_custom_nodeos(self.node_number, self.node_name, self.working_dir, self.log_path, None, _genesis_json)
-            
-            self.node_is_running = True
-            self.start_block_nr = self.utils.get_info()["head_block_num"]
-            return self.start_block_nr
+                log.info("Node nr {0} is already running.".format(self.node_number))
+                return self.start_block_nr
         except Exception as _ex:
             log.exception("Exception `{0}` occures during initialization of node `{1}`".format(str(_ex), self.node_name))
 
@@ -151,8 +156,11 @@ class BEOSNode(object):
     def stop_node(self):
         try:
             if self.node_is_running:
+                log.info("Stoping node nr {0}".format(self.node_number))
                 run.kill_process(self.working_dir+"/run_nodeos_{0}_{1}.pid".format(self.node_number, self.node_name,), "nodeos", self.node_data.node_ip, self.node_data.node_port)
                 self.node_is_running = False
+            else:
+                log.info("Node nr {0} is already stopped.".format(self.node_number))
         except Exception as _ex:
             log.exception("Exception `{0}` occures during stoping node `{1}`".format(str(_ex), self.node_name))
 
@@ -325,10 +333,28 @@ class BEOSNode(object):
         except Exception as _ex:
             log.exception("Exception `{0}` while `{1}`.".format(str(_ex), "wait_for_transaction_in_block"))
 
+    def wait_for_last_irreversible_block(self):
+        head_block_num = int(self.utils.get_info()["head_block_num"])
+        log.info("Wait till last irreversible block num is: {0}".format(head_block_num))
+        last_irreversible_block_num = int(self.utils.get_info()["last_irreversible_block_num"])
+        while head_block_num >= last_irreversible_block_num:
+            time.sleep(0.5)
+            last_irreversible_block_num = int(self.utils.get_info()["last_irreversible_block_num"])
+        log.info("Proceed.")
 
-    def make_cleos_call(self, _params):
+
+    def make_cleos_call(self, _params, _wait_for_transaction = False):
         try:
-            return self.cleos.make_call(_params)
+            code, result = self.cleos.make_call(_params)
+            if _wait_for_transaction:
+                if result.find("executed transaction:" ) != -1:
+                    tmp = result.split()
+                    for idx, item in enumerate(tmp):
+                        if item == "transaction:":
+                            trx_id = tmp[idx+1]
+                            log.info("This cleos call is transaction: {0}.".format(trx_id))
+                            self.wait_for_transaction_in_block(trx_id)
+            return code, result
         except Exception as _ex:
             log.exception("Exception `{0}` occures during `{1}`.".format(str(_ex), "make_cleos_call"))
 

@@ -10,7 +10,7 @@ import requests
 currentdir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(os.path.dirname(currentdir)))
 from beos_test_utils.beos_utils_pack import init, init_cluster, ActionResult, ResourceResult, VotersResult
-from common import get_transaction_id_from_result
+from beos_test_utils.beos_utils_pack import get_transaction_id_from_result
 
 if __name__ == "__main__":
 	try:
@@ -39,6 +39,8 @@ if __name__ == "__main__":
 		prods_1_jurisdiction = 1
 		prods_2_jurisdiction = 2
 
+		cluster.bios.wait_for_last_irreversible_block() 
+
 		call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[{1}]}} }}'.format(prods[0], prods_0_jurisdiction), "-p", "{0}".format(prods[0])]
 		code, result = cluster.bios.make_cleos_call(call)
 		log.info("{0}".format(result))
@@ -51,9 +53,8 @@ if __name__ == "__main__":
 		code, result = cluster.bios.make_cleos_call(call)
 		log.info("{0}".format(result))
 
-
 		call =[ "push", "action", "--jurisdictions", "[{0}]".format(prods_1_jurisdiction), "beos.gateway", "issue", "[ \"{0}\", \"111.0000 BTS\", \"hello\" ]".format(prods[0]), "-p", "beos.gateway"]
-		code, result = cluster.bios.make_cleos_call(call)
+		code, result = cluster.bios.make_cleos_call(call, False)
 		log.info("{0}".format(result))
 
 		trx_id = get_transaction_id_from_result(code, result)
@@ -73,7 +74,7 @@ if __name__ == "__main__":
 		summary.equal(True, prods_1_jurisdiction in result["producer_jurisdiction_for_block"][0]["new_jurisdictions"], "Jurisdiction `{0}` should be assigned to {1}".format(prods_1_jurisdiction, prods[1]))
 
 		call =[ "push", "action", "--jurisdictions", "[{0}]".format(prods_0_jurisdiction), "beos.gateway", "issue", "[ \"{0}\", \"122.0000 BTS\", \"hello\" ]".format(prods[1]), "-p", "beos.gateway"]
-		code, result = cluster.bios.make_cleos_call(call)
+		code, result = cluster.bios.make_cleos_call(call, False)
 		log.info("{0}".format(result))
 
 		trx_id = get_transaction_id_from_result(code, result)
