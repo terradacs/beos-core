@@ -99,6 +99,7 @@ class BEOSNode(object):
                 self.issue(_from="beos.gateway", _to=name, _quantity=value, _memo="init_value")
             accounts.append(tester(name, akey, okey, value))
         if stop_node:
+            self.wait_n_blocks(10)
             self.stop_node()
         return accounts
 
@@ -109,6 +110,7 @@ class BEOSNode(object):
             self.add_producer_to_config(producer.name, producer.akey)
         if self.node_is_running:
             #we need to rerun node to set producers
+            self.wait_n_blocks(10)
             self.stop_node()
             self.run_node()
         return producers

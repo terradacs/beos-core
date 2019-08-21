@@ -111,11 +111,6 @@ class Cluster(object):
 		for node in self.nodes:
 			node.run_node(self.bios_address, True, self.bios.working_dir + "/{0}-{1}/genesis.json".format(self.bios.node_number, self.bios.node_name))
 
-		self.bios.wait_n_blocks(20)
-
-		for node in self.nodes:
-			node.stop_node()
-
 
 	def initialize_bios(self):
 		self.prepare_producers_array()
@@ -125,19 +120,7 @@ class Cluster(object):
 		th.start()
 		deploy.initialize_beos(config)
 		th.join()
-		time.sleep(10)	#wait about 20 block to make all things done - at this level we cannot use wait_n_blocks because all producers are gone
-		deploy.finalize_beos_initialization(config)
-
-
-	def run_all(self):
-		if not self.bios_th:
-			self.bios_th = threading.Thread(target=self.bios.run_node, args=[None, False, None, True])
-			self.bios_th.start()
-		for node in self.nodes:
-			try:
-				node.run_node()
-			except Exception as _ex:
-				log.info("Fail to run node {0}".format(node.node_name))
+		self.bios.wait_n_blocks(20)
 
 
 	def stop_all(self, _stop_bios = False):
@@ -146,11 +129,7 @@ class Cluster(object):
 				node.stop_node()
 			except Exception as _ex:
 				log.info("Fail to stop node {0}".format(node.node_name))
-		if self.bios_th:
-			self.bios.stop_node()
-			self.bios_th.join()
-			self.bios_th = None
-
+		deploy.finalize_beos_initialization(config)
 
 	def get_node(self, _nr):
 		if _nr > len(self.nodes):
