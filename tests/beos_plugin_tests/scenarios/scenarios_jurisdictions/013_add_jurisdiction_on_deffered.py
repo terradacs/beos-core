@@ -43,29 +43,27 @@ if __name__ == "__main__":
     ref_producers = ["aaaaaaaaaaaa","baaaaaaaaaaa","caaaaaaaaaaa"]
     api_rpc_caller = cluster.bios.get_url_caller()
 
-    ret = api_rpc_caller.chain.get_info()
-    log.info(ret)
-    from_date = ret["head_block_time"]
-
+    log.info("Wait for producer other than `aaaaaaaaaaaa`")
     # we will wait till active producer will be not aaaaaaaaaaaa
+    ret = api_rpc_caller.chain.get_info()
     while ret["head_block_producer"] == ref_producers[0]:
       time.sleep(0.5)
       ret = api_rpc_caller.chain.get_info()
 
+    log.info("Change producer `aaaaaaaaaaaa` jurisdiction for not existing one ie: `4`")
     # now we will change jurisdiction code for non existing one
     set_jurisdiction_for_producer(cluster.nodes[0].get_url(), [4])
     time.sleep(10)
 
+    log.info("Now we will add that jurisdiction `4` so it will exists when the change will take effect")
     # now we will add that jurisdiction so it will exists when the change will take effect
     call = ["push", "action", "eosio", "addjurisdict", '[ "eosio", "4", "POLAND", "EAST EUROPE" ]', "-p", "eosio"]
     code, result = cluster.bios.make_cleos_call(call)
-    log.info(result)
+    #log.info(result)
+    summary.equal(True, code == 0, "Expecting operation success")
 
+    log.info("Waiting one minute for whole production cycle")
     time.sleep(60)
-
-    ret = api_rpc_caller.chain.get_info()
-    log.info(ret)
-    to_date = ret["head_block_time"]
 
     log.info("Testing `get_all_producer_jurisdiction_for_block` API call")
     ret = api_rpc_caller.jurisdiction_history.get_all_producer_jurisdiction_for_block()
