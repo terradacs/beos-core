@@ -60,6 +60,7 @@ class BEOSNode(object):
         self.node_producers = {}
         self.delay_block = 0
         self.user_name = list("aaaaaaaaaaaa")
+        self.log_file_path = None
 
     def get_url(self):
         return self.node_data.get_url()
@@ -135,6 +136,7 @@ class BEOSNode(object):
 
     def run_node(self, _synth_with = None, _remove_eosio_as_producer = False, _genesis_json = None, _just_run = False):
         try:
+            self.log_file_path = self.log_path+"/{0}-{1}-{2}-{3}.log".format("nodeos", datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S"), self.node_number, self.node_name)
             if _just_run:
                 run.run_custom_nodeos(self.node_number, self.node_name, self.working_dir, self.log_path, True, _genesis_json)
             else:
