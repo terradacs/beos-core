@@ -8,6 +8,7 @@ import sys
 import json
 import datetime
 import sys
+import signal 
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -157,8 +158,8 @@ def kill_process(pid_file_name, proc_name, ip_address, port):
             for pid in pids:
                 for line in os.popen("ps --no-header --ppid {0}".format(pid)):
                     line = line.strip().split()
-                    os.kill(int(line[0]), 2)
-                os.kill(int(pid), 2)
+                    os.kill(int(line[0]), signal.SIGINT)
+                os.kill(int(pid), signal.SIGINT)
             if os.path.exists(pid_file_name):
                 os.remove(pid_file_name)
     except Exception as ex:

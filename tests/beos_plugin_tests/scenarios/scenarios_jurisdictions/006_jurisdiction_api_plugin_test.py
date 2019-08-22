@@ -8,20 +8,16 @@ import json
 
 currentdir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(os.path.dirname(currentdir)))
-from beos_test_utils.beos_utils_pack import init, init_cluster, ActionResult, ResourceResult, VotersResult
-
-from common import get_transaction_id_from_result
+from beos_test_utils.beos_utils_pack import init, start_cluster, ActionResult, ResourceResult, VotersResult
+from beos_test_utils.beos_utils_pack import get_transaction_id_from_result
 
 if __name__ == "__main__":
   try:
     number_of_pnodes  = 3
     producer_per_node = 1
-    cluster, summary, args, log = init_cluster(__file__, number_of_pnodes, producer_per_node)
-    cluster.run_all()
+    cluster, summary, args, log = start_cluster(__file__, number_of_pnodes, producer_per_node)
+    #cluster.run_all()
 
-    log.info("Wait 5s")
-    time.sleep(5)
-    
     code, mess = cluster.bios.make_cleos_call(["get", "info"])
     log.info("Bios: code: {0}, mess {1}\n".format(code, mess))
     for node in cluster.nodes:
@@ -45,8 +41,7 @@ if __name__ == "__main__":
     code, result = cluster.bios.make_cleos_call(call)
     summary.equal(True, code == 0, "Expecting operation success")
 
-    log.info("Wait 10s. We will wait couple of blocks to be sure that jurisdiction data is added.")
-    time.sleep(10)
+    cluster.bios.wait_for_last_irreversible_block()
 
     api_rpc_caller = cluster.bios.get_url_caller()
 
@@ -73,32 +68,33 @@ if __name__ == "__main__":
       summary.equal(True, code == 0, "Expecting operation success")
       idx += 1
 
-    log.info("Wait 60s for end of turn for each producer. We wait that long for jurisdiction change to take effect.")
-    time.sleep(60)
+    # log.info("Wait 60s for end of turn for each producer. We wait that long for jurisdiction change to take effect.")
+    # time.sleep(60)
+    cluster.wait_full_jurisdiction_cycle()
 
-    log.info("Testing `get_producer_jurisdiction` API call for `aaaaaaaaaaaa`")
-    data = {"producer_names":["aaaaaaaaaaaa"]}
+    log.info("Testing `get_producer_jurisdiction` API call for `{0}`".format(prods[0]))
+    data = {"producer_names":["{0}".format(prods[0])]}
     ret = api_rpc_caller.jurisdiction.get_producer_jurisdiction(data)
     summary.equal(True, len(ret["producer_jurisdictions"]) == 1, "Expecting 1 element in array")
     summary.equal(True, len(ret["producer_jurisdictions"][0]["jurisdictions"]) == 1, "Expecting 1 element in array")
     summary.equal(True, ret["producer_jurisdictions"][0]["jurisdictions"][0] == 1, "Expecting jurisdiction code 1" )
 
-    log.info("Testing `get_producer_jurisdiction` API call for `baaaaaaaaaaa`")
-    data = {"producer_names":["baaaaaaaaaaa"]}
+    log.info("Testing `get_producer_jurisdiction` API call for `{0}`".format(prods[1]))
+    data = {"producer_names":["{0}".format(prods[1])]}
     ret = api_rpc_caller.jurisdiction.get_producer_jurisdiction(data)
     summary.equal(True, len(ret["producer_jurisdictions"]) == 1, "Expecting 1 element in array")
     summary.equal(True, len(ret["producer_jurisdictions"][0]["jurisdictions"]) == 1, "Expecting 1 element in array")
     summary.equal(True, ret["producer_jurisdictions"][0]["jurisdictions"][0] == 2, "Expecting jurisdiction code 2" )
 
-    log.info("Testing `get_producer_jurisdiction` API call for `caaaaaaaaaaa`")
-    data = {"producer_names":["caaaaaaaaaaa"]}
+    log.info("Testing `get_producer_jurisdiction` API call for `{0}`".format(prods[2]))
+    data = {"producer_names":["{0}".format(prods[2])]}
     ret = api_rpc_caller.jurisdiction.get_producer_jurisdiction(data)
     summary.equal(True, len(ret["producer_jurisdictions"]) == 1, "Expecting 1 element in array")
     summary.equal(True, len(ret["producer_jurisdictions"][0]["jurisdictions"]) == 1, "Expecting 1 element in array")
     summary.equal(True, ret["producer_jurisdictions"][0]["jurisdictions"][0] == 3, "Expecting jurisdiction code 3")
 
-    log.info("Testing `get_producer_jurisdiction` API call for `aaaaaaaaaaaa`, `baaaaaaaaaaa` and `caaaaaaaaaaa`")
-    data = {"producer_names":["aaaaaaaaaaaa","baaaaaaaaaaa","caaaaaaaaaaa"]}
+    log.info("Testing `get_producer_jurisdiction` API call for `{0}`, `{1}` and `{2}`".format(prods[0], prods[1], prods[2]))
+    data = {"producer_names":["{0}".format(prods[0]),"{0}".format(prods[1]),"{0}".format(prods[2])]}
     ret = api_rpc_caller.jurisdiction.get_producer_jurisdiction(data)
     summary.equal(True, len(ret["producer_jurisdictions"]) == 3, "Expecting 3 element in array")
 
