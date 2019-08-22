@@ -9,7 +9,7 @@ import threading
 
 currentdir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(os.path.dirname(currentdir)))
-from beos_test_utils.beos_utils_pack import init, init_cluster, ActionResult, ResourceResult, VotersResult
+from beos_test_utils.beos_utils_pack import init, start_cluster, ActionResult, ResourceResult, VotersResult
 
 from common import get_transaction_id_from_result
 from common import set_jurisdiction_for_producer
@@ -18,8 +18,8 @@ if __name__ == "__main__":
   try:
     number_of_pnodes  = 3
     producer_per_node = 1
-    cluster, summary, args, log = init_cluster(__file__, number_of_pnodes, producer_per_node)
-    cluster.run_all()
+    cluster, summary, args, log = start_cluster(__file__, number_of_pnodes, producer_per_node)
+    #cluster.run_all()
 
     ref_producers = ["aaaaaaaaaaaa","baaaaaaaaaaa","caaaaaaaaaaa"]
 
@@ -57,7 +57,7 @@ if __name__ == "__main__":
       ret = api_rpc_caller.chain.get_info()
 
     call =["transfer", ref_producers[0], ref_producers[1], "100.0000 BTS", "hello", "--jurisdictions", "[4]"]
-    code, result = cluster.bios.make_cleos_call(call)
+    code, result = cluster.nodes[0].make_cleos_call(call)
     log.info("{0}".format(result))
     result = json.loads(result)
     summary.equal(True, code == 0, "This call {0} should succeed".format(call) )
@@ -70,7 +70,7 @@ if __name__ == "__main__":
       time.sleep(60)
 
     found = False
-    with open(cluster.bios.log_file_path, 'r') as log_file:
+    with open(cluster.nodes[0].log_file_path, 'r') as log_file:
       for line in log_file.readlines():
         if "expired transaction {}".format(result["trx_id"]) in line:
           found = True
