@@ -8,14 +8,14 @@ import requests
 
 currentdir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(os.path.dirname(currentdir)))
-from beos_test_utils.beos_utils_pack import init, init_cluster, ActionResult, ResourceResult, VotersResult
+from beos_test_utils.beos_utils_pack import init, start_cluster, ActionResult, ResourceResult, VotersResult
 
 if __name__ == "__main__":
 	try:
 		number_of_pnodes  = 3
 		producer_per_node = 1
-		cluster, summary, args, log = init_cluster(__file__, number_of_pnodes, producer_per_node)
-		cluster.run_all()
+		cluster, summary, args, log = start_cluster(__file__, number_of_pnodes, producer_per_node)
+		#cluster.run_all()
 		code, mess = cluster.bios.make_cleos_call(["get", "info"])
 
 		prods=[]
@@ -36,6 +36,8 @@ if __name__ == "__main__":
 		code, result = cluster.bios.make_cleos_call(call)
 		log.info("{0}".format(result))
 		summary.equal(True, code == 0, "This call {0} should succeed".format(call) )
+
+		cluster.bios.wait_for_last_irreversible_block() 
 
 		call = ["push", "action", "eosio", "updateprod", '{{"data":{{"producer":"{0}", "jurisdictions":[0]}} }}'.format(prods[0]), "-p", "{0}".format(prods[0])]
 		code, result = cluster.bios.make_cleos_call(call)

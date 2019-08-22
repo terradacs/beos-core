@@ -61,9 +61,6 @@ if __name__ == "__main__":
     log.info(result)
     summary.equal(True, result.find(return_str) != -1, "Expected: {}".format(return_str))
 
-    node.wait_n_blocks(10)
-
-
   except Exception as _ex:
     log.exception("Exception `{0}` occures while executing `{1}` tests.".format(str(_ex), __file__))
     summary.equal(False, True, "Exception occured durring testing.")

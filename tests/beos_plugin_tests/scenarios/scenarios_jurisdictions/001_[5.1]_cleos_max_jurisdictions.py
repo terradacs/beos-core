@@ -23,7 +23,7 @@ if __name__ == "__main__":
 				["system", "newaccount", "beos.gateway", new_user, "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV", "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV", "--transfer-ram", "--jurisdictions", "{0}".format(juris)]]
 		for call in calls:
 			result, mess = node.make_cleos_call(call)
-			log.info("Call retcode {result} and {mess}")
+			log.info("Call retcode {0} and {1}".format(result, mess))
 			summary.equal(True, result != 0, "This `{0}` call must fail.".format(" ".join(call)))
 			summary.equal(True, mess.find(REQ_ERROR) != 0, "This call `{0}` must have `{1}` error message.".format(" ".join(call), REQ_ERROR))
 
