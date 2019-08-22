@@ -8,20 +8,16 @@ import json
 
 currentdir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(os.path.dirname(currentdir)))
-from beos_test_utils.beos_utils_pack import init, init_cluster, ActionResult, ResourceResult, VotersResult
-
-from common import get_transaction_id_from_result
+from beos_test_utils.beos_utils_pack import init, start_cluster, ActionResult, ResourceResult, VotersResult
+from beos_test_utils.beos_utils_pack import get_transaction_id_from_result
 
 if __name__ == "__main__":
   try:
     number_of_pnodes  = 3
     producer_per_node = 1
-    cluster, summary, args, log = init_cluster(__file__, number_of_pnodes, producer_per_node)
-    cluster.run_all()
+    cluster, summary, args, log = start_cluster(__file__, number_of_pnodes, producer_per_node)
+    #cluster.run_all()
 
-    log.info("Wait 5s")
-    time.sleep(5)
-    
     code, mess = cluster.bios.make_cleos_call(["get", "info"])
     log.info("Bios: code: {0}, mess {1}\n".format(code, mess))
     for node in cluster.nodes:
@@ -45,8 +41,7 @@ if __name__ == "__main__":
     code, result = cluster.bios.make_cleos_call(call)
     summary.equal(True, code == 0, "Expecting operation success")
 
-    log.info("Wait 10s. We will wait couple of blocks to be sure that jurisdiction data is added.")
-    time.sleep(10)
+    cluster.bios.wait_for_last_irreversible_block()
 
     api_rpc_caller = cluster.bios.get_url_caller()
 
@@ -64,8 +59,9 @@ if __name__ == "__main__":
       summary.equal(True, code == 0, "Expecting operation success")
       idx += 1
 
-    log.info("Wait 60s for end of turn for each producer. We wait that long for jurisdiction change to take effect.")
-    time.sleep(60)
+    # log.info("Wait 60s for end of turn for each producer. We wait that long for jurisdiction change to take effect.")
+    # time.sleep(60)
+    cluster.wait_full_jurisdiction_cycle()
 
     ret = api_rpc_caller.chain.get_info()
     #log.info(ret)
@@ -80,8 +76,9 @@ if __name__ == "__main__":
       summary.equal(True, code == 0, "Expecting operation success")
       idx += 1
 
-    log.info("Wait 60s for end of turn for each producer. We wait that long for jurisdiction change to take effect.")
-    time.sleep(60)
+    # log.info("Wait 60s for end of turn for each producer. We wait that long for jurisdiction change to take effect.")
+    # time.sleep(60)
+    cluster.wait_full_jurisdiction_cycle()
 
     ret = api_rpc_caller.chain.get_info()
     #log.info(ret)
@@ -96,8 +93,9 @@ if __name__ == "__main__":
       summary.equal(True, code == 0, "Expecting operation success")
       idx += 1
 
-    log.info("Wait 60s for end of turn for each producer. We wait that long for jurisdiction change to take effect.")
-    time.sleep(60)
+    # log.info("Wait 60s for end of turn for each producer. We wait that long for jurisdiction change to take effect.")
+    # time.sleep(60)
+    cluster.wait_full_jurisdiction_cycle()
 
     ret = api_rpc_caller.chain.get_info()
     #log.info(ret)
@@ -105,14 +103,14 @@ if __name__ == "__main__":
     block_number_third_change = ret["head_block_num"]
 
     ref_jurisdictions = [[1,2,3],[2,3,1],[3,1,2]]
-    ref_producers = ["aaaaaaaaaaaa","baaaaaaaaaaa","caaaaaaaaaaa"]
+    #prods = ["aaaaaaaaaaaa","baaaaaaaaaaa","caaaaaaaaaaa"]
 
     log.info("Testing `get_all_producer_jurisdiction_for_block` API call")
     ret = api_rpc_caller.jurisdiction_history.get_all_producer_jurisdiction_for_block()
     #log.info(ret)
     summary.equal(True, len(ret["producer_jurisdiction_for_block"]) == 3, "Expecting result len 3")
     for idx in range(3):
-      summary.equal(True, ret["producer_jurisdiction_for_block"][idx]["producer_name"] == ref_producers[idx], "Expecting producer {}".format(ref_producers[idx]))
+      summary.equal(True, ret["producer_jurisdiction_for_block"][idx]["producer_name"] == prods[idx], "Expecting producer {}".format(prods[idx]))
       summary.equal(True, len(ret["producer_jurisdiction_for_block"][idx]["new_jurisdictions"]) == 1, "Expecting one jurisdiction code")
       summary.equal(True, ret["producer_jurisdiction_for_block"][idx]["new_jurisdictions"][0] == ref_jurisdictions[idx][2], "Expecting code {} got {}".format(ref_jurisdictions[idx][2], ret["producer_jurisdiction_for_block"][idx]["new_jurisdictions"][0]))
 
@@ -130,12 +128,12 @@ if __name__ == "__main__":
       #log.info(ret)
       summary.equal(True, len(ret["producer_jurisdiction_for_block"]) == 3, "Expecting result len 3")
       for idx in range(3):
-        summary.equal(True, ret["producer_jurisdiction_for_block"][idx]["producer_name"] == ref_producers[idx], "Expecting producer {}".format(ref_producers[idx]))
+        summary.equal(True, ret["producer_jurisdiction_for_block"][idx]["producer_name"] == prods[idx], "Expecting producer {}".format(prods[idx]))
         summary.equal(True, len(ret["producer_jurisdiction_for_block"][idx]["new_jurisdictions"]) == 1, "Expecting one jurisdiction code")
         summary.equal(True, ret["producer_jurisdiction_for_block"][idx]["new_jurisdictions"][0] == ref_jurisdictions[idx][ref_jurisdictions_idx], "Expecting code {} got {}".format(ref_jurisdictions[idx][ref_jurisdictions_idx], ret["producer_jurisdiction_for_block"][idx]["new_jurisdictions"][0]))
       ref_jurisdictions_idx += 1
 
-    for producer in ref_producers:
+    for producer in prods:
       log.info("Testing `get_producer_jurisdiction_for_block` API call with `block_number {}` and `producer {}`".format(block_number_begin, producer))
       data = {"block_number" : block_number_begin, "producer" : producer}
       ret = api_rpc_caller.jurisdiction_history.get_producer_jurisdiction_for_block(data)
@@ -145,18 +143,18 @@ if __name__ == "__main__":
     ref_jurisdictions_idx = 0
     for block_number in [block_number_first_change, block_number_second_change, block_number_third_change]:
       for idx in range(3):
-        log.info("Testing `get_producer_jurisdiction_for_block` API call with `block_number {}` and `producer {}`".format(block_number, ref_producers[idx]))
-        data = {"block_number" : block_number, "producer" : ref_producers[idx]}
+        log.info("Testing `get_producer_jurisdiction_for_block` API call with `block_number {}` and `producer {}`".format(block_number, prods[idx]))
+        data = {"block_number" : block_number, "producer" : prods[idx]}
         ret = api_rpc_caller.jurisdiction_history.get_producer_jurisdiction_for_block(data)
         #log.info(ret)
         summary.equal(True, len(ret["producer_jurisdiction_for_block"]) == 1, "Expecting one result")
-        summary.equal(True, ret["producer_jurisdiction_for_block"][0]["producer_name"] == ref_producers[idx], "Expecting producer {}".format(ref_producers[idx]))
+        summary.equal(True, ret["producer_jurisdiction_for_block"][0]["producer_name"] == prods[idx], "Expecting producer {}".format(prods[idx]))
         summary.equal(True, len(ret["producer_jurisdiction_for_block"][0]["new_jurisdictions"]) == 1, "Expecting one jurisdiction code")
         summary.equal(True, ret["producer_jurisdiction_for_block"][0]["new_jurisdictions"][0] == ref_jurisdictions[idx][ref_jurisdictions_idx], "Expecting code {} got {}".format(ref_jurisdictions[idx][ref_jurisdictions_idx], ret["producer_jurisdiction_for_block"][0]["new_jurisdictions"][0]))
       ref_jurisdictions_idx += 1
 
     ref_jurisdictions_idx = 0
-    for producer in ref_producers:
+    for producer in prods:
       data = {
         "producer" : producer,
         "from_date" : from_date,

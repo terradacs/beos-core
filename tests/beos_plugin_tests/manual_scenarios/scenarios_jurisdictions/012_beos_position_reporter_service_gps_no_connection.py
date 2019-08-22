@@ -9,7 +9,7 @@ import subprocess
 
 currentdir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(os.path.dirname(currentdir)))
-from beos_test_utils.beos_utils_pack import init, init_cluster, ActionResult, ResourceResult, VotersResult
+from beos_test_utils.beos_utils_pack import init, start_cluster, ActionResult, ResourceResult, VotersResult
 
 from common import get_transaction_id_from_result
 
@@ -19,8 +19,8 @@ if __name__ == "__main__":
   try:
     number_of_pnodes  = 3
     producer_per_node = 1
-    cluster, summary, args, log = init_cluster(__file__, number_of_pnodes, producer_per_node)
-    cluster.run_all()
+    cluster, summary, args, log = start_cluster(__file__, number_of_pnodes, producer_per_node)
+    #cluster.run_all()
 
     log.info("Wait 5s")
     time.sleep(5)
