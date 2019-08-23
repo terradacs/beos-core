@@ -66,11 +66,11 @@ if __name__ == "__main__":
     found = False
     with open(cluster.nodes[0].log_file_path, 'r') as log_file:
       for line in log_file.readlines():
-        if "Change of jurisdictions failed" in line:
+        if "jurisdiction doesn't exist" in line:
           found = True
           break
 
-    summary.equal(True, found, "`Change of jurisdictions failed` found in logs")
+    summary.equal(True, found, "`jurisdiction doesn't exist` found in logs")
   except Exception as _ex:
     log.exception(_ex)
     summary.equal(False, True, "Exception occured durring testing: {}.".format(_ex))

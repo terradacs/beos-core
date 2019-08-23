@@ -43,11 +43,12 @@ namespace gps_apis
 
       producer_plugin* producer_plug = nullptr;
       gps_plugin* gps_plug = nullptr;
+      const controller& db;
 
     public:
 
-      read_write( producer_plugin* _producer_plug, gps_plugin* _gps_plug )
-          : producer_plug( _producer_plug ), gps_plug( _gps_plug ) {}
+      read_write( producer_plugin* _producer_plug, gps_plugin* _gps_plug, const controller& c)
+          : producer_plug( _producer_plug ), gps_plug( _gps_plug ), db(c) {}
 
       update_jurisdictions_results update_jurisdictions( const update_jurisdictions_params& params );
   };
@@ -58,7 +59,7 @@ class gps_plugin : public plugin<gps_plugin>
 {
    public:
 
-      APPBASE_PLUGIN_REQUIRES((producer_plugin))
+      APPBASE_PLUGIN_REQUIRES((producer_plugin)(chain_plugin))
 
       gps_plugin();
       virtual ~gps_plugin();
