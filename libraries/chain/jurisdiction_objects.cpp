@@ -363,6 +363,30 @@ void jurisdiction_manager::process_jurisdiction_producer( const chainbase::datab
    }
 }
 
+bool jurisdiction_manager::check_trx_jurisdictions_exists(const chainbase::database& db, const packed_transaction& trx)
+{
+   auto exts = trx.get_transaction().transaction_extensions;
+   if (exts.empty())
+   {
+      return true;
+   }
+
+   auto deserialized_data = read(exts);
+   const auto& idx = db.get_index< jurisdiction_dictionary_index, by_code_jurisdiction_dictionary >();
+   for (auto item_trx_jurisdiction : deserialized_data)
+   {
+      for (auto item : item_trx_jurisdiction.jurisdictions)
+      {
+         if (idx.find(item) == idx.end())
+         {
+            return false;
+         }
+      }
+   }
+
+   return true;
+}
+
 std::string jurisdiction_manager::get_jurisdictions( const signed_transaction& trx )
 {
    try

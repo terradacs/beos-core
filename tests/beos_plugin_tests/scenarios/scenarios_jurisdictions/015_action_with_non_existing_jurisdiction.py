@@ -59,24 +59,7 @@ if __name__ == "__main__":
     call =["transfer", ref_producers[0], ref_producers[1], "100.0000 BTS", "hello", "--jurisdictions", "[4]"]
     code, result = cluster.nodes[0].make_cleos_call(call)
     log.info("{0}".format(result))
-    result = json.loads(result)
-    summary.equal(True, code == 0, "This call {0} should succeed".format(call) )
-    summary.equal(True, result["status"] == "Transaction will be deferred due to the jurisdictions", "Transaction will be deferred due to the jurisdictions")
-
-    log.info("Waiting for transaction {} to expire".format(result["trx_id"]))
-    minutes_wait = 4
-    for i in range(minutes_wait):
-      log.info("Waiting... {} minutes to go...".format(minutes_wait - i))
-      time.sleep(60)
-
-    found = False
-    with open(cluster.nodes[0].log_file_path, 'r') as log_file:
-      for line in log_file.readlines():
-        if "expired transaction {}".format(result["trx_id"]) in line:
-          found = True
-          break
-
-    summary.equal(True, found, "`expired transaction {}` found in logs".format(result["trx_id"]))
+    summary.equal(True, code == 1, "This call {0} should fail".format(call) )
 
   except Exception as _ex:
     log.exception(_ex)
