@@ -160,7 +160,10 @@ def run_nodeos(node_index, name, public_key, use_https = False, _config = None):
         else:
             eosio_tools.raiseEOSIOException("File {0} does not exists.".format(config.BEOS_CONFIG_FILE_SRC))
 
-    log_file_name = eosio_tools.get_log_file_name("nodeos")
+    if _config:
+        log_file_name = "{0}".format(_config.BIOS_LOG_FILE_NAME)
+    else:
+        log_file_name = eosio_tools.get_log_file_name("nodeos")
     if os.path.exists(log_file_name):
         move(log_file_name, log_file_name + ".old")
 
