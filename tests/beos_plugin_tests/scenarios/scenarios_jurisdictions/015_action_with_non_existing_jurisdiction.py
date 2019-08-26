@@ -39,6 +39,8 @@ if __name__ == "__main__":
       code, result = cluster.bios.make_cleos_call(call)
       summary.equal(True, code == 0, "Expecting operation success")
 
+    cluster.bios.wait_for_last_irreversible_block()
+
     call =[ "push", "action", "beos.gateway", "issue", "[ \"{0}\", \"100.0000 BTS\", \"hello\" ]".format(ref_producers[0]), "-p", "beos.gateway"]
     code, result = cluster.bios.make_cleos_call(call)
     log.info("{0}".format(result))
@@ -57,7 +59,7 @@ if __name__ == "__main__":
       ret = api_rpc_caller.chain.get_info()
 
     call =["transfer", ref_producers[0], ref_producers[1], "100.0000 BTS", "hello", "--jurisdictions", "[4]"]
-    code, result = cluster.nodes[0].make_cleos_call(call)
+    code, result = cluster.bios.make_cleos_call(call)
     log.info("{0}".format(result))
     summary.equal(True, code == 1, "This call {0} should fail".format(call) )
 

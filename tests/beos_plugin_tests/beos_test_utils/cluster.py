@@ -4,6 +4,7 @@ import json
 import time
 import socket
 import requests
+import datetime
 import threading
 import collections
 
@@ -74,6 +75,7 @@ class Cluster(object):
 		config.NODEOS_WORKING_DIR = self.bios.working_dir  + "/{0}-".format(self.bios.node_data.node_port)
 		config.PRODUCER_NAME = self.bios.node_data.node_port
 		config.START_NODE_INDEX = "node"
+		config.BIOS_LOG_FILE_NAME = self.bios.log_file_path
 
 
 	def prepare_producers_array(self):
@@ -113,6 +115,7 @@ class Cluster(object):
 
 
 	def initialize_bios(self):
+		self.bios.log_file_path = self.bios.log_path+"/{0}-{1}-{2}-{3}.log".format("nodeos", datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S"), self.bios.node_number, self.bios.node_name)
 		self.prepare_producers_array()
 		self.prepare_config()
 
