@@ -55,7 +55,8 @@ void gps_plugin::plugin_shutdown()
 
 gps_apis::read_write gps_plugin::get_read_write_api()
 {
-  return gps_apis::read_write( my->producer_plug, this );
+  controller &c = app().find_plugin<chain_plugin>()->chain();
+  return gps_apis::read_write( my->producer_plug, this, c );
 }
 
 jurisdiction_gps_provider::ptr_base gps_plugin::get_gps_provider()
@@ -70,6 +71,13 @@ namespace gps_apis
       try {
 
          assert( producer_plug && gps_plug );
+
+         const auto &idx_by_code = db.db().get_index<chain::jurisdiction_dictionary_index, chain::by_code_jurisdiction_dictionary>();
+         for( auto item : params.jurisdictions )
+         {
+            FC_ASSERT( idx_by_code.find( item ) != idx_by_code.end(), "jurisdiction doesn't exist" );
+         }
+
          gps_plug->get_gps_provider()->change( params );
 
          return update_jurisdictions_results( true );

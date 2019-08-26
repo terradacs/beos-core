@@ -428,6 +428,13 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
             return;
          }
 
+         if (!jurisdiction_checker.check_trx_jurisdictions_exists(chain.db(), *trx))
+         {
+            jurisdiction_checker.forget_transaction( id );
+            send_response(std::static_pointer_cast<fc::exception>(std::make_shared<jurisdiction_not_exists_for_tx>(FC_LOG_MESSAGE(error, "jurisdiction does not exists for transaction ${id}", ("id", id)) )));
+            return;
+         }
+
          auto match_result = jurisdiction_checker.transaction_jurisdictions_match( chain.db(), jurisdiction_launcher.get_active_producer(), *trx, &id );
          if( !match_result.first )
          {

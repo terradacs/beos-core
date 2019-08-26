@@ -21,6 +21,8 @@ if __name__ == "__main__":
     cluster, summary, args, log = start_cluster(__file__, number_of_pnodes, producer_per_node)
     #cluster.run_all()
 
+    ref_producers = ["aaaaaaaaaaaa","baaaaaaaaaaa","caaaaaaaaaaa"]
+
     log.info("Wait 5s")
     time.sleep(5)
 
@@ -37,10 +39,14 @@ if __name__ == "__main__":
       code, result = cluster.bios.make_cleos_call(call)
       summary.equal(True, code == 0, "Expecting operation success")
 
+    call =[ "push", "action", "beos.gateway", "issue", "[ \"{0}\", \"100.0000 BTS\", \"hello\" ]".format(ref_producers[0]), "-p", "beos.gateway"]
+    code, result = cluster.bios.make_cleos_call(call)
+    log.info("{0}".format(result))
+    summary.equal(True, code == 0, "This call {0} should succeed".format(call) )    
+
     log.info("Wait 10s. We will wait couple of blocks to be sure that jurisdiction data is added.")
     time.sleep(10)
 
-    ref_producers = ["aaaaaaaaaaaa","baaaaaaaaaaa","caaaaaaaaaaa"]
     api_rpc_caller = cluster.bios.get_url_caller()
 
     log.info("Wait for producer other than `aaaaaaaaaaaa`")
@@ -50,27 +56,11 @@ if __name__ == "__main__":
       time.sleep(0.5)
       ret = api_rpc_caller.chain.get_info()
 
-    log.info("Change producer `aaaaaaaaaaaa` jurisdiction for not existing one ie: `4`")
-    # now we will change jurisdiction code for non existing one
-    set_jurisdiction_for_producer(cluster.nodes[0].get_url(), [4])
-    time.sleep(10)
+    call =["transfer", ref_producers[0], ref_producers[1], "100.0000 BTS", "hello", "--jurisdictions", "[4]"]
+    code, result = cluster.nodes[0].make_cleos_call(call)
+    log.info("{0}".format(result))
+    summary.equal(True, code == 1, "This call {0} should fail".format(call) )
 
-    log.info("Waiting one minute for whole production cycle")
-    time.sleep(60)
-
-    log.info("Testing `get_all_producer_jurisdiction_for_block` API call")
-    ret = api_rpc_caller.jurisdiction_history.get_all_producer_jurisdiction_for_block()
-    log.info(ret)
-    summary.equal(True, len(ret["producer_jurisdiction_for_block"]) == 0, "Expecting result len 0")
-
-    found = False
-    with open(cluster.nodes[0].log_file_path, 'r') as log_file:
-      for line in log_file.readlines():
-        if "jurisdiction doesn't exist" in line:
-          found = True
-          break
-
-    summary.equal(True, found, "`jurisdiction doesn't exist` found in logs")
   except Exception as _ex:
     log.exception(_ex)
     summary.equal(False, True, "Exception occured durring testing: {}.".format(_ex))
