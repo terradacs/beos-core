@@ -57,7 +57,7 @@ def run_script(_test, _multiplier = 1, _interpreter = None ):
   finally:
     if os.path.exists(error_file):
       os.remove(error_file)
-      return error
+    return error
 
 if __name__ == "__main__":
   args = parser.parse_args()
