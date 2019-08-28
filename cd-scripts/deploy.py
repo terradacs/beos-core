@@ -467,7 +467,7 @@ def finalize_beos_initialization(_config = None):
     import eosio_tools
     if _config:
         work_dir = "{0}{1}-{2}/".format(config.NODEOS_WORKING_DIR, config.START_NODE_INDEX, config.PRODUCER_NAME)
-        eosio_tools.kill_process("{0}/run_nodeos.pid".format(work_dir), "nodeos", config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
+        eosio_tools.kill_single_process("{0}/run_nodeos.pid".format(work_dir), "nodeos", config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
     else:
         eosio_tools.wait_for_blocks_produced(10, config.NODEOS_IP_ADDRESS, config.NODEOS_PORT)
         eosio_runner.terminate_running_tasks()
