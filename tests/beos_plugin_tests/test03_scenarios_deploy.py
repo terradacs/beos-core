@@ -9,7 +9,9 @@ import subprocess
 
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__))+"/beos_test_utils")
+from summarizer import Summarizer
 from cmdlineparser import parser
+
 
 test_args = []
 
@@ -24,18 +26,38 @@ def check_subdirs(_dir):
   return error
 
 
+def write_error_to_summary_file_if_not_exists(test_file, _error_file):
+    with open(_error_file, "r") as err:
+      if os.stat(_error_file).st_size:
+        path = os.path.dirname(test_file)
+        if not os.path.exists(path+"/summary"):
+          os.mkdir(path+"/summary")
+        data = os.path.split(test_file)
+        cdir = data[0] if data[0] else "."
+        cfile = data[1]
+        summary = Summarizer(cdir+"/"+cfile)
+        summary.equal(False, True, "Unhandeled exception occured {0}".format(err.read()))
+        summary.summarize()
+
 def run_script(_test, _multiplier = 1, _interpreter = None ):
+  error = True
+  error_file = _test+"_error"
   try:
-    interpreter = _interpreter if _interpreter else "python3"
-    ret_code = subprocess.call(interpreter + " " + _test + " " + test_args, shell=True)
+    with open(error_file, "w") as err:
+      interpreter = _interpreter if _interpreter else "python3"
+      ret_code = subprocess.call(interpreter + " " + _test + " " + test_args, shell=True, stderr=err)
     if ret_code == 0:
-      return False
+      error = False
     else:
-      return True
+      write_error_to_summary_file_if_not_exists(_test, error_file)
+      error = True
   except Exception as _ex:
     print("Exception occures in run_script `{0}`".format(str(_ex)))
-    return True
-
+    error = True
+  finally:
+    if os.path.exists(error_file):
+      os.remove(error_file)
+    return error
 
 if __name__ == "__main__":
   args = parser.parse_args()

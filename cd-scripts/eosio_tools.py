@@ -143,6 +143,25 @@ def wait_for_blocks_produced(block_count, nodeos_ip, nodeos_port, timeout = 60.,
         if curr_block_number - last_block_number > block_count:
             return
 
+def kill_single_process(pid_file_name, proc_name, ip_address, port):
+    pid_name = None
+    node_name = "{0}-node-{0}".format(port)
+    try:
+        with open(pid_file_name, "r") as pid_file:
+            pid_name = pid_file.readline()
+            pid_name = pid_name.strip()
+        if pid_name is not None:
+            for proc in os.popen("ps ax | grep " + proc_name + " | grep -v grep"):
+                if node_name in proc:
+                    pid = proc.strip().split()
+                    os.kill(int(pid[0]), signal.SIGINT)
+                    continue
+            if os.path.exists(pid_file_name):
+                os.remove(pid_file_name)
+    except Exception as ex:
+        logger.warning("Process {0} cannot be killed. Reason: {1}".format(proc_name, ex))
+
+
 def kill_process(pid_file_name, proc_name, ip_address, port):
     pids = []
     pid_name = None
