@@ -21,7 +21,7 @@ if __name__ == "__main__":
     cluster, summary, args, log = start_cluster(__file__, number_of_pnodes, producer_per_node)
     #cluster.run_all()
 
-    ref_producers = ["aaaaaaaaaaaa","baaaaaaaaaaa","caaaaaaaaaaa"]
+    ref_producers = sorted(list(cluster.producers.keys()))
 
     log.info("Wait 5s")
     time.sleep(5)
@@ -51,7 +51,7 @@ if __name__ == "__main__":
 
     api_rpc_caller = cluster.bios.get_url_caller()
 
-    log.info("Wait for producer other than `aaaaaaaaaaaa`")
+    log.info("Wait for producer other than `{}`".format(ref_producers[0]))
     # we will wait till active producer will be not aaaaaaaaaaaa
     ret = api_rpc_caller.chain.get_info()
     while ret["head_block_producer"] == ref_producers[0]:

@@ -40,17 +40,17 @@ if __name__ == "__main__":
     log.info("Wait 10s. We will wait couple of blocks to be sure that jurisdiction data is added.")
     time.sleep(10)
 
-    ref_producers = ["aaaaaaaaaaaa","baaaaaaaaaaa","caaaaaaaaaaa"]
+    ref_producers = sorted(list(cluster.producers.keys()))
     api_rpc_caller = cluster.bios.get_url_caller()
 
-    log.info("Wait for producer other than `aaaaaaaaaaaa`")
+    log.info("Wait for producer other than `{}`".format(ref_producers[0]))
     # we will wait till active producer will be not aaaaaaaaaaaa
     ret = api_rpc_caller.chain.get_info()
     while ret["head_block_producer"] == ref_producers[0]:
       time.sleep(0.5)
       ret = api_rpc_caller.chain.get_info()
 
-    log.info("Change producer `aaaaaaaaaaaa` jurisdiction for not existing one ie: `4`")
+    log.info("Change producer `{}` jurisdiction for not existing one ie: `4`".format(ref_producers[0]))
     # now we will change jurisdiction code for non existing one
     set_jurisdiction_for_producer(cluster.nodes[0].get_url(), [4])
     time.sleep(10)
