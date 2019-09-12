@@ -27,6 +27,13 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/signals2/connection.hpp>
 
+//#define CAVEMEN_DEBUG
+#ifdef CAVEMEN_DEBUG
+#define DBG(format, ... ) { FILE *pFile = fopen("debug.log","a"); fprintf(pFile,format "\n",__VA_ARGS__); fclose(pFile); }
+#else
+#define DBG(format, ... )
+#endif
+
 namespace bmi = boost::multi_index;
 using bmi::indexed_by;
 using bmi::ordered_non_unique;

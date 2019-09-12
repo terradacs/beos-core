@@ -31,6 +31,13 @@
 
 #include <eosio/chain/eosio_contract.hpp>
 
+//#define CAVEMEN_DEBUG
+#ifdef CAVEMEN_DEBUG
+#define DBG(format, ... ) { FILE *pFile = fopen("debug.log","a"); fprintf(pFile,format "\n",__VA_ARGS__); fclose(pFile); }
+#else
+#define DBG(format, ... )
+#endif
+
 namespace eosio { namespace chain {
 
 using resource_limits::resource_limits_manager;
