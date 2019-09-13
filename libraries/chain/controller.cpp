@@ -19,7 +19,6 @@
 
 #include <eosio/chain/voting_manager.hpp>
 
-#include <eosio/chain/jurisdiction_objects.hpp>
 #include <eosio/chain/jurisdiction_object.hpp>
 #include <eosio/chain/jurisdiction_history_object.hpp>
 
@@ -2092,17 +2091,20 @@ const account_object& controller::get_account( account_name name )const
    return my->db.get<account_object, by_name>(name);
 } FC_CAPTURE_AND_RETHROW( (name) ) }
 
-vector<transaction_metadata_ptr> controller::get_unapplied_transactions() const {
-   vector<transaction_metadata_ptr> result;
+controller::unapplied_transactions_type controller::get_unapplied_transactions() const {
+   unapplied_transactions_type result;
    if ( my->read_mode == db_read_mode::SPECULATIVE ) {
-      result.reserve(my->unapplied_transactions.size());
       for ( const auto& entry: my->unapplied_transactions ) {
-         result.emplace_back(entry.second);
+         result.emplace(entry.second);
       }
    } else {
       EOS_ASSERT( my->unapplied_transactions.empty(), transaction_exception, "not empty unapplied_transactions in non-speculative mode" ); //should never happen
    }
    return result;
+}
+
+void controller::insert_unapplied_transaction(const transaction_metadata_ptr& trx) {
+   my->unapplied_transactions[trx->signed_id] = trx;
 }
 
 void controller::drop_unapplied_transaction(const transaction_metadata_ptr& trx) {

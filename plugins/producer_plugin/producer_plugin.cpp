@@ -191,6 +191,7 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
 
       jurisdiction_action_launcher  jurisdiction_launcher;
       jurisdiction_manager          jurisdiction_checker;
+      transaction_validator         trx_validator;
 
       void on_block( const block_state_ptr& bsp ) {
          if( bsp->header.timestamp <= _last_signed_block_time ) return;
@@ -312,7 +313,7 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
          if( existing ) { return; }
 
          // abort the pending block
-         chain.abort_block();
+         abort_block();
 
          // exceptions throw out, make sure we restart our loop
          auto ensure = fc::make_scoped_exit([this](){
@@ -353,6 +354,14 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
       }
 
       std::deque<std::tuple<packed_transaction_ptr, bool, next_function<transaction_trace_ptr>>> _pending_incoming_transactions;
+
+      void abort_block()
+      {
+         chain::controller& chain = app().get_plugin<chain_plugin>().chain();
+
+         chain.abort_block();
+         trx_validator.clear();
+      }
 
       void push_custom_jurisdiction_transaction()
       {
@@ -443,12 +452,17 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
          }
 
          auto match_result = jurisdiction_checker.transaction_jurisdictions_match( chain.db(), jurisdiction_launcher.get_active_producer(), *trx, &id );
+         bool warning_is_generated = false;
+
          if( !match_result.first )
          {
             _pending_incoming_transactions.emplace_back(trx, persist_until_expired, next);
             jurisdiction_checker.remember_transaction( id );
             if( !match_result.second )
+            {
+               warning_is_generated = true;
                send_response( std::make_shared<warning_plugin>( incorrect_location_in_transaction, id.str() ) );
+            }
             return;
          }
          jurisdiction_checker.forget_transaction( id );
@@ -461,7 +475,40 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
          }
 
          try {
-            auto trace = chain.push_transaction(std::make_shared<transaction_metadata>(*trx), deadline);
+
+            auto trx_metadata = std::make_shared<transaction_metadata>( *trx );
+            auto _trx = trx->get_transaction();
+            bool is_jurisdiction_changed = trx_validator.is_jurisdiction_change( _trx );
+            if( is_jurisdiction_changed )
+               trx_metadata->contains_jurisdiction_change = true;
+
+            bool validation_result = trx_validator.validate_transaction( _trx );
+            /*
+               Change of jurisdiction in given transaction impacts on allowance of execution for other transactions in given block.
+               Earlier transactions in block can collide with the newest jurisdiction,
+               therefore such transaction should be moved to next block.
+
+               Example:
+                  There is jurisdiction `J1` before block `B`
+
+                  Block B has transactions as below:
+                  transaction A demands `J1`
+                  transaction B demands `J1`
+                  transaction C with `system_contract::updateprod` action changes jurisdictions to `J2`
+                  transaction D demands `J2`
+
+                  Historically block `B` will have only jurisdiction `J2`, but in that block are transactions `A` and `B`,
+                  there in such case it is inconsistency.
+            */
+            if( !validation_result )
+            {
+               if( !warning_is_generated )
+                  send_response( std::make_shared<warning_plugin>( incorrect_location_in_transaction, id.str() ) );
+               chain.insert_unapplied_transaction( trx_metadata );
+               return;
+            }
+
+            auto trace = chain.push_transaction(trx_metadata, deadline);
             if (trace->except) {
                if (failure_is_subjective(*trace->except, deadline_is_subjective)) {
                   _pending_incoming_transactions.emplace_back(trx, persist_until_expired, next);
@@ -838,8 +885,7 @@ void producer_plugin::resume() {
    // re-evaluate that now
    //
    if (my->_pending_block_mode == pending_block_mode::speculating) {
-      chain::controller& chain = app().get_plugin<chain_plugin>().chain();
-      chain.abort_block();
+      my->abort_block();
       my->schedule_production_loop();
    }
 }
@@ -873,8 +919,7 @@ void producer_plugin::update_runtime_options(const runtime_options& options) {
    }
 
    if (check_speculating && my->_pending_block_mode == pending_block_mode::speculating) {
-      chain::controller& chain = app().get_plugin<chain_plugin>().chain();
-      chain.abort_block();
+      my->abort_block();
       my->schedule_production_loop();
    }
 
@@ -949,7 +994,7 @@ producer_plugin::integrity_hash_information producer_plugin::get_integrity_hash(
 
    if (chain.pending_block_state()) {
       // abort the pending block
-      chain.abort_block();
+      my->abort_block();
    } else {
       reschedule.cancel();
    }
@@ -966,7 +1011,7 @@ producer_plugin::snapshot_information producer_plugin::create_snapshot() const {
 
    if (chain.pending_block_state()) {
       // abort the pending block
-      chain.abort_block();
+      my->abort_block();
    } else {
       reschedule.cancel();
    }
@@ -1208,7 +1253,7 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
          }
       }
 
-      chain.abort_block();
+      abort_block();
       chain.start_block(block_time, blocks_to_confirm);
    } FC_LOG_AND_DROP();
 
@@ -1580,7 +1625,7 @@ bool producer_plugin_impl::maybe_produce_block() {
 
    fc_dlog(_log, "Aborting block due to produce_block error");
    chain::controller& chain = app().get_plugin<chain_plugin>().chain();
-   chain.abort_block();
+   abort_block();
    return false;
 }
 
@@ -1620,6 +1665,8 @@ void producer_plugin_impl::produce_block() {
    chain.commit_block();
    auto hbt = chain.head_block_time();
    //idump((fc::time_point::now() - hbt));
+
+   trx_validator.clear();
 
    block_state_ptr new_bs = chain.head_block_state();
    _producer_watermarks[new_bs->header.producer] = chain.head_block_num();

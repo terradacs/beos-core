@@ -8,6 +8,8 @@
 #include <eosio/chain/account_object.hpp>
 #include <eosio/chain/snapshot.hpp>
 
+#include <eosio/chain/jurisdiction_objects.hpp>
+
 namespace chainbase {
    class database;
 }
@@ -89,6 +91,8 @@ namespace eosio { namespace chain {
             incomplete  = 3, ///< this is an incomplete block (either being produced by a producer or speculatively produced by a node)
          };
 
+         using unapplied_transactions_type = set< transaction_metadata_ptr, eosio::chain::transaction_comparator >;
+
          controller( const config& cfg );
          ~controller();
 
@@ -112,7 +116,8 @@ namespace eosio { namespace chain {
           *
           *  @return vector of transactions which have been unapplied
           */
-         vector<transaction_metadata_ptr> get_unapplied_transactions() const;
+         unapplied_transactions_type get_unapplied_transactions() const;
+         void insert_unapplied_transaction(const transaction_metadata_ptr& trx);
          void drop_unapplied_transaction(const transaction_metadata_ptr& trx);
          void drop_all_unapplied_transactions();
 

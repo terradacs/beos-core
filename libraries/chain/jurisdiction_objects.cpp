@@ -129,6 +129,7 @@ transaction_metadata_ptr jurisdiction_action_launcher::get_jurisdiction_transact
    trx.sign( signature_provider, chain_id );
 
    transaction_metadata_ptr res = std::make_shared< transaction_metadata >( trx );
+   res->contains_jurisdiction_change = true;
 
    return res;
 }
@@ -425,6 +426,198 @@ std::string jurisdiction_manager::get_jurisdictions( const signed_transaction& t
    }
 
    return "";
+}
+
+/*=============================transaction_validator=============================*/
+
+bool transaction_validator::check_action( const action& _action )
+{
+   return _action.account == config::system_account_name && _action.name == N(updateprod);
+}
+
+void transaction_validator::clear( jurisdiction_producer_ordered& src )
+{
+   src.producer = account_name();
+   src.jurisdictions.clear();
+}
+
+void transaction_validator::restore_old_values( bool was_data_added )
+{
+   new_codes = old_codes;
+
+   if( was_data_added )
+   {
+      assert( !items.empty() );
+      items.pop_back();
+   }
+}
+
+bool transaction_validator::add( const transaction& trx )
+{
+   auto exts = trx.transaction_extensions;
+   bool res = !exts.empty();
+
+   if( res )
+      items.push_back( jurisdiction_manager::read( exts ) );
+
+   return res;
+}
+
+void transaction_validator::add( const action& _action )
+{
+   jurisdiction_producer updater;
+
+   fc::datastream<const char*> ds( _action.data.data(), _action.data.size() );
+   fc::raw::unpack(ds, updater );
+
+   old_codes = new_codes;
+   new_codes = jurisdiction_producer_ordered( updater );
+}
+
+bool transaction_validator::validate_trx( const trx_jurisdictions& trx, const jurisdiction_producer_ordered& src )
+{
+   for( auto& item_trx_jurisdiction : trx )
+   {
+      for( auto& item : item_trx_jurisdiction.jurisdictions )
+      {
+         auto found = src.jurisdictions.find( item );
+         if( found != src.jurisdictions.end() )
+            return true;
+      }
+   }
+
+   return false;
+}
+
+bool transaction_validator::validate( bool was_data_added )
+{
+   /*
+      "items.empty()"
+         there isn't any transaction with jurisdiction at all 
+
+      "items.size() == 1 && was_data_added"
+         there wasn't any transaction with jurisdiction before actual
+    */
+   if( items.empty() || ( items.size() == 1 && was_data_added ) )
+      return true;
+
+   size_t cnt = 0;
+   size_t idx_end = items.size() - 1;
+
+   for( auto& item : items )
+   {
+      if( was_data_added && cnt == idx_end )
+      {
+         if( !validate_trx( item, old_codes ) )
+            return false;
+      }
+      else
+      {
+         if( !validate_trx( item, new_codes ) )
+            return false;
+      }
+      ++cnt;
+   }
+
+   return true;
+}
+
+bool transaction_validator::validate_transaction( const transaction& trx )
+{
+   try
+   {
+      bool update_prod = false;
+
+      //Even transaction with `system_contract::updateprod` action should be checked
+      bool was_data_added = add( trx );
+
+      for( auto action : trx.actions )
+      {
+         if( check_action( action ) )
+         {
+            update_prod = true;
+            add( action );
+         }
+      }
+
+      if( update_prod )
+      {
+         bool validated = validate( was_data_added );
+
+         if( !validated )
+            restore_old_values( was_data_added );
+
+         return validated;
+      }
+   }
+   catch( fc::exception& e )
+   {
+      elog( "Exception Details: ${e}", ( "e", e.to_detail_string() ) );
+   }
+   catch( std::exception& e )
+   {
+      elog( "Exception Details: ${e}", ( "e", e.what() ) );
+   }
+   catch( ... )
+   {
+      elog( "Unknown exception during validation of transaction" );
+   }
+
+   return true;
+}
+
+void transaction_validator::clear()
+{
+   clear( new_codes );
+   clear( old_codes );
+
+   items.clear();
+}
+
+bool transaction_validator::is_jurisdiction_change( const transaction& trx )
+{
+   try
+   {
+      for( auto action : trx.actions )
+         if( check_action( action ) )
+            return true;
+   }
+   catch( fc::exception& e )
+   {
+      elog( "Exception Details: ${e}", ( "e", e.to_detail_string() ) );
+   }
+   catch( std::exception& e )
+   {
+      elog( "Exception Details: ${e}", ( "e", e.what() ) );
+   }
+   catch( ... )
+   {
+      elog( "Unknown exception during checking of transaction" );
+   }
+
+   return false;
+}
+
+/*=============================transaction_comparator=============================*/
+
+bool transaction_comparator::operator()( const transaction_metadata_ptr& a, const transaction_metadata_ptr& b ) const
+{
+   if( a->contains_jurisdiction_change || b->contains_jurisdiction_change )
+   {
+      if( a->contains_jurisdiction_change && b->contains_jurisdiction_change )
+         return a->id < b->id;
+      else
+      {
+         if( a->contains_jurisdiction_change )
+            return true;
+         else
+            return false;
+      }
+   }
+   else
+   {
+      return a->id < b->id;
+   }
 }
 
 } } // eosio::chain

@@ -142,13 +142,13 @@ class jurisdiction_manager
 
    private:
 
-      uint16_t read( uint16_t idx, const std::vector< char >& buffer, std::vector< jurisdiction_basic >& dst );
+      static uint16_t read( uint16_t idx, const std::vector< char >& buffer, std::vector< jurisdiction_basic >& dst );
 
    public:
 
       bool check_jurisdictions( const chainbase::database &db, const jurisdiction_producer_ordered& src );
 
-      jurisdictions read( const extensions_type& exts );
+      static jurisdictions read( const extensions_type& exts );
 
       fc::variant get_jurisdiction( const chainbase::database& db, code_jurisdiction code );
 
@@ -164,6 +164,39 @@ class jurisdiction_manager
 
       bool check_trx_jurisdictions_exists(const chainbase::database& db, const packed_transaction& trx);
       std::string get_jurisdictions( const signed_transaction& trx );
+};
+
+class transaction_validator
+{
+   private:
+
+      using trx_jurisdictions = jurisdiction_manager::jurisdictions;
+
+      jurisdiction_producer_ordered old_codes;
+      jurisdiction_producer_ordered new_codes;
+
+      std::list< trx_jurisdictions > items;
+
+      bool check_action( const action& _action );
+      void clear( jurisdiction_producer_ordered& src );
+      void restore_old_values( bool was_data_added );
+
+      void add( const action& _action );
+      bool add( const transaction& trx );
+
+      bool validate_trx( const trx_jurisdictions& trx, const jurisdiction_producer_ordered& src );
+      bool validate( bool was_data_added );
+
+   public:
+
+      bool validate_transaction( const transaction& trx );
+      void clear();
+      bool is_jurisdiction_change( const transaction& trx );
+};
+
+struct transaction_comparator
+{
+   bool operator()( const transaction_metadata_ptr& a, const transaction_metadata_ptr& b ) const;
 };
 
 } }  // eosio::chain

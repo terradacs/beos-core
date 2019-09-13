@@ -23,6 +23,7 @@ class transaction_metadata {
       bool                                                       accepted = false;
       bool                                                       implicit = false;
       bool                                                       scheduled = false;
+      bool                                                       contains_jurisdiction_change = false;
 
       explicit transaction_metadata( const signed_transaction& t, packed_transaction::compression_type c = packed_transaction::none )
       :trx(t),packed_trx(t, c) {
