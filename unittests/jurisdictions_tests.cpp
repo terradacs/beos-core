@@ -77,9 +77,16 @@ class jurisdiction_tester : public tester
          return trx;
       }
 
-      bool validate_trx( bool allow_trx_codes, const data_type& trx_codes, bool allow_updateprod, const data_type& updateprod_codes )
+      bool validate_trx( bool allow_trx_codes, const data_type& trx_codes, bool allow_updateprod, const data_type& updateprod_codes, account_name producer = account_name() )
       {
-         return validator.validate_transaction( create_transaction( allow_trx_codes, trx_codes, allow_updateprod, updateprod_codes ) );
+         auto validation_result = validator.validate_transaction( create_transaction( allow_trx_codes, trx_codes, allow_updateprod, updateprod_codes ), producer );
+         return validation_result.first;
+      }
+
+      bool is_any_updateprod_action_in_transaction( bool allow_updateprod, account_name producer )
+      {
+         auto validation_result = validator.validate_transaction( create_transaction( false/*allow_trx_codes*/, {}/*trx_codes*/, allow_updateprod, {}/*updateprod_codes*/ ), producer );
+         return validation_result.second;
       }
 
       void clear()
@@ -87,10 +94,6 @@ class jurisdiction_tester : public tester
          validator.clear();
       }
 
-      bool is_jurisdiction_change( const transaction& trx )
-      {
-         return validator.is_jurisdiction_change( trx );
-      }
 };
 
 BOOST_AUTO_TEST_SUITE(jurisdiction_tests)
@@ -107,154 +110,179 @@ BOOST_AUTO_TEST_SUITE(jurisdiction_tests)
    Every section is treated as next block.
 */
 BOOST_FIXTURE_TEST_CASE( mix_test, jurisdiction_tester ) try {
+   {
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+   }
+   {
+      clear();
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+   }
+   {
+      clear();
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {3}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,5,2,3}/*updateprod_codes*/ ) );
+   }
+   {
+      clear();
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {3}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {5,2,3}/*updateprod_codes*/ ) );
+   }
+   {
+      clear();
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {3}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+   }
+   {
+      clear();
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,2}/*updateprod_codes*/ ) );
+   }
+   {
+      clear();
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {3,2,1}/*updateprod_codes*/ ) );
+   }
+   {
+      clear();
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {4,5}/*updateprod_codes*/ ) );
+   }
+   {
+      clear();
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {3}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {3}/*updateprod_codes*/ ) );
+   }
+   {
+      clear();
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {3}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {3,2,4,5,1}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1,3,4}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {3,4,5,1}/*updateprod_codes*/ ) );
+   }
+   {
+      clear();
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1,2,3,4}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {3}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {5}/*updateprod_codes*/ ) );
+   }
+   {
+      clear();
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {3}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3,4}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {3}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,2}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {2}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {2,3}/*updateprod_codes*/ ) );
+   }
+   {
+      clear();
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {0}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {3,2,1,0}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {3}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1,2,3,4,5,6}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {6,5,4,3,2,1,0}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {6,1,3,0}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,3,0}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,3}/*updateprod_codes*/ ) );
+   }
+   {
+      clear();
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {0}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {0}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+   }
+   {
+      clear();
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {0,1,2}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {0}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {2}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {0,1}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {3}/*updateprod_codes*/ ) );
+   }
+   {
+      clear();
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2,3}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {4}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {4,1}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {2,3}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3,4}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {4}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {4,2,3}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,4}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,2,4,5}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {5}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3,4}/*updateprod_codes*/ ) );
+   }
+   {
+      clear();
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {0}/*trx_codes*/, true/*allow_updateprod*/, {1}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, true/*allow_updateprod*/, {2,0}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2}/*trx_codes*/, true/*allow_updateprod*/, {3,1,0}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {3}/*trx_codes*/, true/*allow_updateprod*/, {4,2,1,0}/*updateprod_codes*/ ) );
+   }
+   {
+      clear();
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {0}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2,3}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3,4,0}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {0,1}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {2,3}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  true/*allow_trx_codes*/, {1,2,3}/*trx_codes*/, true/*allow_updateprod*/, {7,8}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {4}/*trx_codes*/, true/*allow_updateprod*/, {7,8,2,0}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {7}/*trx_codes*/, false/*allow_updateprod*/, {4,0,3}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {8}/*trx_codes*/, false/*allow_updateprod*/, {0,2,3,4,7}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  true/*allow_trx_codes*/, {0,2,3,4,7,1,8}/*trx_codes*/, true/*allow_updateprod*/, {0,2,3,4,7,1}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {0,2,3,4,7,1,8}/*trx_codes*/, true/*allow_updateprod*/, {0,2,3,4,8,7,1}/*updateprod_codes*/ ) );
+   }
 
-      {
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-      }
-      {
-         clear();
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-      }
-      {
-         clear();
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {3}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,5,2,3}/*updateprod_codes*/ ) );
-      }
-      {
-         clear();
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {3}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {5,2,3}/*updateprod_codes*/ ) );
-      }
-      {
-         clear();
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {3}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-      }
-      {
-         clear();
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,2}/*updateprod_codes*/ ) );
-      }
-      {
-         clear();
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {3,2,1}/*updateprod_codes*/ ) );
-      }
-      {
-         clear();
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {4,5}/*updateprod_codes*/ ) );
-      }
-      {
-         clear();
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {3}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {3}/*updateprod_codes*/ ) );
-      }
-      {
-         clear();
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {3}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {3,2,4,5,1}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1,3,4}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {3,4,5,1}/*updateprod_codes*/ ) );
-      }
-      {
-         clear();
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1,2,3,4}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {3}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {5}/*updateprod_codes*/ ) );
-      }
-      {
-         clear();
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {3}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3,4}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {3}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,2}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {2}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {2,3}/*updateprod_codes*/ ) );
-      }
-      {
-         clear();
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {0}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {3,2,1,0}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {3}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1,2,3,4,5,6}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {6,5,4,3,2,1,0}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {6,1,3,0}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,3,0}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,3}/*updateprod_codes*/ ) );
-      }
-      {
-         clear();
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {0}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {0}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-      }
-      {
-         clear();
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {0,1,2}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {0}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {2}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {0,1}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {3}/*updateprod_codes*/ ) );
-      }
-      {
-         clear();
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2,3}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {4}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {4,1}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {2,3}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3,4}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {4}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {4,2,3}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,4}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,2,4,5}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {5}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3,4}/*updateprod_codes*/ ) );
-      }
-      {
-         clear();
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {0}/*trx_codes*/, true/*allow_updateprod*/, {1}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {1}/*trx_codes*/, true/*allow_updateprod*/, {2,0}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2}/*trx_codes*/, true/*allow_updateprod*/, {3,1,0}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {3}/*trx_codes*/, true/*allow_updateprod*/, {4,2,1,0}/*updateprod_codes*/ ) );
-      }
-      {
-         clear();
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {0}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {2,3}/*trx_codes*/, true/*allow_updateprod*/, {1,2,3,4,0}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {0,1}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {2,3}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  true/*allow_trx_codes*/, {1,2,3}/*trx_codes*/, true/*allow_updateprod*/, {7,8}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {4}/*trx_codes*/, true/*allow_updateprod*/, {7,8,2,0}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {7}/*trx_codes*/, false/*allow_updateprod*/, {4,0,3}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {8}/*trx_codes*/, false/*allow_updateprod*/, {0,2,3,4,7}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( false, validate_trx(  true/*allow_trx_codes*/, {0,2,3,4,7,1,8}/*trx_codes*/, true/*allow_updateprod*/, {0,2,3,4,7,1}/*updateprod_codes*/ ) );
-         BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {0,2,3,4,7,1,8}/*trx_codes*/, true/*allow_updateprod*/, {0,2,3,4,8,7,1}/*updateprod_codes*/ ) );
-      }
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( find_updateprod_test, jurisdiction_tester ) try {
+/*
+   There are 3 options:
+
+   - exists `system_contract::updateprod` action AND producer in `system_contract::updateprod` is the same as actual producer that produces block
+      -> required answer `true`
+
+   - exists `system_contract::updateprod` action AND producer in `system_contract::updateprod` is different from as actual producer that produces block
+      -> required answer `true`
+
+   - doesn't exist `system_contract::updateprod` action
+      -> required answer `false`
+
+   Note!
+      By default and for simplification producer in `system_contract::updateprod` is always empty i.e. `account_name()`
+*/
+   {
+      BOOST_REQUIRE_EQUAL( true, is_any_updateprod_action_in_transaction( true/*allow_updateprod*/, account_name() ) );
+      BOOST_REQUIRE_EQUAL( true, is_any_updateprod_action_in_transaction( true/*allow_updateprod*/, N(other) ) );
+
+      BOOST_REQUIRE_EQUAL( false, is_any_updateprod_action_in_transaction( false/*allow_updateprod*/, account_name() ) );
+      BOOST_REQUIRE_EQUAL( false, is_any_updateprod_action_in_transaction( false/*allow_updateprod*/, N(other) ) );
+   }
 
 } FC_LOG_AND_RETHROW()
 

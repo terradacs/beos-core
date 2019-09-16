@@ -477,30 +477,28 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
          try {
 
             auto trx_metadata = std::make_shared<transaction_metadata>( *trx );
-            auto _trx = trx->get_transaction();
-            bool is_jurisdiction_changed = trx_validator.is_jurisdiction_change( _trx );
-            if( is_jurisdiction_changed )
-               trx_metadata->contains_jurisdiction_change = true;
 
-            bool validation_result = trx_validator.validate_transaction( _trx );
+            transaction_validator::validate_result validation_result = trx_validator.validate_transaction( trx->get_transaction(), jurisdiction_launcher.get_active_producer() );
+            trx_metadata->contains_jurisdiction_change = validation_result.second;
             /*
-               Change of jurisdiction in given transaction impacts on allowance of execution for other transactions in given block.
-               Earlier transactions in block can collide with the newest jurisdiction,
-               therefore such transaction should be moved to next block.
+               Explanation
+                  Change of jurisdiction in given transaction impacts on permission of execution for other transactions in given block.
+                  Earlier transactions in block can collide with the newest jurisdiction.
 
                Example:
                   There is jurisdiction `J1` before block `B`
 
                   Block B has transactions as below:
-                  transaction A demands `J1`
-                  transaction B demands `J1`
-                  transaction C with `system_contract::updateprod` action changes jurisdictions to `J2`
-                  transaction D demands `J2`
+                     - transaction 1 demands `J1`
+                     - transaction 2 demands `J1`
+                     - transaction 3 with `system_contract::updateprod` action changes jurisdictions to `J2`
+                     - transaction 4 demands `J2`
 
-                  Historically block `B` will have only jurisdiction `J2`, but in that block are transactions `A` and `B`,
-                  there in such case it is inconsistency.
+                  Historically block `B` will have only jurisdiction `J2`,
+                  but there are transactions `1` and `2` in that block, that collide with this jurisdiction.
+                  There is inconsistency, so the best solution is moving `system_contract::updateprod` transaction to next block.
             */
-            if( !validation_result )
+            if( !validation_result.first )
             {
                if( !warning_is_generated )
                   send_response( std::make_shared<warning_plugin>( incorrect_location_in_transaction, id.str() ) );
@@ -1297,6 +1295,9 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
       }
 
       try {
+
+         push_custom_jurisdiction_transaction();
+
          size_t orig_pending_txn_size = _pending_incoming_transactions.size();
 
          // Processing unapplied transactions...
@@ -1339,6 +1340,7 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
                int num_applied = 0;
                int num_failed = 0;
                int num_processed = 0;
+               int num_non_validated = 0;
 
                for (const auto& trx: apply_trxs) {
                   if (block_time <= fc::time_point::now()) exhausted = true;
@@ -1349,6 +1351,14 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
                   num_processed++;
 
                   try {
+
+                     transaction_validator::validate_result validation_result = trx_validator.validate_transaction( trx->trx, jurisdiction_launcher.get_active_producer() );
+                     if( !validation_result.first )
+                     {
+                        ++num_non_validated;
+                        continue;
+                     }
+
                      auto deadline = fc::time_point::now() + fc::milliseconds(_max_transaction_time_ms);
                      bool deadline_is_subjective = false;
                      if (_max_transaction_time_ms < 0 || (_pending_block_mode == pending_block_mode::producing && block_time < deadline)) {
@@ -1374,11 +1384,12 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
                   } FC_LOG_AND_DROP();
                }
 
-               fc_dlog(_log, "Processed ${m} of ${n} previously applied transactions, Applied ${applied}, Failed/Dropped ${failed}",
+               fc_dlog(_log, "Processed ${m} of ${n} previously applied transactions, Applied ${applied}, Failed/Dropped ${failed}, not Validated ${non_validated}",
                       ("m", num_processed)
                       ("n", apply_trxs.size())
                       ("applied", num_applied)
-                      ("failed", num_failed));
+                      ("failed", num_failed)
+                      ("non_validated", num_non_validated));
             }
          }
 
@@ -1399,8 +1410,6 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
                       ("n", orig_count)
                       ("expired", num_expired));
             }
-
-            push_custom_jurisdiction_transaction();
 
             auto scheduled_trxs = chain.get_scheduled_transactions();
             if (!scheduled_trxs.empty()) {

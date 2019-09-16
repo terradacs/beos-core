@@ -430,9 +430,19 @@ std::string jurisdiction_manager::get_jurisdictions( const signed_transaction& t
 
 /*=============================transaction_validator=============================*/
 
-bool transaction_validator::check_action( const action& _action )
+bool transaction_validator::check_action( const action& _action, account_name actual_producer, bool& exists )
 {
-   return _action.account == config::system_account_name && _action.name == N(updateprod);
+   exists = _action.account == config::system_account_name && _action.name == N(updateprod);
+
+   if( !exists )
+      return false;
+
+   jurisdiction_producer updater;
+
+   fc::datastream<const char*> ds( _action.data.data(), _action.data.size() );
+   fc::raw::unpack(ds, updater );
+
+   return updater.producer == actual_producer;
 }
 
 void transaction_validator::clear( jurisdiction_producer_ordered& src )
@@ -522,33 +532,34 @@ bool transaction_validator::validate( bool was_data_added )
    return true;
 }
 
-bool transaction_validator::validate_transaction( const transaction& trx )
+transaction_validator::validate_result transaction_validator::validate_transaction( const transaction& trx, account_name actual_producer )
 {
    try
    {
-      bool update_prod = false;
+      validate_result result( true, false );
+      bool make_validation = false;
 
       //Even transaction with `system_contract::updateprod` action should be checked
       bool was_data_added = add( trx );
 
       for( auto action : trx.actions )
       {
-         if( check_action( action ) )
+         if( check_action( action, actual_producer, result.second ) )
          {
-            update_prod = true;
+            make_validation = true;
             add( action );
          }
       }
 
-      if( update_prod )
+      if( make_validation )
       {
-         bool validated = validate( was_data_added );
+         result.first = validate( was_data_added );
 
-         if( !validated )
+         if( !result.first )
             restore_old_values( was_data_added );
-
-         return validated;
       }
+
+      return result;
    }
    catch( fc::exception& e )
    {
@@ -563,7 +574,7 @@ bool transaction_validator::validate_transaction( const transaction& trx )
       elog( "Unknown exception during validation of transaction" );
    }
 
-   return true;
+   return validate_result( true, false );
 }
 
 void transaction_validator::clear()
@@ -572,30 +583,6 @@ void transaction_validator::clear()
    clear( old_codes );
 
    items.clear();
-}
-
-bool transaction_validator::is_jurisdiction_change( const transaction& trx )
-{
-   try
-   {
-      for( auto action : trx.actions )
-         if( check_action( action ) )
-            return true;
-   }
-   catch( fc::exception& e )
-   {
-      elog( "Exception Details: ${e}", ( "e", e.to_detail_string() ) );
-   }
-   catch( std::exception& e )
-   {
-      elog( "Exception Details: ${e}", ( "e", e.what() ) );
-   }
-   catch( ... )
-   {
-      elog( "Unknown exception during checking of transaction" );
-   }
-
-   return false;
 }
 
 /*=============================transaction_comparator=============================*/

@@ -168,6 +168,10 @@ class jurisdiction_manager
 
 class transaction_validator
 {
+   public:
+
+      using validate_result = std::pair< bool/*is correct validation*/, bool/*is jurisdiction changed*/ >;
+
    private:
 
       using trx_jurisdictions = jurisdiction_manager::jurisdictions;
@@ -177,7 +181,7 @@ class transaction_validator
 
       std::list< trx_jurisdictions > items;
 
-      bool check_action( const action& _action );
+      bool check_action( const action& _action, account_name actual_producer, bool& exists );
       void clear( jurisdiction_producer_ordered& src );
       void restore_old_values( bool was_data_added );
 
@@ -189,9 +193,8 @@ class transaction_validator
 
    public:
 
-      bool validate_transaction( const transaction& trx );
+      validate_result validate_transaction( const transaction& trx, account_name actual_producer );
       void clear();
-      bool is_jurisdiction_change( const transaction& trx );
 };
 
 struct transaction_comparator
