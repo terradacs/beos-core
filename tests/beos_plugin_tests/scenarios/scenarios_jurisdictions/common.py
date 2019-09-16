@@ -30,9 +30,10 @@ def set_jurisdiction_for_producer(producer_node_url, jurisdiction_code):
     headers = {'content-type': 'application/json; charset=UTF-8'}
     payload = {"jurisdictions" : jurisdiction_code}
 
-    requests.post(set_jurisdiction_for_producer_url, data=json.dumps(payload), headers=headers)
+    return requests.post(set_jurisdiction_for_producer_url, data=json.dumps(payload), headers=headers)
   except Exception as ex:
     print("set_jurisdiction_for_producer failed with: {}".format(ex))
+    return None
 
 class JurisdictionCodeChanger(threading.Thread):
   def __init__(self,api_node_url,producer_node_url,codes):
