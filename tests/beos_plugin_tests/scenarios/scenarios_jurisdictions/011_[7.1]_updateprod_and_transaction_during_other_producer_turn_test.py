@@ -113,30 +113,30 @@ if __name__ == "__main__":
 					counter += 1
 					log.info("Oooops! counter: {}".format(counter))
 					if counter >= same_blocks:
-						# summary.equal("ONLINE", "OFFLINE") #MARIUSZ
-						summary.equal("OFFLINE", "OFFLINE")
+						summary.equal("ONLINE", "OFFLINE") #implementation from 16.09.2019
+						#summary.equal("OFFLINE", "OFFLINE")
 						break
 				last_block = act_block
 		except Exception as e:
-			# summary.equal("ONLINE", "OFFLINE") #MARIUSZ
-			summary.equal("OFFLINE", "OFFLINE")
+			summary.equal("ONLINE", "OFFLINE") #implementation from 16.09.2019
+			#summary.equal("OFFLINE", "OFFLINE")
 
 		if counter < same_blocks:
-			# summary.equal("ONLINE", "ONLINE") #MARIUSZ
-			summary.equal("OFFLINE", "ONLINE")
+			summary.equal("ONLINE", "ONLINE") #implementation from 16.09.2019
+			#summary.equal("OFFLINE", "ONLINE")
 
 		log.info(resSTR)
 		resINT, resSTR = cluster.bios.make_cleos_call(["get", "transaction", "{}".format(json.loads(resSTR)["trx_id"])])
 		
-		# summary.equal(0, resINT) #MARIUSZ
-		summary.equal(True, resINT != 0)
+		summary.equal(0, resINT) #implementation from 16.09.2019
+		#summary.equal(True, resINT != 0)
 
 		if not resINT:
 			log.info(resSTR)
 		
 		#3040011 - error code that appears on not found transaction
-		#summary.equal(-1, resSTR.find("3040011")) #MARIUSZ
-		summary.equal(True, resSTR.find("3040011") != -1)
+		summary.equal(-1, resSTR.find("3040011")) #implementation from 16.09.2019
+		#summary.equal(True, resSTR.find("3040011") != -1)
 
 	except Exception as _ex:
 		log.exception(_ex)
