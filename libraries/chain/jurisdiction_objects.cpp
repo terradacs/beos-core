@@ -125,7 +125,8 @@ transaction_metadata_ptr jurisdiction_action_launcher::get_jurisdiction_transact
    trx.actions.emplace_back( std::move( on_block_update_jurisdictions_act ) );
 
    trx.set_reference_block( block_id );
-   trx.expiration = time + fc::microseconds(999'999); // Round up to nearest second to avoid appearing expired
+
+   trx.expiration = time + fc::seconds( jurisdiction_manager::artificial_transaction_timeout );
    trx.sign( signature_provider, chain_id );
 
    transaction_metadata_ptr res = std::make_shared< transaction_metadata >( trx );
@@ -173,6 +174,8 @@ bool jurisdiction_action_launcher::check_jurisdictions( const chainbase::databas
 
 const uint16_t jurisdiction_manager::limit_256 = 256;
 const char* jurisdiction_manager::too_many_jurisdictions_exception = "Too many jurisdictions given, max value is 255.";
+const int jurisdiction_manager::transaction_with_jurisdiction_timeout = 200;
+const int jurisdiction_manager::artificial_transaction_timeout = 30;
 
 bool jurisdiction_manager::check_jurisdictions( const chainbase::database &db, const jurisdiction_producer_ordered& src )
 {

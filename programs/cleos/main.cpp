@@ -352,9 +352,8 @@ fc::variant push_transaction( signed_transaction& trx, int32_t extra_kcpu = 1000
       get_jurisdictions();
       if( !juris.jurisdictions.empty() ) {
          constexpr int BEOS_JURISDICTION_EXTENSION_CODE           = 0;
-         constexpr int BEOS_TRANSACTION_WITH_JURISDICTION_TIMEOUT = 200;
          trx.transaction_extensions.push_back({BEOS_JURISDICTION_EXTENSION_CODE, fc::raw::pack( juris.jurisdictions )});
-         trx.expiration = info.head_block_time + fc::seconds(BEOS_TRANSACTION_WITH_JURISDICTION_TIMEOUT);
+         trx.expiration = info.head_block_time + fc::seconds( jurisdiction_manager::transaction_with_jurisdiction_timeout );
       }
    }
 

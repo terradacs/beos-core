@@ -133,6 +133,9 @@ class jurisdiction_manager
       static const uint16_t limit_256;
       static const char* too_many_jurisdictions_exception;
 
+      static const int transaction_with_jurisdiction_timeout;
+      static const int artificial_transaction_timeout;
+
       using jurisdictions = std::vector< jurisdiction_basic >;
 
       using jurisdiction_dictionary_processor = jurisdiction_processor< jurisdiction_dictionary_object >;
