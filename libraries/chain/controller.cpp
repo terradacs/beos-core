@@ -1267,6 +1267,7 @@ struct controller_impl {
          commit_block(false);
          return;
       } catch ( const fc::exception& e ) {
+         elog("apply_block failed at processing block num: ${n}\n\n", ("n", b->block_num()));
          edump((e.to_detail_string()));
          abort_block();
          throw;

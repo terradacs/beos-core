@@ -146,7 +146,7 @@ if __name__ == "__main__":
 
 		rpc = node.get_url_caller()
 		response = rpc.chain.get_table_rows({"scope":"eosio", "code":"eosio", "table":"infojurisdic", "json": True})
-		summary.equal(len(response["rows"]), 4, "There should be 4 jurisdictions.")
+		summary.equal(4, len(response["rows"]), "There should be 4 jurisdictions.")
 
 		#check is fee has been charged
 

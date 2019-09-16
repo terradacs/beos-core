@@ -39,8 +39,7 @@ CONST_ORGINAL_FEE_VALUE_STRING = "1000.0000 BEOS"
 
 if __name__ == "__main__":
 	
-	cluster, summary, args, log = start_cluster(
-		__file__, number_of_pnodes, producer_per_node)
+	cluster, summary, args, log = start_cluster(__file__, number_of_pnodes, producer_per_node)
 	
 	try:
 		def get_currency_balance( src : str = "aaaa" ):
@@ -135,6 +134,7 @@ if __name__ == "__main__":
 		cluster.bios.make_cleos_call( [ "push", "action", "eosio", "undelegatebw", '[ "aaaa", "aaaa", "10000.0000 BEOS", "10000.0000 BEOS" ]', "-p", "aaaa" ] )
 		cluster.bios.make_cleos_call( [ "push", "action", "eosio", "undelegatebw", '[ "bbbb", "bbbb", "10000.0000 BEOS", "10000.0000 BEOS" ]', "-p", "bbbb" ] )
 
+		node.wait_n_blocks(100)
 		cluster.accelerate_nodes( _type = "d", _time = "4")
 
 		node.wait_n_blocks(15)
