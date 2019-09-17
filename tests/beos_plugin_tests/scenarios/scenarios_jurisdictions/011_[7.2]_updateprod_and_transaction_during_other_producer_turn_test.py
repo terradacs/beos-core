@@ -131,18 +131,22 @@ if __name__ == "__main__":
 			summary.equal("ONLINE", "ONLINE") #implementation from 16.09.2019
 			#summary.equal("OFFLINE", "ONLINE")
 
+		if counter >= same_blocks:
+			assert "ONLINE" == "OFFLINE"
+		else:
+			cluster.bios.wait_for_last_irreversible_block()
+
 		log.info(resSTR)
 		resINT, resSTR = cluster.bios.make_cleos_call(["get", "transaction", "{}".format(json.loads(resSTR)["trx_id"])])
 		
-		summary.equal(0, resINT) #implementation from 16.09.2019
-		#summary.equal(True, resINT != 0)
+		summary.equal(True, resINT != 0)
 
-		if not resINT:
-			log.info(resSTR)
+		if resINT:
+			log.info("Exit code: {}".format(resINT))
+			log.info("Return String: {}".format(resSTR))
 		
 		#3040011 - error code that appears on not found transaction
-		summary.equal(-1, resSTR.find("3040011")) #implementation from 16.09.2019
-		#summary.equal(True, resSTR.find("3040011") != -1)
+		summary.equal(True, resSTR.find("3040011") != -1)
 
 	except Exception as _ex:
 		log.exception(_ex)

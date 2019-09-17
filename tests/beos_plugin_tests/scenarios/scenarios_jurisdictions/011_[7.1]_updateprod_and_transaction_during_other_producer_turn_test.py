@@ -131,7 +131,7 @@ if __name__ == "__main__":
 		summary.equal(0, resINT) #implementation from 16.09.2019
 		#summary.equal(True, resINT != 0)
 
-		if not resINT:
+		if resINT:
 			log.info(resSTR)
 		
 		#3040011 - error code that appears on not found transaction
