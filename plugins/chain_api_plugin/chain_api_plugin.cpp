@@ -55,8 +55,10 @@ struct async_result_visitor : public fc::visitor<std::string> {
    [api_handle](string, string body, url_response_callback cb) mutable { \
       if (body.empty()) body = "{}"; \
       api_handle.validate(); \
+      auto times_called = std::make_shared<std::atomic<size_t>>(0);\
       api_handle.call_name(fc::json::from_string(body).as<api_namespace::call_name ## _params>(),\
-         [cb, body](const fc::static_variant<warning_plugin_ptr, fc::exception_ptr, call_result>& result){\
+         [times_called{std::move(times_called)}, cb, body](const fc::static_variant<warning_plugin_ptr, fc::exception_ptr, call_result>& result){\
+	    if( ++(*times_called) > 1 ) return;\
             if (result.contains<fc::exception_ptr>()) {\
                try {\
                   result.get<fc::exception_ptr>()->dynamic_rethrow_exception();\
