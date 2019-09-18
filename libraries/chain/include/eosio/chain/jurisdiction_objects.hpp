@@ -158,7 +158,7 @@ class jurisdiction_manager
       bool update( chainbase::database& db, const jurisdiction_dictionary& info );
       bool update( chainbase::database& db, const jurisdiction_producer_ordered& updater );
 
-      match_result_type transaction_jurisdictions_match( const chainbase::database& db, account_name actual_producer, const packed_transaction& trx, const transaction_id_type* trx_id = nullptr );
+      match_result_type transaction_jurisdictions_match( const chainbase::database& db, account_name actual_producer, const transaction& trx, const transaction_id_type* trx_id = nullptr );
       void remember_transaction( const transaction_id_type& trx_id );
       void forget_transaction( const transaction_id_type& trx_id );
 
@@ -179,6 +179,8 @@ class transaction_validator
 
       using trx_jurisdictions = jurisdiction_manager::jurisdictions;
 
+      bool make_validation = false;
+
       jurisdiction_producer_ordered old_codes;
       jurisdiction_producer_ordered new_codes;
 
@@ -186,13 +188,13 @@ class transaction_validator
 
       bool check_action( const action& _action, account_name actual_producer, bool& exists );
       void clear( jurisdiction_producer_ordered& src );
-      void restore_old_values( bool was_data_added );
+      void restore_old_values( bool new_codes_appeared, bool current_make_validation );
 
       void add( const action& _action );
       bool add( const transaction& trx );
 
       bool validate_trx( const trx_jurisdictions& trx, const jurisdiction_producer_ordered& src );
-      bool validate( bool was_data_added );
+      bool validate( bool new_codes_appeared, bool current_make_validation );
 
    public:
 

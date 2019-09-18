@@ -451,7 +451,7 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
             return;
          }
 
-         auto match_result = jurisdiction_checker.transaction_jurisdictions_match( chain.db(), jurisdiction_launcher.get_active_producer(), *trx, &id );
+         auto match_result = jurisdiction_checker.transaction_jurisdictions_match( chain.db(), jurisdiction_launcher.get_active_producer(), trx->get_transaction(), &id );
          bool warning_is_generated = false;
 
          if( !match_result.first )
@@ -1341,6 +1341,7 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
                int num_failed = 0;
                int num_processed = 0;
                int num_non_validated = 0;
+               int num_non_matched = 0;
 
                for (const auto& trx: apply_trxs) {
                   if (block_time <= fc::time_point::now()) exhausted = true;
@@ -1356,6 +1357,13 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
                      if( !validation_result.first )
                      {
                         ++num_non_validated;
+                        continue;
+                     }
+
+                     auto match_result = jurisdiction_checker.transaction_jurisdictions_match( chain.db(), jurisdiction_launcher.get_active_producer(), trx->trx );
+                     if( !match_result.first )
+                     {
+                        ++num_non_matched;
                         continue;
                      }
 
@@ -1384,12 +1392,13 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
                   } FC_LOG_AND_DROP();
                }
 
-               fc_dlog(_log, "Processed ${m} of ${n} previously applied transactions, Applied ${applied}, Failed/Dropped ${failed}, not Validated ${non_validated}",
+               fc_dlog(_log, "Processed ${m} of ${n} previously applied transactions, Applied ${applied}, Failed/Dropped ${failed}, not Validated ${non_validated}, not Matched ${non_matched}",
                       ("m", num_processed)
                       ("n", apply_trxs.size())
                       ("applied", num_applied)
                       ("failed", num_failed)
-                      ("non_validated", num_non_validated));
+                      ("non_validated", num_non_validated)
+                      ("non_matched", num_non_matched));
             }
          }
 

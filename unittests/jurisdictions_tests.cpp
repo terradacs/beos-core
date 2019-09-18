@@ -257,6 +257,11 @@ BOOST_FIXTURE_TEST_CASE( mix_test, jurisdiction_tester ) try {
       BOOST_REQUIRE_EQUAL( false, validate_trx(  true/*allow_trx_codes*/, {0,2,3,4,7,1,8}/*trx_codes*/, true/*allow_updateprod*/, {0,2,3,4,7,1}/*updateprod_codes*/ ) );
       BOOST_REQUIRE_EQUAL( true, validate_trx(  true/*allow_trx_codes*/, {0,2,3,4,7,1,8}/*trx_codes*/, true/*allow_updateprod*/, {0,2,3,4,8,7,1}/*updateprod_codes*/ ) );
    }
+   {
+      clear();
+      BOOST_REQUIRE_EQUAL( true, validate_trx(  false/*allow_trx_codes*/, {}/*trx_codes*/, true/*allow_updateprod*/, {1}/*updateprod_codes*/ ) );
+      BOOST_REQUIRE_EQUAL( false, validate_trx(  true/*allow_trx_codes*/, {0}/*trx_codes*/, false/*allow_updateprod*/, {}/*updateprod_codes*/ ) );
+   }
 
 } FC_LOG_AND_RETHROW()
 

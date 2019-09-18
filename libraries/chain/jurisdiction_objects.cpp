@@ -297,11 +297,11 @@ bool jurisdiction_manager::update( chainbase::database& db, const jurisdiction_p
    return true;
 }
 
-jurisdiction_manager::match_result_type jurisdiction_manager::transaction_jurisdictions_match( const chainbase::database& db, account_name actual_producer, const packed_transaction& trx, const transaction_id_type* trx_id )
+jurisdiction_manager::match_result_type jurisdiction_manager::transaction_jurisdictions_match( const chainbase::database& db, account_name actual_producer, const transaction& trx, const transaction_id_type* trx_id )
 {
    bool was_already = trx_id ? ( processed_transactions.find( *trx_id ) != processed_transactions.end() ) : false;
 
-   auto exts = trx.get_transaction().transaction_extensions;
+   auto exts = trx.transaction_extensions;
    if( exts.empty() )
       return std::make_pair( true, was_already );
 
@@ -454,11 +454,12 @@ void transaction_validator::clear( jurisdiction_producer_ordered& src )
    src.jurisdictions.clear();
 }
 
-void transaction_validator::restore_old_values( bool was_data_added )
+void transaction_validator::restore_old_values( bool new_codes_appeared, bool current_make_validation )
 {
-   new_codes = old_codes;
+   if( current_make_validation )
+      new_codes = old_codes;
 
-   if( was_data_added )
+   if( new_codes_appeared )
    {
       assert( !items.empty() );
       items.pop_back();
@@ -502,34 +503,46 @@ bool transaction_validator::validate_trx( const trx_jurisdictions& trx, const ju
    return false;
 }
 
-bool transaction_validator::validate( bool was_data_added )
+bool transaction_validator::validate( bool new_codes_appeared, bool current_make_validation )
 {
-   /*
-      "items.empty()"
-         there isn't any transaction with jurisdiction at all 
-
-      "items.size() == 1 && was_data_added"
-         there wasn't any transaction with jurisdiction before actual
-    */
-   if( items.empty() || ( items.size() == 1 && was_data_added ) )
+   //there isn't any transaction with jurisdiction at all
+   if( items.empty() )
       return true;
 
-   size_t cnt = 0;
-   size_t idx_end = items.size() - 1;
-
-   for( auto& item : items )
+   //Actual transaction is with `updateprod` action
+   if( current_make_validation )
    {
-      if( was_data_added && cnt == idx_end )
+      //there wasn't any transaction with jurisdiction before actual transaction
+      if( items.size() == 1 && new_codes_appeared )
+         return true;
+
+      size_t cnt = 0;
+      size_t idx_end = items.size() - 1;
+
+      for( auto& item : items )
       {
-         if( !validate_trx( item, old_codes ) )
-            return false;
+         if( cnt == idx_end && new_codes_appeared )
+         {
+            if( !validate_trx( item, old_codes ) )
+               return false;
+         }
+         else
+         {
+            if( !validate_trx( item, new_codes ) )
+               return false;
+         }
+         ++cnt;
       }
-      else
+   }
+   else//Regular transaction
+   {
+      if( new_codes_appeared )
       {
-         if( !validate_trx( item, new_codes ) )
-            return false;
+         const auto& item = items.rbegin();
+         bool ret = validate_trx( *item, new_codes );
+
+         return ret;
       }
-      ++cnt;
    }
 
    return true;
@@ -540,26 +553,29 @@ transaction_validator::validate_result transaction_validator::validate_transacti
    try
    {
       validate_result result( true, false );
-      bool make_validation = false;
+      bool current_make_validation = false;
 
       //Even transaction with `system_contract::updateprod` action should be checked
-      bool was_data_added = add( trx );
+      bool new_codes_appeared = add( trx );
 
       for( auto action : trx.actions )
       {
          if( check_action( action, actual_producer, result.second ) )
          {
-            make_validation = true;
+            current_make_validation = true;
             add( action );
          }
       }
 
+      if( current_make_validation )
+         make_validation = true;
+
       if( make_validation )
       {
-         result.first = validate( was_data_added );
+         result.first = validate( new_codes_appeared, current_make_validation );
 
          if( !result.first )
-            restore_old_values( was_data_added );
+            restore_old_values( new_codes_appeared, current_make_validation );
       }
 
       return result;
@@ -582,6 +598,8 @@ transaction_validator::validate_result transaction_validator::validate_transacti
 
 void transaction_validator::clear()
 {
+   make_validation = false;
+
    clear( new_codes );
    clear( old_codes );
 

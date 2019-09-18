@@ -168,6 +168,9 @@ struct controller_impl {
     */
    map<digest_type, transaction_metadata_ptr>     unapplied_transactions;
 
+   using checker_transaction_in_block = std::function< void( bool, const transaction& ) >;
+   using opt_checker_transaction_in_block = optional< checker_transaction_in_block >;
+
    void pop_block() {
       auto prev = fork_db.get_block( head->header.previous );
       EOS_ASSERT( prev, block_validate_exception, "attempt to pop beyond last irreversible block" );
@@ -828,14 +831,14 @@ struct controller_impl {
              || failure_is_subjective(e);
    }
 
-   transaction_trace_ptr push_scheduled_transaction( const transaction_id_type& trxid, fc::time_point deadline, uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time = false ) {
+   transaction_trace_ptr push_scheduled_transaction( const transaction_id_type& trxid, fc::time_point deadline, uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time = false, const opt_checker_transaction_in_block& checker_trx_in_block = opt_checker_transaction_in_block() ) {
       const auto& idx = db.get_index<generated_transaction_multi_index,by_trx_id>();
       auto itr = idx.find( trxid );
       EOS_ASSERT( itr != idx.end(), unknown_transaction_exception, "unknown transaction" );
-      return push_scheduled_transaction( *itr, deadline, billed_cpu_time_us, explicit_billed_cpu_time );
+      return push_scheduled_transaction( *itr, deadline, billed_cpu_time_us, explicit_billed_cpu_time, checker_trx_in_block );
    }
 
-   transaction_trace_ptr push_scheduled_transaction( const generated_transaction_object& gto, fc::time_point deadline, uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time = false )
+   transaction_trace_ptr push_scheduled_transaction( const generated_transaction_object& gto, fc::time_point deadline, uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time = false, const opt_checker_transaction_in_block& checker_trx_in_block = opt_checker_transaction_in_block() )
    { try {
       maybe_session undo_session;
       if ( !self.skip_db_sessions() )
@@ -858,6 +861,12 @@ struct controller_impl {
 
       signed_transaction dtrx;
       fc::raw::unpack(ds,static_cast<transaction&>(dtrx) );
+
+      if( checker_trx_in_block )
+      {
+         (*checker_trx_in_block)( true/*is_delayed_transaction*/, dtrx );
+      }
+
       transaction_metadata_ptr trx = std::make_shared<transaction_metadata>( dtrx );
       trx->accepted = true;
       trx->scheduled = true;
@@ -1209,18 +1218,26 @@ struct controller_impl {
          transaction_trace_ptr trace;
          jurisdiction_manager jurisdiction_checker;
 
+         auto checker_trx_in_block = [&]( bool is_delayed_transaction, const transaction& trx )
+            {
+               auto match_result = jurisdiction_checker.transaction_jurisdictions_match( db, b->producer, trx );
+               if( is_delayed_transaction )
+                  EOS_ASSERT( match_result.first == true, block_validate_exception, "producer has incorrect jurisdictions in delayed transaction" );
+               else
+                  EOS_ASSERT( match_result.first == true, block_validate_exception, "producer has incorrect jurisdictions in transaction" );
+            };
+
          for( const auto& receipt : b->transactions ) {
             auto num_pending_receipts = pending->_pending_block_state->block->transactions.size();
             if( receipt.trx.contains<packed_transaction>() ) {
                auto& pt = receipt.trx.get<packed_transaction>();
 
-               auto match_result = jurisdiction_checker.transaction_jurisdictions_match( db, b->producer, pt );
-               EOS_ASSERT( match_result.first == true, block_validate_exception, "producer has incorrect jurisdictions" );
+               checker_trx_in_block( false/*is_delayed_transaction*/, pt.get_transaction() );
 
                auto mtrx = std::make_shared<transaction_metadata>(pt);
                trace = push_transaction( mtrx, fc::time_point::maximum(), receipt.cpu_usage_us, true );
             } else if( receipt.trx.contains<transaction_id_type>() ) {
-               trace = push_scheduled_transaction( receipt.trx.get<transaction_id_type>(), fc::time_point::maximum(), receipt.cpu_usage_us, true );
+               trace = push_scheduled_transaction( receipt.trx.get<transaction_id_type>(), fc::time_point::maximum(), receipt.cpu_usage_us, true, checker_trx_in_block );
             } else {
                EOS_ASSERT( false, block_validate_exception, "encountered unexpected receipt type" );
             }
