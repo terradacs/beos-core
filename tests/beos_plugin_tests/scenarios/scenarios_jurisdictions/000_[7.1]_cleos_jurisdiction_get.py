@@ -7,6 +7,9 @@ import datetime
 import requests
 import json
 
+if os.path.exists(os.path.dirname(os.path.abspath(__file__))+ "/logs/"+ __file__):
+    exit(0)
+
 currentdir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(os.path.dirname(currentdir)))
 from beos_test_utils.beos_utils_pack import init, ActionResult, ResourceResult, VotersResult

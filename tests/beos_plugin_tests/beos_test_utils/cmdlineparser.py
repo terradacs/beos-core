@@ -13,3 +13,4 @@ if not parser:
     parser.add_argument('--path-to-contracts', metavar='', help="Path to contracts dir." )
     parser.add_argument('--scenarios', metavar='', help="Path to scenario(s) *.py file(s)." )
     parser.add_argument('--position-reporter-path', dest="position_reporter_path")
+    parser.add_argument('--force-seed')

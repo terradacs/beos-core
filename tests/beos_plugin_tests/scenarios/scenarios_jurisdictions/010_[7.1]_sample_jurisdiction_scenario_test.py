@@ -8,6 +8,9 @@ import requests
 import json
 import random
 
+if os.path.exists(os.path.dirname(os.path.abspath(__file__))+ "/logs/"+ __file__):
+    exit(0)
+
 currentdir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(os.path.dirname(currentdir)))
 from beos_test_utils.beos_utils_pack import init, start_cluster, ActionResult, ResourceResult, VotersResult
@@ -72,15 +75,23 @@ if __name__ == "__main__":
 		prods = sorted(cluster.producers.keys())
 		call.extend(prods)
 
+		act_prod = json.loads(cluster.bios.cleos(["get", "info"])[1])["head_block_producer"]
+		while act_prod == json.loads(cluster.bios.cleos(["get", "info"])[1])["head_block_producer"]:
+			cluster.bios.wait_n_blocks(1)
+		
+		cluster.bios.wait_n_blocks(2)
+
 		for var in users:
 			tmp = list(call.copy())
 			tmp[3] = var
-			resINT, _ = cluster.bios.make_cleos_call(tmp)
+			resINT, resSTR = cluster.bios.make_cleos_call(tmp)
 			summary.equal(0, resINT)
+			if resINT:
+				log.info(resSTR)
 
 
-		log.info("Waiting 50 s to make schedule stable")
-		cluster.bios.wait_n_blocks(100)
+		log.info("Waiting 3 minutes to make schedule stable")
+		time.sleep(180)
 		while test_prod != json.loads(cluster.bios.make_cleos_call(["get", "info"])[1])["head_block_producer"]:
 			cluster.bios.wait_n_blocks(1)
 

@@ -7,6 +7,9 @@ import datetime
 import requests
 import json
 
+if os.path.exists(os.path.dirname(os.path.abspath(__file__))+ "/logs/"+ __file__):
+    exit(0)
+
 currentdir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(os.path.dirname(currentdir)))
 from beos_test_utils.beos_utils_pack import init, start_cluster, ActionResult, ResourceResult, VotersResult
@@ -123,7 +126,7 @@ if __name__ == "__main__":
 
 		cluster.accelerate_nodes( _type = "d", _time = "4")
 
-		node.wait_n_blocks(15)
+		cluster.bios.wait_for_last_irreversible_block()
 		
 		resINT, resSTR = cluster.bios.make_cleos_call(["push", "action", "eosio", "refund", '[ "aaaa" ]', "-p", "aaaa"])
 		resINT, resSTR = cluster.bios.make_cleos_call(["push", "action", "eosio", "refund", '[ "bbbb" ]', "-p", "bbbb"])
@@ -134,7 +137,7 @@ if __name__ == "__main__":
 		resINT, resSTR = cluster.bios.make_cleos_call(["get", "account", "bbbb" ])
 		resINTv2, resSTR_currency_before_b = cluster.bios.make_cleos_call(["get", "currency", "balance", "eosio.token", "bbbb" ])
 
-		cluster.nodes[0].wait_n_blocks(2)
+		cluster.bios.wait_n_blocks(2)
 
 		resINT, resSTR = cluster.bios.make_cleos_call( ["push", "action", "eosio", "addjurisdict", '["aaaa", 5, "aaaaland", "desc" ]', "-p", "aaaa" ] )
 		summary.equal(True, resINT != 0, "action shouldn't success")
@@ -142,7 +145,9 @@ if __name__ == "__main__":
 		resINT, resSTR = cluster.bios.make_cleos_call( ["push", "action", "eosio", "addjurisdict", '["bbbb", 6, "bbbbland", "desc" ]', "-p", "bbbb" ] )
 		summary.equal(0, resINT, "action should success")
 
-		#check is there onlu 2 jurisdictions
+		cluster.bios.wait_n_blocks(13)
+
+		#check is there only 2 jurisdictions
 
 		rpc = node.get_url_caller()
 		response = rpc.chain.get_table_rows({"scope":"eosio", "code":"eosio", "table":"infojurisdic", "json": True})
@@ -155,6 +160,8 @@ if __name__ == "__main__":
 
 		summary.equal(resSTR_currency_after_a, resSTR_currency_before_a, "'aaaa' user shouldn't be charged")
 		summary.equal(True, resSTR_currency_after_b != resSTR_currency_before_b, "'bbbb' user should be charged")
+
+		cluster.bios.wait_n_blocks(13)
 
 		# get producer_jurisdiction
 		resINT, resSTR = cluster.bios.make_cleos_call(
@@ -172,6 +179,8 @@ if __name__ == "__main__":
 		summary.equal(True, str(resSTR).find("Bad Cast")
 					  != -1, "there should be error")
 		summary.equal(True, resINT != 0, "this querry should crash")
+
+		cluster.bios.wait_n_blocks(13)
 
 		# get all_producer_jurisdiction_for_block
 		resINT, resSTR = cluster.bios.make_cleos_call(
