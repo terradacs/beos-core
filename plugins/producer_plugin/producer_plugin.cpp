@@ -1425,6 +1425,22 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
                int num_applied = 0;
                int num_failed = 0;
                int num_processed = 0;
+               int num_non_validated = 0;
+
+               auto checker_delayed_trx_in_block_during_production = [&]( const transaction& trx )
+               {
+                  transaction_validator::validate_result delayed_validation_result = trx_validator.validate_transaction( trx, jurisdiction_launcher.get_active_producer() );
+
+                  if( !delayed_validation_result.first )
+                     return false;
+
+                  auto match_result = jurisdiction_checker.transaction_jurisdictions_match( chain.db(), jurisdiction_launcher.get_active_producer(), trx );
+
+                  if( !match_result.first )
+                     return false;
+
+                  return true;
+               };
 
                for (const auto& trx : scheduled_trxs) {
                   if (block_time <= fc::time_point::now()) exhausted = true;
@@ -1460,9 +1476,16 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
                         deadline = block_time;
                      }
 
-                     auto trace = chain.push_scheduled_transaction(trx, deadline);
-                     if (trace->except) {
-                        if (failure_is_subjective(*trace->except, deadline_is_subjective)) {
+                     auto trace_check = chain.push_scheduled_transaction( trx, deadline, 0, checker_delayed_trx_in_block_during_production );
+
+                     if( !trace_check.second )
+                     {
+                        ++num_non_validated;
+                        continue;
+                     }
+
+                     if (trace_check.first->except) {
+                        if (failure_is_subjective(*trace_check.first->except, deadline_is_subjective)) {
                            exhausted = true;
                         } else {
                            auto expiration = fc::time_point::now() + fc::seconds(chain.get_global_properties().configuration.deferred_trx_expiration_window);
@@ -1482,11 +1505,12 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
                   if (!orig_pending_txn_size) _incoming_trx_weight = 0.0;
                }
 
-               fc_dlog(_log, "Processed ${m} of ${n} scheduled transactions, Applied ${applied}, Failed/Dropped ${failed}",
+               fc_dlog(_log, "Processed ${m} of ${n} scheduled transactions, Applied ${applied}, Failed/Dropped ${failed}, not Validated ${non_validated}",
                       ("m", num_processed)
                       ("n", scheduled_trxs.size())
                       ("applied", num_applied)
-                      ("failed", num_failed));
+                      ("failed", num_failed)
+                      ("non_validated", num_non_validated));
 
             }
          }

@@ -79,8 +79,8 @@ BOOST_FIXTURE_TEST_CASE( delay_error_create_account, validating_tester) { try {
    auto scheduled_trxs = control->get_scheduled_transactions();
    BOOST_REQUIRE_EQUAL(scheduled_trxs.size(), 1);
    auto dtrace = control->push_scheduled_transaction(scheduled_trxs.front(), fc::time_point::maximum());
-   BOOST_REQUIRE_EQUAL(dtrace->except.valid(), true);
-   BOOST_REQUIRE_EQUAL(dtrace->except->code(), missing_auth_exception::code_value);
+   BOOST_REQUIRE_EQUAL(dtrace.first->except.valid(), true);
+   BOOST_REQUIRE_EQUAL(dtrace.first->except->code(), missing_auth_exception::code_value);
 
 } FC_LOG_AND_RETHROW() }
 

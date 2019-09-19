@@ -91,7 +91,14 @@ namespace eosio { namespace chain {
             incomplete  = 3, ///< this is an incomplete block (either being produced by a producer or speculatively produced by a node)
          };
 
+         using checker_transaction_in_block = std::function< void( bool, const transaction& ) >;
+         using opt_checker_transaction_in_block = optional< checker_transaction_in_block >;
+
+         using validator_transaction_in_block = std::function< bool( const transaction& ) >;
+         using opt_validator_transaction_in_block = optional< validator_transaction_in_block >;
+
          using unapplied_transactions_type = set< transaction_metadata_ptr, eosio::chain::transaction_comparator >;
+         using scheduled_transaction_result_type = std::pair< transaction_trace_ptr, bool >;
 
          controller( const config& cfg );
          ~controller();
@@ -141,7 +148,7 @@ namespace eosio { namespace chain {
           * Attempt to execute a specific transaction in our deferred trx database
           *
           */
-         transaction_trace_ptr push_scheduled_transaction( const transaction_id_type& scheduled, fc::time_point deadline, uint32_t billed_cpu_time_us = 0 );
+         scheduled_transaction_result_type push_scheduled_transaction( const transaction_id_type& scheduled, fc::time_point deadline, uint32_t billed_cpu_time_us = 0, const opt_validator_transaction_in_block& validator_trx_in_block = opt_validator_transaction_in_block() );
 
          void finalize_block();
          void sign_block( const std::function<signature_type( const digest_type& )>& signer_callback );

@@ -168,9 +168,6 @@ struct controller_impl {
     */
    map<digest_type, transaction_metadata_ptr>     unapplied_transactions;
 
-   using checker_transaction_in_block = std::function< void( bool, const transaction& ) >;
-   using opt_checker_transaction_in_block = optional< checker_transaction_in_block >;
-
    void pop_block() {
       auto prev = fork_db.get_block( head->header.previous );
       EOS_ASSERT( prev, block_validate_exception, "attempt to pop beyond last irreversible block" );
@@ -831,28 +828,25 @@ struct controller_impl {
              || failure_is_subjective(e);
    }
 
-   transaction_trace_ptr push_scheduled_transaction( const transaction_id_type& trxid, fc::time_point deadline, uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time = false, const opt_checker_transaction_in_block& checker_trx_in_block = opt_checker_transaction_in_block() ) {
+   controller::scheduled_transaction_result_type push_scheduled_transaction( const transaction_id_type& trxid, fc::time_point deadline, uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time = false,
+                        const controller::opt_checker_transaction_in_block& checker_trx_in_block = controller::opt_checker_transaction_in_block(),
+                        const controller::opt_validator_transaction_in_block& validator_trx_in_block = controller::opt_validator_transaction_in_block() ) {
       const auto& idx = db.get_index<generated_transaction_multi_index,by_trx_id>();
       auto itr = idx.find( trxid );
       EOS_ASSERT( itr != idx.end(), unknown_transaction_exception, "unknown transaction" );
-      return push_scheduled_transaction( *itr, deadline, billed_cpu_time_us, explicit_billed_cpu_time, checker_trx_in_block );
+      return push_scheduled_transaction( *itr, deadline, billed_cpu_time_us, explicit_billed_cpu_time, checker_trx_in_block, validator_trx_in_block );
    }
 
-   transaction_trace_ptr push_scheduled_transaction( const generated_transaction_object& gto, fc::time_point deadline, uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time = false, const opt_checker_transaction_in_block& checker_trx_in_block = opt_checker_transaction_in_block() )
+   controller::scheduled_transaction_result_type push_scheduled_transaction( const generated_transaction_object& gto, fc::time_point deadline, uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time = false,
+                        const controller::opt_checker_transaction_in_block& checker_trx_in_block = controller::opt_checker_transaction_in_block(),
+                        const controller::opt_validator_transaction_in_block& validator_trx_in_block = controller::opt_validator_transaction_in_block() )
    { try {
       maybe_session undo_session;
       if ( !self.skip_db_sessions() )
          undo_session = maybe_session(db);
 
       auto gtrx = generated_transaction(gto);
-
-      // remove the generated transaction object after making a copy
-      // this will ensure that anything which affects the GTO multi-index-container will not invalidate
-      // data we need to successfully retire this transaction.
-      //
-      // IF the transaction FAILs in a subjective way, `undo_session` should expire without being squashed
-      // resulting in the GTO being restored and available for a future block to retire.
-      remove_scheduled_transaction(gto);
+      bool expired = gtrx.expiration < self.pending_block_time();
 
       fc::datastream<const char*> ds( gtrx.packed_trx.data(), gtrx.packed_trx.size() );
 
@@ -862,10 +856,26 @@ struct controller_impl {
       signed_transaction dtrx;
       fc::raw::unpack(ds,static_cast<transaction&>(dtrx) );
 
-      if( checker_trx_in_block )
+      if( checker_trx_in_block && !expired )
       {
          (*checker_trx_in_block)( true/*is_delayed_transaction*/, dtrx );
       }
+
+      bool validated = true;
+      if( validator_trx_in_block && !expired )
+      {
+         validated = (*validator_trx_in_block)( dtrx );
+         if( !validated )
+            return controller::scheduled_transaction_result_type( transaction_trace_ptr(), false );
+      }
+
+      // remove the generated transaction object after making a copy
+      // this will ensure that anything which affects the GTO multi-index-container will not invalidate
+      // data we need to successfully retire this transaction.
+      //
+      // IF the transaction FAILs in a subjective way, `undo_session` should expire without being squashed
+      // resulting in the GTO being restored and available for a future block to retire.
+      remove_scheduled_transaction(gto);
 
       transaction_metadata_ptr trx = std::make_shared<transaction_metadata>( dtrx );
       trx->accepted = true;
@@ -883,7 +893,7 @@ struct controller_impl {
          emit( self.accepted_transaction, trx );
          emit( self.applied_transaction, trace );
          undo_session.squash();
-         return trace;
+         return controller::scheduled_transaction_result_type( trace, true );
       }
 
       auto reset_in_trx_requiring_checks = fc::make_scoped_exit([old_value=in_trx_requiring_checks,this](){
@@ -921,7 +931,7 @@ struct controller_impl {
 
          restore.cancel();
 
-         return trace;
+         return controller::scheduled_transaction_result_type( trace, true );
       } catch( const fc::exception& e ) {
          cpu_time_to_bill_us = trx_context.update_billed_cpu_time( fc::time_point::now() );
          trace->except = e;
@@ -942,7 +952,7 @@ struct controller_impl {
             emit( self.accepted_transaction, trx );
             emit( self.applied_transaction, trace );
             undo_session.squash();
-            return trace;
+            return controller::scheduled_transaction_result_type( trace, true );
          }
          trace->elapsed = fc::time_point::now() - trx_context.start;
       }
@@ -985,7 +995,7 @@ struct controller_impl {
          emit( self.applied_transaction, trace );
       }
 
-      return trace;
+      return controller::scheduled_transaction_result_type( trace, true );
    } FC_CAPTURE_AND_RETHROW() } /// push_scheduled_transaction
 
 
@@ -1237,7 +1247,8 @@ struct controller_impl {
                auto mtrx = std::make_shared<transaction_metadata>(pt);
                trace = push_transaction( mtrx, fc::time_point::maximum(), receipt.cpu_usage_us, true );
             } else if( receipt.trx.contains<transaction_id_type>() ) {
-               trace = push_scheduled_transaction( receipt.trx.get<transaction_id_type>(), fc::time_point::maximum(), receipt.cpu_usage_us, true, checker_trx_in_block );
+               auto _trace = push_scheduled_transaction( receipt.trx.get<transaction_id_type>(), fc::time_point::maximum(), receipt.cpu_usage_us, true, checker_trx_in_block );
+               trace = _trace.first;
             } else {
                EOS_ASSERT( false, block_validate_exception, "encountered unexpected receipt type" );
             }
@@ -1748,10 +1759,11 @@ transaction_trace_ptr controller::push_transaction( const transaction_metadata_p
    return my->push_transaction(trx, deadline, billed_cpu_time_us, billed_cpu_time_us > 0 );
 }
 
-transaction_trace_ptr controller::push_scheduled_transaction( const transaction_id_type& trxid, fc::time_point deadline, uint32_t billed_cpu_time_us )
+controller::scheduled_transaction_result_type controller::push_scheduled_transaction( const transaction_id_type& trxid, fc::time_point deadline, uint32_t billed_cpu_time_us,
+                                    const opt_validator_transaction_in_block& validator_trx_in_block )
 {
    validate_db_available_size();
-   return my->push_scheduled_transaction( trxid, deadline, billed_cpu_time_us, billed_cpu_time_us > 0 );
+   return my->push_scheduled_transaction( trxid, deadline, billed_cpu_time_us, billed_cpu_time_us > 0, opt_checker_transaction_in_block(), validator_trx_in_block );
 }
 
 const flat_set<account_name>& controller::get_actor_whitelist() const {
