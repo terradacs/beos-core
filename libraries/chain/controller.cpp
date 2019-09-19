@@ -1992,18 +1992,33 @@ bool controller::update_jurisdictions( const jurisdiction_producer_ordered& upda
    bool update_result =  mgr.update( my->db, updater );
    if (my->conf.enable_jurisdiction_history && update_result)
    {
+      const auto& idx = my->db.get_index<chain::jurisdiction_history_index, chain::by_producer_block_number>();
+      auto res1 = idx.find(boost::make_tuple(updater.producer, my->fork_db.head()->block_num));
       ilog("Updating jurisdiction history index with jurisdiction change data for producer ${n}", ("n", updater.producer));
       ilog("Jurisdiction update for block ${b} with timestamp ${t}", ("b", my->fork_db.head()->block_num)("t", my->fork_db.head()->block->timestamp.to_time_point()));
-      // update jurisdiction history
-      my->db.create<jurisdiction_history_object>([&](auto &obj) {
-         obj.producer_name = updater.producer;
-         obj.block_number = my->fork_db.head()->block_num;
-         obj.date_changed = my->fork_db.head()->block->timestamp.to_time_point();
-         obj.new_jurisdictions.assign(updater.jurisdictions.begin(), updater.jurisdictions.end());
-      });
+      if(res1 == idx.end())
+      {
+         ilog("Creating new jurisdiction_history_object in stake");
+         // update jurisdiction history
+         my->db.create<jurisdiction_history_object>([&](auto &obj) {
+            obj.producer_name = updater.producer;
+            obj.block_number = my->fork_db.head()->block_num;
+            obj.date_changed = my->fork_db.head()->block->timestamp.to_time_point();
+            obj.new_jurisdictions.assign(updater.jurisdictions.begin(), updater.jurisdictions.end());
+         });
+      }
+      else
+      {
+         ilog("Updating existing jurisdiction_history_object in stake");
+         my->db.modify<jurisdiction_history_object>(*res1, [&](jurisdiction_history_object& src)
+         {
+            src.date_changed = my->fork_db.head()->block->timestamp.to_time_point();
+            src.new_jurisdictions.assign(updater.jurisdictions.begin(), updater.jurisdictions.end());
+         });
+      }
 
-      const auto &idx = my->db.get_index<chain::jurisdiction_producer_history_index, chain::by_producer_name>();
-      if( idx.find( updater.producer ) == idx.end() )
+      const auto &idx_2 = my->db.get_index<chain::jurisdiction_producer_history_index, chain::by_producer_name>();
+      if( idx_2.find( updater.producer ) == idx_2.end() )
          my->db.create<jurisdiction_producer_history_object>([&](auto &obj) {
             obj.producer_name = updater.producer;
          });
