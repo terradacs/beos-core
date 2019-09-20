@@ -2010,7 +2010,7 @@ bool controller::update_jurisdictions( const jurisdiction_producer_ordered& upda
       ilog("Jurisdiction update for block ${b} with timestamp ${t}", ("b", my->fork_db.head()->block_num)("t", my->fork_db.head()->block->timestamp.to_time_point()));
       if(res1 == idx.end())
       {
-         ilog("Creating new jurisdiction_history_object in stake");
+         ilog("Creating new jurisdiction history object");
          // update jurisdiction history
          my->db.create<jurisdiction_history_object>([&](auto &obj) {
             obj.producer_name = updater.producer;
@@ -2021,7 +2021,7 @@ bool controller::update_jurisdictions( const jurisdiction_producer_ordered& upda
       }
       else
       {
-         ilog("Updating existing jurisdiction_history_object in stake");
+         ilog("Updating existing jurisdiction history object");
          my->db.modify<jurisdiction_history_object>(*res1, [&](jurisdiction_history_object& src)
          {
             src.date_changed = my->fork_db.head()->block->timestamp.to_time_point();
