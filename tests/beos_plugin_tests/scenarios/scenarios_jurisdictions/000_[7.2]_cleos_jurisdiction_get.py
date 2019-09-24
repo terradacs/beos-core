@@ -70,6 +70,7 @@ if __name__ == "__main__":
         node.changeparams(newparams)
         node.wait_till_block(25)
 
+
 		# Checking is there no jurisdictions
         rpc = node.get_url_caller()
         response = rpc.chain.get_table_rows({"scope": "eosio", "code": "eosio", "table": "infojurisdic", "json": True})
@@ -94,9 +95,9 @@ if __name__ == "__main__":
         summary.equal(True, str(resSTR).find("Query size is greater than query limit") != -1, "there should be error")
         summary.equal(True, resINT != 0, "this querry should crash")
 
-        resINT, resSTR = node.make_cleos_call(["get", "producer_jurisdiction", '[ "{}" ]'.format(long_names(2000))])
-        summary.equal(True, str(resSTR).find("Invalid name") != -1, "there should be error")
-        summary.equal(True, resINT != 0, "this querry should crash")
+        # resINT, resSTR = node.make_cleos_call(["get", "producer_jurisdiction", '[ "{}" ]'.format(long_names(2000))])
+        # summary.equal(True, str(resSTR).find("Invalid name") != -1, "there should be error")
+        # summary.equal(True, resINT != 0, "this querry should crash")
 
         resINT, resSTR = node.make_cleos_call([ "get", "producer_jurisdiction", "1"])
         summary.equal(True, str(resSTR).find("Bad Cast") != -1, "there should be error")
@@ -104,22 +105,24 @@ if __name__ == "__main__":
 
         # get all_producer_jurisdiction_for_block
         resINT, resSTR = node.make_cleos_call(["get", "all_producer_jurisdiction_for_block", long_names(10, "9999") ])
-        summary.equal(True, str(resSTR).find("std::out_of_range") != -1, "there should be error")
+        summary.equal(True, str(resSTR).find("required valid integer as block number") != -1, "there should be error")
         summary.equal(True, resINT != 0, "this querry should crash")
 
         # get producer_jurisdiction_for_block
         resINT, resSTR = node.make_cleos_call(["get", "producer_jurisdiction_for_block", "eosio", "eosio"])
-        summary.equal(True, str(resSTR).find("std::invalid_argument") != -1, "there should be error")
+        summary.equal(True, str(resSTR).find("required valid integer as block number") != -1, "there should be error")
         summary.equal(True, resINT != 0, "this querry should crash")
 
         resINT, resSTR = node.make_cleos_call(["get", "producer_jurisdiction_for_block", "eosio", long_names(10, "9999") ])
-        summary.equal(True, str(resSTR).find("std::out_of_range") != -1, "there should be error")
+        summary.equal(True, str(resSTR).find("required valid integer as block number") != -1, "there should be error")
         summary.equal(True, resINT != 0, "this querry should crash")
 
         # get producer_jurisdiction_history
         resINT, resSTR = node.make_cleos_call(["get", "producer_jurisdiction_history", "eosio", "fafwadf", "wfafwafw"])
         summary.equal(True, str(resSTR).find("bad lexical cast") != -1, "there should be error")
         summary.equal(True, resINT != 0, "this querry should crash")
+
+        input()
 
     except Exception as _ex:
         log.exception("Exception `{0}` occures while executing `{1}` tests.".format(str(_ex), __file__))

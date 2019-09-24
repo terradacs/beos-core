@@ -2015,17 +2015,15 @@ int main( int argc, char** argv ) {
       std::cout << fc::json::to_pretty_string( result ) << std::endl;
    });
 
-   auto get_number = []( std::string block_number, bool& converted ) -> long
+   auto get_number = []( std::string block_number ) -> long
    {
       try
       {
-         converted = true;
          return std::stol( block_number );
       }
-      catch( std::exception& ex )
+      catch( const std::exception& )
       {
-         converted = false;
-         std::cout << "required integer as block number" << std::endl;
+         try { throw std::invalid_argument{"required valid integer as block number"}; }catch(...) { throw; }
       }
       return 0;
    };
@@ -2036,16 +2034,15 @@ int main( int argc, char** argv ) {
    getAllProducerJurisdictionForBlock->set_callback([&] {
 
       fc::variant result;
-      bool converted;
-      auto number = get_number( block_number, converted );
-      if( converted )
+      try
       {
+         auto number = get_number( block_number );
          if( !block_number.empty() )
             result = call(jurisdiction_history_get_all_producer_jurisdiction_for_block, fc::mutable_variant_object( "block_number", number ) );
          else
             result = call(jurisdiction_history_get_all_producer_jurisdiction_for_block, fc::mutable_variant_object() );
          std::cout << fc::json::to_pretty_string( result ) << std::endl;
-      }
+      }catch(const std::invalid_argument&){ throw; }
    });
 
    // get_producer_jurisdiction_for_block
@@ -2056,17 +2053,16 @@ int main( int argc, char** argv ) {
    getProducerJurisdictionForBlock->set_callback([&] {
 
       fc::variant result;
-      bool converted;
-      auto number = get_number( block_number, converted );
-      if( converted )
+      try
       {
+         auto number = get_number( block_number );
          if( !block_number.empty() )
             result = call(jurisdiction_history_get_producer_jurisdiction_for_block, fc::mutable_variant_object  ( "producer", producer )
                                                                                                                      ( "block_number", number ) );
          else
             result = call(jurisdiction_history_get_producer_jurisdiction_for_block, fc::mutable_variant_object  ( "producer", producer ) );
          std::cout << fc::json::to_pretty_string( result ) << std::endl;
-      }
+      }catch(const std::invalid_argument&){ throw; }
    });
 
    // get_producer_jurisdiction_history
