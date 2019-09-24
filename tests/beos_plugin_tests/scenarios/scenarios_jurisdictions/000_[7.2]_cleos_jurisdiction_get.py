@@ -95,6 +95,7 @@ if __name__ == "__main__":
         summary.equal(True, str(resSTR).find("Query size is greater than query limit") != -1, "there should be error")
         summary.equal(True, resINT != 0, "this querry should crash")
 
+        #unresolved yet issue: name validation ISSUE #44
         # resINT, resSTR = node.make_cleos_call(["get", "producer_jurisdiction", '[ "{}" ]'.format(long_names(2000))])
         # summary.equal(True, str(resSTR).find("Invalid name") != -1, "there should be error")
         # summary.equal(True, resINT != 0, "this querry should crash")

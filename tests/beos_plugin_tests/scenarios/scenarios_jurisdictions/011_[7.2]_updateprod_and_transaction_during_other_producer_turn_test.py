@@ -32,7 +32,7 @@ if __name__ == "__main__":
 			["1", "GERMANY", "EAST EUROPE"],
 			["2", "RUSSIA", "EAST EUROPE"],
 			# ["3", "CZECH REPUBLIC", "EAST EUROPE"],
-			["2", "POLAND", "EAST EUROPE"]
+			["3", "POLAND", "EAST EUROPE"]
 		]
 
 		jurisdictions = list()

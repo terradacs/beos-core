@@ -8,9 +8,6 @@ import requests
 import json
 import random
 
-if os.path.exists(os.path.dirname(os.path.abspath(__file__))+ "/logs/"+ __file__):
-    exit(0)
-
 currentdir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(os.path.dirname(currentdir)))
 from beos_test_utils.beos_utils_pack import init, start_cluster, ActionResult, ResourceResult, VotersResult
@@ -75,8 +72,8 @@ if __name__ == "__main__":
 		prods = sorted(cluster.producers.keys())
 		call.extend(prods)
 
-		act_prod = json.loads(cluster.bios.cleos(["get", "info"])[1])["head_block_producer"]
-		while act_prod == json.loads(cluster.bios.cleos(["get", "info"])[1])["head_block_producer"]:
+		act_prod = json.loads(cluster.bios.make_cleos_call(["get", "info"])[1])["head_block_producer"]
+		while act_prod == json.loads(cluster.bios.make_cleos_call(["get", "info"])[1])["head_block_producer"]:
 			cluster.bios.wait_n_blocks(1)
 		
 		cluster.bios.wait_n_blocks(2)
