@@ -176,8 +176,7 @@ if __name__ == "__main__":
 		# get all_producer_jurisdiction_for_block
 		resINT, resSTR = cluster.bios.make_cleos_call(
 			["get", "all_producer_jurisdiction_for_block", long_names(10, "9999") ])
-		summary.equal(True, str(resSTR).find("std::out_of_range")
-					  != -1, "there should be error")
+		summary.equal(True, str(resSTR).find("required valid integer as block number") != -1, "there should be error")
 		summary.equal(True, resINT != 0, "this querry should crash")
 
 		# get producer_jurisdiction_for_block
@@ -189,8 +188,7 @@ if __name__ == "__main__":
 
 		resINT, resSTR = cluster.bios.make_cleos_call(
 			["get", "producer_jurisdiction_for_block", "eosio", long_names(10, "9999") ])
-		summary.equal(True, str(resSTR).find("std::out_of_range")
-					  != -1, "there should be error")
+		summary.equal(True, str(resSTR).find("required valid integer as block number") != -1, "there should be error")
 		summary.equal(True, resINT != 0, "this querry should crash")
 
 		# get producer_jurisdiction_history
