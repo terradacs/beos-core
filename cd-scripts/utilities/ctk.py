@@ -111,6 +111,14 @@ def get_active_producers():
 		list_of_prods.append(var["producer_name"])
 	return list_of_prods	
 
+def issue(to : str, amount: str, execute_on : list = None, force_uniq = False):
+	data = str('[ "' + to + '", "' + amount +'", "nice money" ]')
+	return push_action("eosio.token", "issue", data, [ "beos.gateway" ], execute_on, force_uniq)
+
+def transfer( _from : str, to : list, amount : str, execute_on : list = None, force_uniq = False):
+	data = str('[ "' + _from + '", "' + to + '", "' + amount + '", "HI" ]')
+	return push_action("eosio.token", "transfer", data, [ _from ], execute_on, force_uniq)
+
 def update_producers(prod : str, new_jurs : list, execute_on : list = None, force_uniq = False):
 	data = str('{"data":{"producer":'+prod+', "jurisdictions":'+str(new_jurs)+'}}')
 	return push_action("eosio", "updateprod", data, [ prod ], execute_on, force_uniq)
@@ -121,6 +129,12 @@ def add_jurisdiction(prod : str, name : str, code : int, desc : str = "sample de
 
 def get_all_jurisdictions():
 	return json.loads(cleos(["get", "all_jurisdictions"]))["jurisdictions"]
+
+def get_producer_jurisdiction( producer : str ):
+	return json.loads(cleos(["get", "producer_jurisdiction", "'[\"" + producer + "\"]'" ]))
+
+def get_transaction( trx : str ):
+	return cleos( ["get", "transaction", "\"" + trx + "\"" ] )
 
 def get_all_keys():
 	return json.loads(cleos(["wallet", "keys"]))

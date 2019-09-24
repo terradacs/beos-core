@@ -451,18 +451,34 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
             return;
          }
 
-         auto match_result = jurisdiction_checker.transaction_jurisdictions_match( chain.db(), jurisdiction_launcher.get_active_producer(), trx->get_transaction(), &id );
-         bool warning_is_generated = false;
+         /*
+            Explanation
+               Change of jurisdiction in given transaction impacts on permission of execution for other transactions in given block.
+               Earlier transactions in block can collide with the newest jurisdiction.
 
-         if( !match_result.first )
+            Example:
+               There is jurisdiction `J1` before block `B`
+
+               Block B has transactions as below:
+                  - transaction 1 demands `J1`
+                  - transaction 2 demands `J1`
+                  - transaction 3 with `system_contract::updateprod` action changes jurisdictions to `J2`
+                  - transaction 4 demands `J2`
+
+               Historically block `B` will have only jurisdiction `J2`,
+               but there are transactions `1` and `2` in that block, that collide with this jurisdiction.
+               There is inconsistency, so the best solution is moving `system_contract::updateprod` transaction to next block.
+         */
+         transaction_validator::validate_result validation_result = trx_validator.validate_transaction( trx->get_transaction(), jurisdiction_launcher.get_active_producer() );
+
+         auto match_result = jurisdiction_checker.transaction_jurisdictions_match( chain.db(), jurisdiction_launcher.get_active_producer(), trx->get_transaction(), &id );
+
+         if( !match_result.first || !validation_result.first )
          {
             _pending_incoming_transactions.emplace_back(trx, persist_until_expired, next);
             jurisdiction_checker.remember_transaction( id );
             if( !match_result.second )
-            {
-               warning_is_generated = true;
                send_response( std::make_shared<warning_plugin>( incorrect_location_in_transaction, id.str() ) );
-            }
             return;
          }
          jurisdiction_checker.forget_transaction( id );
@@ -475,37 +491,8 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
          }
 
          try {
-
             auto trx_metadata = std::make_shared<transaction_metadata>( *trx );
-
-            transaction_validator::validate_result validation_result = trx_validator.validate_transaction( trx->get_transaction(), jurisdiction_launcher.get_active_producer() );
             trx_metadata->contains_jurisdiction_change = validation_result.second;
-            /*
-               Explanation
-                  Change of jurisdiction in given transaction impacts on permission of execution for other transactions in given block.
-                  Earlier transactions in block can collide with the newest jurisdiction.
-
-               Example:
-                  There is jurisdiction `J1` before block `B`
-
-                  Block B has transactions as below:
-                     - transaction 1 demands `J1`
-                     - transaction 2 demands `J1`
-                     - transaction 3 with `system_contract::updateprod` action changes jurisdictions to `J2`
-                     - transaction 4 demands `J2`
-
-                  Historically block `B` will have only jurisdiction `J2`,
-                  but there are transactions `1` and `2` in that block, that collide with this jurisdiction.
-                  There is inconsistency, so the best solution is moving `system_contract::updateprod` transaction to next block.
-            */
-            if( !validation_result.first )
-            {
-               if( !warning_is_generated )
-                  send_response( std::make_shared<warning_plugin>( incorrect_location_in_transaction, id.str() ) );
-               chain.insert_unapplied_transaction( trx_metadata );
-               return;
-            }
-
             auto trace = chain.push_transaction(trx_metadata, deadline);
             if (trace->except) {
                if (failure_is_subjective(*trace->except, deadline_is_subjective)) {

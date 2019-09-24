@@ -68,14 +68,8 @@ if __name__ == "__main__":
 			log.info(resSTR)
 		
 		api_rpc_caller = cluster.bios.get_url_caller()
-		log.info("Wait for producer other than `{}`".format(ref_producers[0]))
-		cluster.bios.wait_for_last_irreversible_block()
 
-		# we will wait till active producer will be not aaaaaaaaaaaa
-		ret = api_rpc_caller.chain.get_info()
-		while ret["head_block_producer"] == ref_producers[0]:
-			time.sleep(0.5)
-			ret = api_rpc_caller.chain.get_info()
+		cluster.bios.wait_for_another_producer( ref_producers[0] )
 
 		jur_idx = len(jurisdictions_tests) + 1
 		#updateprod burst loop
@@ -101,52 +95,24 @@ if __name__ == "__main__":
 			summary.equal(0, resINT)
 			if resINT:
 				log.info(resSTR)
-			
 
-		#Exception may appear if it's impossible to connect to nodeos
-		counter = 0
-		same_blocks = 12
+		nr_cycles_for_every_producer = 2
+		cycle_length = 12
+		nr_blocks = len(cluster.producers) * cycle_length * nr_cycles_for_every_producer
 		try:
-			last_block = int(api_rpc_caller.chain.get_info()["head_block_num"])
-			log.info("Checking is blockchain still on go [60 seconds]")
-			for _ in range(2 * 12 * len(cluster.producers)):
+			log.info("Wait for {} blocks".format( nr_blocks ))
+			for _ in range( nr_blocks ):
+				print( "block nr: {}".format( api_rpc_caller.chain.get_info()["head_block_num"] ) )
 				time.sleep(0.5)
-				act_block = int(api_rpc_caller.chain.get_info()["head_block_num"])
-				if act_block != last_block:
-					counter = 0
-					log.info("Still on go: {} block".format(act_block))
-				else:
-					counter += 1
-					log.info("Oooops! counter: {}".format(counter))
-					if counter >= same_blocks:
-						summary.equal("ONLINE", "OFFLINE") #implementation from 16.09.2019
-						#summary.equal("OFFLINE", "OFFLINE")
-						break
-				last_block = act_block
-		except Exception as e:
-			summary.equal("ONLINE", "OFFLINE") #implementation from 16.09.2019
-			#summary.equal("OFFLINE", "OFFLINE")
-
-		if counter < same_blocks:
-			summary.equal("ONLINE", "ONLINE") #implementation from 16.09.2019
-			#summary.equal("OFFLINE", "ONLINE")
-
-		if counter >= same_blocks:
-			assert "ONLINE" == "OFFLINE"
-		else:
-			cluster.bios.wait_for_last_irreversible_block()
+		except Exception as _ex:
+			log.exception(_ex)
+			summary.equal(False, True, "Exception occured durring testing.")
 
 		log.info(resSTR)
 		resINT, resSTR = cluster.bios.make_cleos_call(["get", "transaction", "{}".format(json.loads(resSTR)["trx_id"])])
-		
-		summary.equal(True, resINT != 0)
 
-		if resINT:
-			log.info("Exit code: {}".format(resINT))
-			log.info("Return String: {}".format(resSTR))
-		
-		#3040011 - error code that appears on not found transaction
-		summary.equal(True, resSTR.find("3040011") != -1)
+		log.info(resSTR)
+		summary.equal(0, resINT)
 
 	except Exception as _ex:
 		log.exception(_ex)

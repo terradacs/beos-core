@@ -346,6 +346,17 @@ class BEOSNode(object):
             last_irreversible_block_num = int(self.utils.get_info()["last_irreversible_block_num"])
         log.info("Proceed.")
 
+    def wait_for_another_producer( self, producer : str ):
+      prod_check = 0
+      log.info("Wait for producer other than `{}`".format(producer))
+      while True:
+        ret =  self.utils.get_info()
+        log.info( ret["head_block_producer"] )
+        if ret["head_block_producer"] != producer and prod_check > 0:
+          break
+        if ret["head_block_producer"] == producer:
+          prod_check += 1
+        time.sleep(0.5)
 
     def make_cleos_call(self, _params, _wait_for_transaction = False):
         try:
