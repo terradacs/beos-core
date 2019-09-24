@@ -1226,11 +1226,11 @@ struct controller_impl {
          start_block( b->timestamp, b->confirmed, s , producer_block_id);
 
          transaction_trace_ptr trace;
-         jurisdiction_manager jurisdiction_checker;
+         jurisdiction_manager jurisdiction_mgr;
 
          auto checker_trx_in_block = [&]( bool is_delayed_transaction, const transaction& trx )
             {
-               auto match_result = jurisdiction_checker.transaction_jurisdictions_match( db, b->producer, trx );
+               auto match_result = jurisdiction_mgr.transaction_jurisdictions_match( db, b->producer, trx );
                if( is_delayed_transaction )
                   EOS_ASSERT( match_result.first == true, block_validate_exception, "producer has incorrect jurisdictions in delayed transaction" );
                else

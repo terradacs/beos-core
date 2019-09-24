@@ -170,19 +170,9 @@ bool jurisdiction_action_launcher::check_jurisdictions( const chainbase::databas
    return res && check1 && check2;
 }
 
-/*=============================jurisdiction_manager=============================*/
+/*=============================jurisdiction_base=============================*/
 
-const uint16_t jurisdiction_manager::limit_256 = 256;
-const char* jurisdiction_manager::too_many_jurisdictions_exception = "Too many jurisdictions given, max value is 255.";
-const int jurisdiction_manager::transaction_with_jurisdiction_timeout = 200;
-const int jurisdiction_manager::artificial_transaction_timeout = 30;
-
-bool jurisdiction_manager::check_jurisdictions( const chainbase::database &db, const jurisdiction_producer_ordered& src )
-{
-   return jurisdiction_action_launcher::check_jurisdictions( db, src );
-}
-
-uint16_t jurisdiction_manager::read( uint16_t idx, const std::vector< char>& buffer, std::vector< jurisdiction_basic >& dst )
+uint16_t jurisdiction_base::read( uint16_t idx, const std::vector< char>& buffer, std::vector< jurisdiction_basic >& dst )
 {
    eosio::chain::trx_extensions ext;
    ext.set_which( idx );
@@ -195,7 +185,7 @@ uint16_t jurisdiction_manager::read( uint16_t idx, const std::vector< char>& buf
    return visitor.jurisdiction.jurisdictions.size();
 }
 
-jurisdiction_manager::jurisdictions jurisdiction_manager::read( const extensions_type& exts )
+jurisdiction_base::jurisdictions jurisdiction_base::read( const extensions_type& exts )
 {
    std::vector< jurisdiction_basic > res;
 
@@ -208,6 +198,193 @@ jurisdiction_manager::jurisdictions jurisdiction_manager::read( const extensions
    }
 
    return res;
+}
+
+const uint16_t jurisdiction_base::limit_256 = 256;
+const char* jurisdiction_base::too_many_jurisdictions_exception = "Too many jurisdictions given, max value is 255.";
+const int jurisdiction_base::transaction_with_jurisdiction_timeout = 200;
+const int jurisdiction_base::artificial_transaction_timeout = 30;
+
+/*=============================transaction_validator=============================*/
+
+bool transaction_validator::check_action( const action& _action, account_name actual_producer, bool& exists )
+{
+   exists = _action.account == config::system_account_name && _action.name == N(updateprod);
+
+   if( !exists )
+      return false;
+
+   jurisdiction_producer updater;
+
+   fc::datastream<const char*> ds( _action.data.data(), _action.data.size() );
+   fc::raw::unpack(ds, updater );
+
+   return updater.producer == actual_producer;
+}
+
+void transaction_validator::clear( jurisdiction_producer_ordered& src )
+{
+   src.producer = account_name();
+   src.jurisdictions.clear();
+}
+
+void transaction_validator::restore_old_values( bool new_codes_appeared, bool current_make_validation )
+{
+   if( current_make_validation )
+      new_codes = old_codes;
+
+   if( new_codes_appeared )
+   {
+      assert( !items.empty() );
+      items.pop_back();
+   }
+}
+
+bool transaction_validator::add( const transaction& trx )
+{
+   auto exts = trx.transaction_extensions;
+   bool res = !exts.empty();
+
+   if( res )
+      items.push_back( read( exts ) );
+
+   return res;
+}
+
+void transaction_validator::add( const action& _action )
+{
+   jurisdiction_producer updater;
+
+   fc::datastream<const char*> ds( _action.data.data(), _action.data.size() );
+   fc::raw::unpack(ds, updater );
+
+   old_codes = new_codes;
+   new_codes = jurisdiction_producer_ordered( updater );
+}
+
+bool transaction_validator::validate_trx( const jurisdictions& trx, const jurisdiction_producer_ordered& src )
+{
+   for( auto& item_trx_jurisdiction : trx )
+   {
+      for( auto& item : item_trx_jurisdiction.jurisdictions )
+      {
+         auto found = src.jurisdictions.find( item );
+         if( found != src.jurisdictions.end() )
+            return true;
+      }
+   }
+
+   return false;
+}
+
+bool transaction_validator::validate( bool new_codes_appeared, bool current_make_validation )
+{
+   //there isn't any transaction with jurisdiction at all
+   if( items.empty() )
+      return true;
+
+   //Actual transaction is with `updateprod` action
+   if( current_make_validation )
+   {
+      //there wasn't any transaction with jurisdiction before actual transaction
+      if( items.size() == 1 && new_codes_appeared )
+         return true;
+
+      size_t cnt = 0;
+      size_t idx_end = items.size() - 1;
+
+      for( auto& item : items )
+      {
+         if( cnt == idx_end && new_codes_appeared )
+         {
+            if( !validate_trx( item, old_codes ) )
+               return false;
+         }
+         else
+         {
+            if( !validate_trx( item, new_codes ) )
+               return false;
+         }
+         ++cnt;
+      }
+   }
+   else//Regular transaction
+   {
+      if( new_codes_appeared )
+      {
+         const auto& item = items.rbegin();
+         bool ret = validate_trx( *item, new_codes );
+
+         return ret;
+      }
+   }
+
+   return true;
+}
+
+transaction_validator::validate_result transaction_validator::validate_transaction( const transaction& trx, account_name actual_producer )
+{
+   try
+   {
+      validate_result result( true, false );
+      bool current_make_validation = false;
+
+      //Even transaction with `system_contract::updateprod` action should be checked
+      bool new_codes_appeared = add( trx );
+
+      for( auto action : trx.actions )
+      {
+         if( check_action( action, actual_producer, result.second ) )
+         {
+            current_make_validation = true;
+            add( action );
+         }
+      }
+
+      if( current_make_validation )
+         make_validation = true;
+
+      if( make_validation )
+      {
+         result.first = validate( new_codes_appeared, current_make_validation );
+
+         if( !result.first )
+            restore_old_values( new_codes_appeared, current_make_validation );
+      }
+
+      return result;
+   }
+   catch( fc::exception& e )
+   {
+      elog( "Exception Details: ${e}", ( "e", e.to_detail_string() ) );
+   }
+   catch( std::exception& e )
+   {
+      elog( "Exception Details: ${e}", ( "e", e.what() ) );
+   }
+   catch( ... )
+   {
+      elog( "Unknown exception during validation of transaction" );
+   }
+
+   return validate_result( true, false );
+}
+
+void transaction_validator::clear()
+{
+   make_validation = false;
+
+   clear( new_codes );
+   clear( old_codes );
+
+   items.clear();
+}
+
+/*=============================jurisdiction_manager=============================*/
+
+bool jurisdiction_manager::check_jurisdictions( const chainbase::database &db, const jurisdiction_producer_ordered& src )
+{
+   return jurisdiction_action_launcher::check_jurisdictions( db, src );
 }
 
 fc::variant jurisdiction_manager::get_jurisdiction( const chainbase::database& db, code_jurisdiction code )
@@ -431,179 +608,9 @@ std::string jurisdiction_manager::get_jurisdictions( const signed_transaction& t
    return "";
 }
 
-/*=============================transaction_validator=============================*/
-
-bool transaction_validator::check_action( const action& _action, account_name actual_producer, bool& exists )
+transaction_validator& jurisdiction_manager::get_validator()
 {
-   exists = _action.account == config::system_account_name && _action.name == N(updateprod);
-
-   if( !exists )
-      return false;
-
-   jurisdiction_producer updater;
-
-   fc::datastream<const char*> ds( _action.data.data(), _action.data.size() );
-   fc::raw::unpack(ds, updater );
-
-   return updater.producer == actual_producer;
-}
-
-void transaction_validator::clear( jurisdiction_producer_ordered& src )
-{
-   src.producer = account_name();
-   src.jurisdictions.clear();
-}
-
-void transaction_validator::restore_old_values( bool new_codes_appeared, bool current_make_validation )
-{
-   if( current_make_validation )
-      new_codes = old_codes;
-
-   if( new_codes_appeared )
-   {
-      assert( !items.empty() );
-      items.pop_back();
-   }
-}
-
-bool transaction_validator::add( const transaction& trx )
-{
-   auto exts = trx.transaction_extensions;
-   bool res = !exts.empty();
-
-   if( res )
-      items.push_back( jurisdiction_manager::read( exts ) );
-
-   return res;
-}
-
-void transaction_validator::add( const action& _action )
-{
-   jurisdiction_producer updater;
-
-   fc::datastream<const char*> ds( _action.data.data(), _action.data.size() );
-   fc::raw::unpack(ds, updater );
-
-   old_codes = new_codes;
-   new_codes = jurisdiction_producer_ordered( updater );
-}
-
-bool transaction_validator::validate_trx( const trx_jurisdictions& trx, const jurisdiction_producer_ordered& src )
-{
-   for( auto& item_trx_jurisdiction : trx )
-   {
-      for( auto& item : item_trx_jurisdiction.jurisdictions )
-      {
-         auto found = src.jurisdictions.find( item );
-         if( found != src.jurisdictions.end() )
-            return true;
-      }
-   }
-
-   return false;
-}
-
-bool transaction_validator::validate( bool new_codes_appeared, bool current_make_validation )
-{
-   //there isn't any transaction with jurisdiction at all
-   if( items.empty() )
-      return true;
-
-   //Actual transaction is with `updateprod` action
-   if( current_make_validation )
-   {
-      //there wasn't any transaction with jurisdiction before actual transaction
-      if( items.size() == 1 && new_codes_appeared )
-         return true;
-
-      size_t cnt = 0;
-      size_t idx_end = items.size() - 1;
-
-      for( auto& item : items )
-      {
-         if( cnt == idx_end && new_codes_appeared )
-         {
-            if( !validate_trx( item, old_codes ) )
-               return false;
-         }
-         else
-         {
-            if( !validate_trx( item, new_codes ) )
-               return false;
-         }
-         ++cnt;
-      }
-   }
-   else//Regular transaction
-   {
-      if( new_codes_appeared )
-      {
-         const auto& item = items.rbegin();
-         bool ret = validate_trx( *item, new_codes );
-
-         return ret;
-      }
-   }
-
-   return true;
-}
-
-transaction_validator::validate_result transaction_validator::validate_transaction( const transaction& trx, account_name actual_producer )
-{
-   try
-   {
-      validate_result result( true, false );
-      bool current_make_validation = false;
-
-      //Even transaction with `system_contract::updateprod` action should be checked
-      bool new_codes_appeared = add( trx );
-
-      for( auto action : trx.actions )
-      {
-         if( check_action( action, actual_producer, result.second ) )
-         {
-            current_make_validation = true;
-            add( action );
-         }
-      }
-
-      if( current_make_validation )
-         make_validation = true;
-
-      if( make_validation )
-      {
-         result.first = validate( new_codes_appeared, current_make_validation );
-
-         if( !result.first )
-            restore_old_values( new_codes_appeared, current_make_validation );
-      }
-
-      return result;
-   }
-   catch( fc::exception& e )
-   {
-      elog( "Exception Details: ${e}", ( "e", e.to_detail_string() ) );
-   }
-   catch( std::exception& e )
-   {
-      elog( "Exception Details: ${e}", ( "e", e.what() ) );
-   }
-   catch( ... )
-   {
-      elog( "Unknown exception during validation of transaction" );
-   }
-
-   return validate_result( true, false );
-}
-
-void transaction_validator::clear()
-{
-   make_validation = false;
-
-   clear( new_codes );
-   clear( old_codes );
-
-   items.clear();
+   return validator;
 }
 
 /*=============================transaction_comparator=============================*/

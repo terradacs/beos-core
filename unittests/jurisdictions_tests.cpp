@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_SUITE(jurisdiction_tests)
 
    For every block is assumption, that given producer has all possible jurisdictions at the start,
    otherwise is impossible to execute `transaction_validator::validate_transaction`( here `validate_trx` ),
-   because this call is blocked by `jurisdiction_checker.transaction_jurisdictions_match` in producer plugin.
+   because this call is blocked by `jurisdiction_mgr.transaction_jurisdictions_match` in producer plugin.
 
    Every section is treated as next block.
 */

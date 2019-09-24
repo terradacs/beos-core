@@ -190,8 +190,7 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
       bfs::path _snapshots_dir;
 
       jurisdiction_action_launcher  jurisdiction_launcher;
-      jurisdiction_manager          jurisdiction_checker;
-      transaction_validator         trx_validator;
+      jurisdiction_manager          jurisdiction_mgr;
 
       void on_block( const block_state_ptr& bsp ) {
          if( bsp->header.timestamp <= _last_signed_block_time ) return;
@@ -360,7 +359,7 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
          chain::controller& chain = app().get_plugin<chain_plugin>().chain();
 
          chain.abort_block();
-         trx_validator.clear();
+         jurisdiction_mgr.get_validator().clear();
       }
 
       void push_custom_jurisdiction_transaction()
@@ -433,20 +432,20 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
 
          auto id = trx->id();
          if( fc::time_point(trx->expiration()) < block_time ) {
-            jurisdiction_checker.forget_transaction( id );
+            jurisdiction_mgr.forget_transaction( id );
             send_response(std::static_pointer_cast<fc::exception>(std::make_shared<expired_tx_exception>(FC_LOG_MESSAGE(error, "expired transaction ${id}", ("id", id)) )));
             return;
          }
 
          if( chain.is_known_unexpired_transaction(id) ) {
-            jurisdiction_checker.forget_transaction( id );
+            jurisdiction_mgr.forget_transaction( id );
             send_response(std::static_pointer_cast<fc::exception>(std::make_shared<tx_duplicate>(FC_LOG_MESSAGE(error, "duplicate transaction ${id}", ("id", id)) )));
             return;
          }
 
-         if (!jurisdiction_checker.check_trx_jurisdictions_exists(chain.db(), *trx))
+         if (!jurisdiction_mgr.check_trx_jurisdictions_exists(chain.db(), *trx))
          {
-            jurisdiction_checker.forget_transaction( id );
+            jurisdiction_mgr.forget_transaction( id );
             send_response(std::static_pointer_cast<fc::exception>(std::make_shared<jurisdiction_not_exists_for_tx>(FC_LOG_MESSAGE(error, "jurisdiction does not exists for transaction ${id}", ("id", id)) )));
             return;
          }
@@ -469,19 +468,19 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
                but there are transactions `1` and `2` in that block, that collide with this jurisdiction.
                There is inconsistency, so the best solution is moving `system_contract::updateprod` transaction to next block.
          */
-         transaction_validator::validate_result validation_result = trx_validator.validate_transaction( trx->get_transaction(), jurisdiction_launcher.get_active_producer() );
+         transaction_validator::validate_result validation_result = jurisdiction_mgr.get_validator().validate_transaction( trx->get_transaction(), jurisdiction_launcher.get_active_producer() );
 
-         auto match_result = jurisdiction_checker.transaction_jurisdictions_match( chain.db(), jurisdiction_launcher.get_active_producer(), trx->get_transaction(), &id );
+         auto match_result = jurisdiction_mgr.transaction_jurisdictions_match( chain.db(), jurisdiction_launcher.get_active_producer(), trx->get_transaction(), &id );
 
          if( !match_result.first || !validation_result.first )
          {
             _pending_incoming_transactions.emplace_back(trx, persist_until_expired, next);
-            jurisdiction_checker.remember_transaction( id );
+            jurisdiction_mgr.remember_transaction( id );
             if( !match_result.second )
                send_response( std::make_shared<warning_plugin>( incorrect_location_in_transaction, id.str() ) );
             return;
          }
-         jurisdiction_checker.forget_transaction( id );
+         jurisdiction_mgr.forget_transaction( id );
 
          auto deadline = fc::time_point::now() + fc::milliseconds(_max_transaction_time_ms);
          bool deadline_is_subjective = false;
@@ -1340,14 +1339,14 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
 
                   try {
 
-                     transaction_validator::validate_result validation_result = trx_validator.validate_transaction( trx->trx, jurisdiction_launcher.get_active_producer() );
+                     transaction_validator::validate_result validation_result = jurisdiction_mgr.get_validator().validate_transaction( trx->trx, jurisdiction_launcher.get_active_producer() );
                      if( !validation_result.first )
                      {
                         ++num_non_validated;
                         continue;
                      }
 
-                     auto match_result = jurisdiction_checker.transaction_jurisdictions_match( chain.db(), jurisdiction_launcher.get_active_producer(), trx->trx );
+                     auto match_result = jurisdiction_mgr.transaction_jurisdictions_match( chain.db(), jurisdiction_launcher.get_active_producer(), trx->trx );
                      if( !match_result.first )
                      {
                         ++num_non_matched;
@@ -1416,12 +1415,12 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block(bool 
 
                auto checker_delayed_trx_in_block_during_production = [&]( const transaction& trx )
                {
-                  transaction_validator::validate_result delayed_validation_result = trx_validator.validate_transaction( trx, jurisdiction_launcher.get_active_producer() );
+                  transaction_validator::validate_result delayed_validation_result = jurisdiction_mgr.get_validator().validate_transaction( trx, jurisdiction_launcher.get_active_producer() );
 
                   if( !delayed_validation_result.first )
                      return false;
 
-                  auto match_result = jurisdiction_checker.transaction_jurisdictions_match( chain.db(), jurisdiction_launcher.get_active_producer(), trx );
+                  auto match_result = jurisdiction_mgr.transaction_jurisdictions_match( chain.db(), jurisdiction_launcher.get_active_producer(), trx );
 
                   if( !match_result.first )
                      return false;
@@ -1695,7 +1694,7 @@ void producer_plugin_impl::produce_block() {
    auto hbt = chain.head_block_time();
    //idump((fc::time_point::now() - hbt));
 
-   trx_validator.clear();
+   jurisdiction_mgr.get_validator().clear();
 
    block_state_ptr new_bs = chain.head_block_state();
    _producer_watermarks[new_bs->header.producer] = chain.head_block_num();

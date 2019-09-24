@@ -119,7 +119,59 @@ class jurisdiction_action_launcher
       static bool check_jurisdictions( const chainbase::database &db, const jurisdiction_producer_ordered& src );
 };
 
-class jurisdiction_manager
+class jurisdiction_base
+{
+   public:
+
+      using jurisdictions = std::vector< jurisdiction_basic >;
+
+      static const uint16_t limit_256;
+      static const char* too_many_jurisdictions_exception;
+
+      static const int transaction_with_jurisdiction_timeout;
+      static const int artificial_transaction_timeout;
+
+   private:
+
+      uint16_t read( uint16_t idx, const std::vector< char >& buffer, std::vector< jurisdiction_basic >& dst );
+
+   public:
+
+      jurisdictions read( const extensions_type& exts );
+};
+
+class transaction_validator: public jurisdiction_base
+{
+   public:
+
+      using validate_result = std::pair< bool/*is correct validation*/, bool/*is jurisdiction changed*/ >;
+
+   private:
+
+      bool make_validation = false;
+
+      jurisdiction_producer_ordered old_codes;
+      jurisdiction_producer_ordered new_codes;
+
+      std::list< jurisdictions > items;
+
+      bool check_action( const action& _action, account_name actual_producer, bool& exists );
+      void clear( jurisdiction_producer_ordered& src );
+      void restore_old_values( bool new_codes_appeared, bool current_make_validation );
+
+      void add( const action& _action );
+      bool add( const transaction& trx );
+
+      bool validate_trx( const jurisdictions& trx, const jurisdiction_producer_ordered& src );
+      bool validate( bool new_codes_appeared, bool current_make_validation );
+
+   public:
+
+      validate_result validate_transaction( const transaction& trx, account_name actual_producer );
+      void clear();
+};
+
+class jurisdiction_manager: public jurisdiction_base
 {
    private:
 
@@ -128,30 +180,18 @@ class jurisdiction_manager
 
       std::set< transaction_id_type > processed_transactions;
 
+      transaction_validator validator;
+
    public:
-   
-      static const uint16_t limit_256;
-      static const char* too_many_jurisdictions_exception;
-
-      static const int transaction_with_jurisdiction_timeout;
-      static const int artificial_transaction_timeout;
-
-      using jurisdictions = std::vector< jurisdiction_basic >;
 
       using jurisdiction_dictionary_processor = jurisdiction_processor< jurisdiction_dictionary_object >;
       using jurisdiction_producer_processor = jurisdiction_processor< jurisdiction_producer_object >;
 
       using match_result_type = std::pair< bool/*match result*/, bool/*was_already*/ >;
 
-   private:
-
-      static uint16_t read( uint16_t idx, const std::vector< char >& buffer, std::vector< jurisdiction_basic >& dst );
-
    public:
 
       bool check_jurisdictions( const chainbase::database &db, const jurisdiction_producer_ordered& src );
-
-      static jurisdictions read( const extensions_type& exts );
 
       fc::variant get_jurisdiction( const chainbase::database& db, code_jurisdiction code );
 
@@ -167,39 +207,8 @@ class jurisdiction_manager
 
       bool check_trx_jurisdictions_exists(const chainbase::database& db, const packed_transaction& trx);
       std::string get_jurisdictions( const signed_transaction& trx );
-};
 
-class transaction_validator
-{
-   public:
-
-      using validate_result = std::pair< bool/*is correct validation*/, bool/*is jurisdiction changed*/ >;
-
-   private:
-
-      using trx_jurisdictions = jurisdiction_manager::jurisdictions;
-
-      bool make_validation = false;
-
-      jurisdiction_producer_ordered old_codes;
-      jurisdiction_producer_ordered new_codes;
-
-      std::list< trx_jurisdictions > items;
-
-      bool check_action( const action& _action, account_name actual_producer, bool& exists );
-      void clear( jurisdiction_producer_ordered& src );
-      void restore_old_values( bool new_codes_appeared, bool current_make_validation );
-
-      void add( const action& _action );
-      bool add( const transaction& trx );
-
-      bool validate_trx( const trx_jurisdictions& trx, const jurisdiction_producer_ordered& src );
-      bool validate( bool new_codes_appeared, bool current_make_validation );
-
-   public:
-
-      validate_result validate_transaction( const transaction& trx, account_name actual_producer );
-      void clear();
+      transaction_validator& get_validator();
 };
 
 struct transaction_comparator
