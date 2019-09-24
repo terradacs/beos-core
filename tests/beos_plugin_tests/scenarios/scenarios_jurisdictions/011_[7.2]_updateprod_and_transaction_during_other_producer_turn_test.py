@@ -30,7 +30,7 @@ if __name__ == "__main__":
 		#Minimum is: (amount of nodes) * (amount of producers per node) + 1
 		jurisdictions_tests = [
 			["1", "GERMANY", "EAST EUROPE"],
-			# ["2", "RUSSIA", "EAST EUROPE"],
+			["2", "RUSSIA", "EAST EUROPE"],
 			# ["3", "CZECH REPUBLIC", "EAST EUROPE"],
 			["2", "POLAND", "EAST EUROPE"]
 		]
@@ -72,6 +72,7 @@ if __name__ == "__main__":
 		cluster.bios.wait_for_another_producer( ref_producers[0] )
 
 		jur_idx = len(jurisdictions_tests) + 1
+		results = []
 		#updateprod burst loop
 		for jur in jurisdictions_tests:
 			log.info("Change producer `{}` jurisdiction for existing one ie: `{}`".format(ref_producers[0], jur))
@@ -92,6 +93,7 @@ if __name__ == "__main__":
 			 "-u", "[{}]".format(jur_idx), "eosio.token",
 			"transfer", '["{}", "eosio.null", "1000.0000 BTS", "ice-creams" ]'.format(ref_producers[0]),
 			"-p", "{}".format(ref_producers[0]), "-j"])
+			results.append(resSTR)
 			summary.equal(0, resINT)
 			if resINT:
 				log.info(resSTR)
@@ -108,11 +110,11 @@ if __name__ == "__main__":
 			log.exception(_ex)
 			summary.equal(False, True, "Exception occured durring testing.")
 
-		log.info(resSTR)
-		resINT, resSTR = cluster.bios.make_cleos_call(["get", "transaction", "{}".format(json.loads(resSTR)["trx_id"])])
-
-		log.info(resSTR)
-		summary.equal(0, resINT)
+		for res in results:
+			log.info(res)
+			resINT, resSTR = cluster.bios.make_cleos_call(["get", "transaction", "{}".format(json.loads(res)["trx_id"])])
+			log.info(resSTR)
+			summary.equal(0, resINT)
 
 	except Exception as _ex:
 		log.exception(_ex)
