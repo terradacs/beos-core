@@ -162,7 +162,7 @@ class jurisdiction_manager
       void remember_transaction( const transaction_id_type& trx_id );
       void forget_transaction( const transaction_id_type& trx_id );
 
-      void process_jurisdiction_dictionary( const chainbase::database& db, jurisdiction_dictionary_processor processor ) const;
+      void process_jurisdiction_dictionary( const chainbase::database& db, const std::string& lowerBound, const std::string& upperBound, jurisdiction_dictionary_processor processor ) const;
       void process_jurisdiction_producer( const chainbase::database& db, const account_name& lowerBound, const account_name& upperBound, jurisdiction_producer_processor processor ) const;
 
       bool check_trx_jurisdictions_exists(const chainbase::database& db, const packed_transaction& trx);

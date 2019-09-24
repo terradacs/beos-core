@@ -1843,10 +1843,7 @@ read_only::get_table_rows_result read_only::get_any_table_rows(const get_table_r
                      return true;
                   };
 
-   auto lb = convert_to_type<uint64_t>(p.lower_bound, "lower_bound");
-   auto ub = convert_to_type<uint64_t>(p.upper_bound, "upper_bound");
-
-   manager_method( account_name(lb), account_name(ub), iteration_processor );
+   manager_method( iteration_processor );
 
    return result;
 }
@@ -1857,9 +1854,9 @@ read_only::get_table_rows_result read_only::get_jurisdiction_dictionary_table_ro
 
    jurisdiction_manager helper;
 
-   auto manager_method = [&]( const account_name& lowerBound, const account_name& upperBound, iteration_processor_type< const _object_type& > iteration_processor )
+   auto manager_method = [&]( iteration_processor_type< const _object_type& > iteration_processor )
    {
-      helper.process_jurisdiction_dictionary( db.db(), iteration_processor );
+      helper.process_jurisdiction_dictionary( db.db(), p.lower_bound, p.upper_bound, iteration_processor );
    };
    auto emplace_method =[]( const _object_type& obj )
    {
@@ -1875,9 +1872,12 @@ read_only::get_table_rows_result read_only::get_jurisdiction_producer_table_rows
 
    jurisdiction_manager helper;
 
-   auto manager_method = [&]( const account_name& lowerBound, const account_name& upperBound, iteration_processor_type< const _object_type& > iteration_processor )
+   auto manager_method = [&]( iteration_processor_type< const _object_type& > iteration_processor )
    {
-      helper.process_jurisdiction_producer( db.db(), lowerBound, upperBound, iteration_processor );
+      auto lb = convert_to_type<uint64_t>(p.lower_bound, "lower_bound");
+      auto ub = convert_to_type<uint64_t>(p.upper_bound, "upper_bound");
+
+      helper.process_jurisdiction_producer( db.db(), account_name(lb), account_name(ub), iteration_processor );
    };
    auto emplace_method =[]( const _object_type& obj )
    {
@@ -1892,9 +1892,12 @@ read_only::get_table_rows_result read_only::get_voters_table_rows(const get_tabl
    using _object_type = voter_info_object;
 
    const auto& vm = db.get_voting_manager();
-   auto manager_method = [&]( const account_name& lowerBound, const account_name& upperBound, iteration_processor_type< const _object_type& > iteration_processor )
+   auto manager_method = [&]( iteration_processor_type< const _object_type& > iteration_processor )
    {
-      vm.process_voters( lowerBound, upperBound, iteration_processor );
+      auto lb = convert_to_type<uint64_t>(p.lower_bound, "lower_bound");
+      auto ub = convert_to_type<uint64_t>(p.upper_bound, "upper_bound");
+
+      vm.process_voters( account_name(lb), account_name(ub), iteration_processor );
    };
    auto emplace_method =[]( const _object_type& obj )
    {
@@ -1909,9 +1912,12 @@ read_only::get_table_rows_result read_only::get_userres_table_rows(const get_tab
    using _object_type = mutable_variant_object;
 
    const resource_limits_manager& resource_limit_mgr = db.get_resource_limits_manager();
-   auto manager_method = [&]( const account_name& lowerBound, const account_name& upperBound, iteration_processor_type< _object_type&& > iteration_processor )
+   auto manager_method = [&]( iteration_processor_type< _object_type&& > iteration_processor )
    {
-      resource_limit_mgr.process_public_userres( lowerBound, upperBound, iteration_processor );
+      auto lb = convert_to_type<uint64_t>(p.lower_bound, "lower_bound");
+      auto ub = convert_to_type<uint64_t>(p.upper_bound, "upper_bound");
+
+      resource_limit_mgr.process_public_userres( account_name(lb), account_name(ub), iteration_processor );
    };
    auto emplace_method =[]( _object_type&& obj )
    {

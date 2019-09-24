@@ -332,12 +332,12 @@ void jurisdiction_manager::forget_transaction( const transaction_id_type& trx_id
    processed_transactions.erase( trx_id );
 }
 
-void jurisdiction_manager::process_jurisdiction_dictionary( const chainbase::database& db, jurisdiction_dictionary_processor processor ) const
+void jurisdiction_manager::process_jurisdiction_dictionary( const chainbase::database& db, const std::string& lowerBound, const std::string& upperBound, jurisdiction_dictionary_processor processor ) const
 {
-   const auto& idx = db.get_index< jurisdiction_dictionary_index, by_id >();
+   const auto& idx = db.get_index< jurisdiction_dictionary_index, by_name_jurisdiction_dictionary >();
 
-   auto lbI = idx.begin();
-   auto ubI = idx.end();
+   auto lbI = lowerBound.empty() ? idx.begin() : idx.lower_bound( lowerBound );
+   auto ubI = upperBound.empty() ? idx.end() : idx.lower_bound( upperBound );
 
    bool canContinue = true;
    for(; canContinue && lbI != ubI; ++lbI)
