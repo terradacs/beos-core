@@ -123,8 +123,6 @@ if __name__ == "__main__":
         summary.equal(True, str(resSTR).find("bad lexical cast") != -1, "there should be error")
         summary.equal(True, resINT != 0, "this querry should crash")
 
-        input()
-
     except Exception as _ex:
         log.exception("Exception `{0}` occures while executing `{1}` tests.".format(str(_ex), __file__))
         summary.equal(False, True, "Exception occured durring testing.")
