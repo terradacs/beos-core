@@ -378,9 +378,9 @@ class eosio_interchain_tester : public actions
   {
     test_gateway_global_state tgs;
 
-    tgs.proxy_assets.emplace_back( asset( 0, symbol(SY(6, PROXY)) ), "bts" );
+    tgs.proxy_assets.emplace_back( asset( 0, symbol(SY(4, PROXY)) ), "bts" );
     tgs.proxy_assets.emplace_back( asset( 0, symbol(SY(6, BROWNIE)) ), "brownie.pts" );
-    tgs.proxy_assets.emplace_back( asset( 0, symbol(SY(6, PXEOS)) ), "eos" );
+    tgs.proxy_assets.emplace_back( asset( 0, symbol(SY(5, PXEOS)) ), "eos" );
 
     variants v;
     v.emplace_back( std::move( tgs.proxy_assets ) );

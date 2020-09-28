@@ -20,10 +20,8 @@ std::string gateway::get_description( const asset& proxy_asset )
 
    auto found = std::find_if( _gstate.proxy_assets.begin(), _gstate.proxy_assets.end(), cmp );
 
-   if( found == _gstate.proxy_assets.end() )
-      return "";
-   else
-      return found->description;
+   eosio_assert( found != _gstate.proxy_assets.end(), "this asset is not allowed to withdraw" );
+   return found->description;
 }
 
 void gateway::issue( account_name to, asset quantity, std::string memo)
